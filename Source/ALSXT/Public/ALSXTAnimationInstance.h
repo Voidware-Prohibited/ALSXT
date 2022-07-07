@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AlsAnimationInstance.h"
+#include "Utility/ALSXTGameplayTags.h"
 #include "ALSXTAnimationInstance.generated.h"
 
 /**

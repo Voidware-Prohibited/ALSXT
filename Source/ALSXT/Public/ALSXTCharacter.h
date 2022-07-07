@@ -1,6 +1,8 @@
 #pragma once
 
 #include "AlsCharacter.h"
+
+#include "Utility/ALSXTGameplayTags.h"
 #include "ALSXTCharacter.generated.h"
 
 class UAlsCameraComponent;
