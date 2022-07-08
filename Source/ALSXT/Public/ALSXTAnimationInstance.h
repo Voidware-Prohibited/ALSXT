@@ -14,5 +14,9 @@ UCLASS()
 class ALSXT_API UALSXTAnimationInstance : public UAlsAnimationInstance
 {
 	GENERATED_BODY()
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Sex{ALSXTSexTags::Male};
 	
 };

@@ -19,6 +19,12 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredSex{ALSXTSexTags::Male};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Sex{ALSXTSexTags::Male};
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -83,6 +89,8 @@ public:
 
 	virtual void NotifyControllerChanged() override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	// Camera
 
 protected:
@@ -124,4 +132,38 @@ private:
 
 public:
 	virtual void DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalLocation) override;
+
+	// Desired Sex
+
+public:
+	const FGameplayTag& GetDesiredSex() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewSexTag"))
+		void SetDesiredSex(const FGameplayTag& NewSexTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetDesiredSex(const FGameplayTag& NewSexTag);
+
+	// Sex
+
+public:
+	const FGameplayTag& GetSex() const;
+
+private:
+	void SetSex(const FGameplayTag& NewSexTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnSexChanged(const FGameplayTag& PreviousSexTag);
 };
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredSex() const
+{
+	return DesiredSex;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetSex() const
+{
+	return Sex;
+}

@@ -4,6 +4,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
 
 AALSXTCharacter::AALSXTCharacter()
@@ -40,6 +41,17 @@ void AALSXTCharacter::NotifyControllerChanged()
 	}
 
 	Super::NotifyControllerChanged();
+}
+
+void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams Parameters;
+	Parameters.bIsPushBased = true;
+
+	Parameters.Condition = COND_SkipOwner;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredSex, Parameters)
 }
 
 void AALSXTCharacter::CalcCamera(const float DeltaTime, FMinimalViewInfo& ViewInfo)
@@ -206,3 +218,38 @@ void AALSXTCharacter::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& Deb
 
 	Super::DisplayDebug(Canvas, DebugDisplay, Unused, VerticalLocation);
 }
+
+void AALSXTCharacter::SetDesiredSex(const FGameplayTag& NewSexTag)
+{
+	if (DesiredSex != NewSexTag)
+	{
+		DesiredSex = NewSexTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredSex, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredSex(NewSexTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredSex_Implementation(const FGameplayTag& NewSexTag)
+{
+	SetDesiredSex(NewSexTag);
+}
+
+void AALSXTCharacter::SetSex(const FGameplayTag& NewSexTag)
+{
+
+	if (Sex != NewSexTag)
+	{
+		const auto PreviousSex{ Sex };
+
+		Sex = NewSexTag;
+
+		OnSexChanged(PreviousSex);
+	}
+}
+
+void AALSXTCharacter::OnSexChanged_Implementation(const FGameplayTag& PreviousSexTag) {}
