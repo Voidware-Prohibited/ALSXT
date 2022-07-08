@@ -19,11 +19,53 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
 
+	// Sex
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
 	FGameplayTag DesiredSex{ALSXTSexTags::Male};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag Sex{ALSXTSexTags::Male};
+
+	// LocomotionVariant
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredLocomotionVariant{ALSXTLocomotionVariantTags::Default};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag LocomotionVariant{ALSXTLocomotionVariantTags::Default};
+
+	// Injury
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredInjury{ALSXTInjuryTags::None};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Injury{ALSXTInjuryTags::None};
+
+	// CombatStance
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredCombatStance{ALSXTCombatStanceTags::Neutral};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag CombatStance{ALSXTCombatStanceTags::Neutral};
+
+	// WeaponFirearmStance
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredWeaponFirearmStance{ALSXTWeaponFirearmStanceTags::Regular};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag WeaponFirearmStance{ALSXTWeaponFirearmStanceTags::Regular};
+
+	// WeaponReadyPosition
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredWeaponReadyPosition{ALSXTWeaponReadyPositionTags::None};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag WeaponReadyPosition{ALSXTWeaponReadyPositionTags::None};
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
@@ -143,7 +185,7 @@ public:
 
 private:
 	UFUNCTION(Server, Reliable)
-		void ServerSetDesiredSex(const FGameplayTag& NewSexTag);
+	void ServerSetDesiredSex(const FGameplayTag& NewSexTag);
 
 	// Sex
 
@@ -155,7 +197,127 @@ private:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-		void OnSexChanged(const FGameplayTag& PreviousSexTag);
+	void OnSexChanged(const FGameplayTag& PreviousSexTag);
+
+	// Desired LocomotionVariant
+
+public:
+	const FGameplayTag& GetDesiredLocomotionVariant() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewLocomotionVariantTag"))
+	void SetDesiredLocomotionVariant(const FGameplayTag& NewLocomotionVariantTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredLocomotionVariant(const FGameplayTag& NewLocomotionVariantTag);
+
+	// LocomotionVariant
+
+public:
+	const FGameplayTag& GetLocomotionVariant() const;
+
+private:
+	void SetLocomotionVariant(const FGameplayTag& NewLocomotionVariantTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnLocomotionVariantChanged(const FGameplayTag& PreviousLocomotionVariantTag);
+
+	// Desired Injury
+
+public:
+	const FGameplayTag& GetDesiredInjury() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewInjuryTag"))
+	void SetDesiredInjury(const FGameplayTag& NewInjuryTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredInjury(const FGameplayTag& NewInjuryTag);
+
+	// Injury
+
+public:
+	const FGameplayTag& GetInjury() const;
+
+private:
+	void SetInjury(const FGameplayTag& NewInjuryTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnInjuryChanged(const FGameplayTag& PreviousInjuryTag);
+
+	// Desired CombatStance
+
+public:
+	const FGameplayTag& GetDesiredCombatStance() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewCombatStanceTag"))
+	void SetDesiredCombatStance(const FGameplayTag& NewCombatStanceTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredCombatStance(const FGameplayTag& NewCombatStanceTag);
+
+	// CombatStance
+
+public:
+	const FGameplayTag& GetCombatStance() const;
+
+private:
+	void SetCombatStance(const FGameplayTag& NewCombatStanceTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnCombatStanceChanged(const FGameplayTag& PreviousCombatStanceTag);
+
+	// Desired WeaponFirearmStance
+
+public:
+	const FGameplayTag& GetDesiredWeaponFirearmStance() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewWeaponFirearmStanceTag"))
+	void SetDesiredWeaponFirearmStance(const FGameplayTag& NewWeaponFirearmStanceTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredWeaponFirearmStance(const FGameplayTag& NewWeaponFirearmStanceTag);
+
+	// WeaponFirearmStance
+
+public:
+	const FGameplayTag& GetWeaponFirearmStance() const;
+
+private:
+	void SetWeaponFirearmStance(const FGameplayTag& NewWeaponFirearmStanceTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnWeaponFirearmStanceChanged(const FGameplayTag& PreviousWeaponFirearmStanceTag);
+
+	// Desired WeaponReadyPosition
+
+public:
+	const FGameplayTag& GetDesiredWeaponReadyPosition() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewWeaponReadyPositionTag"))
+	void SetDesiredWeaponReadyPosition(const FGameplayTag& NewWeaponReadyPositionTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredWeaponReadyPosition(const FGameplayTag& NewWeaponReadyPositionTag);
+
+	// WeaponReadyPosition
+
+public:
+	const FGameplayTag& GetWeaponReadyPosition() const;
+
+private:
+	void SetWeaponReadyPosition(const FGameplayTag& NewWeaponReadyPositionTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnWeaponReadyPositionChanged(const FGameplayTag& PreviousWeaponReadyPositionTag);
 };
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredSex() const
@@ -166,4 +328,55 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredSex() const
 inline const FGameplayTag& AALSXTCharacter::GetSex() const
 {
 	return Sex;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredLocomotionVariant() const
+{
+	return DesiredLocomotionVariant;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetLocomotionVariant() const
+{
+	return LocomotionVariant;
+}
+
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredInjury() const
+{
+	return DesiredInjury;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetInjury() const
+{
+	return Injury;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredCombatStance() const
+{
+	return DesiredCombatStance;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetCombatStance() const
+{
+	return CombatStance;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredWeaponFirearmStance() const
+{
+	return DesiredWeaponFirearmStance;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetWeaponFirearmStance() const
+{
+	return WeaponFirearmStance;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredWeaponReadyPosition() const
+{
+	return DesiredWeaponReadyPosition;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetWeaponReadyPosition() const
+{
+	return WeaponReadyPosition;
 }

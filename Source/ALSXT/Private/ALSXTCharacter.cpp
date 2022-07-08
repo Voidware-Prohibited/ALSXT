@@ -52,6 +52,11 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	Parameters.Condition = COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredSex, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredLocomotionVariant, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredInjury, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredCombatStance, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponFirearmStance, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponReadyPosition, Parameters)
 }
 
 void AALSXTCharacter::CalcCamera(const float DeltaTime, FMinimalViewInfo& ViewInfo)
@@ -219,6 +224,8 @@ void AALSXTCharacter::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& Deb
 	Super::DisplayDebug(Canvas, DebugDisplay, Unused, VerticalLocation);
 }
 
+// Sex
+
 void AALSXTCharacter::SetDesiredSex(const FGameplayTag& NewSexTag)
 {
 	if (DesiredSex != NewSexTag)
@@ -253,3 +260,188 @@ void AALSXTCharacter::SetSex(const FGameplayTag& NewSexTag)
 }
 
 void AALSXTCharacter::OnSexChanged_Implementation(const FGameplayTag& PreviousSexTag) {}
+
+// LocomotionVariant
+
+void AALSXTCharacter::SetDesiredLocomotionVariant(const FGameplayTag& NewLocomotionVariantTag)
+{
+	if (DesiredLocomotionVariant != NewLocomotionVariantTag)
+	{
+		DesiredLocomotionVariant = NewLocomotionVariantTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredLocomotionVariant, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredLocomotionVariant(NewLocomotionVariantTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredLocomotionVariant_Implementation(const FGameplayTag& NewLocomotionVariantTag)
+{
+	SetDesiredLocomotionVariant(NewLocomotionVariantTag);
+}
+
+void AALSXTCharacter::SetLocomotionVariant(const FGameplayTag& NewLocomotionVariantTag)
+{
+
+	if (LocomotionVariant != NewLocomotionVariantTag)
+	{
+		const auto PreviousLocomotionVariant{ LocomotionVariant };
+
+		LocomotionVariant = NewLocomotionVariantTag;
+
+		OnLocomotionVariantChanged(PreviousLocomotionVariant);
+	}
+}
+
+void AALSXTCharacter::OnLocomotionVariantChanged_Implementation(const FGameplayTag& PreviousLocomotionVariantTag) {}
+
+// Injury
+
+void AALSXTCharacter::SetDesiredInjury(const FGameplayTag& NewInjuryTag)
+{
+	if (DesiredInjury != NewInjuryTag)
+	{
+		DesiredInjury = NewInjuryTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredInjury, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredInjury(NewInjuryTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredInjury_Implementation(const FGameplayTag& NewInjuryTag)
+{
+	SetDesiredInjury(NewInjuryTag);
+}
+
+void AALSXTCharacter::SetInjury(const FGameplayTag& NewInjuryTag)
+{
+
+	if (Injury != NewInjuryTag)
+	{
+		const auto PreviousInjury{ Injury };
+
+		Injury = NewInjuryTag;
+
+		OnInjuryChanged(PreviousInjury);
+	}
+}
+
+void AALSXTCharacter::OnInjuryChanged_Implementation(const FGameplayTag& PreviousInjuryTag) {}
+
+// CombatStance
+
+void AALSXTCharacter::SetDesiredCombatStance(const FGameplayTag& NewCombatStanceTag)
+{
+	if (DesiredCombatStance != NewCombatStanceTag)
+	{
+		DesiredCombatStance = NewCombatStanceTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredCombatStance, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredCombatStance(NewCombatStanceTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredCombatStance_Implementation(const FGameplayTag& NewCombatStanceTag)
+{
+	SetDesiredCombatStance(NewCombatStanceTag);
+}
+
+void AALSXTCharacter::SetCombatStance(const FGameplayTag& NewCombatStanceTag)
+{
+
+	if (CombatStance != NewCombatStanceTag)
+	{
+		const auto PreviousCombatStance{ CombatStance };
+
+		CombatStance = NewCombatStanceTag;
+
+		OnCombatStanceChanged(PreviousCombatStance);
+	}
+}
+
+void AALSXTCharacter::OnCombatStanceChanged_Implementation(const FGameplayTag& PreviousCombatStanceTag) {}
+
+// WeaponFirearmStance
+
+void AALSXTCharacter::SetDesiredWeaponFirearmStance(const FGameplayTag& NewWeaponFirearmStanceTag)
+{
+	if (DesiredWeaponFirearmStance != NewWeaponFirearmStanceTag)
+	{
+		DesiredWeaponFirearmStance = NewWeaponFirearmStanceTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredWeaponFirearmStance, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredWeaponFirearmStance(NewWeaponFirearmStanceTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredWeaponFirearmStance_Implementation(const FGameplayTag& NewWeaponFirearmStanceTag)
+{
+	SetDesiredWeaponFirearmStance(NewWeaponFirearmStanceTag);
+}
+
+void AALSXTCharacter::SetWeaponFirearmStance(const FGameplayTag& NewWeaponFirearmStanceTag)
+{
+
+	if (WeaponFirearmStance != NewWeaponFirearmStanceTag)
+	{
+		const auto PreviousWeaponFirearmStance{ WeaponFirearmStance };
+
+		WeaponFirearmStance = NewWeaponFirearmStanceTag;
+
+		OnWeaponFirearmStanceChanged(PreviousWeaponFirearmStance);
+	}
+}
+
+void AALSXTCharacter::OnWeaponFirearmStanceChanged_Implementation(const FGameplayTag& PreviousWeaponFirearmStanceTag) {}
+
+// WeaponReadyPosition
+
+void AALSXTCharacter::SetDesiredWeaponReadyPosition(const FGameplayTag& NewWeaponReadyPositionTag)
+{
+	if (DesiredWeaponReadyPosition != NewWeaponReadyPositionTag)
+	{
+		DesiredWeaponReadyPosition = NewWeaponReadyPositionTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredWeaponReadyPosition, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredWeaponReadyPosition(NewWeaponReadyPositionTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredWeaponReadyPosition_Implementation(const FGameplayTag& NewWeaponReadyPositionTag)
+{
+	SetDesiredWeaponReadyPosition(NewWeaponReadyPositionTag);
+}
+
+void AALSXTCharacter::SetWeaponReadyPosition(const FGameplayTag& NewWeaponReadyPositionTag)
+{
+
+	if (WeaponReadyPosition != NewWeaponReadyPositionTag)
+	{
+		const auto PreviousWeaponReadyPosition{ WeaponReadyPosition };
+
+		WeaponReadyPosition = NewWeaponReadyPositionTag;
+
+		OnWeaponReadyPositionChanged(PreviousWeaponReadyPosition);
+	}
+}
+
+void AALSXTCharacter::OnWeaponReadyPositionChanged_Implementation(const FGameplayTag& PreviousWeaponReadyPositionTag) {}
