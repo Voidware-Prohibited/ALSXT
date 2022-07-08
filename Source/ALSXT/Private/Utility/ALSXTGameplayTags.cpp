@@ -1,5 +1,11 @@
 #include "Utility/ALSXTGameplayTags.h"
 
+namespace ALSXTFreelookingTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(False, TEXT("Als.Freelooking.False"))
+	UE_DEFINE_GAMEPLAY_TAG(True, TEXT("Als.Freelooking.True"))
+}
+
 namespace ALSXTOverlayModeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(AxeOneHanded, TEXT("Als.OverlayMode.AxeOneHanded"))

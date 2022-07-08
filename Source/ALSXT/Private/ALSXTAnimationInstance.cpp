@@ -2,4 +2,27 @@
 
 
 #include "ALSXTAnimationInstance.h"
+#include "ALSXTCharacter.h"
 
+void UALSXTAnimationInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+
+	ALSXTCharacter = Cast<AALSXTCharacter>(GetOwningActor());
+
+#if WITH_EDITOR
+	if (!GetWorld()->IsGameWorld() && ALSXTCharacter.IsNull())
+	{
+		// Use default objects for editor preview.
+
+		ALSXTCharacter = GetMutableDefault<AALSXTCharacter>();
+	}
+#endif
+}
+
+void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
+{
+
+	Super::NativeUpdateAnimation(DeltaTime);
+
+}

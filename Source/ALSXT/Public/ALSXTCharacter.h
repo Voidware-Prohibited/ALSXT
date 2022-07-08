@@ -2,9 +2,11 @@
 
 #include "AlsCharacter.h"
 
+#include "State/AlsLocomotionState.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "ALSXTCharacter.generated.h"
 
+class UALSXTAnimationInstance;
 class UAlsCameraComponent;
 class UInputMappingContext;
 class UInputAction;
@@ -18,6 +20,23 @@ class ALSXT_API AALSXTCharacter : public AAlsCharacter
 private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess, ShowInnerProperties))
+	TObjectPtr<UALSXTAnimationInstance> XTAnimationInstance;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Replicated, Meta = (AllowPrivateAccess))
+	FRotator MeshRotation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Replicated, Meta = (AllowPrivateAccess))
+	FVector MovementInput;
+
+	// Freelooking
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredFreelooking{ALSXTFreelookingTags::False};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Freelooking{ALSXTFreelookingTags::False};
 
 	// Sex
 
@@ -110,6 +129,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputAction> SwitchShoulderAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	TObjectPtr<UInputAction> FreelookAction;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example",
 		Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
 	float LookUpMouseSensitivity{3.0f};
@@ -170,10 +192,90 @@ private:
 
 	void InputSwitchShoulder();
 
+	void InputFreelook(const FInputActionValue& ActionValue);
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanSprint() const;
+	void CanSprint_Implementation();
+
 	// Debug
 
 public:
 	virtual void DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalLocation) override;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	void OnAIJumpObstacle_Implementation();
+
+	/** BP implementable function that called when Mantle starts */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Movement System")
+	void AIObstacleTrace();
+	virtual void AIObstacleTrace_Implementation();
+
+	/** BP implementable function that called when Roll starts */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Movement System")
+	void OnRoll();
+	virtual void OnRoll_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanRoll() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanMantle() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanVault() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanSlide() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanWallrun() const;
+
+	/** BP implementable function that called when Mantle starts */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Movement System")
+	void OnMantle();
+	virtual void OnMantle_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool TryVault() const;
+
+protected:		
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void StartVault();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void StartSlide();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void StartWallrun();
+
+	// Desired Freelooking
+
+public:
+	const FGameplayTag& GetDesiredFreelooking() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFreelookingTag"))
+	void SetDesiredFreelooking(const FGameplayTag& NewFreelookingTag);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanFreelook() const;
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredFreelooking(const FGameplayTag& NewFreelookingTag);
+
+	// Freelooking
+
+public:
+	const FGameplayTag& GetFreelooking() const;
+
+private:
+	void SetFreelooking(const FGameplayTag& NewFreelookingTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnFreelookingChanged(const FGameplayTag& PreviousFreelookingTag);
 
 	// Desired Sex
 
@@ -181,7 +283,7 @@ public:
 	const FGameplayTag& GetDesiredSex() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewSexTag"))
-		void SetDesiredSex(const FGameplayTag& NewSexTag);
+	void SetDesiredSex(const FGameplayTag& NewSexTag);
 
 private:
 	UFUNCTION(Server, Reliable)
@@ -319,6 +421,16 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnWeaponReadyPositionChanged(const FGameplayTag& PreviousWeaponReadyPositionTag);
 };
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredFreelooking() const
+{
+	return DesiredFreelooking;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetFreelooking() const
+{
+	return Freelooking;
+}
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredSex() const
 {

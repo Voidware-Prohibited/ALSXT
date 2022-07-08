@@ -2,6 +2,12 @@
 
 #include "NativeGameplayTags.h"
 
+namespace ALSXTFreelookingTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(False)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(True)
+}
+
 namespace ALSXTOverlayModeTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(BuildingPlan)
