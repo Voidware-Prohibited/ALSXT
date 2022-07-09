@@ -125,11 +125,15 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 	const auto CharForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(CharRotation.Pitch)) };
 	const auto CharRightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(CharForwardDirection) };
 
+	MeshRotationYaw = FMath::GetMappedRangeValueClamped(FVector2D(-180.f, 180.f), FVector2D(0, 360.0f), MeshRotation.Yaw);
+
 	AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
 	if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
 	{
 		AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
 		MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, CharRotation.ToString());
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(MeshRotationYaw));
 	}
 	else
 	{
@@ -180,12 +184,9 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 			{
 				return;
 			}
-			if (CanMantle())
+			if (TryStartMantlingGrounded())
 			{
-				if (TryStartMantlingGrounded())
-				{
 					return;
-				}
 			}
 			if (GetStance() == AlsStanceTags::Crouching)
 			{
@@ -253,12 +254,12 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 		if (ActionValue.Get<bool>())
 		{
 			SetDesiredFreelooking(ALSXTFreelookingTags::True);
-			LockRotation(GetLocomotionState().ViewRelativeTargetYawAngle);
+			// LockRotation(MeshRotationYaw);
 		}
 		else
 		{
 			SetDesiredFreelooking(ALSXTFreelookingTags::False);
-			UnLockRotation();
+			// UnLockRotation();
 		}
 	}
 }

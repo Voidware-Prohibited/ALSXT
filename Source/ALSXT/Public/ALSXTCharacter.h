@@ -27,6 +27,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Replicated, Meta = (AllowPrivateAccess))
 	FRotator MeshRotation;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Replicated, Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
+	float MeshRotationYaw{0.0f};
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Replicated, Meta = (AllowPrivateAccess))
 	FVector MovementInput;
 
@@ -204,10 +207,11 @@ public:
 public:
 	virtual void DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalLocation) override;
 
+	/** BP implementable function for AI to check if they can Mantle or Vault obstacle */
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	void OnAIJumpObstacle_Implementation();
 
-	/** BP implementable function that called when Mantle starts */
+	/** BP implementable function for AI to trace for Mantle or Vault obstacles */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Movement System")
 	void AIObstacleTrace();
 	virtual void AIObstacleTrace_Implementation();
@@ -219,9 +223,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool CanRoll() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
-	bool CanMantle() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanVault() const;
