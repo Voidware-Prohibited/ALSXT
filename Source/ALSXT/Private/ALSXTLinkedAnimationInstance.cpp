@@ -7,6 +7,7 @@
 
 UALSXTLinkedAnimationInstance::UALSXTLinkedAnimationInstance()
 {
+	Super::UAlsLinkedAnimationInstance();
 	RootMotionMode = ERootMotionMode::IgnoreRootMotion;
 	bUseMainInstanceMontageEvaluationData = true;
 }

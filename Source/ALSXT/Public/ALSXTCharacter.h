@@ -135,6 +135,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputAction> FreelookAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	TObjectPtr<UInputAction> ToggleCombatReadyAction;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example",
 		Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
 	float LookUpMouseSensitivity{3.0f};
@@ -196,6 +199,8 @@ private:
 	void InputSwitchShoulder();
 
 	void InputFreelook(const FInputActionValue& ActionValue);
+
+	void InputToggleCombatReady();
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
@@ -366,6 +371,12 @@ private:
 
 public:
 	const FGameplayTag& GetCombatStance() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanToggleCombatReady() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanBecomeCombatReady() const;
 
 private:
 	void SetCombatStance(const FGameplayTag& NewCombatStanceTag);

@@ -8,7 +8,7 @@ namespace ALSXTFreelookingTags
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(True)
 }
 
-namespace ALSXTOverlayModeTags
+namespace AlsOverlayModeTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(BuildingPlan)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Flashlight)
@@ -22,7 +22,7 @@ namespace ALSXTOverlayModeTags
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Grenade)
 }
 
-namespace ALSXTLocomotionActionTags
+namespace AlsLocomotionActionTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Vaulting)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Sliding)

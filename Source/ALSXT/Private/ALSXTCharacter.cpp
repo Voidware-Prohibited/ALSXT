@@ -97,6 +97,7 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::InputViewMode);
 		EnhancedInput->BindAction(SwitchShoulderAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchShoulder);
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
+		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleCombatReady);
 	}
 }
 
@@ -190,7 +191,7 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 			}
 			if (TryStartMantlingGrounded())
 			{
-					return;
+				return;
 			}
 			if (GetStance() == AlsStanceTags::Crouching)
 			{
@@ -264,6 +265,24 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 		{
 			SetDesiredFreelooking(ALSXTFreelookingTags::False);
 			// UnLockRotation();
+		}
+	}
+}
+
+void AALSXTCharacter::InputToggleCombatReady()
+{
+	if (CanToggleCombatReady())
+	{
+		if ((GetDesiredCombatStance() == FGameplayTag::EmptyTag) | (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral))
+		{
+			if (CanBecomeCombatReady())
+			{
+				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
+			}
+		}
+		else
+		{
+			SetDesiredCombatStance(ALSXTCombatStanceTags::Neutral);
 		}
 	}
 }

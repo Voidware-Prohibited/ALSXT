@@ -1,3 +1,4 @@
+#include "Utility/AlsGameplayTags.h"
 #include "Utility/ALSXTGameplayTags.h"
 
 namespace ALSXTFreelookingTags
@@ -6,7 +7,7 @@ namespace ALSXTFreelookingTags
 	UE_DEFINE_GAMEPLAY_TAG(True, TEXT("Als.Freelooking.True"))
 }
 
-namespace ALSXTOverlayModeTags
+namespace AlsOverlayModeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(AxeOneHanded, TEXT("Als.OverlayMode.AxeOneHanded"))
 	UE_DEFINE_GAMEPLAY_TAG(AxeTwoHanded, TEXT("Als.OverlayMode.AxeTwoHanded"))
@@ -21,7 +22,7 @@ namespace ALSXTOverlayModeTags
 }
 
 
-namespace ALSXTLocomotionActionTags
+namespace AlsLocomotionActionTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Vaulting, TEXT("Als.LocomotionAction.Vaulting"))
 	UE_DEFINE_GAMEPLAY_TAG(Sliding, TEXT("Als.LocomotionAction.Sliding"))
