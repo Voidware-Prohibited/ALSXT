@@ -7,7 +7,6 @@
 
 UALSXTLinkedAnimationInstance::UALSXTLinkedAnimationInstance()
 {
-	Super::UAlsLinkedAnimationInstance();
 	RootMotionMode = ERootMotionMode::IgnoreRootMotion;
 	bUseMainInstanceMontageEvaluationData = true;
 }
@@ -40,9 +39,9 @@ void UALSXTLinkedAnimationInstance::NativeInitializeAnimation()
 void UALSXTLinkedAnimationInstance::NativeBeginPlay()
 {
 	ALS_ENSURE_MESSAGE(IsValid(ALSXTParent),
-		TEXT("%s (%s) should only be used as a linked animation instance within the %s animation blueprint!"),
-		ALS_GET_TYPE_STRING(UALSXTLinkedAnimationInstance), *GetClass()->GetName(),
-		ALS_GET_TYPE_STRING(UALSXTAnimationInstance));
+					TEXT("%s (%s) should only be used as a linked animation instance within the %s animation blueprint!"),
+					ALS_GET_TYPE_STRING(UALSXTLinkedAnimationInstance), *GetClass()->GetName(),
+					ALS_GET_TYPE_STRING(UALSXTAnimationInstance));
 
 	Super::NativeBeginPlay();
 }

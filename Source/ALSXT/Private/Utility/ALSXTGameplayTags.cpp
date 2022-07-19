@@ -1,5 +1,5 @@
-#include "Utility/AlsGameplayTags.h"
 #include "Utility/ALSXTGameplayTags.h"
+#include "Utility/AlsGameplayTags.h"
 
 namespace ALSXTFreelookingTags
 {
