@@ -25,4 +25,17 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 
 	Super::NativeUpdateAnimation(DeltaTime);
 
+	if (!IsValid(ALSXTCharacter))
+	{
+		return;
+	}
+
+	Freelooking = ALSXTCharacter->GetDesiredFreelooking();
+	Sex = ALSXTCharacter->GetDesiredSex();
+	LocomotionVariant = ALSXTCharacter->GetDesiredLocomotionVariant();
+	Injury = ALSXTCharacter->GetDesiredInjury();
+	CombatStance = ALSXTCharacter->GetDesiredCombatStance();
+	WeaponFirearmStance = ALSXTCharacter->GetDesiredWeaponFirearmStance();
+	WeaponReadyPosition = ALSXTCharacter->GetDesiredWeaponReadyPosition();
+
 }
