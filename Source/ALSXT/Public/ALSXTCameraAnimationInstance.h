@@ -5,11 +5,14 @@
 #include "CoreMinimal.h"
 #include "AlsCameraAnimationInstance.h"
 #include "Utility/ALSXTGameplayTags.h"
+// #include "ALSXTCharacter.h"
 #include "ALSXTCameraAnimationInstance.generated.h"
 
-/**
- * 
- */
+class AALSXTCharacter;
+// class UALSXTCameraComponent;
+class UAlsCameraComponent;
+
+
 UCLASS()
 class ALSXT_API UALSXTCameraAnimationInstance : public UAlsCameraAnimationInstance
 {
@@ -21,6 +24,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 		TObjectPtr<UAlsCameraComponent> ALSXTCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+		FGameplayTag Overlay {
+		AlsOverlayModeTags::Default
+	};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 		FGameplayTag Freelooking {

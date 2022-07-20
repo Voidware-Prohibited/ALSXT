@@ -4,6 +4,7 @@
 #include "ALSXTCameraAnimationInstance.h"
 #include "AlsCameraComponent.h"
 #include "AlsCharacter.h"
+#include "ALSXTCharacter.h"
 
 void UALSXTCameraAnimationInstance::NativeInitializeAnimation()
 {
@@ -39,6 +40,7 @@ void UALSXTCameraAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		return;
 	}
 
+	Overlay = ALSXTCharacter->GetOverlayMode();
 	Freelooking = ALSXTCharacter->GetDesiredFreelooking();
 	Sex = ALSXTCharacter->GetDesiredSex();
 	LocomotionVariant = ALSXTCharacter->GetDesiredLocomotionVariant();
