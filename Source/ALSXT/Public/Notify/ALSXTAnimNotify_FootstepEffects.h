@@ -51,73 +51,53 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-		TSoftObjectPtr<USoundBase> Sound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TSoftObjectPtr<USoundBase> Sound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-		EALSXTFootstepSoundSpawnType SoundSpawnType {
-		EALSXTFootstepSoundSpawnType::SpawnAtTraceHitLocation
-	};
+	EALSXTFootstepSoundSpawnType SoundSpawnType{EALSXTFootstepSoundSpawnType::SpawnAtTraceHitLocation};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
-		TSoftObjectPtr<UMaterialInterface> DecalMaterial;
+	TSoftObjectPtr<UMaterialInterface> DecalMaterial;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
-		FVector DecalSize {
-		10.0f, 20.0f, 20.0f
-	};
+	FVector DecalSize{10.0f, 20.0f, 20.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -1))
-		float DecalNormal{ 0.0f };
+	float DecalNormalAmount{0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0, ForceUnits = "s"))
-		float DecalDuration{ 4.0f };
+	float DecalDuration{4.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0, ForceUnits = "s"))
-		float DecalFadeOutDuration{ 2.0f };
+	float DecalFadeOutDuration{2.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
-		EALSXTFootstepDecalSpawnType DecalSpawnType {
-		EALSXTFootstepDecalSpawnType::SpawnAttachedToTraceHitComponent
-	};
+	EALSXTFootstepDecalSpawnType DecalSpawnType{EALSXTFootstepDecalSpawnType::SpawnAttachedToTraceHitComponent};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
-		FVector DecalLocationOffset {
-		0.0f, -10.0f, -1.75f
-	};
+	FVector DecalLocationOffset{0.0f, -10.0f, -1.75f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
-		FRotator DecalFootLeftRotationOffset {
-		90.0f, -90.0f, 180.0f
-	};
+	FRotator DecalFootLeftRotationOffset{90.0f, -90.0f, 180.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
-		FRotator DecalFootRightRotationOffset {
-		-90.0f, 90.0f, 0.0f
-	};
+	FRotator DecalFootRightRotationOffset{-90.0f, 90.0f, 0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System")
-		TSoftObjectPtr<UNiagaraSystem> ParticleSystem;
+	TSoftObjectPtr<UNiagaraSystem> ParticleSystem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System")
-		EALSXTFootstepParticleEffectSpawnType ParticleSystemSpawnType {
-		EALSXTFootstepParticleEffectSpawnType::SpawnAtTraceHitLocation
-	};
+	EALSXTFootstepParticleEffectSpawnType ParticleSystemSpawnType{EALSXTFootstepParticleEffectSpawnType::SpawnAtTraceHitLocation};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System")
-		FVector ParticleSystemLocationOffset {
-		ForceInit
-	};
+	FVector ParticleSystemLocationOffset{ForceInit};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System")
-		FRotator ParticleSystemFootLeftRotationOffset {
-		ForceInit
-	};
+	FRotator ParticleSystemFootLeftRotationOffset{ForceInit};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System")
-		FRotator ParticleSystemFootRightRotationOffset {
-		ForceInit
-	};
+	FRotator ParticleSystemFootRightRotationOffset{ForceInit};
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -127,158 +107,148 @@ class ALSXT_API UALSXTFootstepEffectsSettings : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		TEnumAsByte<ETraceTypeQuery> SurfaceTraceChannel;
+	TEnumAsByte<ETraceTypeQuery> SurfaceTraceChannel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ClampMin = 0, ForceUnits = "cm"))
-		float SurfaceTraceDistance{ 50.0f };
+	float SurfaceTraceDistance{50.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "Foot Left Y Axis")
-		FVector FootLeftYAxis {
-		0.0f, 0.0f, 1.0f
-	};
+	FVector FootLeftYAxis{0.0f, 0.0f, 1.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "Foot Left Z Axis")
-		FVector FootLeftZAxis {
-		1.0f, 0.0f, 0.0f
-	};
+	FVector FootLeftZAxis{1.0f, 0.0f, 0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "Foot Right Y Axis")
-		FVector FootRightYAxis {
-		0.0f, 0.0f, 1.0f
-	};
+	FVector FootRightYAxis{0.0f, 0.0f, 1.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "Foot Right Z Axis")
-		FVector FootRightZAxis {
-		-1.0f, 0.0f, 0.0f
-	};
+	FVector FootRightZAxis{-1.0f, 0.0f, 0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ForceInlineRow))
-		TMap<TEnumAsByte<EPhysicalSurface>, FALSXTFootstepEffectSettings> Effects;
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTFootstepEffectSettings> Effects;
 };
 
 UCLASS(DisplayName = "ALSXT Footstep Effects Animation Notify",
 	AutoExpandCategories = ("Settings|Sound", "Settings|Decal", "Settings|Particle System"), Meta = (ShowWorldContextPin))
-	class ALSXT_API UALSXTAnimNotify_FootstepEffects : public UAnimNotify
+class ALSXT_API UALSXTAnimNotify_FootstepEffects : public UAnimNotify
 {
 	GENERATED_BODY()
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
-		TObjectPtr<UALSXTFootstepEffectsSettings> FootstepEffectsSettings;
+	TObjectPtr<UALSXTFootstepEffectsSettings> FootstepEffectsSettings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
-		EALSXTFootBone FootBone {
-		EALSXTFootBone::Left
-	};
+	EALSXTFootBone FootBone {EALSXTFootBone::Left};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
-		bool bSkipEffectsWhenInAir;
+	bool bSkipEffectsWhenInAir;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
-		bool bSpawnSound{ true };
+	bool bSpawnSound{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
-		float SoundVolumeMultiplier{ 1.0f };
+	float SoundVolumeMultiplier{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
-		float SoundPitchMultiplier{ 1.0f };
+	float SoundPitchMultiplier{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
-		EALSXTFootstepSoundType SoundType;
+	EALSXTFootstepSoundType SoundType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
-		bool bIgnoreFootstepSoundBlockCurve;
+	bool bIgnoreFootstepSoundBlockCurve;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Decal", Meta = (AllowPrivateAccess))
-		bool bSpawnDecal{ true };
+	bool bSpawnDecal{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
-		bool bSpawnParticleSystem{ true };
+	bool bSpawnParticleSystem{ true };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
-		TWeakObjectPtr<UPhysicalMaterial> LeftFootstepPhysicalMaterial;
+	TWeakObjectPtr<UPhysicalMaterial> LeftFootstepPhysicalMaterial;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
-		TWeakObjectPtr<UPhysicalMaterial> PrevLeftFootstepPhysicalMaterial;
+	TWeakObjectPtr<UPhysicalMaterial> PrevLeftFootstepPhysicalMaterial;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
-		TWeakObjectPtr<UPhysicalMaterial> RightFootstepPhysicalMaterial;
+	TWeakObjectPtr<UPhysicalMaterial> RightFootstepPhysicalMaterial;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
-		TWeakObjectPtr<UPhysicalMaterial> PrevRightFootstepPhysicalMaterial;
+	TWeakObjectPtr<UPhysicalMaterial> PrevRightFootstepPhysicalMaterial;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float LeftFootstepWetness{ 0.0f };
+	float LeftFootstepWetness{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float RightFootstepWetness{ 0.0f };
+	float RightFootstepWetness{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float LeftFootstepBlood{ 0.0f };
+	float LeftFootstepBlood{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float RightFootstepBlood{ 0.0f };
+	float RightFootstepBlood{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float LeftFootstepDirt1{ 0.0f };
+	float LeftFootstepDirt1{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float RightFootstepDirt1{ 0.0f };
+	float RightFootstepDirt1{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float LeftFootstepDirt2{ 0.0f };
+	float LeftFootstepDirt2{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float RightFootstepDirt2{ 0.0f };
+	float RightFootstepDirt2{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float LeftFootstepSand{ 0.0f };
+	float LeftFootstepSand{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float RightFootstepSand{ 0.0f };
+	float RightFootstepSand{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float LeftFootstepVegetation{ 0.0f };
+	float LeftFootstepVegetation{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float RightFootstepVegetation{ 0.0f };
+	float RightFootstepVegetation{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float LeftFootstepSnow{ 0.0f };
+	float LeftFootstepSnow{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float RightFootstepSnow{ 0.0f };
+	float RightFootstepSnow{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float LeftFootstepOil{ 0.0f };
+	float LeftFootstepOil{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-		float RightFootstepOil{ 0.0f };
+	float RightFootstepOil{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-		float LeftFootstepDurationModifierMin{ 1.0f };
+	float LeftFootstepDurationModifierMin{ 1.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-		float RightFootstepDurationModifierMin{ 1.0f };
+	float RightFootstepDurationModifierMin{ 1.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-		float LeftFootstepDurationModifierMax{ 4.0f };
+	float LeftFootstepDurationModifierMax{ 4.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-		float RightFootstepDurationModifierMax{ 4.0f };
+	float RightFootstepDurationModifierMax{ 4.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-		UTexture2D* FootstepSoleTexture;
+	UTexture2D* FootstepSoleTexture;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-		UTexture2D* FootstepSoleNormal;
+	UTexture2D* FootstepSoleNormal;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-		TWeakObjectPtr<UPhysicalMaterial> FootstepSoleSurfaceType;
+	TWeakObjectPtr<UPhysicalMaterial> FootstepSoleSurfaceType;
 
 public:
 	virtual FString GetNotifyName_Implementation() const override;
 
 	virtual void Notify(USkeletalMeshComponent* Mesh, UAnimSequenceBase* Animation,
-		const FAnimNotifyEventReference& EventReference) override;
+	const FAnimNotifyEventReference& EventReference) override;
 };

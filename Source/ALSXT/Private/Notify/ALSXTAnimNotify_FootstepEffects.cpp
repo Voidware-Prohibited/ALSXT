@@ -32,20 +32,20 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		return;
 	}
 
-	const auto* Character{ Cast<AAlsCharacter>(Mesh->GetOwner()) };
+	const auto* Character{Cast<AAlsCharacter>(Mesh->GetOwner())};
 
 	if (bSkipEffectsWhenInAir && IsValid(Character) && Character->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
 	{
 		return;
 	}
 
-	const auto CapsuleScale{ IsValid(Character) ? Character->GetCapsuleComponent()->GetComponentScale().Z : 1.0f };
+	const auto CapsuleScale{IsValid(Character) ? Character->GetCapsuleComponent()->GetComponentScale().Z : 1.0f};
 
-	const auto* World{ Mesh->GetWorld() };
-	const auto* AnimationInstance{ Mesh->GetAnimInstance() };
+	const auto* World{Mesh->GetWorld()};
+	const auto* AnimationInstance{Mesh->GetAnimInstance()};
 
-	const auto FootBoneName{ FootBone == EALSXTFootBone::Left ? UAlsConstants::FootLeftBone() : UAlsConstants::FootRightBone() };
-	const auto FootTransform{ Mesh->GetSocketTransform(FootBoneName) };
+	const auto FootBoneName{FootBone == EALSXTFootBone::Left ? UAlsConstants::FootLeftBone() : UAlsConstants::FootRightBone()};
+	const auto FootTransform{Mesh->GetSocketTransform(FootBoneName)};
 
 	const auto FootZAxis{
 		FootTransform.TransformVectorNoScale(FootBone == EALSXTFootBone::Left
