@@ -4,6 +4,7 @@
 
 #include "State/AlsLocomotionState.h"
 #include "Utility/ALSXTGameplayTags.h"
+#include "State/ALSXTFootstepState.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
@@ -32,6 +33,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Replicated, Meta = (AllowPrivateAccess))
 	FVector MovementInput;
+
+	// Footstep State
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootstepState", Meta = (AllowPrivateAccess))
+	FALSXTFootstepState FootstepState;
 
 	// Freelooking
 
@@ -207,9 +213,38 @@ public:
 	bool CanSprint() const;
 	void CanSprint_Implementation();
 
-	// Debug
+public:
+	// Footstep Values
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+		FALSXTFootstepState GetFootstepValues() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+		FALSXTFootwearDetails GetFootwearDetails() const;
+
+	// Footstep State
 
 public:
+	const FALSXTFootstepState& GetFootstepState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewStanceTag"))
+		void SetFootstepState(const FALSXTFootstepState& NewFootstepState);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetFootstepState(const FALSXTFootstepState& NewFootstepState);
+
+	UFUNCTION()
+		void OnReplicate_FootstepState(const FALSXTFootstepState& PreviousFootstepState);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnFootstepStateChanged(const FALSXTFootstepState& PreviousFootstepState);
+
+public:
+
+	// Debug
+
 	virtual void DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalLocation) override;
 
 	/** BP implementable function for AI to check if they can Mantle or Vault obstacle */

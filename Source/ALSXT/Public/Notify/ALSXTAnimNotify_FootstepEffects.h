@@ -67,6 +67,9 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 		10.0f, 20.0f, 20.0f
 	};
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -1))
+		float DecalNormal{ 0.0f };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0, ForceUnits = "s"))
 		float DecalDuration{ 4.0f };
 
@@ -191,6 +194,87 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
 		bool bSpawnParticleSystem{ true };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
+		TWeakObjectPtr<UPhysicalMaterial> LeftFootstepPhysicalMaterial;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
+		TWeakObjectPtr<UPhysicalMaterial> PrevLeftFootstepPhysicalMaterial;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
+		TWeakObjectPtr<UPhysicalMaterial> RightFootstepPhysicalMaterial;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
+		TWeakObjectPtr<UPhysicalMaterial> PrevRightFootstepPhysicalMaterial;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float LeftFootstepWetness{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float RightFootstepWetness{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float LeftFootstepBlood{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float RightFootstepBlood{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float LeftFootstepDirt1{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float RightFootstepDirt1{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float LeftFootstepDirt2{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float RightFootstepDirt2{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float LeftFootstepSand{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float RightFootstepSand{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float LeftFootstepVegetation{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float RightFootstepVegetation{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float LeftFootstepSnow{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float RightFootstepSnow{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float LeftFootstepOil{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+		float RightFootstepOil{ 0.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
+		float LeftFootstepDurationModifierMin{ 1.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
+		float RightFootstepDurationModifierMin{ 1.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
+		float LeftFootstepDurationModifierMax{ 4.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
+		float RightFootstepDurationModifierMax{ 4.0f };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
+		UTexture2D* FootstepSoleTexture;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
+		UTexture2D* FootstepSoleNormal;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
+		TWeakObjectPtr<UPhysicalMaterial> FootstepSoleSurfaceType;
 
 public:
 	virtual FString GetNotifyName_Implementation() const override;

@@ -269,6 +269,32 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 	}
 }
 
+void AALSXTCharacter::SetFootstepState(const FALSXTFootstepState& NewFootstepState)
+{
+	const auto PreviousFootstepState{ FootstepState };
+
+	FootstepState = NewFootstepState;
+
+	OnFootstepStateChanged(PreviousFootstepState);
+
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerSetFootstepState(NewFootstepState);
+	}
+}
+
+void AALSXTCharacter::ServerSetFootstepState_Implementation(const FALSXTFootstepState& NewFootstepState)
+{
+	SetFootstepState(NewFootstepState);
+}
+
+void AALSXTCharacter::OnReplicate_FootstepState(const FALSXTFootstepState& PreviousFootstepState)
+{
+	OnFootstepStateChanged(PreviousFootstepState);
+}
+
+void AALSXTCharacter::OnFootstepStateChanged_Implementation(const FALSXTFootstepState& PreviousFootstepState) {}
+
 void AALSXTCharacter::InputToggleCombatReady()
 {
 	if (CanToggleCombatReady())
