@@ -61,6 +61,15 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 	TSoftObjectPtr<UMaterialInterface> DecalMaterial;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
+	FLinearColor MaterialBaseColor{0.0f, 0.0f, 0.0f, 1.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float MaterialWetness{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float MaterialTransferAmount{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
 	FVector DecalSize{10.0f, 20.0f, 20.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -1))
