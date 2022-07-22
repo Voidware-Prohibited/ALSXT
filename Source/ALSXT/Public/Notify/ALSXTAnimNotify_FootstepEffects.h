@@ -251,4 +251,7 @@ public:
 
 	virtual void Notify(USkeletalMeshComponent* Mesh, UAnimSequenceBase* Animation,
 	const FAnimNotifyEventReference& EventReference) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|DynamicValues", Meta = (AllowPrivateAccess))
+	FHitResult HitResult;
 };

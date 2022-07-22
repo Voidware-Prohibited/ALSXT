@@ -33,6 +33,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 	}
 
 	const auto* Character{Cast<AAlsCharacter>(Mesh->GetOwner())};
+	const auto* ALSXTCharacter{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
 
 	if (bSkipEffectsWhenInAir && IsValid(Character) && Character->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
 	{
@@ -43,6 +44,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 
 	const auto* World{Mesh->GetWorld()};
 	const auto* AnimationInstance{Mesh->GetAnimInstance()};
+	const auto* ALSXTAnimationInstance{ Cast<UALSXTAnimationInstance>(Mesh->GetAnimInstance()) };
 
 	const auto FootBoneName{FootBone == EALSXTFootBone::Left ? UAlsConstants::FootLeftBone() : UAlsConstants::FootRightBone()};
 	const auto FootTransform{Mesh->GetSocketTransform(FootBoneName)};
@@ -52,6 +54,21 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 												 ? FootstepEffectsSettings->FootLeftZAxis
 												 : FootstepEffectsSettings->FootRightZAxis)
 	};
+
+	FVector HitLocation;
+	FVector HitNormal;
+	TWeakObjectPtr<UPrimitiveComponent> HitComponent;
+	TWeakObjectPtr<UPhysicalMaterial> HitPhysicalMaterial;
+
+	// const auto* FeetState{
+	// 	!IsValid(ALSXTAnimationInstance)
+	// 		? nullptr
+	// 		: FootBone == EALSXTFootBone::Left
+	// 		? &ALSXTAnimationInstance->GetFeetState().Left
+	// 		: &ALSXTAnimationInstance->GetFeetState().Right
+	// };
+
+	const bool LeftFoot = FootBone == EALSXTFootBone::Left ? true : false;
 
 #if ENABLE_DRAW_DEBUG
 	const auto bDisplayDebug{ UAlsUtility::ShouldDisplayDebug(Mesh->GetOwner(), UAlsConstants::TracesDisplayName()) };
@@ -67,6 +84,12 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		UEngineTypes::ConvertToCollisionChannel(FootstepEffectsSettings->SurfaceTraceChannel),
 		QueryParameters))
 	{
+		HitResult = Hit;
+		HitLocation = Hit.ImpactPoint;
+		HitNormal = Hit.ImpactNormal;
+		HitComponent = Hit.Component;
+		HitPhysicalMaterial = Hit.PhysMaterial;
+
 #if ENABLE_DRAW_DEBUG
 		if (bDisplayDebug)
 		{
@@ -79,6 +102,10 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 	{
 		Hit.ImpactPoint = FootTransform.GetLocation();
 		Hit.ImpactNormal = FVector::UpVector;
+		HitLocation = FootTransform.GetLocation();
+		HitNormal = FVector::UpVector;
+		HitComponent = nullptr;
+		HitPhysicalMaterial = nullptr;
 	}
 
 	const auto SurfaceType{ Hit.PhysMaterial.IsValid() ? Hit.PhysMaterial->SurfaceType.GetValue() : SurfaceType_Default };
@@ -187,8 +214,103 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 
 		if (IsValid(Decal))
 		{
+			if (IsValid(ALSXTCharacter)) {
 
-			Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration, false);
+				// Set ALSXT Footstep Values
+				LeftFootstepPhysicalMaterial = ALSXTCharacter->GetFootstepValues().LeftFootPhysicalMaterial;
+				PrevLeftFootstepPhysicalMaterial = ALSXTCharacter->GetFootstepValues().PrevLeftFootPhysicalMaterial;
+				RightFootstepPhysicalMaterial = ALSXTCharacter->GetFootstepValues().RightFootPhysicalMaterial;
+				PrevRightFootstepPhysicalMaterial = ALSXTCharacter->GetFootstepValues().PrevRightFootPhysicalMaterial;
+				LeftFootstepWetness = ALSXTCharacter->GetFootstepValues().LeftFootWetness;
+				RightFootstepWetness = ALSXTCharacter->GetFootstepValues().RightFootWetness;
+				LeftFootstepBlood = ALSXTCharacter->GetFootstepValues().LeftFootBlood;
+				RightFootstepBlood = ALSXTCharacter->GetFootstepValues().RightFootBlood;
+				LeftFootstepDirt1 = ALSXTCharacter->GetFootstepValues().LeftFootDirt1;
+				RightFootstepDirt1 = ALSXTCharacter->GetFootstepValues().RightFootDirt1;
+				LeftFootstepDirt2 = ALSXTCharacter->GetFootstepValues().LeftFootDirt2;
+				RightFootstepDirt2 = ALSXTCharacter->GetFootstepValues().RightFootDirt2;
+				LeftFootstepSand = ALSXTCharacter->GetFootstepValues().LeftFootSand;
+				RightFootstepSand = ALSXTCharacter->GetFootstepValues().RightFootSand;
+				LeftFootstepVegetation = ALSXTCharacter->GetFootstepValues().LeftFootVegetation;
+				RightFootstepVegetation = ALSXTCharacter->GetFootstepValues().RightFootVegetation;
+				LeftFootstepSnow = ALSXTCharacter->GetFootstepValues().LeftFootSnow;
+				RightFootstepSnow = ALSXTCharacter->GetFootstepValues().RightFootSnow;
+				LeftFootstepOil = ALSXTCharacter->GetFootstepValues().LeftFootOil;
+				RightFootstepOil = ALSXTCharacter->GetFootstepValues().RightFootOil;
+				LeftFootstepDurationModifierMin = ALSXTCharacter->GetFootstepValues().LeftFootDurationModifierMin;
+				RightFootstepDurationModifierMin = ALSXTCharacter->GetFootstepValues().RightFootDurationModifierMin;
+				LeftFootstepDurationModifierMax = ALSXTCharacter->GetFootstepValues().LeftFootDurationModifierMax;
+				RightFootstepDurationModifierMax = ALSXTCharacter->GetFootstepValues().RightFootDurationModifierMax;
+				FootstepSoleTexture = ALSXTCharacter->GetFootwearDetails().FootwearSoleTexture;
+				FootstepSoleNormal = ALSXTCharacter->GetFootwearDetails().FootwearSoleNormal;
+				FootstepSoleSurfaceType = ALSXTCharacter->GetFootwearDetails().FootwearSoleSurfaceType;
+
+				// Declare local variables
+				UMaterialInstanceDynamic* MI;
+				float DurationAverage{ 0.0f };
+				FVector2D InputRange{ 0, 1 };
+				FVector2D OutputRange{ 0, 1 };
+				float DurationModifier{ 0.0f };
+				FALSXTFootstepState NewFootstepState;
+
+				// Set New Left or Right foot Values based on current FootBone
+				if (FootBone == EALSXTFootBone::Left) {
+					//Create Dynamic Material Instance and Set Parameters
+					MI = UMaterialInstanceDynamic::Create(Decal->GetMaterial(0), this);
+					Decal->SetMaterial(0, MI);
+					MI->SetTextureParameterValue(FName("SoleTexture"), FootstepSoleTexture);
+					MI->SetTextureParameterValue(FName("SoleNormal"), FootstepSoleNormal);
+					MI->SetScalarParameterValue(TEXT("Wetness"), LeftFootstepWetness);
+					MI->SetScalarParameterValue(TEXT("Blood"), LeftFootstepBlood);
+					MI->SetScalarParameterValue(TEXT("Dirt1"), LeftFootstepDirt1);
+					MI->SetScalarParameterValue(TEXT("Dirt2"), LeftFootstepDirt2);
+
+					//Calculate Duration based on Materials. Wetter materials stay longer
+					DurationAverage = LeftFootstepWetness + LeftFootstepBlood + LeftFootstepDirt1 + LeftFootstepDirt2 / 4;
+					InputRange = { 0, 1 };
+					OutputRange = { LeftFootstepDurationModifierMin, LeftFootstepDurationModifierMax };
+					DurationModifier = FMath::GetMappedRangeValueClamped(InputRange, OutputRange, DurationAverage);
+					Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration* DurationModifier, false);
+
+					// Set New Footstep State
+					NewFootstepState = { HitPhysicalMaterial, PrevLeftFootstepPhysicalMaterial, RightFootstepPhysicalMaterial, HitPhysicalMaterial, LeftFootstepWetness, RightFootstepWetness, LeftFootstepBlood, RightFootstepBlood, LeftFootstepDirt1, RightFootstepDirt1, LeftFootstepDirt2, RightFootstepDirt2, LeftFootstepSand, RightFootstepSand, LeftFootstepVegetation, RightFootstepVegetation, LeftFootstepSnow, RightFootstepSnow, LeftFootstepOil, RightFootstepOil, LeftFootstepDurationModifierMin, RightFootstepDurationModifierMin, LeftFootstepDurationModifierMax, RightFootstepDurationModifierMax };
+
+					if (IsValid(ALSXTCharacter)) {
+						Cast<AALSXTCharacter>(Mesh->GetOwner())->SetFootstepState(NewFootstepState);
+					}		
+				}
+				if (FootBone == EALSXTFootBone::Right) {
+					//Create Dynamic Material Instance and Set Parameters
+					MI = UMaterialInstanceDynamic::Create(Decal->GetMaterial(0), this);
+					Decal->SetMaterial(0, MI);
+					MI->SetTextureParameterValue(FName("SoleTexture"), FootstepSoleTexture);
+					MI->SetTextureParameterValue(FName("SoleNormal"), FootstepSoleNormal);
+					MI->SetScalarParameterValue(TEXT("Wetness"), RightFootstepWetness);
+					MI->SetScalarParameterValue(TEXT("Blood"), RightFootstepBlood);
+					MI->SetScalarParameterValue(TEXT("Dirt1"), RightFootstepDirt1);
+					MI->SetScalarParameterValue(TEXT("Dirt2"), RightFootstepDirt2);
+
+					//Calculate Duration based on Materials. Wetter materials stay longer
+					DurationAverage = RightFootstepWetness + RightFootstepBlood + RightFootstepDirt1 + RightFootstepDirt2 / 4;
+					InputRange = { 0, 1 };
+					OutputRange = { RightFootstepDurationModifierMin, RightFootstepDurationModifierMax };
+					DurationModifier = FMath::GetMappedRangeValueClamped(InputRange, OutputRange, DurationAverage);
+					Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration * DurationModifier, false);
+
+					// Set New Footstep State
+					NewFootstepState = { LeftFootstepPhysicalMaterial, HitPhysicalMaterial, HitPhysicalMaterial, PrevRightFootstepPhysicalMaterial, LeftFootstepWetness, RightFootstepWetness, LeftFootstepBlood, RightFootstepBlood, LeftFootstepDirt1, RightFootstepDirt1, LeftFootstepDirt2, RightFootstepDirt2, LeftFootstepSand, RightFootstepSand, LeftFootstepVegetation, RightFootstepVegetation, LeftFootstepSnow, RightFootstepSnow, LeftFootstepOil, RightFootstepOil, LeftFootstepDurationModifierMin, RightFootstepDurationModifierMin, LeftFootstepDurationModifierMax, RightFootstepDurationModifierMax };
+
+					if (IsValid(ALSXTCharacter)) {
+						Cast<AALSXTCharacter>(Mesh->GetOwner())->SetFootstepState(NewFootstepState);
+					}				
+				}
+			}
+			else
+			{
+#if WITH_EDITOR
+				Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration, false);
+#endif		
+			}
 		}
 	}
 

@@ -1,16 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// MIT
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "AlsAnimationInstance.h"
+#include "State/AlsFeetState.h"
 #include "ALSXTCharacter.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "ALSXTAnimationInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ALSXT_API UALSXTAnimationInstance : public UAlsAnimationInstance
 {
