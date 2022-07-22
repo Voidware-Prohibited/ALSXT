@@ -60,20 +60,41 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
 	TSoftObjectPtr<UMaterialInterface> DecalMaterial;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
+	TSoftObjectPtr<UTexture2D> FootstepSoleTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
+	TSoftObjectPtr<UTexture2D> FootstepSoleNormal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
+	TSoftObjectPtr<UTexture2D> FootstepSoleDetail;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float FootstepSoleDetailScale{ 1.0f };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
-	FLinearColor MaterialBaseColor{0.0f, 0.0f, 0.0f, 1.0f};
+	FLinearColor MaterialPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
+	FLinearColor MaterialSecondaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float MaterialGrainSize{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
 	float MaterialWetness{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialTransferAmount{ 0.0f };
+	float MaterialTransferAmount{ 0.5f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
 	FVector DecalSize{10.0f, 20.0f, 20.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -1))
 	float DecalNormalAmount{0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float MaterialEmissive{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0, ForceUnits = "s"))
 	float DecalDuration{4.0f};
@@ -187,52 +208,82 @@ private:
 	TWeakObjectPtr<UPhysicalMaterial> PrevRightFootstepPhysicalMaterial;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float LeftFootstepWetness{ 0.0f };
+	UTexture2D* LeftFootstepSoleTexture;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* RightFootstepSoleTexture;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* LeftFootstepSoleNormal;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* RightFootstepSoleNormal;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* LeftFootstepSoleDetail;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* RightFootstepSoleDetail;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootstepSoleDetailScale{ 0.0f };
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootstepSoleDetailScale{ 0.0f };
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	FLinearColor LeftFootstepMaterialPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	FLinearColor RightFootstepMaterialPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	FLinearColor LeftFootstepMaterialSecondaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	FLinearColor RightFootstepMaterialSecondaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootstepMaterialGrainSize{ 1.0f };
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootstepMaterialGrainSize{ 1.0f };
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootstepMaterialWetness{ 0.0f };
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootstepMaterialWetness{ 0.0f };
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootstepMaterialTransferAmount{ 0.5f };
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootstepMaterialTransferAmount{ 0.5f };
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootstepDecalNormalAmount{0.0f};
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootstepDecalNormalAmount{0.0f};
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float RightFootstepWetness{ 0.0f };
-
+	float LeftFootstepDecalEmissiveAmount{0.0f};
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float LeftFootstepBlood{ 0.0f };
-
+	float RightFootstepDecalEmissiveAmount{0.0f};
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float RightFootstepBlood{ 0.0f };
-
+	float LeftFootstepDecalDuration{4.0f};
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float LeftFootstepDirt1{ 0.0f };
-
+	float RightFootstepDecalDuration{4.0f};
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float RightFootstepDirt1{ 0.0f };
-
+	float LeftFootstepDecalFadeOutDuration{2.0f};
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float LeftFootstepDirt2{ 0.0f };
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float RightFootstepDirt2{ 0.0f };
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float LeftFootstepSand{ 0.0f };
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float RightFootstepSand{ 0.0f };
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float LeftFootstepVegetation{ 0.0f };
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float RightFootstepVegetation{ 0.0f };
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float LeftFootstepSnow{ 0.0f };
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float RightFootstepSnow{ 0.0f };
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float LeftFootstepOil{ 0.0f };
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float RightFootstepOil{ 0.0f };
+	float RightFootstepDecalFadeOutDuration{2.0f};
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
 	float LeftFootstepDurationModifierMin{ 1.0f };
@@ -247,12 +298,6 @@ private:
 	float RightFootstepDurationModifierMax{ 4.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-	UTexture2D* FootstepSoleTexture;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-	UTexture2D* FootstepSoleNormal;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Settings|Values", Meta = (AllowPrivateAccess))
 	TWeakObjectPtr<UPhysicalMaterial> FootstepSoleSurfaceType;
 
 public:
@@ -261,6 +306,6 @@ public:
 	virtual void Notify(USkeletalMeshComponent* Mesh, UAnimSequenceBase* Animation,
 	const FAnimNotifyEventReference& EventReference) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|DynamicValues", Meta = (AllowPrivateAccess))
+	UPROPERTY(Meta = (AllowPrivateAccess))
 	FHitResult HitResult;
 };

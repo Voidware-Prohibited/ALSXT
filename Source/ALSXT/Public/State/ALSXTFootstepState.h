@@ -11,77 +11,107 @@ struct ALSXT_API FALSXTFootstepState
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TWeakObjectPtr<UPhysicalMaterial> LeftFootPhysicalMaterial;
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	TWeakObjectPtr<UPhysicalMaterial> LeftFootPhysicalMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TWeakObjectPtr<UPhysicalMaterial> PrevLeftFootPhysicalMaterial;
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	TWeakObjectPtr<UPhysicalMaterial> PrevLeftFootPhysicalMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TWeakObjectPtr<UPhysicalMaterial> RightFootPhysicalMaterial;
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	TWeakObjectPtr<UPhysicalMaterial> RightFootPhysicalMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TWeakObjectPtr<UPhysicalMaterial> PrevRightFootPhysicalMaterial;
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	TWeakObjectPtr<UPhysicalMaterial> PrevRightFootPhysicalMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float LeftFootWetness{ 0.0f };
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* LeftFootSoleTexture;
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* RightFootSoleTexture;
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* LeftFootSoleNormal;
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* RightFootSoleNormal;
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* LeftFootSoleDetail;
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	UTexture2D* RightFootSoleDetail;
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootSoleDetailScale{ 0.0f };
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootSoleDetailScale{ 0.0f };
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	FLinearColor LeftFootMaterialPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	FLinearColor RightFootMaterialPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	FLinearColor LeftFootMaterialSecondaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	FLinearColor RightFootMaterialSecondaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootMaterialGrainSize{ 1.0f };
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootMaterialGrainSize{ 1.0f };
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootMaterialWetness{ 0.0f };
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootMaterialWetness{ 0.0f };
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootMaterialTransferAmount{ 0.5f };
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootMaterialTransferAmount{ 0.5f };
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = -1))
+	float LeftFootDecalNormalAmount{0.0f};
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = -1))
+	float RightFootDecalNormalAmount{0.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float RightFootWetness{ 0.0f };
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootDecalEmissiveAmount{ 0.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float LeftFootBlood{ 0.0f };
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootDecalEmissiveAmount{ 0.0f };
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootDecalDuration{4.0f};
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootDecalDuration{4.0f};
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootDecalFadeOutDuration{2.0f};
+	
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootDecalFadeOutDuration{2.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float RightFootBlood{ 0.0f };
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootDurationModifierMin{ 1.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float LeftFootDirt1{ 0.0f };
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootDurationModifierMin{ 1.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float RightFootDirt1{ 0.0f };
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float LeftFootDurationModifierMax{ 4.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float LeftFootDirt2{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float RightFootDirt2{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float LeftFootSand{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float RightFootSand{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float LeftFootVegetation{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float RightFootVegetation{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float LeftFootSnow{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float RightFootSnow{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float LeftFootOil{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-		float RightFootOil{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float LeftFootDurationModifierMin{ 1.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float RightFootDurationModifierMin{ 1.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float LeftFootDurationModifierMax{ 4.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float RightFootDurationModifierMax{ 4.0f };
+	UPROPERTY(Meta = (AllowPrivateAccess, ClampMin = 0))
+	float RightFootDurationModifierMax{ 4.0f };
 };
 
 USTRUCT(BlueprintType)
@@ -89,13 +119,13 @@ struct ALSXT_API FALSXTFootwearDetails
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 		UTexture2D* FootwearSoleTexture;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 		UTexture2D* FootwearSoleNormal;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 		TWeakObjectPtr<UPhysicalMaterial> FootwearSoleSurfaceType;
 
 };
