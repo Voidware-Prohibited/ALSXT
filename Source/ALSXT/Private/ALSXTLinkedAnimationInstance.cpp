@@ -3,7 +3,7 @@
 
 #include "ALSXTLinkedAnimationInstance.h"
 #include "ALSXTCharacter.h"
-#include "Utility/AlsMacro.h"
+#include "Utility/AlsMacros.h"
 
 UALSXTLinkedAnimationInstance::UALSXTLinkedAnimationInstance()
 {
