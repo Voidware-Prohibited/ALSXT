@@ -227,7 +227,7 @@ public:
 public:
 	const FALSXTFootstepState& GetFootstepState() const;
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewStanceTag"))
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootstepState"))
 		void SetFootstepState(const FALSXTFootstepState& NewFootstepState);
 
 private:

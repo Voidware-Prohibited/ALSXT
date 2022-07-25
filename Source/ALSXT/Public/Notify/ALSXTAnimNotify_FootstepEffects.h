@@ -165,36 +165,6 @@ class ALSXT_API UALSXTAnimNotify_FootstepEffects : public UAnimNotify
 	GENERATED_BODY()
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
-	TObjectPtr<UALSXTFootstepEffectsSettings> FootstepEffectsSettings;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
-	EALSXTFootBone FootBone {EALSXTFootBone::Left};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
-	bool bSkipEffectsWhenInAir;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
-	bool bSpawnSound{ true };
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
-	float SoundVolumeMultiplier{ 1.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
-	float SoundPitchMultiplier{ 1.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
-	EALSXTFootstepSoundType SoundType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
-	bool bIgnoreFootstepSoundBlockCurve;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Decal", Meta = (AllowPrivateAccess))
-	bool bSpawnDecal{ true };
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
-	bool bSpawnParticleSystem{ true };
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess))
 	TWeakObjectPtr<UPhysicalMaterial> FootstepSoleSurfaceType;
 
@@ -203,6 +173,39 @@ public:
 
 	virtual void Notify(USkeletalMeshComponent* Mesh, UAnimSequenceBase* Animation,
 	const FAnimNotifyEventReference& EventReference) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	UALSXTFootstepEffectsSettings* FootstepEffectsSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Sound", Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
+	float SoundVolumeMultiplier{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Sound", Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
+	float SoundPitchMultiplier{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	EALSXTFootBone FootBone {EALSXTFootBone::Left};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
+	bool bSkipEffectsWhenInAir;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
+	bool bSpawnSound{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
+	EALSXTFootstepSoundType SoundType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
+	bool bIgnoreFootstepSoundBlockCurve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Decal", Meta = (AllowPrivateAccess))
+	bool bSpawnDecal{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
+	bool bSpawnParticleSystem{ true };
+
+	UFUNCTION(BlueprintCallable, Category = "Settings", Meta = (AutoCreateRefTerm = "NewALSXTFootstepEffectsSettings"))
+	void SetFootstepEffectsSettings(UALSXTFootstepEffectsSettings* NewALSXTFootstepEffectsSettings, float NewSoundVolumeMultiplier, float NewSoundPitchMultiplier, EALSXTFootBone NewFootBone, bool bNewSkipEffectsWhenInAir, bool bNewSpawnSound, EALSXTFootstepSoundType NewFootstepSoundType, bool bNewIgnoreFootstepSoundBlockCurve, bool bNewSpawnDecal, bool bNewSpawnParticleSystem);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	FHitResult HitResult;

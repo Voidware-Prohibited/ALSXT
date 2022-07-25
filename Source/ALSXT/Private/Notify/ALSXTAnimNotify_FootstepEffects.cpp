@@ -23,6 +23,20 @@ FString UALSXTAnimNotify_FootstepEffects::GetNotifyName_Implementation() const
 	return FString::Format(TEXT("ALSXT Footstep Effects: {0}"), { AlsEnumUtility::GetNameStringByValue(FootBone) });
 }
 
+void UALSXTAnimNotify_FootstepEffects::SetFootstepEffectsSettings(UALSXTFootstepEffectsSettings* NewALSXTFootstepEffectsSettings, float NewSoundVolumeMultiplier, float NewSoundPitchMultiplier, EALSXTFootBone NewFootBone, bool bNewSkipEffectsWhenInAir, bool bNewSpawnSound, EALSXTFootstepSoundType NewFootstepSoundType, bool bNewIgnoreFootstepSoundBlockCurve, bool bNewSpawnDecal, bool bNewSpawnParticleSystem)
+{
+	FootstepEffectsSettings = NewALSXTFootstepEffectsSettings;
+	SoundVolumeMultiplier = NewSoundVolumeMultiplier;
+	SoundPitchMultiplier = NewSoundPitchMultiplier;
+	FootBone = NewFootBone;
+	bSkipEffectsWhenInAir = bNewSkipEffectsWhenInAir;
+	bSpawnSound = bNewSpawnSound;
+	SoundType = NewFootstepSoundType;
+	bIgnoreFootstepSoundBlockCurve = bNewIgnoreFootstepSoundBlockCurve;
+	bSpawnDecal = bNewSpawnDecal;
+	bSpawnParticleSystem = bNewSpawnParticleSystem;
+}
+
 void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSequenceBase* Animation,
 	const FAnimNotifyEventReference& EventReference)
 {
