@@ -36,6 +36,9 @@ private:
 
 	// Footstep State
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootprintsState", Meta = (AllowPrivateAccess))
+	FALSXTFootprintsState FootprintsState;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootstepState", Meta = (AllowPrivateAccess))
 	FALSXTFootstepState FootstepState;
 
@@ -225,21 +228,37 @@ public:
 	// Footstep State
 
 public:
-	const FALSXTFootstepState& GetFootstepState() const;
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTFootprintsState& GetFootprintsState() const;
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootstepState"))
-		void SetFootstepState(const FALSXTFootstepState& NewFootstepState);
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
+	void SetFootprintsState(const FALSXTFootprintsState& NewFootprintsState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
+	FALSXTFootprintsState SetFootprintsState_Implementation(const FALSXTFootprintsState& NewFootprintsState);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
+	void SetFootstepState(const FALSXTFootstepState& NewFootstepState);
 
 private:
 	UFUNCTION(Server, Reliable)
-		void ServerSetFootstepState(const FALSXTFootstepState& NewFootstepState);
+	void ServerSetFootprintsState(const FALSXTFootprintsState& NewFootprintsState);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetFootstepState(const FALSXTFootstepState& NewFootstepState);
 
 	UFUNCTION()
-		void OnReplicate_FootstepState(const FALSXTFootstepState& PreviousFootstepState);
+	void OnReplicate_FootprintsState(const FALSXTFootprintsState& PreviousFootprintsState);
+
+	UFUNCTION()
+	void OnReplicate_FootstepState(const FALSXTFootstepState& PreviousFootstepState);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-		void OnFootstepStateChanged(const FALSXTFootstepState& PreviousFootstepState);
+	void OnFootprintsStateChanged(const FALSXTFootprintsState& PreviousFootprintsState);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnFootstepStateChanged(const FALSXTFootstepState& PreviousFootstepState);
 
 public:
 
@@ -468,6 +487,11 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnWeaponReadyPositionChanged(const FGameplayTag& PreviousWeaponReadyPositionTag);
 };
+
+inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
+{
+	return FootprintsState;
+}
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredFreelooking() const
 {

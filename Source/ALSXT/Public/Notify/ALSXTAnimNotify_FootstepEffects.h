@@ -4,18 +4,12 @@
 #include "Chaos/ChaosEngineInterface.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
+#include "State/ALSXTFootstepState.h"
 #include "ALSXTAnimNotify_FootstepEffects.generated.h"
 
 class USoundBase;
 class UMaterialInterface;
 class UNiagaraSystem;
-
-UENUM(BlueprintType)
-enum class EALSXTFootBone : uint8
-{
-	Left,
-	Right,
-};
 
 UENUM(BlueprintType)
 enum class EALSXTFootstepSoundType : uint8
@@ -86,6 +80,12 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
 	float MaterialTransferAmount{ 0.5f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float MaterialSaturationRate{ 0.5f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float MaterialDesaturationRate{ 0.5f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
 	FVector DecalSize{10.0f, 20.0f, 20.0f};
@@ -211,10 +211,10 @@ public:
 	FHitResult HitResult;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
-	FALSXTFootstepState CurrentFootstepState;
+	FALSXTFootprintsState CurrentFootprintsState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
-	FALSXTFootstepState UpdatedFootstepState;
+	FALSXTFootprintsState NewFootprintsState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
 	TWeakObjectPtr<UPhysicalMaterial> LeftFootstepPhysicalMaterial;

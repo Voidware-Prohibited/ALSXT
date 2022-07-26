@@ -52,6 +52,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Parameters.bIsPushBased = true;
 
 	Parameters.Condition = COND_SkipOwner;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FootprintsState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FootstepState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFreelooking, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredSex, Parameters)
@@ -270,6 +271,22 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 	}
 }
 
+void AALSXTCharacter::SetFootprintsState(const FALSXTFootprintsState& NewFootprintsState)
+{
+	const auto PreviousFootprintsState{ FootprintsState };
+
+	//SetFootprintsState_Implementation(NewFootprintsState);
+	FALSXTFootprintsState UpdatedFootprintsState{SetFootprintsState_Implementation(NewFootprintsState)};
+	FootprintsState = SetFootprintsState_Implementation(UpdatedFootprintsState);
+
+	OnFootprintsStateChanged(PreviousFootprintsState);
+
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerSetFootprintsState(NewFootprintsState);
+	}
+}
+
 void AALSXTCharacter::SetFootstepState(const FALSXTFootstepState& NewFootstepState)
 {
 	const auto PreviousFootstepState{ FootstepState };
@@ -284,15 +301,27 @@ void AALSXTCharacter::SetFootstepState(const FALSXTFootstepState& NewFootstepSta
 	}
 }
 
+void AALSXTCharacter::ServerSetFootprintsState_Implementation(const FALSXTFootprintsState& NewFootprintsState)
+{
+	SetFootprintsState(NewFootprintsState);
+}
+
 void AALSXTCharacter::ServerSetFootstepState_Implementation(const FALSXTFootstepState& NewFootstepState)
 {
 	SetFootstepState(NewFootstepState);
+}
+
+void AALSXTCharacter::OnReplicate_FootprintsState(const FALSXTFootprintsState& PreviousFootprintsState)
+{
+	OnFootprintsStateChanged(PreviousFootprintsState);
 }
 
 void AALSXTCharacter::OnReplicate_FootstepState(const FALSXTFootstepState& PreviousFootstepState)
 {
 	OnFootstepStateChanged(PreviousFootstepState);
 }
+
+void AALSXTCharacter::OnFootprintsStateChanged_Implementation(const FALSXTFootprintsState& PreviousFootprintsState) {}
 
 void AALSXTCharacter::OnFootstepStateChanged_Implementation(const FALSXTFootstepState& PreviousFootstepState) {}
 

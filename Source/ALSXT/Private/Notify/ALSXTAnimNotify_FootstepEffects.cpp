@@ -16,7 +16,9 @@
 #include "Utility/AlsMacros.h"
 #include "Utility/AlsMath.h"
 #include "Utility/AlsUtility.h"
+#include "State/ALSXTFootstepState.h"
 #include "Engine/GameEngine.h"
+#include "Math/UnrealMathUtility.h"
 
 FString UALSXTAnimNotify_FootstepEffects::GetNotifyName_Implementation() const
 {
@@ -70,6 +72,8 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 												 : FootstepEffectsSettings->FootRightZAxis)
 	};
 
+	FHitResult Hit;
+	bool NewSurface;
 	FVector HitLocation;
 	FVector HitNormal;
 	TWeakObjectPtr<UPrimitiveComponent> HitComponent;
@@ -82,7 +86,6 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 	FCollisionQueryParams QueryParameters{ ANSI_TO_TCHAR(__FUNCTION__), true, Mesh->GetOwner() };
 	QueryParameters.bReturnPhysicalMaterial = true;
 
-	FHitResult Hit;
 	if (World->LineTraceSingleByChannel(Hit, FootTransform.GetLocation(),
 		FootTransform.GetLocation() - FootZAxis *
 		(FootstepEffectsSettings->SurfaceTraceDistance * CapsuleScale),
@@ -225,7 +228,11 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		{
 			if (IsValid(ALSXTCharacter)) {
 
+				CurrentFootprintsState = ALSXTCharacter->GetFootprintsState();
+
+
 				// Set ALSXT Footstep Values
+		
 				LeftFootstepPhysicalMaterial = Hit.PhysMaterial;
 				PrevLeftFootstepPhysicalMaterial = ALSXTCharacter->GetFootstepValues().PrevLeftFootPhysicalMaterial;
 				RightFootstepPhysicalMaterial = Hit.PhysMaterial;
@@ -277,20 +284,95 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 
 				// Set New Left or Right foot Values based on current FootBone
 				if (FootBone == EALSXTFootBone::Left) {
+
+					NewSurface = ((UGameplayStatics::GetSurfaceType(Hit) != CurrentFootprintsState.Left.Current.FootPhysicalMaterial));
+
+					if (NewSurface) {
+
+						//Set Current as Previous
+						CurrentFootprintsState.Left.Previous.FootPhysicalMaterial = CurrentFootprintsState.Left.Current.FootPhysicalMaterial;
+						CurrentFootprintsState.Left.Previous.FootTransferDetailTexture = CurrentFootprintsState.Left.Current.FootTransferDetailTexture;
+						CurrentFootprintsState.Left.Previous.FootTransferDetailScale = CurrentFootprintsState.Left.Current.FootTransferDetailScale;
+						CurrentFootprintsState.Left.Previous.FootMaterialPrimaryColor = CurrentFootprintsState.Left.Current.FootMaterialPrimaryColor;
+						CurrentFootprintsState.Left.Previous.FootMaterialSecondaryColor = CurrentFootprintsState.Left.Current.FootMaterialSecondaryColor;
+						CurrentFootprintsState.Left.Previous.FootMaterialGrainSize = CurrentFootprintsState.Left.Current.FootMaterialGrainSize;
+						CurrentFootprintsState.Left.Previous.FootMaterialWetness = CurrentFootprintsState.Left.Current.FootMaterialWetness;
+						CurrentFootprintsState.Left.Previous.FootMaterialTransferAmount = CurrentFootprintsState.Left.Current.FootMaterialTransferAmount;
+						CurrentFootprintsState.Left.Previous.FootMaterialSaturationRate = CurrentFootprintsState.Left.Current.FootMaterialSaturationRate;
+						CurrentFootprintsState.Left.Previous.FootMaterialDesaturationRate = CurrentFootprintsState.Left.Current.FootMaterialDesaturationRate;
+						CurrentFootprintsState.Left.Previous.FootDecalNormalAmount = CurrentFootprintsState.Left.Current.FootDecalNormalAmount;
+						CurrentFootprintsState.Left.Previous.FootDecalEmissiveAmount = CurrentFootprintsState.Left.Current.FootDecalEmissiveAmount;
+						CurrentFootprintsState.Left.Previous.FootDecalDuration = CurrentFootprintsState.Left.Current.FootDecalDuration;
+						CurrentFootprintsState.Left.Previous.FootDecalFadeOutDuration = CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration;
+						CurrentFootprintsState.Left.Previous.FootDurationModifierMin = CurrentFootprintsState.Left.Current.FootDurationModifierMin;
+						CurrentFootprintsState.Left.Previous.FootDurationModifierMax = CurrentFootprintsState.Left.Current.FootDurationModifierMax;
+
+						//Set New Current
+						CurrentFootprintsState.Left.Current.FootPhysicalMaterial = UGameplayStatics::GetSurfaceType(Hit);
+						CurrentFootprintsState.Left.Current.FootTransferDetailTexture = EffectSettings->FootstepSoleDetail;
+						CurrentFootprintsState.Left.Current.FootTransferDetailScale = EffectSettings->FootstepSoleDetailScale;
+						CurrentFootprintsState.Left.Current.FootMaterialPrimaryColor = EffectSettings->MaterialPrimaryColor;
+						CurrentFootprintsState.Left.Current.FootMaterialSecondaryColor = EffectSettings->MaterialSecondaryColor;
+						CurrentFootprintsState.Left.Current.FootMaterialGrainSize = EffectSettings->MaterialGrainSize;
+						CurrentFootprintsState.Left.Current.FootMaterialWetness = EffectSettings->MaterialWetness;
+						CurrentFootprintsState.Left.Current.FootMaterialTransferAmount = EffectSettings->MaterialTransferAmount;
+						CurrentFootprintsState.Left.Current.FootMaterialSaturationRate = EffectSettings->MaterialSaturationRate;
+						CurrentFootprintsState.Left.Current.FootMaterialDesaturationRate = EffectSettings->MaterialDesaturationRate;
+						CurrentFootprintsState.Left.Current.FootDecalNormalAmount = EffectSettings->DecalNormalAmount;
+						CurrentFootprintsState.Left.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
+						CurrentFootprintsState.Left.Current.FootDecalDuration = EffectSettings->DecalDuration;
+						CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
+						CurrentFootprintsState.Left.Current.FootDurationModifierMin = CurrentFootprintsState.Left.Current.FootDurationModifierMin;
+						CurrentFootprintsState.Left.Current.FootDurationModifierMax = CurrentFootprintsState.Left.Current.FootDurationModifierMax;
+					}
+					else {
+						//Set New Current
+						CurrentFootprintsState.Left.Current.FootPhysicalMaterial = UGameplayStatics::GetSurfaceType(Hit);
+						CurrentFootprintsState.Left.Current.FootTransferDetailTexture = EffectSettings->FootstepSoleDetail;
+						CurrentFootprintsState.Left.Current.FootTransferDetailScale = EffectSettings->FootstepSoleDetailScale;
+						CurrentFootprintsState.Left.Current.FootMaterialPrimaryColor = EffectSettings->MaterialPrimaryColor;
+						CurrentFootprintsState.Left.Current.FootMaterialSecondaryColor = EffectSettings->MaterialSecondaryColor;
+						CurrentFootprintsState.Left.Current.FootMaterialGrainSize = EffectSettings->MaterialGrainSize;
+						CurrentFootprintsState.Left.Current.FootMaterialWetness = EffectSettings->MaterialWetness;
+						CurrentFootprintsState.Left.Current.FootMaterialTransferAmount = EffectSettings->MaterialTransferAmount;
+						CurrentFootprintsState.Left.Current.FootMaterialSaturationRate = EffectSettings->MaterialSaturationRate;
+						CurrentFootprintsState.Left.Current.FootMaterialDesaturationRate = EffectSettings->MaterialDesaturationRate;
+						CurrentFootprintsState.Left.Current.FootDecalNormalAmount = EffectSettings->DecalNormalAmount;
+						CurrentFootprintsState.Left.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
+						CurrentFootprintsState.Left.Current.FootDecalDuration = EffectSettings->DecalDuration;
+						CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
+						CurrentFootprintsState.Left.Current.FootDurationModifierMin = CurrentFootprintsState.Left.Current.FootDurationModifierMin;
+						CurrentFootprintsState.Left.Current.FootDurationModifierMax = CurrentFootprintsState.Left.Current.FootDurationModifierMax;
+					}
+
+					ALSXTCharacter->SetFootprintsState(CurrentFootprintsState);
+					CurrentFootprintsState = ALSXTCharacter->GetFootprintsState();
+
 					//Create Dynamic Material Instance and Set Parameters
 					MI = UMaterialInstanceDynamic::Create(Decal->GetMaterial(0), this);
 					Decal->SetMaterial(0, MI);
 					MI->SetTextureParameterValue(FName("SoleTexture"), LeftFootstepSoleTexture);
 					MI->SetTextureParameterValue(FName("SoleNormal"), LeftFootstepSoleNormal);
 					MI->SetTextureParameterValue(FName("SoleDetail"), LeftFootstepSoleDetail);
-					MI->SetScalarParameterValue(FName("SoleDetailScale"), LeftFootstepSoleDetailScale);
-					MI->SetVectorParameterValue(FName("PrimaryColor"), LeftFootstepMaterialPrimaryColor);
-					MI->SetVectorParameterValue(FName("SecondaryColor"), LeftFootstepMaterialSecondaryColor);
-					MI->SetScalarParameterValue(FName("GrainSize"), LeftFootstepMaterialGrainSize);
-					MI->SetScalarParameterValue(FName("Wetness"), LeftFootstepMaterialWetness);
-					MI->SetScalarParameterValue(FName("TransferAmount"), LeftFootstepMaterialTransferAmount);
-					MI->SetScalarParameterValue(FName("NormalAmount"), LeftFootstepDecalNormalAmount);
-					MI->SetScalarParameterValue(FName("EmissiveAmount"), LeftFootstepDecalEmissiveAmount);
+					MI->SetScalarParameterValue(FName("SoleNormalAmount"), LeftFootstepDecalNormalAmount);
+					MI->SetTextureParameterValue(FName("TransferDetailTexture"), CurrentFootprintsState.Left.Current.FootTransferDetailTexture);
+					MI->SetTextureParameterValue(FName("TransferDetailNormal"), CurrentFootprintsState.Left.Current.FootTransferDetailNormal);
+					MI->SetScalarParameterValue(FName("TransferNormalAmount"), CurrentFootprintsState.Left.Current.FootMaterialTransferDetailNormalAmount);
+					MI->SetScalarParameterValue(FName("TransferDetailScale"), CurrentFootprintsState.Left.Current.FootTransferDetailScale);
+					MI->SetVectorParameterValue(FName("PrimaryColor"), ALSXTCharacter->GetFootprintsState().Left.Current.FootMaterialPrimaryColor);
+					MI->SetVectorParameterValue(FName("SecondaryColor"), ALSXTCharacter->GetFootprintsState().Left.Current.FootMaterialSecondaryColor);
+					MI->SetScalarParameterValue(FName("GrainSize"), CurrentFootprintsState.Left.Current.FootMaterialGrainSize);
+					MI->SetScalarParameterValue(FName("Wetness"), CurrentFootprintsState.Left.Current.FootMaterialWetness);
+					MI->SetScalarParameterValue(FName("EmissiveAmount"), CurrentFootprintsState.Left.Current.FootDecalEmissiveAmount);
+					MI->SetTextureParameterValue(FName("TransferDetailTexturePrevious"), CurrentFootprintsState.Left.Previous.FootTransferDetailTexture);
+					MI->SetTextureParameterValue(FName("TransferDetailNormalPrevious"), CurrentFootprintsState.Left.Previous.FootTransferDetailNormal);
+					MI->SetScalarParameterValue(FName("TransferNormalAmountPrevious"), CurrentFootprintsState.Left.Previous.FootMaterialTransferDetailNormalAmount);
+					MI->SetScalarParameterValue(FName("TransferDetailScalePrevious"), CurrentFootprintsState.Left.Previous.FootTransferDetailScale);
+					MI->SetVectorParameterValue(FName("PrimaryColorPrevious"), CurrentFootprintsState.Left.Previous.FootMaterialPrimaryColor);
+					MI->SetVectorParameterValue(FName("SecondaryColorPrevious"), CurrentFootprintsState.Left.Previous.FootMaterialSecondaryColor);
+					MI->SetScalarParameterValue(FName("GrainSizePrevious"), CurrentFootprintsState.Left.Previous.FootMaterialGrainSize);
+					MI->SetScalarParameterValue(FName("WetnessPrevious"), CurrentFootprintsState.Left.Previous.FootMaterialWetness);
+					MI->SetScalarParameterValue(FName("EmissiveAmountPrevious"), CurrentFootprintsState.Left.Previous.FootDecalEmissiveAmount);
 
 					//Calculate Duration based on Materials. Wetter materials stay longer
 					DurationAverage = LeftFootstepMaterialWetness + LeftFootstepMaterialTransferAmount / 2;
@@ -298,35 +380,102 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					OutputRange = { LeftFootstepDurationModifierMin, LeftFootstepDurationModifierMax };
 					DurationModifier = FMath::GetMappedRangeValueClamped(InputRange, OutputRange, DurationAverage);
 					Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration* DurationModifier, false);
-
+					
 					// Set New Footstep State
-					NewFootstepState = { LeftFootstepPhysicalMaterial, PrevLeftFootstepPhysicalMaterial, RightFootstepPhysicalMaterial, PrevRightFootstepPhysicalMaterial, LeftFootstepSoleTexture, RightFootstepSoleTexture, LeftFootstepSoleNormal, RightFootstepSoleNormal, LeftFootstepSoleDetail, RightFootstepSoleDetail, LeftFootstepSoleDetailScale, RightFootstepSoleDetailScale, LeftFootstepMaterialPrimaryColor, RightFootstepMaterialPrimaryColor, LeftFootstepMaterialSecondaryColor, RightFootstepMaterialSecondaryColor, LeftFootstepMaterialGrainSize, RightFootstepMaterialGrainSize, LeftFootstepMaterialWetness, RightFootstepMaterialWetness, LeftFootstepMaterialTransferAmount, RightFootstepMaterialTransferAmount, LeftFootstepDecalNormalAmount, RightFootstepDecalNormalAmount, LeftFootstepDecalEmissiveAmount, RightFootstepDecalEmissiveAmount, LeftFootstepDecalDuration, RightFootstepDecalDuration, LeftFootstepDecalFadeOutDuration, RightFootstepDecalFadeOutDuration, LeftFootstepDurationModifierMin, RightFootstepDurationModifierMin, LeftFootstepDurationModifierMax, RightFootstepDurationModifierMax };
+					// NewFootstepState = { LeftFootstepPhysicalMaterial, PrevLeftFootstepPhysicalMaterial, RightFootstepPhysicalMaterial, PrevRightFootstepPhysicalMaterial, LeftFootstepSoleTexture, RightFootstepSoleTexture, LeftFootstepSoleNormal, RightFootstepSoleNormal, LeftFootstepSoleDetail, RightFootstepSoleDetail, LeftFootstepSoleDetailScale, RightFootstepSoleDetailScale, LeftFootstepMaterialPrimaryColor, RightFootstepMaterialPrimaryColor, LeftFootstepMaterialSecondaryColor, RightFootstepMaterialSecondaryColor, LeftFootstepMaterialGrainSize, RightFootstepMaterialGrainSize, LeftFootstepMaterialWetness, RightFootstepMaterialWetness, LeftFootstepMaterialTransferAmount, RightFootstepMaterialTransferAmount, LeftFootstepDecalNormalAmount, RightFootstepDecalNormalAmount, LeftFootstepDecalEmissiveAmount, RightFootstepDecalEmissiveAmount, LeftFootstepDecalDuration, RightFootstepDecalDuration, LeftFootstepDecalFadeOutDuration, RightFootstepDecalFadeOutDuration, LeftFootstepDurationModifierMin, RightFootstepDurationModifierMin, LeftFootstepDurationModifierMax, RightFootstepDurationModifierMax };
 
-					// NewFootstepState.LeftFootPhysicalMaterial = HitResult.PhysMaterial;
-					// NewFootstepState.PrevLeftFootPhysicalMaterial = PrevLeftFootstepPhysicalMaterial;
-					// NewFootstepState.RightFootPhysicalMaterial = RightFootstepPhysicalMaterial;
-					// NewFootstepState.PrevRightFootPhysicalMaterial = HitResult.PhysMaterial;
-
-					if (IsValid(ALSXTCharacter)) {
-						Cast<AALSXTCharacter>(Mesh->GetOwner())->SetFootstepState(NewFootstepState);
-						ALSXTCharacter->SetFootstepState(NewFootstepState);
-					}		
+					// ALSXTCharacter->SetFootstepState(NewFootstepState);
 				}
 				if (FootBone == EALSXTFootBone::Right) {
+
+					NewSurface = ((UGameplayStatics::GetSurfaceType(Hit) != CurrentFootprintsState.Right.Current.FootPhysicalMaterial));
+
+					if (NewSurface) {
+
+						//Set Current as Previous
+						CurrentFootprintsState.Right.Previous.FootPhysicalMaterial = CurrentFootprintsState.Right.Current.FootPhysicalMaterial;
+						CurrentFootprintsState.Right.Previous.FootTransferDetailTexture = CurrentFootprintsState.Right.Current.FootTransferDetailTexture;
+						CurrentFootprintsState.Right.Previous.FootTransferDetailScale = CurrentFootprintsState.Right.Current.FootTransferDetailScale;
+						CurrentFootprintsState.Right.Previous.FootMaterialPrimaryColor = CurrentFootprintsState.Right.Current.FootMaterialPrimaryColor;
+						CurrentFootprintsState.Right.Previous.FootMaterialSecondaryColor = CurrentFootprintsState.Right.Current.FootMaterialSecondaryColor;
+						CurrentFootprintsState.Right.Previous.FootMaterialGrainSize = CurrentFootprintsState.Right.Current.FootMaterialGrainSize;
+						CurrentFootprintsState.Right.Previous.FootMaterialWetness = CurrentFootprintsState.Right.Current.FootMaterialWetness;
+						CurrentFootprintsState.Right.Previous.FootMaterialTransferAmount = CurrentFootprintsState.Right.Current.FootMaterialTransferAmount;
+						CurrentFootprintsState.Right.Previous.FootMaterialSaturationRate = CurrentFootprintsState.Right.Current.FootMaterialSaturationRate;
+						CurrentFootprintsState.Right.Previous.FootMaterialDesaturationRate = CurrentFootprintsState.Right.Current.FootMaterialDesaturationRate;
+						CurrentFootprintsState.Right.Previous.FootDecalNormalAmount = CurrentFootprintsState.Right.Current.FootDecalNormalAmount;
+						CurrentFootprintsState.Right.Previous.FootDecalEmissiveAmount = CurrentFootprintsState.Right.Current.FootDecalEmissiveAmount;
+						CurrentFootprintsState.Right.Previous.FootDecalDuration = CurrentFootprintsState.Right.Current.FootDecalDuration;
+						CurrentFootprintsState.Right.Previous.FootDecalFadeOutDuration = CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration;
+						CurrentFootprintsState.Right.Previous.FootDurationModifierMin = CurrentFootprintsState.Right.Current.FootDurationModifierMin;
+						CurrentFootprintsState.Right.Previous.FootDurationModifierMax = CurrentFootprintsState.Right.Current.FootDurationModifierMax;
+
+						//Set New Current
+						CurrentFootprintsState.Right.Current.FootPhysicalMaterial = UGameplayStatics::GetSurfaceType(Hit);
+						CurrentFootprintsState.Right.Current.FootTransferDetailTexture = EffectSettings->FootstepSoleDetail;
+						CurrentFootprintsState.Right.Current.FootTransferDetailScale = EffectSettings->FootstepSoleDetailScale;
+						CurrentFootprintsState.Right.Current.FootMaterialPrimaryColor = EffectSettings->MaterialPrimaryColor;
+						CurrentFootprintsState.Right.Current.FootMaterialSecondaryColor = EffectSettings->MaterialSecondaryColor;
+						CurrentFootprintsState.Right.Current.FootMaterialGrainSize = EffectSettings->MaterialGrainSize;
+						CurrentFootprintsState.Right.Current.FootMaterialWetness = EffectSettings->MaterialWetness;
+						CurrentFootprintsState.Right.Current.FootMaterialTransferAmount = EffectSettings->MaterialTransferAmount;
+						CurrentFootprintsState.Right.Current.FootMaterialSaturationRate = EffectSettings->MaterialSaturationRate;
+						CurrentFootprintsState.Right.Current.FootMaterialDesaturationRate = EffectSettings->MaterialDesaturationRate;
+						CurrentFootprintsState.Right.Current.FootDecalNormalAmount = EffectSettings->DecalNormalAmount;
+						CurrentFootprintsState.Right.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
+						CurrentFootprintsState.Right.Current.FootDecalDuration = EffectSettings->DecalDuration;
+						CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
+						CurrentFootprintsState.Right.Current.FootDurationModifierMin = CurrentFootprintsState.Right.Current.FootDurationModifierMin;
+						CurrentFootprintsState.Right.Current.FootDurationModifierMax = CurrentFootprintsState.Right.Current.FootDurationModifierMax;
+					}
+					else {
+						//Set New Current
+						CurrentFootprintsState.Right.Current.FootPhysicalMaterial = UGameplayStatics::GetSurfaceType(Hit);
+						CurrentFootprintsState.Right.Current.FootTransferDetailTexture = EffectSettings->FootstepSoleDetail;
+						CurrentFootprintsState.Right.Current.FootTransferDetailScale = EffectSettings->FootstepSoleDetailScale;
+						CurrentFootprintsState.Right.Current.FootMaterialPrimaryColor = EffectSettings->MaterialPrimaryColor;
+						CurrentFootprintsState.Right.Current.FootMaterialSecondaryColor = EffectSettings->MaterialSecondaryColor;
+						CurrentFootprintsState.Right.Current.FootMaterialGrainSize = EffectSettings->MaterialGrainSize;
+						CurrentFootprintsState.Right.Current.FootMaterialWetness = EffectSettings->MaterialWetness;
+						CurrentFootprintsState.Right.Current.FootMaterialTransferAmount = EffectSettings->MaterialTransferAmount;
+						CurrentFootprintsState.Right.Current.FootMaterialSaturationRate = EffectSettings->MaterialSaturationRate;
+						CurrentFootprintsState.Right.Current.FootMaterialDesaturationRate = EffectSettings->MaterialDesaturationRate;
+						CurrentFootprintsState.Right.Current.FootDecalNormalAmount = EffectSettings->DecalNormalAmount;
+						CurrentFootprintsState.Right.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
+						CurrentFootprintsState.Right.Current.FootDecalDuration = EffectSettings->DecalDuration;
+						CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
+						CurrentFootprintsState.Right.Current.FootDurationModifierMin = CurrentFootprintsState.Right.Current.FootDurationModifierMin;
+						CurrentFootprintsState.Right.Current.FootDurationModifierMax = CurrentFootprintsState.Right.Current.FootDurationModifierMax;
+					}
+
+					ALSXTCharacter->SetFootprintsState(CurrentFootprintsState);
+					CurrentFootprintsState = ALSXTCharacter->GetFootprintsState();
+
 					//Create Dynamic Material Instance and Set Parameters
 					MI = UMaterialInstanceDynamic::Create(Decal->GetMaterial(0), this);
 					Decal->SetMaterial(0, MI);
 					MI->SetTextureParameterValue(FName("SoleTexture"), RightFootstepSoleTexture);
 					MI->SetTextureParameterValue(FName("SoleNormal"), RightFootstepSoleNormal);
 					MI->SetTextureParameterValue(FName("SoleDetail"), RightFootstepSoleDetail);
-					MI->SetScalarParameterValue(FName("SoleDetailScale"), RightFootstepSoleDetailScale);
-					MI->SetVectorParameterValue(FName("PrimaryColor"), RightFootstepMaterialPrimaryColor);
-					MI->SetVectorParameterValue(FName("SecondaryColor"), RightFootstepMaterialSecondaryColor);
-					MI->SetScalarParameterValue(FName("GrainSize"), RightFootstepMaterialGrainSize);
-					MI->SetScalarParameterValue(FName("Wetness"), RightFootstepMaterialWetness);
-					MI->SetScalarParameterValue(FName("TransferAmount"), RightFootstepMaterialTransferAmount);
-					MI->SetScalarParameterValue(FName("NormalAmount"), RightFootstepDecalNormalAmount);
-					MI->SetScalarParameterValue(FName("EmissiveAmount"), RightFootstepDecalEmissiveAmount);
+					MI->SetScalarParameterValue(FName("SoleNormalAmount"), RightFootstepDecalNormalAmount);
+					MI->SetTextureParameterValue(FName("TransferDetailTexture"), CurrentFootprintsState.Right.Current.FootTransferDetailTexture);
+					MI->SetTextureParameterValue(FName("TransferDetailNormal"), CurrentFootprintsState.Right.Current.FootTransferDetailNormal);
+					MI->SetScalarParameterValue(FName("TransferNormalAmount"), CurrentFootprintsState.Right.Current.FootMaterialTransferDetailNormalAmount);
+					MI->SetScalarParameterValue(FName("TransferDetailScale"), CurrentFootprintsState.Right.Current.FootTransferDetailScale);
+					MI->SetVectorParameterValue(FName("PrimaryColor"), CurrentFootprintsState.Right.Current.FootMaterialPrimaryColor);
+					MI->SetVectorParameterValue(FName("SecondaryColor"), CurrentFootprintsState.Right.Current.FootMaterialSecondaryColor);
+					MI->SetScalarParameterValue(FName("GrainSize"), CurrentFootprintsState.Right.Current.FootMaterialGrainSize);
+					MI->SetScalarParameterValue(FName("Wetness"), CurrentFootprintsState.Right.Current.FootMaterialWetness);
+					MI->SetScalarParameterValue(FName("EmissiveAmount"), CurrentFootprintsState.Right.Current.FootDecalEmissiveAmount);
+					MI->SetTextureParameterValue(FName("TransferDetailTexturePrevious"), CurrentFootprintsState.Right.Previous.FootTransferDetailTexture);
+					MI->SetTextureParameterValue(FName("TransferDetailNormalPrevious"), CurrentFootprintsState.Right.Previous.FootTransferDetailNormal);
+					MI->SetScalarParameterValue(FName("TransferNormalAmountPrevious"), CurrentFootprintsState.Right.Previous.FootMaterialTransferDetailNormalAmount);
+					MI->SetScalarParameterValue(FName("TransferDetailScalePrevious"), CurrentFootprintsState.Right.Previous.FootTransferDetailScale);
+					MI->SetVectorParameterValue(FName("PrimaryColorPrevious"), CurrentFootprintsState.Right.Previous.FootMaterialPrimaryColor);
+					MI->SetVectorParameterValue(FName("SecondaryColorPrevious"), CurrentFootprintsState.Right.Previous.FootMaterialSecondaryColor);
+					MI->SetScalarParameterValue(FName("GrainSizePrevious"), CurrentFootprintsState.Right.Previous.FootMaterialGrainSize);
+					MI->SetScalarParameterValue(FName("WetnessPrevious"), CurrentFootprintsState.Right.Previous.FootMaterialWetness);
+					MI->SetScalarParameterValue(FName("EmissiveAmountPrevious"), CurrentFootprintsState.Right.Previous.FootDecalEmissiveAmount);
 
 					//Calculate Duration based on Materials. Wetter materials stay longer
 					DurationAverage = RightFootstepMaterialWetness + RightFootstepMaterialTransferAmount / 2;
@@ -336,12 +485,9 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration * DurationModifier, false);
 
 					// Set New Footstep State
-					NewFootstepState = { LeftFootstepPhysicalMaterial, PrevLeftFootstepPhysicalMaterial, RightFootstepPhysicalMaterial, PrevRightFootstepPhysicalMaterial, LeftFootstepSoleTexture, RightFootstepSoleTexture, LeftFootstepSoleNormal, RightFootstepSoleNormal, LeftFootstepSoleDetail, RightFootstepSoleDetail, LeftFootstepSoleDetailScale, RightFootstepSoleDetailScale, LeftFootstepMaterialPrimaryColor, RightFootstepMaterialPrimaryColor, LeftFootstepMaterialSecondaryColor, RightFootstepMaterialSecondaryColor, LeftFootstepMaterialGrainSize, RightFootstepMaterialGrainSize, LeftFootstepMaterialWetness, RightFootstepMaterialWetness, LeftFootstepMaterialTransferAmount, RightFootstepMaterialTransferAmount, LeftFootstepDecalNormalAmount, RightFootstepDecalNormalAmount,LeftFootstepDecalEmissiveAmount, RightFootstepDecalEmissiveAmount, LeftFootstepDecalDuration, RightFootstepDecalDuration, LeftFootstepDecalFadeOutDuration, RightFootstepDecalFadeOutDuration, LeftFootstepDurationModifierMin, RightFootstepDurationModifierMin, LeftFootstepDurationModifierMax, RightFootstepDurationModifierMax };
+					// NewFootstepState = { LeftFootstepPhysicalMaterial, PrevLeftFootstepPhysicalMaterial, RightFootstepPhysicalMaterial, PrevRightFootstepPhysicalMaterial, LeftFootstepSoleTexture, RightFootstepSoleTexture, LeftFootstepSoleNormal, RightFootstepSoleNormal, LeftFootstepSoleDetail, RightFootstepSoleDetail, LeftFootstepSoleDetailScale, RightFootstepSoleDetailScale, LeftFootstepMaterialPrimaryColor, RightFootstepMaterialPrimaryColor, LeftFootstepMaterialSecondaryColor, RightFootstepMaterialSecondaryColor, LeftFootstepMaterialGrainSize, RightFootstepMaterialGrainSize, LeftFootstepMaterialWetness, RightFootstepMaterialWetness, LeftFootstepMaterialTransferAmount, RightFootstepMaterialTransferAmount, LeftFootstepDecalNormalAmount, RightFootstepDecalNormalAmount,LeftFootstepDecalEmissiveAmount, RightFootstepDecalEmissiveAmount, LeftFootstepDecalDuration, RightFootstepDecalDuration, LeftFootstepDecalFadeOutDuration, RightFootstepDecalFadeOutDuration, LeftFootstepDurationModifierMin, RightFootstepDurationModifierMin, LeftFootstepDurationModifierMax, RightFootstepDurationModifierMax };
 
-					if (IsValid(ALSXTCharacter)) {
-						Cast<AALSXTCharacter>(Mesh->GetOwner())->SetFootstepState(NewFootstepState);
-						ALSXTCharacter->SetFootstepState(NewFootstepState);
-					}				
+					// ALSXTCharacter->SetFootstepState(NewFootstepState);		
 				}
 			}
 			else
