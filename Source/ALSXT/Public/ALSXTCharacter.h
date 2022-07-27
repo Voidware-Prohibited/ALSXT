@@ -232,17 +232,17 @@ public:
 	const FALSXTFootprintsState& GetFootprintsState() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
-	void SetFootprintsState(const FALSXTFootprintsState& NewFootprintsState);
+	void SetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
-	FALSXTFootprintsState SetFootprintsState_Implementation(const FALSXTFootprintsState& NewFootprintsState);
+	FALSXTFootprintsState SetFootprintsState_Implementation(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
 	void SetFootstepState(const FALSXTFootstepState& NewFootstepState);
 
 private:
 	UFUNCTION(Server, Reliable)
-	void ServerSetFootprintsState(const FALSXTFootprintsState& NewFootprintsState);
+	void ServerSetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetFootstepState(const FALSXTFootstepState& NewFootstepState);

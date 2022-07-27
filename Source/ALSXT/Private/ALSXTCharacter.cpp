@@ -271,19 +271,19 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 	}
 }
 
-void AALSXTCharacter::SetFootprintsState(const FALSXTFootprintsState& NewFootprintsState)
+void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
 {
 	const auto PreviousFootprintsState{ FootprintsState };
 
 	//SetFootprintsState_Implementation(NewFootprintsState);
-	FALSXTFootprintsState UpdatedFootprintsState{SetFootprintsState_Implementation(NewFootprintsState)};
-	FootprintsState = SetFootprintsState_Implementation(UpdatedFootprintsState);
+	FALSXTFootprintsState UpdatedFootprintsState{SetFootprintsState_Implementation(Foot, NewFootprintsState)};
+	FootprintsState = SetFootprintsState_Implementation(Foot, UpdatedFootprintsState);
 
 	OnFootprintsStateChanged(PreviousFootprintsState);
 
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		ServerSetFootprintsState(NewFootprintsState);
+		ServerSetFootprintsState(Foot, NewFootprintsState);
 	}
 }
 
@@ -301,9 +301,9 @@ void AALSXTCharacter::SetFootstepState(const FALSXTFootstepState& NewFootstepSta
 	}
 }
 
-void AALSXTCharacter::ServerSetFootprintsState_Implementation(const FALSXTFootprintsState& NewFootprintsState)
+void AALSXTCharacter::ServerSetFootprintsState_Implementation(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
 {
-	SetFootprintsState(NewFootprintsState);
+	SetFootprintsState(Foot, NewFootprintsState);
 }
 
 void AALSXTCharacter::ServerSetFootstepState_Implementation(const FALSXTFootstepState& NewFootstepState)
