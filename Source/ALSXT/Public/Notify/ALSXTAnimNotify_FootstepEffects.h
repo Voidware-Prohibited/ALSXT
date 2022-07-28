@@ -85,10 +85,10 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 	float MaterialWetness{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialSaturationRate{ 0.5f };
+	float MaterialSaturationRate{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialDesaturationRate{ 0.5f };
+	float MaterialDesaturationRate{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
 	FVector DecalSize{10.0f, 20.0f, 20.0f};

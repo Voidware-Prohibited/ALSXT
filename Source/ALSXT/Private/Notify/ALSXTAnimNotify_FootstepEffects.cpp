@@ -290,22 +290,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					if (NewSurface) {
 
 						//Set Current as Previous
-						CurrentFootprintsState.Left.Previous.FootPhysicalMaterial = CurrentFootprintsState.Left.Current.FootPhysicalMaterial;
-						CurrentFootprintsState.Left.Previous.FootTransferDetailTexture = CurrentFootprintsState.Left.Current.FootTransferDetailTexture;
-						CurrentFootprintsState.Left.Previous.FootTransferDetailScale = CurrentFootprintsState.Left.Current.FootTransferDetailScale;
-						CurrentFootprintsState.Left.Previous.FootMaterialPrimaryColor = CurrentFootprintsState.Left.Current.FootMaterialPrimaryColor;
-						CurrentFootprintsState.Left.Previous.FootMaterialSecondaryColor = CurrentFootprintsState.Left.Current.FootMaterialSecondaryColor;
-						CurrentFootprintsState.Left.Previous.FootMaterialGrainSize = CurrentFootprintsState.Left.Current.FootMaterialGrainSize;
-						CurrentFootprintsState.Left.Previous.FootMaterialWetness = CurrentFootprintsState.Left.Current.FootMaterialWetness;
-						CurrentFootprintsState.Left.Previous.FootMaterialTransferAmount = CurrentFootprintsState.Left.Current.FootMaterialTransferAmount;
-						CurrentFootprintsState.Left.Previous.FootMaterialSaturationRate = CurrentFootprintsState.Left.Current.FootMaterialSaturationRate;
-						CurrentFootprintsState.Left.Previous.FootMaterialDesaturationRate = CurrentFootprintsState.Left.Current.FootMaterialDesaturationRate;
-						CurrentFootprintsState.Left.Previous.FootDecalNormalAmount = CurrentFootprintsState.Left.Current.FootDecalNormalAmount;
-						CurrentFootprintsState.Left.Previous.FootDecalEmissiveAmount = CurrentFootprintsState.Left.Current.FootDecalEmissiveAmount;
-						CurrentFootprintsState.Left.Previous.FootDecalDuration = CurrentFootprintsState.Left.Current.FootDecalDuration;
-						CurrentFootprintsState.Left.Previous.FootDecalFadeOutDuration = CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration;
-						CurrentFootprintsState.Left.Previous.FootDurationModifierMin = CurrentFootprintsState.Left.Current.FootDurationModifierMin;
-						CurrentFootprintsState.Left.Previous.FootDurationModifierMax = CurrentFootprintsState.Left.Current.FootDurationModifierMax;
+						CurrentFootprintsState.Left.Previous = ALSXTCharacter->GetFootprintsState().Left.Current;
 
 						//Set New Current
 						CurrentFootprintsState.Left.Current.FootPhysicalMaterial = UGameplayStatics::GetSurfaceType(Hit);
@@ -393,22 +378,10 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					if (NewSurface) {
 
 						//Set Current as Previous
-						CurrentFootprintsState.Right.Previous.FootPhysicalMaterial = CurrentFootprintsState.Right.Current.FootPhysicalMaterial;
-						CurrentFootprintsState.Right.Previous.FootTransferDetailTexture = CurrentFootprintsState.Right.Current.FootTransferDetailTexture;
-						CurrentFootprintsState.Right.Previous.FootTransferDetailScale = CurrentFootprintsState.Right.Current.FootTransferDetailScale;
-						CurrentFootprintsState.Right.Previous.FootMaterialPrimaryColor = CurrentFootprintsState.Right.Current.FootMaterialPrimaryColor;
-						CurrentFootprintsState.Right.Previous.FootMaterialSecondaryColor = CurrentFootprintsState.Right.Current.FootMaterialSecondaryColor;
-						CurrentFootprintsState.Right.Previous.FootMaterialGrainSize = CurrentFootprintsState.Right.Current.FootMaterialGrainSize;
-						CurrentFootprintsState.Right.Previous.FootMaterialWetness = CurrentFootprintsState.Right.Current.FootMaterialWetness;
-						CurrentFootprintsState.Right.Previous.FootMaterialTransferAmount = CurrentFootprintsState.Right.Current.FootMaterialTransferAmount;
-						CurrentFootprintsState.Right.Previous.FootMaterialSaturationRate = CurrentFootprintsState.Right.Current.FootMaterialSaturationRate;
-						CurrentFootprintsState.Right.Previous.FootMaterialDesaturationRate = CurrentFootprintsState.Right.Current.FootMaterialDesaturationRate;
-						CurrentFootprintsState.Right.Previous.FootDecalNormalAmount = CurrentFootprintsState.Right.Current.FootDecalNormalAmount;
-						CurrentFootprintsState.Right.Previous.FootDecalEmissiveAmount = CurrentFootprintsState.Right.Current.FootDecalEmissiveAmount;
-						CurrentFootprintsState.Right.Previous.FootDecalDuration = CurrentFootprintsState.Right.Current.FootDecalDuration;
-						CurrentFootprintsState.Right.Previous.FootDecalFadeOutDuration = CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration;
-						CurrentFootprintsState.Right.Previous.FootDurationModifierMin = CurrentFootprintsState.Right.Current.FootDurationModifierMin;
-						CurrentFootprintsState.Right.Previous.FootDurationModifierMax = CurrentFootprintsState.Right.Current.FootDurationModifierMax;
+
+						CurrentFootprintsState.Right.Previous = ALSXTCharacter->GetFootprintsState().Right.Current;
+
+						// CurrentFootprintsState.Right.Previous.FootMaterialSaturationRate = ALSXTCharacter->GetFootprintsState().Right.Current.FootMaterialSaturationRate;
 
 						//Set New Current
 						CurrentFootprintsState.Right.Current.FootPhysicalMaterial = UGameplayStatics::GetSurfaceType(Hit);

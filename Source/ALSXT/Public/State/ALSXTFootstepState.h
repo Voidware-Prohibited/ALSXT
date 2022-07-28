@@ -42,6 +42,9 @@ struct ALSXT_API FALSXTFootprintStatePhase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float FootTransferAmount{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float FootSurfaceTransferAcceptanceAmount{ 0.5f };
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float FootTransferDetailScale{ 0.0f };
@@ -62,10 +65,10 @@ struct ALSXT_API FALSXTFootprintStatePhase
 	float FootMaterialTransferAmount{ 0.5f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootMaterialSaturationRate{ 0.5f };
+	float FootMaterialSaturationRate{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootMaterialDesaturationRate{ 0.5f };
+	float FootMaterialDesaturationRate{ 1.0f };
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float FootDecalNormalAmount{0.0f};
