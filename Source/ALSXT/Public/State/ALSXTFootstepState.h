@@ -41,6 +41,9 @@ struct ALSXT_API FALSXTFootprintStatePhase
 	UTexture2D* FootTransferDetailNormal = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float FootTransferAmount{ 0.0f };
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float FootTransferDetailScale{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))

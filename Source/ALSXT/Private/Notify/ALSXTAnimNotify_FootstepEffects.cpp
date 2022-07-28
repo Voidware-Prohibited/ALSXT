@@ -374,17 +374,17 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					MI->SetScalarParameterValue(FName("WetnessPrevious"), ALSXTCharacter->GetFootprintsState().Left.Previous.FootMaterialWetness);
 					MI->SetScalarParameterValue(FName("EmissiveAmountPrevious"), ALSXTCharacter->GetFootprintsState().Left.Previous.FootDecalEmissiveAmount);
 
+					MI->SetScalarParameterValue(FName("PhaseAlpha"), ALSXTCharacter->GetFootprintsState().Left.FootSurfaceAlpha);
+					MI->SetScalarParameterValue(FName("TransferAmount"), EffectSettings->MaterialTransferAmount);
+					MI->SetScalarParameterValue(FName("TransferAmountCurrent"), ALSXTCharacter->GetFootprintsState().Left.Current.FootTransferAmount);
+					MI->SetScalarParameterValue(FName("TransferAmountPrevious"), ALSXTCharacter->GetFootprintsState().Left.Previous.FootTransferAmount);
+
 					//Calculate Duration based on Materials. Wetter materials stay longer
 					DurationAverage = LeftFootstepMaterialWetness + LeftFootstepMaterialTransferAmount / 2;
 					InputRange = { 0, 1 };
 					OutputRange = { LeftFootstepDurationModifierMin, LeftFootstepDurationModifierMax };
 					DurationModifier = FMath::GetMappedRangeValueClamped(InputRange, OutputRange, DurationAverage);
 					Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration* DurationModifier, false);
-					
-					// Set New Footstep State
-					// NewFootstepState = { LeftFootstepPhysicalMaterial, PrevLeftFootstepPhysicalMaterial, RightFootstepPhysicalMaterial, PrevRightFootstepPhysicalMaterial, LeftFootstepSoleTexture, RightFootstepSoleTexture, LeftFootstepSoleNormal, RightFootstepSoleNormal, LeftFootstepSoleDetail, RightFootstepSoleDetail, LeftFootstepSoleDetailScale, RightFootstepSoleDetailScale, LeftFootstepMaterialPrimaryColor, RightFootstepMaterialPrimaryColor, LeftFootstepMaterialSecondaryColor, RightFootstepMaterialSecondaryColor, LeftFootstepMaterialGrainSize, RightFootstepMaterialGrainSize, LeftFootstepMaterialWetness, RightFootstepMaterialWetness, LeftFootstepMaterialTransferAmount, RightFootstepMaterialTransferAmount, LeftFootstepDecalNormalAmount, RightFootstepDecalNormalAmount, LeftFootstepDecalEmissiveAmount, RightFootstepDecalEmissiveAmount, LeftFootstepDecalDuration, RightFootstepDecalDuration, LeftFootstepDecalFadeOutDuration, RightFootstepDecalFadeOutDuration, LeftFootstepDurationModifierMin, RightFootstepDurationModifierMin, LeftFootstepDurationModifierMax, RightFootstepDurationModifierMax };
-
-					// ALSXTCharacter->SetFootstepState(NewFootstepState);
 				}
 				if (FootBone == EALSXTFootBone::Right) {
 
@@ -477,17 +477,17 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					MI->SetScalarParameterValue(FName("WetnessPrevious"), ALSXTCharacter->GetFootprintsState().Right.Previous.FootMaterialWetness);
 					MI->SetScalarParameterValue(FName("EmissiveAmountPrevious"), ALSXTCharacter->GetFootprintsState().Right.Previous.FootDecalEmissiveAmount);
 
+					MI->SetScalarParameterValue(FName("PhaseAlpha"), ALSXTCharacter->GetFootprintsState().Right.FootSurfaceAlpha);
+					MI->SetScalarParameterValue(FName("TransferAmount"), EffectSettings->MaterialTransferAmount);
+					MI->SetScalarParameterValue(FName("TransferAmountCurrent"), ALSXTCharacter->GetFootprintsState().Right.Current.FootTransferAmount);
+					MI->SetScalarParameterValue(FName("TransferAmountPrevious"), ALSXTCharacter->GetFootprintsState().Right.Previous.FootTransferAmount);
+
 					//Calculate Duration based on Materials. Wetter materials stay longer
 					DurationAverage = RightFootstepMaterialWetness + RightFootstepMaterialTransferAmount / 2;
 					InputRange = { 0, 1 };
 					OutputRange = { RightFootstepDurationModifierMin, RightFootstepDurationModifierMax };
 					DurationModifier = FMath::GetMappedRangeValueClamped(InputRange, OutputRange, DurationAverage);
-					Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration * DurationModifier, false);
-
-					// Set New Footstep State
-					// NewFootstepState = { LeftFootstepPhysicalMaterial, PrevLeftFootstepPhysicalMaterial, RightFootstepPhysicalMaterial, PrevRightFootstepPhysicalMaterial, LeftFootstepSoleTexture, RightFootstepSoleTexture, LeftFootstepSoleNormal, RightFootstepSoleNormal, LeftFootstepSoleDetail, RightFootstepSoleDetail, LeftFootstepSoleDetailScale, RightFootstepSoleDetailScale, LeftFootstepMaterialPrimaryColor, RightFootstepMaterialPrimaryColor, LeftFootstepMaterialSecondaryColor, RightFootstepMaterialSecondaryColor, LeftFootstepMaterialGrainSize, RightFootstepMaterialGrainSize, LeftFootstepMaterialWetness, RightFootstepMaterialWetness, LeftFootstepMaterialTransferAmount, RightFootstepMaterialTransferAmount, LeftFootstepDecalNormalAmount, RightFootstepDecalNormalAmount,LeftFootstepDecalEmissiveAmount, RightFootstepDecalEmissiveAmount, LeftFootstepDecalDuration, RightFootstepDecalDuration, LeftFootstepDecalFadeOutDuration, RightFootstepDecalFadeOutDuration, LeftFootstepDurationModifierMin, RightFootstepDurationModifierMin, LeftFootstepDurationModifierMax, RightFootstepDurationModifierMax };
-
-					// ALSXTCharacter->SetFootstepState(NewFootstepState);		
+					Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration * DurationModifier, false);	
 				}
 			}
 			else

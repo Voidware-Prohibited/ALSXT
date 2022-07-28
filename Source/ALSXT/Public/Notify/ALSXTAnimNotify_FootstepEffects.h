@@ -66,6 +66,12 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
 	float FootstepSoleDetailScale{ 1.0f };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float FootstepSurfaceTransferAcceptanceAmount{ 0.5f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float MaterialTransferAmount{ 0.5f };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
 	FLinearColor MaterialPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
 
@@ -77,9 +83,6 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
 	float MaterialWetness{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialTransferAmount{ 0.5f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
 	float MaterialSaturationRate{ 0.5f };
