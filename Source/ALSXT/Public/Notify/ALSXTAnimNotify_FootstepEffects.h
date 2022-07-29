@@ -88,7 +88,7 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 	float MaterialDesaturationRate{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -1))
-	float DecalNormalAmount{0.0f};
+	float TransferNormalAmount{0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
 	float TransferDetailScale{ 1.0f };

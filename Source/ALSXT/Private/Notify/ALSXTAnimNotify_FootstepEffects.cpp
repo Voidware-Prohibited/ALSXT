@@ -303,7 +303,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Left.Current.FootMaterialTransferAmount = EffectSettings->MaterialTransferAmount;
 						CurrentFootprintsState.Left.Current.FootMaterialSaturationRate = EffectSettings->MaterialSaturationRate;
 						CurrentFootprintsState.Left.Current.FootMaterialDesaturationRate = EffectSettings->MaterialDesaturationRate;
-						CurrentFootprintsState.Left.Current.FootDecalNormalAmount = EffectSettings->DecalNormalAmount;
+						CurrentFootprintsState.Left.Current.FootDecalNormalAmount = EffectSettings->TransferNormalAmount;
 						CurrentFootprintsState.Left.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
 						CurrentFootprintsState.Left.Current.FootDecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
@@ -322,7 +322,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Left.Current.FootMaterialTransferAmount = EffectSettings->MaterialTransferAmount;
 						CurrentFootprintsState.Left.Current.FootMaterialSaturationRate = EffectSettings->MaterialSaturationRate;
 						CurrentFootprintsState.Left.Current.FootMaterialDesaturationRate = EffectSettings->MaterialDesaturationRate;
-						CurrentFootprintsState.Left.Current.FootDecalNormalAmount = EffectSettings->DecalNormalAmount;
+						CurrentFootprintsState.Left.Current.FootDecalNormalAmount = EffectSettings->TransferNormalAmount;
 						CurrentFootprintsState.Left.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
 						CurrentFootprintsState.Left.Current.FootDecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
@@ -394,7 +394,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.FootMaterialTransferAmount = EffectSettings->MaterialTransferAmount;
 						CurrentFootprintsState.Right.Current.FootMaterialSaturationRate = EffectSettings->MaterialSaturationRate;
 						CurrentFootprintsState.Right.Current.FootMaterialDesaturationRate = EffectSettings->MaterialDesaturationRate;
-						CurrentFootprintsState.Right.Current.FootDecalNormalAmount = EffectSettings->DecalNormalAmount;
+						CurrentFootprintsState.Right.Current.FootDecalNormalAmount = EffectSettings->TransferNormalAmount;
 						CurrentFootprintsState.Right.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
 						CurrentFootprintsState.Right.Current.FootDecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
@@ -413,7 +413,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.FootMaterialTransferAmount = EffectSettings->MaterialTransferAmount;
 						CurrentFootprintsState.Right.Current.FootMaterialSaturationRate = EffectSettings->MaterialSaturationRate;
 						CurrentFootprintsState.Right.Current.FootMaterialDesaturationRate = EffectSettings->MaterialDesaturationRate;
-						CurrentFootprintsState.Right.Current.FootDecalNormalAmount = EffectSettings->DecalNormalAmount;
+						CurrentFootprintsState.Right.Current.FootDecalNormalAmount = EffectSettings->TransferNormalAmount;
 						CurrentFootprintsState.Right.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
 						CurrentFootprintsState.Right.Current.FootDecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
