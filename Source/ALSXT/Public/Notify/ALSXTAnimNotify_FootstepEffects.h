@@ -70,6 +70,9 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 	float FootstepSurfaceTransferAcceptanceAmount{ 0.5f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float SurfaceTransferAcceptanceNormalScale{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
 	float MaterialTransferAmount{ 0.5f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
