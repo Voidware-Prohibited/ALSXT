@@ -275,9 +275,7 @@ void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSX
 {
 	const auto PreviousFootprintsState{ FootprintsState };
 
-	//SetFootprintsState_Implementation(NewFootprintsState);
-	FALSXTFootprintsState UpdatedFootprintsState{SetFootprintsState_Implementation(Foot, NewFootprintsState)};
-	FootprintsState = SetFootprintsState_Implementation(Foot, UpdatedFootprintsState);
+	FootprintsState = NewFootprintsState;
 
 	OnFootprintsStateChanged(PreviousFootprintsState);
 
@@ -304,6 +302,12 @@ void AALSXTCharacter::SetFootstepState(const FALSXTFootstepState& NewFootstepSta
 void AALSXTCharacter::ServerSetFootprintsState_Implementation(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
 {
 	SetFootprintsState(Foot, NewFootprintsState);
+}
+
+
+void AALSXTCharacter::ServerProcessNewFootprintsState_Implementation(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
+{
+	ProcessNewFootprintsState(Foot, NewFootprintsState);
 }
 
 void AALSXTCharacter::ServerSetFootstepState_Implementation(const FALSXTFootstepState& NewFootstepState)

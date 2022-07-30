@@ -330,9 +330,16 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Left.Current.FootDurationModifierMax = CurrentFootprintsState.Left.Current.FootDurationModifierMax;
 					}
 
-					ALSXTCharacter->SetFootprintsState(EALSXTFootBone::Left, CurrentFootprintsState);
+					ALSXTCharacter->ProcessNewFootprintsState(EALSXTFootBone::Left, CurrentFootprintsState);
+
+					if (ALSXTCharacter->GetLocalRole() == ROLE_AutonomousProxy)
+					{
+						ALSXTCharacter->ServerProcessNewFootprintsState(EALSXTFootBone::Left, CurrentFootprintsState);
+					}
+
 					CurrentFootprintsState = ALSXTCharacter->GetFootprintsState();
 
+					
 					//Create Dynamic Material Instance and Set Parameters
 					MI = UMaterialInstanceDynamic::Create(Decal->GetMaterial(0), this);
 					Decal->SetMaterial(0, MI);
@@ -421,7 +428,13 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.FootDurationModifierMax = CurrentFootprintsState.Right.Current.FootDurationModifierMax;
 					}
 
-					ALSXTCharacter->SetFootprintsState(EALSXTFootBone::Right, CurrentFootprintsState);
+					ALSXTCharacter->ProcessNewFootprintsState(EALSXTFootBone::Right, CurrentFootprintsState);
+
+					if (ALSXTCharacter->GetLocalRole() == ROLE_AutonomousProxy)
+					{
+						ALSXTCharacter->ServerProcessNewFootprintsState(EALSXTFootBone::Right, CurrentFootprintsState);
+					}
+
 					CurrentFootprintsState = ALSXTCharacter->GetFootprintsState();
 
 					//Create Dynamic Material Instance and Set Parameters
