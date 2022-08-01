@@ -7,6 +7,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/Pawn.h"
 
 AALSXTCharacter::AALSXTCharacter()
 {
@@ -279,7 +280,7 @@ void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSX
 
 	OnFootprintsStateChanged(PreviousFootprintsState);
 
-	if (GetLocalRole() == ROLE_AutonomousProxy)
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
 	{
 		ServerSetFootprintsState(Foot, NewFootprintsState);
 	}
