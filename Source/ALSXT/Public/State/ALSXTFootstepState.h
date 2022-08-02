@@ -127,18 +127,18 @@ struct ALSXT_API FALSXTFootwearDetails
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTexture2D* FootwearSoleTexture = nullptr;
+	UTexture2D* FootwearSoleTexture = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTexture2D* FootwearSoleNormalTexture = nullptr;
+	UTexture2D* FootwearSoleNormalTexture = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float FootwearSoleNormalScale{ 0.0f };
+	float FootwearSoleNormalScale{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTexture2D* FootwearSoleDetailTexture = nullptr;
+	UTexture2D* FootwearSoleDetailTexture = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TWeakObjectPtr<UPhysicalMaterial> FootwearSoleSurfaceType;
+	TEnumAsByte<EPhysicalSurface> FootwearSoleSurfaceType {0};
 
 };
