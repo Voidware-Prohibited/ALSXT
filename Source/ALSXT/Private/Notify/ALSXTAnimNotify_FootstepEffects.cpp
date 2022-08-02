@@ -232,6 +232,8 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 
 				// Declare local variables
 				UMaterialInstanceDynamic* MI;
+				float CalculatedSoleNormalScale{ 0.0f };
+				float CalculatedTransferNormalScale{ 0.0f };
 				float DurationAverage{ 0.0f };
 				FVector2D InputRange{ 0, 1 };
 				FVector2D OutputRange{ 0, 1 };
@@ -264,6 +266,8 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
 						CurrentFootprintsState.Left.Current.FootDurationModifierMin = EffectSettings->DecalDurationModifierMin;
 						CurrentFootprintsState.Left.Current.FootDurationModifierMax = EffectSettings->DecalDurationModifierMax;
+						CurrentFootprintsState.Left.Current.FootSurfaceTransferAcceptanceAmount = EffectSettings->FootstepSurfaceTransferAcceptanceAmount;
+						CurrentFootprintsState.Left.Current.FootTransferDetailScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
 					}
 					else {
 						//Set New Current
@@ -283,8 +287,10 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
 						CurrentFootprintsState.Left.Current.FootDurationModifierMin = EffectSettings->DecalDurationModifierMin;
 						CurrentFootprintsState.Left.Current.FootDurationModifierMax = EffectSettings->DecalDurationModifierMax;
+						CurrentFootprintsState.Left.Current.FootSurfaceTransferAcceptanceAmount = EffectSettings->FootstepSurfaceTransferAcceptanceAmount;
+						CurrentFootprintsState.Left.Current.FootTransferDetailScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
 					}
-
+					CalculatedSoleNormalScale = (EffectSettings->TransferNormalAmount * EffectSettings->MaterialTransferAmount) * (EffectSettings->SurfaceTransferAcceptanceNormalScale * EffectSettings->FootstepSurfaceTransferAcceptanceAmount);
 					ALSXTCharacter->ProcessNewFootprintsState(EALSXTFootBone::Left, CurrentFootprintsState);
 
 					CurrentFootprintsState = ALSXTCharacter->GetFootprintsState();
@@ -293,14 +299,17 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					//Create Dynamic Material Instance and Set Parameters
 					MI = UMaterialInstanceDynamic::Create(Decal->GetMaterial(0), this);
 					Decal->SetMaterial(0, MI);
+
 					MI->SetTextureParameterValue(FName("SoleTexture"), ALSXTCharacter->GetFootwearDetails().FootwearSoleTexture);
 					MI->SetTextureParameterValue(FName("SoleNormal"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormalTexture);
 					MI->SetTextureParameterValue(FName("SoleDetail"), ALSXTCharacter->GetFootwearDetails().FootwearSoleDetailTexture);
-					MI->SetScalarParameterValue(FName("SoleNormalAmount"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormalScale);
+					MI->SetScalarParameterValue(FName("SoleNormalScale"), CalculatedSoleNormalScale);
+
 					MI->SetTextureParameterValue(FName("TransferDetailTexture"), ALSXTCharacter->GetFootprintsState().Left.Current.FootTransferDetailTexture);
 					MI->SetTextureParameterValue(FName("TransferDetailNormal"), ALSXTCharacter->GetFootprintsState().Left.Current.FootTransferDetailNormal);
-					MI->SetScalarParameterValue(FName("TransferNormalAmount"), ALSXTCharacter->GetFootprintsState().Left.Current.FootMaterialTransferDetailNormalAmount);
+					MI->SetScalarParameterValue(FName("TransferNormalScale"), ALSXTCharacter->GetFootprintsState().Left.Current.FootMaterialTransferDetailNormalAmount);
 					MI->SetScalarParameterValue(FName("TransferDetailScale"), ALSXTCharacter->GetFootprintsState().Left.Current.FootTransferDetailScale);
+
 					MI->SetVectorParameterValue(FName("PrimaryColor"), ALSXTCharacter->GetFootprintsState().Left.Current.FootMaterialPrimaryColor);
 					MI->SetVectorParameterValue(FName("SecondaryColor"), ALSXTCharacter->GetFootprintsState().Left.Current.FootMaterialSecondaryColor);
 					MI->SetScalarParameterValue(FName("GrainSize"), ALSXTCharacter->GetFootprintsState().Left.Current.FootMaterialGrainSize);
@@ -357,6 +366,8 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
 						CurrentFootprintsState.Right.Current.FootDurationModifierMin = EffectSettings->DecalDurationModifierMin;
 						CurrentFootprintsState.Right.Current.FootDurationModifierMax = EffectSettings->DecalDurationModifierMax;
+						CurrentFootprintsState.Right.Current.FootSurfaceTransferAcceptanceAmount = EffectSettings->FootstepSurfaceTransferAcceptanceAmount;
+						CurrentFootprintsState.Right.Current.FootTransferDetailScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
 					}
 					else {
 						//Set New Current
@@ -376,8 +387,10 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
 						CurrentFootprintsState.Right.Current.FootDurationModifierMin = EffectSettings->DecalDurationModifierMin;
 						CurrentFootprintsState.Right.Current.FootDurationModifierMax = EffectSettings->DecalDurationModifierMax;
+						CurrentFootprintsState.Right.Current.FootSurfaceTransferAcceptanceAmount = EffectSettings->FootstepSurfaceTransferAcceptanceAmount;
+						CurrentFootprintsState.Right.Current.FootTransferDetailScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
 					}
-
+					CalculatedSoleNormalScale = (EffectSettings->TransferNormalAmount * EffectSettings->MaterialTransferAmount) * (EffectSettings->SurfaceTransferAcceptanceNormalScale * EffectSettings->FootstepSurfaceTransferAcceptanceAmount);
 					ALSXTCharacter->ProcessNewFootprintsState(EALSXTFootBone::Right, CurrentFootprintsState);
 
 					CurrentFootprintsState = ALSXTCharacter->GetFootprintsState();
@@ -385,14 +398,17 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					//Create Dynamic Material Instance and Set Parameters
 					MI = UMaterialInstanceDynamic::Create(Decal->GetMaterial(0), this);
 					Decal->SetMaterial(0, MI);
+
 					MI->SetTextureParameterValue(FName("SoleTexture"), ALSXTCharacter->GetFootwearDetails().FootwearSoleTexture);
 					MI->SetTextureParameterValue(FName("SoleNormal"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormalTexture);
 					MI->SetTextureParameterValue(FName("SoleDetail"), ALSXTCharacter->GetFootwearDetails().FootwearSoleDetailTexture);
-					MI->SetScalarParameterValue(FName("SoleNormalAmount"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormalScale);
+					MI->SetScalarParameterValue(FName("SoleNormalScale"), CalculatedSoleNormalScale);
+
 					MI->SetTextureParameterValue(FName("TransferDetailTexture"), ALSXTCharacter->GetFootprintsState().Right.Current.FootTransferDetailTexture);
 					MI->SetTextureParameterValue(FName("TransferDetailNormal"), ALSXTCharacter->GetFootprintsState().Right.Current.FootTransferDetailNormal);
-					MI->SetScalarParameterValue(FName("TransferNormalAmount"), ALSXTCharacter->GetFootprintsState().Right.Current.FootMaterialTransferDetailNormalAmount);
+					MI->SetScalarParameterValue(FName("TransferNormalScale"), ALSXTCharacter->GetFootprintsState().Right.Current.FootMaterialTransferDetailNormalAmount);
 					MI->SetScalarParameterValue(FName("TransferDetailScale"), ALSXTCharacter->GetFootprintsState().Right.Current.FootTransferDetailScale);
+
 					MI->SetVectorParameterValue(FName("PrimaryColor"), ALSXTCharacter->GetFootprintsState().Right.Current.FootMaterialPrimaryColor);
 					MI->SetVectorParameterValue(FName("SecondaryColor"), ALSXTCharacter->GetFootprintsState().Right.Current.FootMaterialSecondaryColor);
 					MI->SetScalarParameterValue(FName("GrainSize"), ALSXTCharacter->GetFootprintsState().Right.Current.FootMaterialGrainSize);
