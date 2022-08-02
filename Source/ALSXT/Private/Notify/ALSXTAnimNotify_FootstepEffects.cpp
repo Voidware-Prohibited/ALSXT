@@ -276,8 +276,8 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Left.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
 						CurrentFootprintsState.Left.Current.FootDecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
-						CurrentFootprintsState.Left.Current.FootDurationModifierMin = ALSXTCharacter->GetFootstepValues().LeftFootDurationModifierMin;
-						CurrentFootprintsState.Left.Current.FootDurationModifierMax = ALSXTCharacter->GetFootstepValues().LeftFootDurationModifierMax;
+						CurrentFootprintsState.Left.Current.FootDurationModifierMin = EffectSettings->DecalDurationModifierMin;
+						CurrentFootprintsState.Left.Current.FootDurationModifierMax = EffectSettings->DecalDurationModifierMax;
 					}
 					else {
 						//Set New Current
@@ -295,8 +295,8 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Left.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
 						CurrentFootprintsState.Left.Current.FootDecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Left.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
-						CurrentFootprintsState.Left.Current.FootDurationModifierMin = ALSXTCharacter->GetFootstepValues().LeftFootDurationModifierMin;
-						CurrentFootprintsState.Left.Current.FootDurationModifierMax = ALSXTCharacter->GetFootstepValues().LeftFootDurationModifierMax;
+						CurrentFootprintsState.Left.Current.FootDurationModifierMin = EffectSettings->DecalDurationModifierMin;
+						CurrentFootprintsState.Left.Current.FootDurationModifierMax = EffectSettings->DecalDurationModifierMax;
 					}
 
 					ALSXTCharacter->ProcessNewFootprintsState(EALSXTFootBone::Left, CurrentFootprintsState);
@@ -338,7 +338,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					//Calculate Duration based on Materials. Wetter materials stay longer
 					DurationAverage = ALSXTCharacter->GetFootprintsState().Left.Current.FootMaterialWetness + EffectSettings->MaterialTransferAmount / 2;
 					InputRange = { 0, 1 };
-					OutputRange = { LeftFootstepDurationModifierMin, LeftFootstepDurationModifierMax };
+					OutputRange = { EffectSettings->DecalDurationModifierMin, EffectSettings->DecalDurationModifierMax };
 					DurationModifier = FMath::GetMappedRangeValueClamped(InputRange, OutputRange, DurationAverage);
 					Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration* DurationModifier, false);
 				}
@@ -369,8 +369,8 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
 						CurrentFootprintsState.Right.Current.FootDecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
-						CurrentFootprintsState.Right.Current.FootDurationModifierMin = CurrentFootprintsState.Right.Current.FootDurationModifierMin;
-						CurrentFootprintsState.Right.Current.FootDurationModifierMax = CurrentFootprintsState.Right.Current.FootDurationModifierMax;
+						CurrentFootprintsState.Right.Current.FootDurationModifierMin = EffectSettings->DecalDurationModifierMin;
+						CurrentFootprintsState.Right.Current.FootDurationModifierMax = EffectSettings->DecalDurationModifierMax;
 					}
 					else {
 						//Set New Current
@@ -388,8 +388,8 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.FootDecalEmissiveAmount = EffectSettings->MaterialEmissive;
 						CurrentFootprintsState.Right.Current.FootDecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Right.Current.FootDecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
-						CurrentFootprintsState.Right.Current.FootDurationModifierMin = CurrentFootprintsState.Right.Current.FootDurationModifierMin;
-						CurrentFootprintsState.Right.Current.FootDurationModifierMax = CurrentFootprintsState.Right.Current.FootDurationModifierMax;
+						CurrentFootprintsState.Right.Current.FootDurationModifierMin = EffectSettings->DecalDurationModifierMin;
+						CurrentFootprintsState.Right.Current.FootDurationModifierMax = EffectSettings->DecalDurationModifierMax;
 					}
 
 					ALSXTCharacter->ProcessNewFootprintsState(EALSXTFootBone::Right, CurrentFootprintsState);
@@ -430,7 +430,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					//Calculate Duration based on Materials. Wetter materials stay longer
 					DurationAverage = ALSXTCharacter->GetFootprintsState().Right.Current.FootMaterialWetness + EffectSettings->MaterialTransferAmount / 2;
 					InputRange = { 0, 1 };
-					OutputRange = { RightFootstepDurationModifierMin, RightFootstepDurationModifierMax };
+					OutputRange = { EffectSettings->DecalDurationModifierMin, EffectSettings->DecalDurationModifierMax };
 					DurationModifier = FMath::GetMappedRangeValueClamped(InputRange, OutputRange, DurationAverage);
 					Decal->SetFadeOut(EffectSettings->DecalDuration, EffectSettings->DecalFadeOutDuration * DurationModifier, false);	
 				}
