@@ -230,26 +230,12 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 
 				CurrentFootprintsState = ALSXTCharacter->GetFootprintsState();
 
-
-				// Set ALSXT Footstep Values
-		
-				LeftFootstepSoleDetail = ALSXTCharacter->GetFootstepValues().LeftFootSoleDetail;
-				RightFootstepSoleDetail = ALSXTCharacter->GetFootstepValues().RightFootSoleDetail;
-				LeftFootstepDecalNormalAmount = ALSXTCharacter->GetFootstepValues().LeftFootDecalNormalAmount;
-				RightFootstepDecalNormalAmount = ALSXTCharacter->GetFootstepValues().RightFootDecalNormalAmount;
-				LeftFootstepDurationModifierMin = ALSXTCharacter->GetFootstepValues().LeftFootDurationModifierMin;
-				RightFootstepDurationModifierMin = ALSXTCharacter->GetFootstepValues().RightFootDurationModifierMin;
-				LeftFootstepDurationModifierMax = ALSXTCharacter->GetFootstepValues().LeftFootDurationModifierMax;
-				RightFootstepDurationModifierMax = ALSXTCharacter->GetFootstepValues().RightFootDurationModifierMax;
-
-
 				// Declare local variables
 				UMaterialInstanceDynamic* MI;
 				float DurationAverage{ 0.0f };
 				FVector2D InputRange{ 0, 1 };
 				FVector2D OutputRange{ 0, 1 };
 				float DurationModifier{ 0.0f };
-				FALSXTFootstepState NewFootstepState;
 
 				// Set New Left or Right foot Values based on current FootBone
 				if (FootBone == EALSXTFootBone::Left) {
@@ -308,9 +294,9 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					MI = UMaterialInstanceDynamic::Create(Decal->GetMaterial(0), this);
 					Decal->SetMaterial(0, MI);
 					MI->SetTextureParameterValue(FName("SoleTexture"), ALSXTCharacter->GetFootwearDetails().FootwearSoleTexture);
-					MI->SetTextureParameterValue(FName("SoleNormal"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormal);
-					MI->SetTextureParameterValue(FName("SoleDetail"), LeftFootstepSoleDetail);
-					MI->SetScalarParameterValue(FName("SoleNormalAmount"), LeftFootstepDecalNormalAmount);
+					MI->SetTextureParameterValue(FName("SoleNormal"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormalTexture);
+					MI->SetTextureParameterValue(FName("SoleDetail"), ALSXTCharacter->GetFootwearDetails().FootwearSoleDetailTexture);
+					MI->SetScalarParameterValue(FName("SoleNormalAmount"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormalScale);
 					MI->SetTextureParameterValue(FName("TransferDetailTexture"), ALSXTCharacter->GetFootprintsState().Left.Current.FootTransferDetailTexture);
 					MI->SetTextureParameterValue(FName("TransferDetailNormal"), ALSXTCharacter->GetFootprintsState().Left.Current.FootTransferDetailNormal);
 					MI->SetScalarParameterValue(FName("TransferNormalAmount"), ALSXTCharacter->GetFootprintsState().Left.Current.FootMaterialTransferDetailNormalAmount);
@@ -400,9 +386,9 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					MI = UMaterialInstanceDynamic::Create(Decal->GetMaterial(0), this);
 					Decal->SetMaterial(0, MI);
 					MI->SetTextureParameterValue(FName("SoleTexture"), ALSXTCharacter->GetFootwearDetails().FootwearSoleTexture);
-					MI->SetTextureParameterValue(FName("SoleNormal"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormal);
-					MI->SetTextureParameterValue(FName("SoleDetail"), RightFootstepSoleDetail);
-					MI->SetScalarParameterValue(FName("SoleNormalAmount"), RightFootstepDecalNormalAmount);
+					MI->SetTextureParameterValue(FName("SoleNormal"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormalTexture);
+					MI->SetTextureParameterValue(FName("SoleDetail"), ALSXTCharacter->GetFootwearDetails().FootwearSoleDetailTexture);
+					MI->SetScalarParameterValue(FName("SoleNormalAmount"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormalScale);
 					MI->SetTextureParameterValue(FName("TransferDetailTexture"), ALSXTCharacter->GetFootprintsState().Right.Current.FootTransferDetailTexture);
 					MI->SetTextureParameterValue(FName("TransferDetailNormal"), ALSXTCharacter->GetFootprintsState().Right.Current.FootTransferDetailNormal);
 					MI->SetScalarParameterValue(FName("TransferNormalAmount"), ALSXTCharacter->GetFootprintsState().Right.Current.FootMaterialTransferDetailNormalAmount);

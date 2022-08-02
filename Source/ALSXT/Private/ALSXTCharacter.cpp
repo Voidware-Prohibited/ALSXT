@@ -54,7 +54,6 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	Parameters.Condition = COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FootprintsState, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FootstepState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFreelooking, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredSex, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredLocomotionVariant, Parameters)
@@ -286,20 +285,6 @@ void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSX
 	}
 }
 
-void AALSXTCharacter::SetFootstepState(const FALSXTFootstepState& NewFootstepState)
-{
-	const auto PreviousFootstepState{ FootstepState };
-
-	FootstepState = NewFootstepState;
-
-	OnFootstepStateChanged(PreviousFootstepState);
-
-	if (GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		ServerSetFootstepState(NewFootstepState);
-	}
-}
-
 void AALSXTCharacter::ServerSetFootprintsState_Implementation(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
 {
 	SetFootprintsState(Foot, NewFootprintsState);
@@ -311,24 +296,12 @@ void AALSXTCharacter::ServerProcessNewFootprintsState_Implementation(const EALSX
 	ProcessNewFootprintsState(Foot, NewFootprintsState);
 }
 
-void AALSXTCharacter::ServerSetFootstepState_Implementation(const FALSXTFootstepState& NewFootstepState)
-{
-	SetFootstepState(NewFootstepState);
-}
-
 void AALSXTCharacter::OnReplicate_FootprintsState(const FALSXTFootprintsState& PreviousFootprintsState)
 {
 	OnFootprintsStateChanged(PreviousFootprintsState);
 }
 
-void AALSXTCharacter::OnReplicate_FootstepState(const FALSXTFootstepState& PreviousFootstepState)
-{
-	OnFootstepStateChanged(PreviousFootstepState);
-}
-
 void AALSXTCharacter::OnFootprintsStateChanged_Implementation(const FALSXTFootprintsState& PreviousFootprintsState) {}
-
-void AALSXTCharacter::OnFootstepStateChanged_Implementation(const FALSXTFootstepState& PreviousFootstepState) {}
 
 void AALSXTCharacter::InputToggleCombatReady()
 {

@@ -38,9 +38,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootprintsState", Meta = (AllowPrivateAccess))
 	FALSXTFootprintsState FootprintsState;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootstepState", Meta = (AllowPrivateAccess))
-	FALSXTFootstepState FootstepState;
 
 	// Freelooking
 
@@ -220,9 +217,6 @@ public:
 	// Footstep Values
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
-		FALSXTFootstepState GetFootstepValues() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 		FALSXTFootwearDetails GetFootwearDetails() const;
 
 	// Footstep State
@@ -237,9 +231,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
 	FALSXTFootprintsState ProcessNewFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
-	void SetFootstepState(const FALSXTFootstepState& NewFootstepState);
-
 	UFUNCTION(Server, Unreliable)
 	void ServerProcessNewFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
@@ -247,21 +238,12 @@ private:
 	UFUNCTION(Server, Unreliable)
 	void ServerSetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
-	UFUNCTION(Server, Reliable)
-	void ServerSetFootstepState(const FALSXTFootstepState& NewFootstepState);
-
 	UFUNCTION()
 	void OnReplicate_FootprintsState(const FALSXTFootprintsState& PreviousFootprintsState);
-
-	UFUNCTION()
-	void OnReplicate_FootstepState(const FALSXTFootstepState& PreviousFootstepState);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnFootprintsStateChanged(const FALSXTFootprintsState& PreviousFootprintsState);
-
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	void OnFootstepStateChanged(const FALSXTFootstepState& PreviousFootstepState);
 
 public:
 
