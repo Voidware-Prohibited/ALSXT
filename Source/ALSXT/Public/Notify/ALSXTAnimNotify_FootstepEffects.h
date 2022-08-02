@@ -183,8 +183,6 @@ public:
 	virtual void Notify(USkeletalMeshComponent* Mesh, UAnimSequenceBase* Animation,
 	const FAnimNotifyEventReference& EventReference) override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	UALSXTFootstepEffectsSettings* FootstepEffectsSettings;
 
@@ -221,7 +219,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	FHitResult HitResult;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
 	FALSXTFootprintsState CurrentFootprintsState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))

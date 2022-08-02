@@ -39,17 +39,6 @@ void UALSXTAnimNotify_FootstepEffects::SetFootstepEffectsSettings(UALSXTFootstep
 	bSpawnParticleSystem = bNewSpawnParticleSystem;
 }
 
-void UALSXTAnimNotify_FootstepEffects::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	FDoRepLifetimeParams Parameters;
-	Parameters.bIsPushBased = true;
-
-	Parameters.Condition = COND_SkipOwner;
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CurrentFootprintsState, Parameters)
-}
-
 void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSequenceBase* Animation,
 	const FAnimNotifyEventReference& EventReference)
 {
