@@ -55,52 +55,58 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 	TSoftObjectPtr<UMaterialInterface> DecalMaterial;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
-	UTexture2D* FootstepSoleTexture = nullptr;
+	UTexture2D* TransferTexture = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
-	UTexture2D* FootstepSoleNormal = nullptr;
+	UTexture2D* TransferNormalTexture = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
-	UTexture2D* FootstepSoleDetail = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -1))
-	float FootstepSoleDetailScale{ 1.0f };
+	UTexture2D* TransferDetailTexture = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float FootstepSurfaceTransferAcceptanceAmount{ 0.5f };
+	float TransferDetailTextureScale{ 1.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float SurfaceTransferAmount{ 0.5f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float SurfaceTransferAcceptanceAmount{ 0.5f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -2))
 	float SurfaceTransferAcceptanceNormalScale{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialTransferAmount{ 0.5f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
-	FLinearColor MaterialPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
-	FLinearColor MaterialSecondaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+	float TransferAmount{ 0.5f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialSaturationRate{ 1.0f };
+	float TransferSaturationRate{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialDesaturationRate{ 1.0f };
+	float TransferDesaturationRate{ 1.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -1))
-	float TransferNormalAmount{0.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0.0001))
 	float TransferDetailScale{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialGrainSize{ 1.0f };
+	float TransferDetailNormalAmount{0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = -2))
+	float TransferNormalScale{0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
+	FLinearColor TransferPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
+	FLinearColor TransferSecondaryColor{0.0f, 0.0f, 0.0f, 1.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialWetness{ 0.0f };
+	float TransferGrainSize{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
-	float MaterialEmissive{ 0.0f };
+	float TransferWetness{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (ClampMin = 0))
+	float TransferEmissive{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
 	FVector DecalSize{10.0f, 20.0f, 20.0f};
@@ -227,29 +233,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
 	FALSXTFootprintsState CurrentFootprintsState;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	UTexture2D* LeftFootstepSoleDetail;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	UTexture2D* RightFootstepSoleDetail;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float LeftFootstepDecalNormalAmount{0.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess, ClampMin = 0))
-	float RightFootstepDecalNormalAmount{0.0f};
-
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-	float LeftFootstepDurationModifierMin{ 1.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-	float RightFootstepDurationModifierMin{ 1.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-	float LeftFootstepDurationModifierMax{ 4.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-	float RightFootstepDurationModifierMax{ 4.0f };
 };

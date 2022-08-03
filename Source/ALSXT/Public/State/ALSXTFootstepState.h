@@ -26,70 +26,70 @@ struct ALSXT_API FALSXTFootprintStatePhase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TEnumAsByte<EPhysicalSurface> FootPhysicalMaterial {0};
+	TEnumAsByte<EPhysicalSurface> SurfaceType {0};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UTexture2D* FootSoleTexture = nullptr;
+	UTexture2D* TransferTexture = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UTexture2D* FootSoleNormal = nullptr;
+	UTexture2D* TransferNormalTexture = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UTexture2D* FootTransferDetailTexture = nullptr;
+	UTexture2D* TransferDetailTexture = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UTexture2D* FootTransferDetailNormal = nullptr;
+	UTexture2D* TransferDetailNormal = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootTransferAmount{ 0.0f };
+	float SurfaceTransferAmount{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootSurfaceTransferAcceptanceAmount{ 0.5f };
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootTransferDetailScale{ 0.0f };
+	float SurfaceTransferAcceptanceAmount{ 0.5f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FLinearColor FootMaterialPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FLinearColor FootMaterialSecondaryColor{0.0f, 0.0f, 0.0f, 1.0f};
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootMaterialGrainSize{ 1.0f };
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootMaterialWetness{ 0.0f };
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootMaterialTransferAmount{ 0.5f };
+	float TransferAmount{ 0.5f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootMaterialSaturationRate{ 1.0f };
+	float TransferSaturationRate{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootMaterialDesaturationRate{ 1.0f };
+	float TransferDesaturationRate{ 1.0f };
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootDecalNormalAmount{0.0f};
+	float TransferDetailScale{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootMaterialTransferDetailNormalAmount{ 0.5f };
+	float TransferDetailNormalAmount{0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootDecalEmissiveAmount{ 0.0f };
+	float TransferNormalScale{ 0.5f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FLinearColor TransferPrimaryColor{0.0f, 0.0f, 0.0f, 1.0f};
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootDecalDuration{4.0f};
+	FLinearColor TransferSecondaryColor{0.0f, 0.0f, 0.0f, 1.0f};
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootDecalFadeOutDuration{2.0f};
+	float TransferGrainSize{ 1.0f };
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float TransferWetness{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootDurationModifierMin{ 1.0f };
+	float TransferEmissiveAmount{ 0.0f };
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float DecalDuration{4.0f};
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float DecalFadeOutDuration{2.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float FootDurationModifierMax{ 4.0f };
+	float DecalDurationModifierMin{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float DecalDurationModifierMax{ 4.0f };
 };
 
 USTRUCT(BlueprintType)
