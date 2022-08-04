@@ -255,19 +255,23 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Left.Current.TransferDetailScale = EffectSettings->TransferDetailTextureScale;
 						CurrentFootprintsState.Left.Current.TransferPrimaryColor = EffectSettings->TransferPrimaryColor;
 						CurrentFootprintsState.Left.Current.TransferSecondaryColor = EffectSettings->TransferSecondaryColor;
-						CurrentFootprintsState.Left.Current.TransferGrainSize = EffectSettings->TransferGrainSize;
 						CurrentFootprintsState.Left.Current.TransferWetness = EffectSettings->TransferWetness;
-						CurrentFootprintsState.Left.Current.TransferAmount = EffectSettings->SurfaceTransferAmount;
 						CurrentFootprintsState.Left.Current.TransferSaturationRate = EffectSettings->TransferSaturationRate;
 						CurrentFootprintsState.Left.Current.TransferDesaturationRate = EffectSettings->TransferDesaturationRate;
-						CurrentFootprintsState.Left.Current.TransferNormalScale = EffectSettings->TransferNormalScale;
 						CurrentFootprintsState.Left.Current.TransferEmissiveAmount = EffectSettings->TransferEmissive;
 						CurrentFootprintsState.Left.Current.DecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Left.Current.DecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
 						CurrentFootprintsState.Left.Current.DecalDurationModifierMin = EffectSettings->DecalDurationModifierMin;
 						CurrentFootprintsState.Left.Current.DecalDurationModifierMax = EffectSettings->DecalDurationModifierMax;
 						CurrentFootprintsState.Left.Current.SurfaceTransferAcceptanceAmount = EffectSettings->SurfaceTransferAcceptanceAmount;
-						CurrentFootprintsState.Left.Current.TransferDetailScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
+
+						CurrentFootprintsState.Left.Current.TransferDetailScale = EffectSettings->TransferDetailScale;
+						CurrentFootprintsState.Left.Current.TransferAmount = EffectSettings->TransferAmount;
+						CurrentFootprintsState.Left.Current.SurfaceTransferAmount = EffectSettings->SurfaceTransferAmount;
+						CurrentFootprintsState.Left.Current.TransferNormalScale = EffectSettings->TransferNormalScale;
+						CurrentFootprintsState.Left.Current.TransferGrainSize = EffectSettings->TransferGrainSize;
+						CurrentFootprintsState.Left.Current.SurfaceTransferAcceptanceNormalScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
+						CurrentFootprintsState.Left.Current.TransferDetailNormalAmount = EffectSettings->TransferDetailNormalAmount;
 					}
 					else {
 						//Set New Current
@@ -276,19 +280,23 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Left.Current.TransferDetailScale = EffectSettings->TransferDetailTextureScale;
 						CurrentFootprintsState.Left.Current.TransferPrimaryColor = EffectSettings->TransferPrimaryColor;
 						CurrentFootprintsState.Left.Current.TransferSecondaryColor = EffectSettings->TransferSecondaryColor;
-						CurrentFootprintsState.Left.Current.TransferGrainSize = EffectSettings->TransferGrainSize;
 						CurrentFootprintsState.Left.Current.TransferWetness = EffectSettings->TransferWetness;
-						CurrentFootprintsState.Left.Current.TransferAmount = EffectSettings->SurfaceTransferAmount;
 						CurrentFootprintsState.Left.Current.TransferSaturationRate = EffectSettings->TransferSaturationRate;
 						CurrentFootprintsState.Left.Current.TransferDesaturationRate = EffectSettings->TransferDesaturationRate;
-						CurrentFootprintsState.Left.Current.TransferNormalScale = EffectSettings->TransferNormalScale;
 						CurrentFootprintsState.Left.Current.TransferEmissiveAmount = EffectSettings->TransferEmissive;
 						CurrentFootprintsState.Left.Current.DecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Left.Current.DecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
 						CurrentFootprintsState.Left.Current.DecalDurationModifierMin = EffectSettings->DecalDurationModifierMin;
 						CurrentFootprintsState.Left.Current.DecalDurationModifierMax = EffectSettings->DecalDurationModifierMax;
 						CurrentFootprintsState.Left.Current.SurfaceTransferAcceptanceAmount = EffectSettings->SurfaceTransferAcceptanceAmount;
-						CurrentFootprintsState.Left.Current.TransferDetailScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
+
+						CurrentFootprintsState.Left.Current.TransferDetailScale = EffectSettings->TransferDetailScale;
+						CurrentFootprintsState.Left.Current.TransferAmount = EffectSettings->TransferAmount;
+						CurrentFootprintsState.Left.Current.SurfaceTransferAmount = EffectSettings->SurfaceTransferAmount;
+						CurrentFootprintsState.Left.Current.TransferNormalScale = EffectSettings->TransferNormalScale;
+						CurrentFootprintsState.Left.Current.TransferGrainSize = EffectSettings->TransferGrainSize;
+						CurrentFootprintsState.Left.Current.SurfaceTransferAcceptanceNormalScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
+						CurrentFootprintsState.Left.Current.TransferDetailNormalAmount = EffectSettings->TransferDetailNormalAmount;
 					}
 					CalculatedSoleNormalScale = (EffectSettings->TransferNormalScale * EffectSettings->SurfaceTransferAmount) * (EffectSettings->SurfaceTransferAcceptanceNormalScale * EffectSettings->SurfaceTransferAcceptanceAmount);
 					ALSXTCharacter->ProcessNewFootprintsState(EALSXTFootBone::Left, CurrentFootprintsState);
@@ -326,9 +334,10 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					MI->SetScalarParameterValue(FName("EmissiveAmountPrevious"), ALSXTCharacter->GetFootprintsState().Left.Previous.TransferEmissiveAmount);
 
 					MI->SetScalarParameterValue(FName("PhaseAlpha"), ALSXTCharacter->GetFootprintsState().Left.FootSurfaceAlpha);
-					MI->SetScalarParameterValue(FName("TransferAmount"), EffectSettings->SurfaceTransferAmount);
-					MI->SetScalarParameterValue(FName("TransferAmountCurrent"), ALSXTCharacter->GetFootprintsState().Left.Current.SurfaceTransferAmount);
-					MI->SetScalarParameterValue(FName("TransferAmountPrevious"), ALSXTCharacter->GetFootprintsState().Left.Previous.SurfaceTransferAmount);
+					MI->SetScalarParameterValue(FName("TransferAmount"), ALSXTCharacter->GetFootprintsState().Left.Current.TransferAmount);
+					MI->SetScalarParameterValue(FName("SurfaceTransferAmount"), ALSXTCharacter->GetFootprintsState().Left.Current.SurfaceTransferAmount);
+					MI->SetScalarParameterValue(FName("TransferAmountPrevious"), ALSXTCharacter->GetFootprintsState().Left.Previous.TransferAmount);
+					MI->SetScalarParameterValue(FName("SurfaceTransferAmountPrevious"), ALSXTCharacter->GetFootprintsState().Left.Previous.SurfaceTransferAmount);
 
 					//Calculate Duration based on Materials. Wetter materials stay longer
 					DurationAverage = ALSXTCharacter->GetFootprintsState().Left.Current.TransferWetness + EffectSettings->SurfaceTransferAmount / 2;
@@ -355,19 +364,23 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.TransferDetailScale = EffectSettings->TransferDetailTextureScale;
 						CurrentFootprintsState.Right.Current.TransferPrimaryColor = EffectSettings->TransferPrimaryColor;
 						CurrentFootprintsState.Right.Current.TransferSecondaryColor = EffectSettings->TransferSecondaryColor;
-						CurrentFootprintsState.Right.Current.TransferGrainSize = EffectSettings->TransferGrainSize;
 						CurrentFootprintsState.Right.Current.TransferWetness = EffectSettings->TransferWetness;
-						CurrentFootprintsState.Right.Current.TransferAmount = EffectSettings->SurfaceTransferAmount;
 						CurrentFootprintsState.Right.Current.TransferSaturationRate = EffectSettings->TransferSaturationRate;
 						CurrentFootprintsState.Right.Current.TransferDesaturationRate = EffectSettings->TransferDesaturationRate;
-						CurrentFootprintsState.Right.Current.TransferNormalScale = EffectSettings->TransferNormalScale;
 						CurrentFootprintsState.Right.Current.TransferEmissiveAmount = EffectSettings->TransferEmissive;
 						CurrentFootprintsState.Right.Current.DecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Right.Current.DecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
 						CurrentFootprintsState.Right.Current.DecalDurationModifierMin = EffectSettings->DecalDurationModifierMin;
 						CurrentFootprintsState.Right.Current.DecalDurationModifierMax = EffectSettings->DecalDurationModifierMax;
 						CurrentFootprintsState.Right.Current.SurfaceTransferAcceptanceAmount = EffectSettings->SurfaceTransferAcceptanceAmount;
-						CurrentFootprintsState.Right.Current.TransferDetailScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
+
+						CurrentFootprintsState.Right.Current.TransferDetailScale = EffectSettings->TransferDetailScale;
+						CurrentFootprintsState.Right.Current.TransferAmount = EffectSettings->TransferAmount;
+						CurrentFootprintsState.Right.Current.SurfaceTransferAmount = EffectSettings->SurfaceTransferAmount;
+						CurrentFootprintsState.Right.Current.TransferNormalScale = EffectSettings->TransferNormalScale;
+						CurrentFootprintsState.Right.Current.TransferGrainSize = EffectSettings->TransferGrainSize;
+						CurrentFootprintsState.Right.Current.SurfaceTransferAcceptanceNormalScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
+						CurrentFootprintsState.Right.Current.TransferDetailNormalAmount = EffectSettings->TransferDetailNormalAmount;
 					}
 					else {
 						//Set New Current
@@ -376,12 +389,9 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.TransferDetailScale = EffectSettings->TransferDetailTextureScale;
 						CurrentFootprintsState.Right.Current.TransferPrimaryColor = EffectSettings->TransferPrimaryColor;
 						CurrentFootprintsState.Right.Current.TransferSecondaryColor = EffectSettings->TransferSecondaryColor;
-						CurrentFootprintsState.Right.Current.TransferGrainSize = EffectSettings->TransferGrainSize;
 						CurrentFootprintsState.Right.Current.TransferWetness = EffectSettings->TransferWetness;
-						CurrentFootprintsState.Right.Current.TransferAmount = EffectSettings->SurfaceTransferAmount;
 						CurrentFootprintsState.Right.Current.TransferSaturationRate = EffectSettings->TransferSaturationRate;
 						CurrentFootprintsState.Right.Current.TransferDesaturationRate = EffectSettings->TransferDesaturationRate;
-						CurrentFootprintsState.Right.Current.TransferNormalScale = EffectSettings->TransferNormalScale;
 						CurrentFootprintsState.Right.Current.TransferEmissiveAmount = EffectSettings->TransferEmissive;
 						CurrentFootprintsState.Right.Current.DecalDuration = EffectSettings->DecalDuration;
 						CurrentFootprintsState.Right.Current.DecalFadeOutDuration = EffectSettings->DecalFadeOutDuration;
@@ -389,6 +399,14 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 						CurrentFootprintsState.Right.Current.DecalDurationModifierMax = EffectSettings->DecalDurationModifierMax;
 						CurrentFootprintsState.Right.Current.SurfaceTransferAcceptanceAmount = EffectSettings->SurfaceTransferAcceptanceAmount;
 						CurrentFootprintsState.Right.Current.TransferDetailScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
+
+						CurrentFootprintsState.Right.Current.TransferDetailScale = EffectSettings->TransferDetailScale;
+						CurrentFootprintsState.Right.Current.TransferAmount = EffectSettings->TransferAmount;
+						CurrentFootprintsState.Right.Current.SurfaceTransferAmount = EffectSettings->SurfaceTransferAmount;
+						CurrentFootprintsState.Right.Current.TransferNormalScale = EffectSettings->TransferNormalScale;
+						CurrentFootprintsState.Right.Current.TransferGrainSize = EffectSettings->TransferGrainSize;
+						CurrentFootprintsState.Right.Current.SurfaceTransferAcceptanceNormalScale = EffectSettings->SurfaceTransferAcceptanceNormalScale;
+						CurrentFootprintsState.Right.Current.TransferDetailNormalAmount = EffectSettings->TransferDetailNormalAmount;
 					}
 					CalculatedSoleNormalScale = (EffectSettings->TransferNormalScale * EffectSettings->SurfaceTransferAmount) * (EffectSettings->SurfaceTransferAcceptanceNormalScale * EffectSettings->SurfaceTransferAcceptanceAmount);
 					ALSXTCharacter->ProcessNewFootprintsState(EALSXTFootBone::Right, CurrentFootprintsState);
@@ -403,12 +421,10 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					MI->SetTextureParameterValue(FName("SoleNormal"), ALSXTCharacter->GetFootwearDetails().FootwearSoleNormalTexture);
 					MI->SetTextureParameterValue(FName("SoleDetail"), ALSXTCharacter->GetFootwearDetails().FootwearSoleDetailTexture);
 					MI->SetScalarParameterValue(FName("SoleNormalScale"), CalculatedSoleNormalScale);
-
 					MI->SetTextureParameterValue(FName("TransferDetailTexture"), ALSXTCharacter->GetFootprintsState().Right.Current.TransferDetailTexture);
 					MI->SetTextureParameterValue(FName("TransferDetailNormal"), ALSXTCharacter->GetFootprintsState().Right.Current.TransferDetailNormal);
 					MI->SetScalarParameterValue(FName("TransferNormalScale"), ALSXTCharacter->GetFootprintsState().Right.Current.TransferNormalScale);
 					MI->SetScalarParameterValue(FName("TransferDetailScale"), ALSXTCharacter->GetFootprintsState().Right.Current.TransferDetailScale);
-
 					MI->SetVectorParameterValue(FName("PrimaryColor"), ALSXTCharacter->GetFootprintsState().Right.Current.TransferPrimaryColor);
 					MI->SetVectorParameterValue(FName("SecondaryColor"), ALSXTCharacter->GetFootprintsState().Right.Current.TransferSecondaryColor);
 					MI->SetScalarParameterValue(FName("GrainSize"), ALSXTCharacter->GetFootprintsState().Right.Current.TransferGrainSize);
@@ -423,11 +439,11 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					MI->SetScalarParameterValue(FName("GrainSizePrevious"), ALSXTCharacter->GetFootprintsState().Right.Previous.TransferGrainSize);
 					MI->SetScalarParameterValue(FName("WetnessPrevious"), ALSXTCharacter->GetFootprintsState().Right.Previous.TransferWetness);
 					MI->SetScalarParameterValue(FName("EmissiveAmountPrevious"), ALSXTCharacter->GetFootprintsState().Right.Previous.TransferEmissiveAmount);
-
 					MI->SetScalarParameterValue(FName("PhaseAlpha"), ALSXTCharacter->GetFootprintsState().Right.FootSurfaceAlpha);
-					MI->SetScalarParameterValue(FName("TransferAmount"), EffectSettings->SurfaceTransferAmount);
-					MI->SetScalarParameterValue(FName("TransferAmountCurrent"), ALSXTCharacter->GetFootprintsState().Right.Current.SurfaceTransferAmount);
-					MI->SetScalarParameterValue(FName("TransferAmountPrevious"), ALSXTCharacter->GetFootprintsState().Right.Previous.SurfaceTransferAmount);
+					MI->SetScalarParameterValue(FName("TransferAmount"), ALSXTCharacter->GetFootprintsState().Right.Current.TransferAmount);
+					MI->SetScalarParameterValue(FName("SurfaceTransferAmount"), ALSXTCharacter->GetFootprintsState().Right.Current.SurfaceTransferAmount);
+					MI->SetScalarParameterValue(FName("TransferAmountPrevious"), ALSXTCharacter->GetFootprintsState().Right.Previous.TransferAmount);
+					MI->SetScalarParameterValue(FName("SurfaceTransferAmountPrevious"), ALSXTCharacter->GetFootprintsState().Right.Previous.SurfaceTransferAmount);
 
 					//Calculate Duration based on Materials. Wetter materials stay longer
 					DurationAverage = ALSXTCharacter->GetFootprintsState().Right.Current.TransferWetness + EffectSettings->SurfaceTransferAmount / 2;

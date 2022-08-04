@@ -46,6 +46,9 @@ struct ALSXT_API FALSXTFootprintStatePhase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float SurfaceTransferAcceptanceAmount{ 0.5f };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -2))
+	float SurfaceTransferAcceptanceNormalScale{ 0.0f };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float TransferAmount{ 0.5f };
 
