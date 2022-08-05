@@ -289,8 +289,22 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void StartVault();
 
+	void StartSlideInternal();
+
+	void OnSlideFinishedInternal();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Movement System")
+	void StopSlide();
+	virtual void StopSlide_Implementation();
+
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void StartSlide();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnSlideStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnSlideFinished();
 
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void StartWallrun();

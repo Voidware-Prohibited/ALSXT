@@ -173,7 +173,13 @@ void AALSXTCharacter::InputCrouch()
 {
 	if (GetDesiredStance() == AlsStanceTags::Standing)
 	{
-		SetDesiredStance(AlsStanceTags::Crouching);
+		if (CanSlide())
+		{
+			StartSlideInternal();
+		}
+		else {
+			SetDesiredStance(AlsStanceTags::Crouching);
+		}
 	}
 	else if (GetDesiredStance() == AlsStanceTags::Crouching)
 	{
@@ -600,11 +606,21 @@ void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 	// }
 	Jump();
 }
+void AALSXTCharacter::StartSlideInternal()
+{
+	SetLocomotionAction(AlsLocomotionActionTags::Vaulting);
+	StartSlide();
+}
 void AALSXTCharacter::CanSprint_Implementation() {}
 void AALSXTCharacter::AIObstacleTrace_Implementation() {}
 void AALSXTCharacter::OnRoll_Implementation() {}
 void AALSXTCharacter::OnMantle_Implementation() {}
 void AALSXTCharacter::StartVault_Implementation() {}
-void AALSXTCharacter::StartSlide_Implementation() {}
+void AALSXTCharacter::StartSlide_Implementation() {
+	SetLocomotionAction(AlsLocomotionActionTags::Sliding);
+}
+void AALSXTCharacter::StopSlide_Implementation() {
+	SetLocomotionAction(FGameplayTag::EmptyTag);
+}
 void AALSXTCharacter::StartWallrun_Implementation() {}
 void AALSXTCharacter::OnWeaponReadyPositionChanged_Implementation(const FGameplayTag& PreviousWeaponReadyPositionTag) {}
