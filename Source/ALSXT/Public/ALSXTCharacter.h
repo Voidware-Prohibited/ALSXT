@@ -1,13 +1,15 @@
 #pragma once
 
 #include "AlsCharacter.h"
-
+#include "GameFramework/Character.h"
 #include "State/AlsLocomotionState.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "State/ALSXTFootstepState.h"
+#include "State/ALSXTSlidingState.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
+class UALSXTCharacterSettings;
 class UAlsCameraComponent;
 class UInputMappingContext;
 class UInputAction;
@@ -19,6 +21,9 @@ class ALSXT_API AALSXTCharacter : public AAlsCharacter
 	GENERATED_BODY()
 
 private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Als Character", Meta = (AllowPrivateAccess))
+	TObjectPtr<UALSXTCharacterSettings> ALSXTSettings;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
 
@@ -95,6 +100,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag WeaponReadyPosition{ALSXTWeaponReadyPositionTags::None};
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FALSXTSlidingState SlidingState;
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -167,6 +175,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void Crouch(bool bClientSimulation = false) override;
+
 	// Camera
 
 protected:
@@ -212,6 +222,33 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanSprint() const;
 	void CanSprint_Implementation();
+
+	// Sliding
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+		void TryStartSliding(float PlayRate = 1.0f);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		UAnimMontage* SelectSlideMontage();
+
+private:
+	bool IsSlidingAllowedToStart(const UAnimMontage* Montage) const;
+
+	void StartSliding(float PlayRate, float TargetYawAngle);
+
+	UFUNCTION(Server, Reliable)
+		void ServerStartSliding(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
+
+	UFUNCTION(NetMulticast, Reliable)
+		void MulticastStartSliding(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
+
+	void StartSlidingImplementation(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
+
+	void RefreshSliding(float DeltaTime);
+
+	void RefreshSlidingPhysics(float DeltaTime);
 
 public:
 	// Footstep Values

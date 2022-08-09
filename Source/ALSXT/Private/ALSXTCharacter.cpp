@@ -6,8 +6,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "Net/UnrealNetwork.h"
+#include "Settings/ALSXTCharacterSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AALSXTCharacter::AALSXTCharacter()
 {
@@ -175,7 +177,8 @@ void AALSXTCharacter::InputCrouch()
 	{
 		if (CanSlide())
 		{
-			StartSlideInternal();
+			// StartSlideInternal();
+			TryStartSliding(1.3f);
 		}
 		else {
 			SetDesiredStance(AlsStanceTags::Crouching);
@@ -275,6 +278,26 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 			// UnLockRotation();
 		}
 	}
+}
+
+void AALSXTCharacter::Crouch(const bool bClientSimulation)
+{
+	Super::Crouch(bClientSimulation);
+
+	// Change stance instantly without waiting for ACharacter::OnStartCrouch().
+
+	if (!GetCharacterMovement()->bWantsToCrouch)
+	{
+		return;
+	}
+
+	if ((GetLocomotionAction() == AlsLocomotionActionTags::Rolling) || (GetLocomotionAction() == AlsLocomotionActionTags::Sliding))
+	{
+		SetDesiredStance(GetDesiredStance()); // Keep desired stance when rolling.
+		return;
+	}
+
+	SetDesiredStance(AlsStanceTags::Crouching);
 }
 
 void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
@@ -608,7 +631,8 @@ void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 }
 void AALSXTCharacter::StartSlideInternal()
 {
-	SetLocomotionAction(AlsLocomotionActionTags::Vaulting);
+	SetLocomotionAction(AlsLocomotionActionTags::Sliding);
+	SetDesiredStance(AlsStanceTags::Crouching);
 	StartSlide();
 }
 void AALSXTCharacter::CanSprint_Implementation() {}
@@ -619,8 +643,13 @@ void AALSXTCharacter::StartVault_Implementation() {}
 void AALSXTCharacter::StartSlide_Implementation() {
 	SetLocomotionAction(AlsLocomotionActionTags::Sliding);
 }
+void AALSXTCharacter::OnSlideFinishedInternal() {
+	SetLocomotionAction(FGameplayTag::EmptyTag);
+	SetDesiredStance(AlsStanceTags::Standing);
+}
 void AALSXTCharacter::StopSlide_Implementation() {
 	SetLocomotionAction(FGameplayTag::EmptyTag);
+	SetDesiredStance(AlsStanceTags::Standing);
 }
 void AALSXTCharacter::StartWallrun_Implementation() {}
 void AALSXTCharacter::OnWeaponReadyPositionChanged_Implementation(const FGameplayTag& PreviousWeaponReadyPositionTag) {}
