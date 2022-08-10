@@ -629,27 +629,10 @@ void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 	// }
 	Jump();
 }
-void AALSXTCharacter::StartSlideInternal()
-{
-	SetLocomotionAction(AlsLocomotionActionTags::Sliding);
-	SetDesiredStance(AlsStanceTags::Crouching);
-	StartSlide();
-}
 void AALSXTCharacter::CanSprint_Implementation() {}
 void AALSXTCharacter::AIObstacleTrace_Implementation() {}
 void AALSXTCharacter::OnRoll_Implementation() {}
 void AALSXTCharacter::OnMantle_Implementation() {}
 void AALSXTCharacter::StartVault_Implementation() {}
-void AALSXTCharacter::StartSlide_Implementation() {
-	SetLocomotionAction(AlsLocomotionActionTags::Sliding);
-}
-void AALSXTCharacter::OnSlideFinishedInternal() {
-	SetLocomotionAction(FGameplayTag::EmptyTag);
-	SetDesiredStance(AlsStanceTags::Standing);
-}
-void AALSXTCharacter::StopSlide_Implementation() {
-	SetLocomotionAction(FGameplayTag::EmptyTag);
-	SetDesiredStance(AlsStanceTags::Standing);
-}
 void AALSXTCharacter::StartWallrun_Implementation() {}
 void AALSXTCharacter::OnWeaponReadyPositionChanged_Implementation(const FGameplayTag& PreviousWeaponReadyPositionTag) {}
