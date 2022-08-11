@@ -280,31 +280,31 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 	}
 }
 
-// void AALSXTCharacter::ApplyDesiredStance()
-// {
-// 	if (!GetLocomotionAction().IsValid())
-// 	{
-// 		if (GetLocomotionMode() == AlsLocomotionModeTags::Grounded)
-// 		{
-// 			if (GetDesiredStance() == AlsStanceTags::Standing)
-// 			{
-// 				UnCrouch();
-// 			}
-// 			else if (GetDesiredStance() == AlsStanceTags::Crouching)
-// 			{
-// 				Crouch();
-// 			}
-// 		}
-// 		else if (GetLocomotionMode() == AlsLocomotionModeTags::InAir)
-// 		{
-// 			UnCrouch();
-// 		}
-// 	}
-// 	else if ((GetLocomotionAction() == AlsLocomotionActionTags::Rolling && ALSXTSettings->Rolling.bCrouchOnStart) || (GetLocomotionAction() == AlsLocomotionActionTags::Sliding && ALSXTSettings->Sliding.bCrouchOnStart))
-// 	{
-// 		Crouch();
-// 	}
-// }
+void AALSXTCharacter::ApplyDesiredStance()
+{
+	if (!GetLocomotionAction().IsValid())
+	{
+		if (GetLocomotionMode() == AlsLocomotionModeTags::Grounded)
+		{
+			if (GetDesiredStance() == AlsStanceTags::Standing)
+			{
+				UnCrouch();
+			}
+			else if (GetDesiredStance() == AlsStanceTags::Crouching)
+			{
+				Crouch();
+			}
+		}
+		else if (GetLocomotionMode() == AlsLocomotionModeTags::InAir)
+		{
+			UnCrouch();
+		}
+	}
+	else if ((GetLocomotionAction() == AlsLocomotionActionTags::Rolling && ALSXTSettings->Rolling.bCrouchOnStart) || (GetLocomotionAction() == AlsLocomotionActionTags::Sliding && ALSXTSettings->Sliding.bCrouchOnStart))
+	{
+		Crouch();
+	}
+}
 
 void AALSXTCharacter::Crouch(const bool bClientSimulation)
 {
