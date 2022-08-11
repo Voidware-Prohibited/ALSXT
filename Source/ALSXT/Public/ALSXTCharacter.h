@@ -177,6 +177,8 @@ public:
 
 	virtual void Crouch(bool bClientSimulation = false) override;
 
+	// void ApplyDesiredStance() override;
+
 	// Camera
 
 protected:
