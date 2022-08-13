@@ -200,6 +200,10 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 			{
 				return;
 			}
+			if (TryVault())
+			{
+				return;
+			}
 			if (TryStartMantlingGrounded())
 			{
 				return;
