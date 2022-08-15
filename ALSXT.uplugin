@@ -49,6 +49,10 @@
 		{
 			"Name": "ALS",
 			"Enabled": true
+		},
+		{
+			"Name": "PropertyAccessNode",
+			"Enabled": true
 		}
 	]
 }
