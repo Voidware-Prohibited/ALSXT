@@ -461,8 +461,28 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		}
 	}
 
-	if (bSpawnParticleSystem && IsValid(EffectSettings->ParticleSystem.LoadSynchronous()))
+	if (bSpawnParticleSystem && IsValid(EffectSettings->ParticleSystem.LoadSynchronous()) && IsValid(EffectSettings->FootstepParticles.WalkParticleSystem.LoadSynchronous()) && IsValid(EffectSettings->FootstepParticles.RunParticleSystem.LoadSynchronous()) && IsValid(EffectSettings->FootstepParticles.LandParticleSystem.LoadSynchronous()))
 	{
+		UNiagaraSystem* GaitParticleSystem;
+		if (IsValid(ALSXTCharacter)) {
+			if (ALSXTCharacter->GetDesiredGait() == AlsGaitTags::Walking)
+			{
+				GaitParticleSystem = EffectSettings->FootstepParticles.WalkParticleSystem.Get();
+			}
+			else if (ALSXTCharacter->GetDesiredGait() == AlsGaitTags::Running || ALSXTCharacter->GetDesiredGait() == AlsGaitTags::Sprinting)
+			{
+				GaitParticleSystem = EffectSettings->FootstepParticles.RunParticleSystem.Get();
+			}
+			else
+			{
+				GaitParticleSystem = EffectSettings->FootstepParticles.LandParticleSystem.Get();
+			}
+		}
+		else
+		{
+			GaitParticleSystem = EffectSettings->FootstepParticles.WalkParticleSystem.Get();
+		}
+		
 		switch (EffectSettings->ParticleSystemSpawnType)
 		{
 		case EALSXTFootstepParticleEffectSpawnType::SpawnAtTraceHitLocation:
