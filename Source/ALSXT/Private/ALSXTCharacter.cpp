@@ -229,7 +229,10 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 
 void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 {
-	SetDesiredAiming(ActionValue.Get<bool>());
+	if (CanAim())
+	{
+		SetDesiredAiming(ActionValue.Get<bool>());
+	}
 }
 
 void AALSXTCharacter::InputRagdoll()
