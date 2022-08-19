@@ -284,6 +284,9 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnFootprintsStateChanged(const FALSXTFootprintsState& PreviousFootprintsState);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnSlidingStarted();
+
 public:
 
 	// Debug
@@ -299,11 +302,6 @@ public:
 	void AIObstacleTrace();
 	virtual void AIObstacleTrace_Implementation();
 
-	/** BP implementable function that called when Roll starts */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Movement System")
-	void OnRoll();
-	virtual void OnRoll_Implementation();
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool CanAim() const;
 
@@ -318,11 +316,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanWallrun() const;
-
-	/** BP implementable function that called when Mantle starts */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Movement System")
-	void OnMantle();
-	virtual void OnMantle_Implementation();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool TryVault() const;

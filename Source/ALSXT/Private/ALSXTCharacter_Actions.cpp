@@ -61,6 +61,7 @@ void AALSXTCharacter::StartSliding(const float PlayRate, const float TargetYawAn
 
 		StartSlidingImplementation(Montage, PlayRate, StartYawAngle, TargetYawAngle);
 		ServerStartSliding(Montage, PlayRate, StartYawAngle, TargetYawAngle);
+		OnSlidingStarted();
 	}
 }
 

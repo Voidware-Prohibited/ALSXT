@@ -664,8 +664,6 @@ void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 }
 void AALSXTCharacter::CanSprint_Implementation() {}
 void AALSXTCharacter::AIObstacleTrace_Implementation() {}
-void AALSXTCharacter::OnRoll_Implementation() {}
-void AALSXTCharacter::OnMantle_Implementation() {}
 void AALSXTCharacter::StartVault_Implementation() {}
 void AALSXTCharacter::StartWallrun_Implementation() {}
 void AALSXTCharacter::OnWeaponReadyPositionChanged_Implementation(const FGameplayTag& PreviousWeaponReadyPositionTag) {}
