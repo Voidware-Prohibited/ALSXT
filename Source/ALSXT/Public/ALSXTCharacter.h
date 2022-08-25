@@ -220,6 +220,20 @@ private:
 
 	void InputToggleCombatReady();
 
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnViewModeChanged(const FGameplayTag& PreviousViewModeTag);
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
+	void GetHeldItemViewTarget(FTransform& Transform, float& FOV, bool& Attachment);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
+	bool IsHoldingAimableItem() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Aim Down Sights")
+	bool IsAimingDownSights() const;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanSprint() const;
@@ -229,11 +243,11 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-		void TryStartSliding(float PlayRate = 1.0f);
+	void TryStartSliding(float PlayRate = 1.0f);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-		UAnimMontage* SelectSlideMontage();
+	UAnimMontage* SelectSlideMontage();
 
 private:
 	bool IsSlidingAllowedToStart(const UAnimMontage* Montage) const;
@@ -241,10 +255,10 @@ private:
 	void StartSliding(float PlayRate, float TargetYawAngle);
 
 	UFUNCTION(Server, Reliable)
-		void ServerStartSliding(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
+	void ServerStartSliding(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
 
 	UFUNCTION(NetMulticast, Reliable)
-		void MulticastStartSliding(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
+	void MulticastStartSliding(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
 
 	void StartSlidingImplementation(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
 
@@ -301,6 +315,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Movement System")
 	void AIObstacleTrace();
 	virtual void AIObstacleTrace_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanAimDownSights() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool CanAim() const;

@@ -261,7 +261,9 @@ void AALSXTCharacter::InputRotationMode()
 
 void AALSXTCharacter::InputViewMode()
 {
+	const auto PreviousViewMode{ GetViewMode() };
 	SetViewMode(GetViewMode() == AlsViewModeTags::ThirdPerson ? AlsViewModeTags::FirstPerson : AlsViewModeTags::ThirdPerson);
+	OnViewModeChanged(PreviousViewMode);
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
@@ -331,6 +333,11 @@ void AALSXTCharacter::Crouch(const bool bClientSimulation)
 	}
 
 	SetDesiredStance(AlsStanceTags::Crouching);
+}
+
+bool AALSXTCharacter::IsAimingDownSights_Implementation() const
+{
+	return (IsDesiredAiming() && CanAimDownSights() && (GetViewMode() == AlsViewModeTags::FirstPerson));
 }
 
 void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
