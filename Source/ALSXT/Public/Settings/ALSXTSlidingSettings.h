@@ -11,6 +11,12 @@ struct ALSXT_API FALSXTSlidingSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAnimMontage> Montage{ nullptr };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+		float MinimumSpeedToSlide{ 350.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+		float MaximumSlidingDuration{ 0.0f };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bCrouchOnStart{ true };
 
