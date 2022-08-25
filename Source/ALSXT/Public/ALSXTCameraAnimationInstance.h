@@ -8,6 +8,8 @@
 // #include "ALSXTCharacter.h"
 #include "ALSXTCameraAnimationInstance.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFirstPersonOverrideChanged, float, FirstPersonOverride);
+
 class AALSXTCharacter;
 // class UALSXTCameraComponent;
 class UAlsCameraComponent;
@@ -64,10 +66,19 @@ private:
 		FGameplayTag WeaponReadyPosition {
 		ALSXTWeaponReadyPositionTags::None
 	};
+	
+	virtual void OnFirstPersonOverrideChangedEvent();
+	float FirstPersonOverride{ GetCurveValue("FirstPersonOverride") };
+	float PreviousFirstPersonOverride{ GetCurveValue("FirstPersonOverride") };
+	FTimerHandle FirstPersonOverrideHandle;
 
 public:
+	virtual void NativeBeginPlay() override;
 	virtual void NativeInitializeAnimation() override;
 
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnFirstPersonOverrideChanged OnFirstPersonOverrideChanged;
 	
 };

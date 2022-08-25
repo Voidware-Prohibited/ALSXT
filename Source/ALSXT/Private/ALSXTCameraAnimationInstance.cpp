@@ -6,6 +6,13 @@
 #include "AlsCharacter.h"
 #include "ALSXTCharacter.h"
 
+void UALSXTCameraAnimationInstance::NativeBeginPlay()
+{
+	Super::NativeBeginPlay();
+	// Call RepeatingFunction once per second, starting two seconds from now.
+	GetWorld()->GetTimerManager().SetTimer(FirstPersonOverrideHandle, this, &UALSXTCameraAnimationInstance::OnFirstPersonOverrideChangedEvent, 0.01f, true, 0.0f);
+}
+
 void UALSXTCameraAnimationInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
@@ -48,4 +55,18 @@ void UALSXTCameraAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	CombatStance = ALSXTCharacter->GetDesiredCombatStance();
 	WeaponFirearmStance = ALSXTCharacter->GetDesiredWeaponFirearmStance();
 	WeaponReadyPosition = ALSXTCharacter->GetDesiredWeaponReadyPosition();
+}
+
+void UALSXTCameraAnimationInstance::OnFirstPersonOverrideChangedEvent()
+{
+	FirstPersonOverride = GetCurveValue("FirstPersonOverride");
+	if (FirstPersonOverride != PreviousFirstPersonOverride)
+	{
+		OnFirstPersonOverrideChanged.Broadcast(GetCurveValue("FirstPersonOverride"));
+		PreviousFirstPersonOverride = GetCurveValue("FirstPersonOverride");
+	}
+	else
+	{
+		PreviousFirstPersonOverride = GetCurveValue("FirstPersonOverride");
+	}
 }
