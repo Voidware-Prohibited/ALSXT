@@ -226,7 +226,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
-	void GetHeldItemViewTarget(FTransform& Transform, float& FOV, bool& Attachment);
+	void GetHeldItemViewTarget(FTransform& Transform, float& FOV, bool& Attachment) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
 	bool IsHoldingAimableItem() const;
