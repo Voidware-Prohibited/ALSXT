@@ -40,6 +40,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag WeaponReadyPosition{ALSXTWeaponReadyPositionTags::None};
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Blocking{ALSXTBlockingTags::NotBlocking};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag StationaryMode{FGameplayTag::EmptyTag};
+
 public:
 
 	virtual void NativeInitializeAnimation() override;

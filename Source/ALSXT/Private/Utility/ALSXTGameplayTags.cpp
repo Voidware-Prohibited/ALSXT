@@ -88,3 +88,15 @@ namespace ALSXTWeaponReadyPositionTags
 	UE_DEFINE_GAMEPLAY_TAG(Aiming, TEXT("Als.WeaponReadyPosition.Aiming"))
 	UE_DEFINE_GAMEPLAY_TAG(Hidden, TEXT("Als.WeaponReadyPosition.Hidden"))
 }
+
+namespace ALSXTBlockingTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(NotBlocking, TEXT("Als.Blocking.NotBlocking"))
+	UE_DEFINE_GAMEPLAY_TAG(Blocking, TEXT("Als.Blocking.Blocking"))
+}
+
+namespace ALSXTStationaryModeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Sitting01, TEXT("Als.StationaryMode.Sitting01"))
+	UE_DEFINE_GAMEPLAY_TAG(Vehicle01, TEXT("Als.StationaryMode.Vehicle01"))
+}

@@ -63,6 +63,8 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredCombatStance, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponFirearmStance, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponReadyPosition, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredBlocking, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MeshRotation, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MeshRotationYaw, Parameters)
@@ -102,6 +104,7 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SwitchShoulderAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchShoulder);
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
 		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleCombatReady);
+		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::InputBlock);
 	}
 }
 
@@ -390,6 +393,18 @@ void AALSXTCharacter::InputToggleCombatReady()
 	}
 }
 
+void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
+{
+	if (CanBlock())
+	{
+		SetDesiredBlocking(ActionValue.Get<bool>() ? ALSXTBlockingTags::Blocking : ALSXTBlockingTags::NotBlocking);
+	}
+	else if ((DesiredBlocking == ALSXTBlockingTags::Blocking) && (ActionValue.Get<bool>()  == false))
+	{
+		SetDesiredBlocking(ALSXTBlockingTags::NotBlocking);
+	}
+}
+
 void AALSXTCharacter::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalLocation)
 {
 	if (Camera->IsActive())
@@ -656,6 +671,90 @@ void AALSXTCharacter::SetWeaponReadyPosition(const FGameplayTag& NewWeaponReadyP
 		OnWeaponReadyPositionChanged(PreviousWeaponReadyPosition);
 	}
 }
+
+// Blocking
+
+bool AALSXTCharacter::IsBlocking() const
+{
+	if (GetBlocking() == ALSXTBlockingTags::Blocking)
+	{
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+}
+
+void AALSXTCharacter::SetDesiredBlocking(const FGameplayTag& NewBlockingTag)
+{
+	if (DesiredBlocking != NewBlockingTag)
+	{
+		DesiredBlocking = NewBlockingTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredBlocking, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredBlocking(NewBlockingTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredBlocking_Implementation(const FGameplayTag& NewBlockingTag)
+{
+	SetDesiredBlocking(NewBlockingTag);
+}
+
+void AALSXTCharacter::SetBlocking(const FGameplayTag& NewBlockingTag)
+{
+	if (Blocking != NewBlockingTag)
+	{
+		const auto PreviousBlocking{ Blocking };
+
+		Blocking = NewBlockingTag;
+
+		OnBlockingChanged(PreviousBlocking);
+	}
+}
+
+void AALSXTCharacter::OnBlockingChanged_Implementation(const FGameplayTag& PreviousBlockingTag) {}
+
+void AALSXTCharacter::SetDesiredStationaryMode(const FGameplayTag& NewStationaryModeTag)
+{
+	if (DesiredStationaryMode != NewStationaryModeTag)
+	{
+		DesiredStationaryMode = NewStationaryModeTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredStationaryMode, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredStationaryMode(NewStationaryModeTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredStationaryMode_Implementation(const FGameplayTag& NewStationaryModeTag)
+{
+	SetDesiredStationaryMode(NewStationaryModeTag);
+}
+
+void AALSXTCharacter::SetStationaryMode(const FGameplayTag& NewStationaryModeTag)
+{
+
+	if (StationaryMode != NewStationaryModeTag)
+	{
+		const auto PreviousStationaryMode{ StationaryMode };
+
+		StationaryMode = NewStationaryModeTag;
+
+		OnStationaryModeChanged(PreviousStationaryMode);
+	}
+}
+
+void AALSXTCharacter::OnStationaryModeChanged_Implementation(const FGameplayTag& PreviousStationaryModeTag) {}
+
 void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 {
 	// if (TryVault())

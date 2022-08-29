@@ -17,6 +17,9 @@ struct ALSXT_API FALSXTSlidingSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
 		float MaximumSlidingDuration{ 0.0f };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+		float AutoSlideOnSlopeDegree{ 0.0f };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bCrouchOnStart{ true };
 

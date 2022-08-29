@@ -103,6 +103,22 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FALSXTSlidingState SlidingState;
 
+	// Blocking
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredBlocking{ALSXTBlockingTags::NotBlocking};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Blocking{ALSXTBlockingTags::NotBlocking};
+
+	// StationaryMode
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredStationaryMode{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag StationaryMode{FGameplayTag::EmptyTag};
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -151,6 +167,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputAction> ToggleCombatReadyAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	TObjectPtr<UInputAction> BlockAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example",
 		Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
@@ -219,6 +238,8 @@ private:
 	void InputFreelook(const FInputActionValue& ActionValue);
 
 	void InputToggleCombatReady();
+
+	void InputBlock(const FInputActionValue& ActionValue);
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
@@ -520,6 +541,60 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnWeaponReadyPositionChanged(const FGameplayTag& PreviousWeaponReadyPositionTag);
+
+	// Desired Blocking
+
+public:
+	const FGameplayTag& GetDesiredBlocking() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanBlock() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	bool IsBlocking() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewBlockingTag"))
+	void SetDesiredBlocking(const FGameplayTag& NewBlockingTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredBlocking(const FGameplayTag& NewBlockingTag);
+
+	// Blocking
+
+public:
+	const FGameplayTag& GetBlocking() const;
+
+private:
+	void SetBlocking(const FGameplayTag& NewBlockingTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnBlockingChanged(const FGameplayTag& PreviousBlockingTag);
+
+	// Desired StationaryMode
+
+public:
+	const FGameplayTag& GetDesiredStationaryMode() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewStationaryModeTag"))
+		void SetDesiredStationaryMode(const FGameplayTag& NewStationaryModeTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetDesiredStationaryMode(const FGameplayTag& NewStationaryModeTag);
+
+	// StationaryMode
+
+public:
+	const FGameplayTag& GetStationaryMode() const;
+
+private:
+	void SetStationaryMode(const FGameplayTag& NewStationaryModeTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnStationaryModeChanged(const FGameplayTag& PreviousStationaryModeTag);
 };
 
 inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
@@ -596,4 +671,24 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredWeaponReadyPosition() cons
 inline const FGameplayTag& AALSXTCharacter::GetWeaponReadyPosition() const
 {
 	return WeaponReadyPosition;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredBlocking() const
+{
+	return DesiredBlocking;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetBlocking() const
+{
+	return Blocking;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredStationaryMode() const
+{
+	return DesiredStationaryMode;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetStationaryMode() const
+{
+	return StationaryMode;
 }
