@@ -265,8 +265,13 @@ void AALSXTCharacter::InputRotationMode()
 void AALSXTCharacter::InputViewMode()
 {
 	const auto PreviousViewMode{ GetViewMode() };
-	SetViewMode(GetViewMode() == AlsViewModeTags::ThirdPerson ? AlsViewModeTags::FirstPerson : AlsViewModeTags::ThirdPerson);
-	OnViewModeChanged(PreviousViewMode);
+	auto DesiredViewMode{ FGameplayTag::EmptyTag };
+	DesiredViewMode == (GetViewMode() == AlsViewModeTags::ThirdPerson ? AlsViewModeTags::FirstPerson : AlsViewModeTags::ThirdPerson);
+	if (CanSetToViewMode(DesiredViewMode)) 
+	{
+		SetViewMode(GetViewMode() == AlsViewModeTags::ThirdPerson ? AlsViewModeTags::FirstPerson : AlsViewModeTags::ThirdPerson);
+		OnViewModeChanged(PreviousViewMode);
+	}
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst

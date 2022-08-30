@@ -246,6 +246,9 @@ protected:
 	void OnViewModeChanged(const FGameplayTag& PreviousViewModeTag);
 
 public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanSetToViewMode(const FGameplayTag& ViewModeTag) const;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
 	void GetHeldItemViewTarget(FTransform& Transform, float& FOV, bool& Attachment) const;
 
@@ -577,12 +580,18 @@ protected:
 public:
 	const FGameplayTag& GetDesiredStationaryMode() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanEnterStationaryMode() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanExitStationaryMode() const;
+
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewStationaryModeTag"))
-		void SetDesiredStationaryMode(const FGameplayTag& NewStationaryModeTag);
+	void SetDesiredStationaryMode(const FGameplayTag& NewStationaryModeTag);
 
 private:
 	UFUNCTION(Server, Reliable)
-		void ServerSetDesiredStationaryMode(const FGameplayTag& NewStationaryModeTag);
+	void ServerSetDesiredStationaryMode(const FGameplayTag& NewStationaryModeTag);
 
 	// StationaryMode
 
