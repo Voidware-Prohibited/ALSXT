@@ -68,12 +68,46 @@ namespace ALSXTFocusedTags
 	UE_DEFINE_GAMEPLAY_TAG(True, TEXT("Als.Focused.True"))
 }
 
+namespace ALSXTBumpReactionTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(HeadBackLight)
+}
+
+namespace ALSXTBumpSurfaceTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cloth)
+}
+
+namespace ALSXTHitReactionTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(BluntHeadBackLight)
+}
+
+namespace ALSXTHitSurfaceTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cloth)
+}
+
+namespace ALSXTBumpReactionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(HeadBackLight, TEXT("Als.BumpReaction.Head.Back.Light"))
+}
+
+namespace ALSXTBumpSurfaceTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Cloth, TEXT("Als.BumpSurface.Cloth"))
+
+}
+
 namespace ALSXTImpactReactionTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(BumpClothHeadBackLight, TEXT("Als.ImpactReaction.Bump.Head.Back.Light"))
-	UE_DEFINE_GAMEPLAY_TAG(HitClothBluntHeadBackLight, TEXT("Als.ImpactReaction.Hit.Head.Back.Light"))
-	UE_DEFINE_GAMEPLAY_TAG(BumpSurfaceCloth, TEXT("Als.ImpactReaction.BumpSurface.Cloth"))
-	UE_DEFINE_GAMEPLAY_TAG(HitSurfaceCloth, TEXT("Als.ImpactReaction.HitSurface.Cloth"))
+	UE_DEFINE_GAMEPLAY_TAG(BluntHeadBackLight, TEXT("Als.HitReaction.Blunt.Head.Back.Light"))
+
+}
+
+namespace ALSXTImpactReactionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Cloth, TEXT("Als.HitSurface.Cloth"))
 }
 
 namespace ALSXTLocomotionVariantTags

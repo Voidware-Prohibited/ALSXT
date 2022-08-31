@@ -70,12 +70,24 @@ namespace ALSXTFocusedTags
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(True)
 }
 
-namespace ALSXTImpactReactionTags
+namespace ALSXTBumpReactionTags
 {
-	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(BumpHeadBackLight)
-	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitBluntHeadBackLight)
-	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitSurfaceCloth)
-	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(BumpSurfaceCloth)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(HeadBackLight)
+}
+
+namespace ALSXTBumpSurfaceTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cloth)
+}
+
+namespace ALSXTHitReactionTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(BluntHeadBackLight)
+}
+
+namespace ALSXTHitSurfaceTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cloth)
 }
 
 namespace ALSXTLocomotionVariantTags

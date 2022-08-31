@@ -65,6 +65,12 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponReadyPosition, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredBlocking, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStatus, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFocus, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHitReaction, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHitSurface, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredBumpReaction, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredBumpSurface, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MeshRotation, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MeshRotationYaw, Parameters)
@@ -759,6 +765,228 @@ void AALSXTCharacter::SetStationaryMode(const FGameplayTag& NewStationaryModeTag
 }
 
 void AALSXTCharacter::OnStationaryModeChanged_Implementation(const FGameplayTag& PreviousStationaryModeTag) {}
+
+// Status
+
+void AALSXTCharacter::SetDesiredStatus(const FGameplayTag& NewStatusTag)
+{
+	if (DesiredStatus != NewStatusTag)
+	{
+		DesiredStatus = NewStatusTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredStatus, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredStatus(NewStatusTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredStatus_Implementation(const FGameplayTag& NewStatusTag)
+{
+	SetDesiredStatus(NewStatusTag);
+}
+
+void AALSXTCharacter::SetStatus(const FGameplayTag& NewStatusTag)
+{
+
+	if (Status != NewStatusTag)
+	{
+		const auto PreviousStatus{ Status };
+
+		Status = NewStatusTag;
+
+		OnStatusChanged(PreviousStatus);
+	}
+}
+
+void AALSXTCharacter::OnStatusChanged_Implementation(const FGameplayTag& PreviousStatusTag) {}
+
+// Focus
+
+void AALSXTCharacter::SetDesiredFocus(const FGameplayTag& NewFocusTag)
+{
+	if (DesiredFocus != NewFocusTag)
+	{
+		DesiredFocus = NewFocusTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredFocus, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredFocus(NewFocusTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredFocus_Implementation(const FGameplayTag& NewFocusTag)
+{
+	SetDesiredFocus(NewFocusTag);
+}
+
+void AALSXTCharacter::SetFocus(const FGameplayTag& NewFocusTag)
+{
+
+	if (Focus != NewFocusTag)
+	{
+		const auto PreviousFocus{ Focus };
+
+		Focus = NewFocusTag;
+
+		OnFocusChanged(PreviousFocus);
+	}
+}
+
+void AALSXTCharacter::OnFocusChanged_Implementation(const FGameplayTag& PreviousFocusTag) {}
+
+// HitReaction
+
+void AALSXTCharacter::SetDesiredHitReaction(const FGameplayTag& NewHitReactionTag)
+{
+	if (DesiredHitReaction != NewHitReactionTag)
+	{
+		DesiredHitReaction = NewHitReactionTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredHitReaction, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredHitReaction(NewHitReactionTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredHitReaction_Implementation(const FGameplayTag& NewHitReactionTag)
+{
+	SetDesiredHitReaction(NewHitReactionTag);
+}
+
+void AALSXTCharacter::SetHitReaction(const FGameplayTag& NewHitReactionTag)
+{
+
+	if (HitReaction != NewHitReactionTag)
+	{
+		const auto PreviousHitReaction{ HitReaction };
+
+		HitReaction = NewHitReactionTag;
+
+		OnHitReactionChanged(PreviousHitReaction);
+	}
+}
+
+void AALSXTCharacter::OnHitReactionChanged_Implementation(const FGameplayTag& PreviousHitReactionTag) {}
+
+// HitSurface
+
+void AALSXTCharacter::SetDesiredHitSurface(const FGameplayTag& NewHitSurfaceTag)
+{
+	if (DesiredHitSurface != NewHitSurfaceTag)
+	{
+		DesiredHitSurface = NewHitSurfaceTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredHitSurface, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredHitSurface(NewHitSurfaceTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredHitSurface_Implementation(const FGameplayTag& NewHitSurfaceTag)
+{
+	SetDesiredHitSurface(NewHitSurfaceTag);
+}
+
+void AALSXTCharacter::SetHitSurface(const FGameplayTag& NewHitSurfaceTag)
+{
+
+	if (HitSurface != NewHitSurfaceTag)
+	{
+		const auto PreviousHitSurface{ HitSurface };
+
+		HitSurface = NewHitSurfaceTag;
+
+		OnHitSurfaceChanged(PreviousHitSurface);
+	}
+}
+
+void AALSXTCharacter::OnHitSurfaceChanged_Implementation(const FGameplayTag& PreviousHitSurfaceTag) {}
+
+// BumpReaction
+
+void AALSXTCharacter::SetDesiredBumpReaction(const FGameplayTag& NewBumpReactionTag)
+{
+	if (DesiredBumpReaction != NewBumpReactionTag)
+	{
+		DesiredBumpReaction = NewBumpReactionTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredBumpReaction, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredBumpReaction(NewBumpReactionTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredBumpReaction_Implementation(const FGameplayTag& NewBumpReactionTag)
+{
+	SetDesiredBumpReaction(NewBumpReactionTag);
+}
+
+void AALSXTCharacter::SetBumpReaction(const FGameplayTag& NewBumpReactionTag)
+{
+
+	if (BumpReaction != NewBumpReactionTag)
+	{
+		const auto PreviousBumpReaction{ BumpReaction };
+
+		BumpReaction = NewBumpReactionTag;
+
+		OnBumpReactionChanged(PreviousBumpReaction);
+	}
+}
+
+void AALSXTCharacter::OnBumpReactionChanged_Implementation(const FGameplayTag& PreviousBumpReactionTag) {}
+
+// BumpSurface
+
+void AALSXTCharacter::SetDesiredBumpSurface(const FGameplayTag& NewBumpSurfaceTag)
+{
+	if (DesiredBumpSurface != NewBumpSurfaceTag)
+	{
+		DesiredBumpSurface = NewBumpSurfaceTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredBumpSurface, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredBumpSurface(NewBumpSurfaceTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredBumpSurface_Implementation(const FGameplayTag& NewBumpSurfaceTag)
+{
+	SetDesiredBumpSurface(NewBumpSurfaceTag);
+}
+
+void AALSXTCharacter::SetBumpSurface(const FGameplayTag& NewBumpSurfaceTag)
+{
+
+	if (BumpSurface != NewBumpSurfaceTag)
+	{
+		const auto PreviousBumpSurface{ BumpSurface };
+
+		BumpSurface = NewBumpSurfaceTag;
+
+		OnBumpSurfaceChanged(PreviousBumpSurface);
+	}
+}
+
+void AALSXTCharacter::OnBumpSurfaceChanged_Implementation(const FGameplayTag& PreviousBumpSurfaceTag) {}
 
 void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 {

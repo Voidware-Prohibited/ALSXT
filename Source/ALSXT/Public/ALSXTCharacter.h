@@ -119,6 +119,54 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag StationaryMode{FGameplayTag::EmptyTag};
 
+	// Status
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredStatus{ALSXTStatusTags::Normal};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Status{ALSXTStatusTags::Normal};
+
+	// Focus
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredFocus{ALSXTFocusedTags::False};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Focus{ALSXTFocusedTags::False};
+
+	// HitReaction
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredHitReaction{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag HitReaction{FGameplayTag::EmptyTag};
+
+	// HitSurface
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredHitSurface{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag HitSurface{FGameplayTag::EmptyTag};
+
+	// BumpReaction
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredBumpReaction{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag BumpReaction{FGameplayTag::EmptyTag};
+
+	// BumpSurface
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredBumpSurface{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag BumpSurface{FGameplayTag::EmptyTag};
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -604,6 +652,150 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 		void OnStationaryModeChanged(const FGameplayTag& PreviousStationaryModeTag);
+
+	// Desired Status
+
+public:
+	const FGameplayTag& GetDesiredStatus() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewStatusTag"))
+		void SetDesiredStatus(const FGameplayTag& NewStatusTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetDesiredStatus(const FGameplayTag& NewStatusTag);
+
+	// Status
+
+public:
+	const FGameplayTag& GetStatus() const;
+
+private:
+	void SetStatus(const FGameplayTag& NewStatusTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnStatusChanged(const FGameplayTag& PreviousStatusTag);
+
+	// Desired Focus
+
+public:
+	const FGameplayTag& GetDesiredFocus() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFocusTag"))
+		void SetDesiredFocus(const FGameplayTag& NewFocusTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetDesiredFocus(const FGameplayTag& NewFocusTag);
+
+	// Focus
+
+public:
+	const FGameplayTag& GetFocus() const;
+
+private:
+	void SetFocus(const FGameplayTag& NewFocusTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnFocusChanged(const FGameplayTag& PreviousFocusTag);
+
+	// Desired HitReaction
+
+public:
+	const FGameplayTag& GetDesiredHitReaction() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHitReactionTag"))
+		void SetDesiredHitReaction(const FGameplayTag& NewHitReactionTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetDesiredHitReaction(const FGameplayTag& NewHitReactionTag);
+
+	// HitReaction
+
+public:
+	const FGameplayTag& GetHitReaction() const;
+
+private:
+	void SetHitReaction(const FGameplayTag& NewHitReactionTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnHitReactionChanged(const FGameplayTag& PreviousHitReactionTag);
+
+	// Desired HitSurface
+
+public:
+	const FGameplayTag& GetDesiredHitSurface() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHitSurfaceTag"))
+		void SetDesiredHitSurface(const FGameplayTag& NewHitSurfaceTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetDesiredHitSurface(const FGameplayTag& NewHitSurfaceTag);
+
+	// HitSurface
+
+public:
+	const FGameplayTag& GetHitSurface() const;
+
+private:
+	void SetHitSurface(const FGameplayTag& NewHitSurfaceTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnHitSurfaceChanged(const FGameplayTag& PreviousHitSurfaceTag);
+
+	// Desired BumpReaction
+
+public:
+	const FGameplayTag& GetDesiredBumpReaction() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewBumpReactionTag"))
+		void SetDesiredBumpReaction(const FGameplayTag& NewBumpReactionTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetDesiredBumpReaction(const FGameplayTag& NewBumpReactionTag);
+
+	// BumpReaction
+
+public:
+	const FGameplayTag& GetBumpReaction() const;
+
+private:
+	void SetBumpReaction(const FGameplayTag& NewBumpReactionTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnBumpReactionChanged(const FGameplayTag& PreviousBumpReactionTag);
+
+	// Desired BumpSurface
+
+public:
+	const FGameplayTag& GetDesiredBumpSurface() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewBumpSurfaceTag"))
+		void SetDesiredBumpSurface(const FGameplayTag& NewBumpSurfaceTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetDesiredBumpSurface(const FGameplayTag& NewBumpSurfaceTag);
+
+	// BumpSurface
+
+public:
+	const FGameplayTag& GetBumpSurface() const;
+
+private:
+	void SetBumpSurface(const FGameplayTag& NewBumpSurfaceTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnBumpSurfaceChanged(const FGameplayTag& PreviousBumpSurfaceTag);
 };
 
 inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
@@ -700,4 +892,64 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredStationaryMode() const
 inline const FGameplayTag& AALSXTCharacter::GetStationaryMode() const
 {
 	return StationaryMode;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredStatus() const
+{
+	return DesiredStatus;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetStatus() const
+{
+	return Status;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredFocus() const
+{
+	return DesiredFocus;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetFocus() const
+{
+	return Focus;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredHitReaction() const
+{
+	return DesiredHitReaction;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetHitReaction() const
+{
+	return HitReaction;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredHitSurface() const
+{
+	return DesiredHitSurface;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetHitSurface() const
+{
+	return HitSurface;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredBumpReaction() const
+{
+	return DesiredBumpReaction;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetBumpReaction() const
+{
+	return BumpReaction;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredBumpSurface() const
+{
+	return DesiredBumpSurface;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetBumpSurface() const
+{
+	return BumpSurface;
 }
