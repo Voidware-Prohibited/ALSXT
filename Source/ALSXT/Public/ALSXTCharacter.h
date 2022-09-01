@@ -306,6 +306,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Aim Down Sights")
 	bool IsAimingDownSights() const;
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|First Person Eye Focus")
+	bool IsFirstPersonEyeFocusActive() const;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanSprint() const;

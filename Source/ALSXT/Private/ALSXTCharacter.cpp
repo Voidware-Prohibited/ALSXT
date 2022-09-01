@@ -426,6 +426,20 @@ void AALSXTCharacter::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& Deb
 	Super::DisplayDebug(Canvas, DebugDisplay, Unused, VerticalLocation);
 }
 
+// First Person Eye Focus
+
+bool AALSXTCharacter::IsFirstPersonEyeFocusActive() const
+{
+	if (!IsHoldingAimableItem() && IsDesiredAiming() && (GetViewMode() == AlsViewModeTags::FirstPerson))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 // Freelooking
 
 void AALSXTCharacter::SetDesiredFreelooking(const FGameplayTag& NewFreelookingTag)
