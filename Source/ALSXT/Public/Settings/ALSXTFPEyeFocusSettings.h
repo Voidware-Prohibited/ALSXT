@@ -9,4 +9,7 @@ struct ALSXT_API FALSXTFPEyeFocusSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
 	float FirstPersonEyeFocusFOV{ 80.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float FirstPersonEyeFocusVignette{ 0.33f };
 };

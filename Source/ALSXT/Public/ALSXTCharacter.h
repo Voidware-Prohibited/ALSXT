@@ -298,7 +298,7 @@ public:
 	bool CanSetToViewMode(const FGameplayTag& ViewModeTag) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
-	void GetHeldItemViewTarget(FTransform& Transform, float& FOV, bool& Attachment) const;
+	void GetHeldItemViewTarget(FTransform& Transform, float& FOV, float& VignetteIntensity, bool& Attachment) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
 	bool IsHoldingAimableItem() const;

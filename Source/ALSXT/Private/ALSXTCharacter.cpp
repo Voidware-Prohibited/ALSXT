@@ -351,7 +351,7 @@ void AALSXTCharacter::Crouch(const bool bClientSimulation)
 
 bool AALSXTCharacter::IsAimingDownSights_Implementation() const
 {
-	return (IsDesiredAiming() && CanAimDownSights() && (GetViewMode() == AlsViewModeTags::FirstPerson));
+	return (IsDesiredAiming() && CanAimDownSights() && (GetViewMode() == AlsViewModeTags::FirstPerson) && (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral));
 }
 
 void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
