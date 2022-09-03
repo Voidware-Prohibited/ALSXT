@@ -167,6 +167,30 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag BumpSurface{FGameplayTag::EmptyTag};
 
+	// HoldingBreath
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredHoldingBreath{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag HoldingBreath{FGameplayTag::EmptyTag};
+
+// Emote
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredEmote{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Emote{FGameplayTag::EmptyTag};
+
+// ReloadingType
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredReloadingType{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag ReloadingType{FGameplayTag::EmptyTag};
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -799,6 +823,78 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 		void OnBumpSurfaceChanged(const FGameplayTag& PreviousBumpSurfaceTag);
+
+	// Desired HoldingBreath
+
+public:
+	const FGameplayTag& GetDesiredHoldingBreath() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHoldingBreathTag"))
+	void SetDesiredHoldingBreath(const FGameplayTag& NewHoldingBreathTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredHoldingBreath(const FGameplayTag& NewHoldingBreathTag);
+
+	// HoldingBreath
+
+public:
+	const FGameplayTag& GetHoldingBreath() const;
+
+private:
+	void SetHoldingBreath(const FGameplayTag& NewHoldingBreathTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnHoldingBreathChanged(const FGameplayTag& PreviousHoldingBreathTag);
+
+	// Desired Emote
+
+public:
+	const FGameplayTag& GetDesiredEmote() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewEmoteTag"))
+	void SetDesiredEmote(const FGameplayTag& NewEmoteTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredEmote(const FGameplayTag& NewEmoteTag);
+
+	// Emote
+
+public:
+	const FGameplayTag& GetEmote() const;
+
+private:
+	void SetEmote(const FGameplayTag& NewEmoteTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnEmoteChanged(const FGameplayTag& PreviousEmoteTag);
+
+	// Desired ReloadingType
+
+public:
+	const FGameplayTag& GetDesiredReloadingType() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewReloadingTypeTag"))
+		void SetDesiredReloadingType(const FGameplayTag& NewReloadingTypeTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+		void ServerSetDesiredReloadingType(const FGameplayTag& NewReloadingTypeTag);
+
+	// ReloadingType
+
+public:
+	const FGameplayTag& GetReloadingType() const;
+
+private:
+	void SetReloadingType(const FGameplayTag& NewReloadingTypeTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnReloadingTypeChanged(const FGameplayTag& PreviousReloadingTypeTag);
 };
 
 inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
@@ -955,4 +1051,34 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredBumpSurface() const
 inline const FGameplayTag& AALSXTCharacter::GetBumpSurface() const
 {
 	return BumpSurface;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredHoldingBreath() const
+{
+	return DesiredHoldingBreath;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetHoldingBreath() const
+{
+	return HoldingBreath;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredEmote() const
+{
+	return DesiredEmote;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetEmote() const
+{
+	return Emote;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredReloadingType() const
+{
+	return DesiredReloadingType;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetReloadingType() const
+{
+	return ReloadingType;
 }

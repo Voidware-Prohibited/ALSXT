@@ -23,22 +23,25 @@ namespace AlsLocomotionActionTags
 	UE_DEFINE_GAMEPLAY_TAG(ThrowDefault, TEXT("Als.LocomotionAction.Throw.Default"))
 	UE_DEFINE_GAMEPLAY_TAG(Vaulting, TEXT("Als.LocomotionAction.Vaulting"))
 	UE_DEFINE_GAMEPLAY_TAG(Sliding, TEXT("Als.LocomotionAction.Sliding"))
-	UE_DEFINE_GAMEPLAY_TAG(StandingBackflip, TEXT("Als.LocomotionAction.StandingBackflip"))
-	UE_DEFINE_GAMEPLAY_TAG(RunningFlip, TEXT("Als.LocomotionAction.RunningFlip"))
+	UE_DEFINE_GAMEPLAY_TAG(StandingBackflip, TEXT("Als.LocomotionAction.Acrobatic"))
 	UE_DEFINE_GAMEPLAY_TAG(WallJumping, TEXT("Als.LocomotionAction.WallJumping"))
 	UE_DEFINE_GAMEPLAY_TAG(WallRunning, TEXT("Als.LocomotionAction.WallRunning"))
-	UE_DEFINE_GAMEPLAY_TAG(RunningMan, TEXT("Als.LocomotionAction.Emote.Dance.RunningMan"))
-	UE_DEFINE_GAMEPLAY_TAG(Sitting01Entering, TEXT("Als.LocomotionAction.StationaryMode.Sitting01.Entering"))
-	UE_DEFINE_GAMEPLAY_TAG(Sitting01Exiting, TEXT("Als.LocomotionAction.StationaryMode.Sitting01.Exiting"))
-	UE_DEFINE_GAMEPLAY_TAG(PushButton, TEXT("Als.LocomotionAction.Interaction.PushButton"))
-	UE_DEFINE_GAMEPLAY_TAG(JabLeft, TEXT("Als.LocomotionAction.Attacking.Unarmed.JabLeft"))
-	UE_DEFINE_GAMEPLAY_TAG(HookRight, TEXT("Als.LocomotionAction.Attacking.Unarmed.HookRight"))
-	UE_DEFINE_GAMEPLAY_TAG(KickFront, TEXT("Als.LocomotionAction.Attacking.Unarmed.KickFront"))
-	UE_DEFINE_GAMEPLAY_TAG(KickSoccer, TEXT("Als.LocomotionAction.Attacking.Unarmed.KickSoccer"))
-	UE_DEFINE_GAMEPLAY_TAG(Stab, TEXT("Als.LocomotionAction.Attacking.Knife.Stab"))
-	UE_DEFINE_GAMEPLAY_TAG(OverHead, TEXT("Als.LocomotionAction.Attacking.Axe.OverHead"))
-	UE_DEFINE_GAMEPLAY_TAG(OutSide, TEXT("Als.LocomotionAction.Attacking.Axe.OutSide"))
-	UE_DEFINE_GAMEPLAY_TAG(Reloading, TEXT("Als.LocomotionAction.Weapon.Reloading"))
+	UE_DEFINE_GAMEPLAY_TAG(Emote, TEXT("Als.LocomotionAction.Emote"))
+	UE_DEFINE_GAMEPLAY_TAG(EnteringStationary, TEXT("Als.LocomotionAction.EnteringStationary"))
+	UE_DEFINE_GAMEPLAY_TAG(ExitingStationary, TEXT("Als.LocomotionAction.ExitingStationary"))
+	UE_DEFINE_GAMEPLAY_TAG(PrimaryInteraction, TEXT("Als.LocomotionAction.PrimaryInteraction"))
+	UE_DEFINE_GAMEPLAY_TAG(SecondaryInteraction, TEXT("Als.LocomotionAction.SecondaryInteraction"))
+	UE_DEFINE_GAMEPLAY_TAG(PrimaryAction, TEXT("Als.LocomotionAction.PrimaryAction"))
+	UE_DEFINE_GAMEPLAY_TAG(SecondaryAction, TEXT("Als.LocomotionAction.SecondaryAction"))
+	UE_DEFINE_GAMEPLAY_TAG(EquipingItem, TEXT("Als.LocomotionAction.EquipingItem"))
+	UE_DEFINE_GAMEPLAY_TAG(UnequipingItem, TEXT("Als.LocomotionAction.UnequipingItem"))
+	UE_DEFINE_GAMEPLAY_TAG(InspectHeldItem, TEXT("Als.LocomotionAction.InspectHeldItem"))
+	UE_DEFINE_GAMEPLAY_TAG(InspectMagazine, TEXT("Als.LocomotionAction.Firearm.InspectMagazine"))
+	UE_DEFINE_GAMEPLAY_TAG(Reloading, TEXT("Als.LocomotionAction.Firearm.Reloading"))
+	UE_DEFINE_GAMEPLAY_TAG(TogglingFireMode, TEXT("Als.LocomotionAction.Firearm.TogglingFireMode"))
+	UE_DEFINE_GAMEPLAY_TAG(TogglingFirearmStance, TEXT("Als.LocomotionAction.Firearm.TogglingFirearmStance"))
+	UE_DEFINE_GAMEPLAY_TAG(Racking, TEXT("Als.LocomotionAction.Firearm.Racking"))
+		
 	
 }
 
@@ -51,9 +54,9 @@ namespace ALSXTSexTags
 namespace ALSXTStatusTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Normal, TEXT("Als.Status.Normal"))
-		UE_DEFINE_GAMEPLAY_TAG(KnockedDown, TEXT("Als.Status.KnockedDown"))
-		UE_DEFINE_GAMEPLAY_TAG(Unconscious, TEXT("Als.Status.Unconscious"))
-		UE_DEFINE_GAMEPLAY_TAG(Dead, TEXT("Als.Status.Dead"))
+	UE_DEFINE_GAMEPLAY_TAG(KnockedDown, TEXT("Als.Status.KnockedDown"))
+	UE_DEFINE_GAMEPLAY_TAG(Unconscious, TEXT("Als.Status.Unconscious"))
+	UE_DEFINE_GAMEPLAY_TAG(Dead, TEXT("Als.Status.Dead"))
 }
 
 namespace ALSXTFreelookingTags
@@ -66,6 +69,12 @@ namespace ALSXTFocusedTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(False, TEXT("Als.Focused.False"))
 	UE_DEFINE_GAMEPLAY_TAG(True, TEXT("Als.Focused.True"))
+}
+
+namespace ALSXTHoldingBreathTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(False, TEXT("Als.HoldingBreath.False"))
+	UE_DEFINE_GAMEPLAY_TAG(True, TEXT("Als.HoldingBreath.True"))
 }
 
 namespace ALSXTBumpReactionTags
@@ -170,4 +179,19 @@ namespace ALSXTStationaryModeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Sitting01, TEXT("Als.StationaryMode.Sitting01"))
 	UE_DEFINE_GAMEPLAY_TAG(Petting, TEXT("Als.StationaryMode.Petting"))
+}
+
+namespace ALSXTEmoteTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(RunningMan, TEXT("Als.Emote.RunningMan"))
+}
+
+namespace ALSXTReloadingTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Drop, TEXT("Als.ReloadingType.Drop"))
+	UE_DEFINE_GAMEPLAY_TAG(Retention, TEXT("Als.ReloadingType.Retention"))
+	UE_DEFINE_GAMEPLAY_TAG(Tactical, TEXT("Als.ReloadingType.Tactical"))
+	UE_DEFINE_GAMEPLAY_TAG(DropAimed, TEXT("Als.ReloadingType.DropAimed"))
+	UE_DEFINE_GAMEPLAY_TAG(RetentionAimed, TEXT("Als.ReloadingType.RetentionAimed"))
+	UE_DEFINE_GAMEPLAY_TAG(TacticalAimed, TEXT("Als.ReloadingType.TacticalAimed"))
 }

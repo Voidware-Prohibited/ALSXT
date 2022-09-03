@@ -71,6 +71,10 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHitSurface, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredBumpReaction, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredBumpSurface, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHoldingBreath, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredEmote, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MeshRotation, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MeshRotationYaw, Parameters)
@@ -1001,6 +1005,117 @@ void AALSXTCharacter::SetBumpSurface(const FGameplayTag& NewBumpSurfaceTag)
 }
 
 void AALSXTCharacter::OnBumpSurfaceChanged_Implementation(const FGameplayTag& PreviousBumpSurfaceTag) {}
+
+// HoldingBreath
+
+void AALSXTCharacter::SetDesiredHoldingBreath(const FGameplayTag& NewHoldingBreathTag)
+{
+	if (DesiredHoldingBreath != NewHoldingBreathTag)
+	{
+		DesiredHoldingBreath = NewHoldingBreathTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredHoldingBreath, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredHoldingBreath(NewHoldingBreathTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredHoldingBreath_Implementation(const FGameplayTag& NewHoldingBreathTag)
+{
+	SetDesiredHoldingBreath(NewHoldingBreathTag);
+}
+
+void AALSXTCharacter::SetHoldingBreath(const FGameplayTag& NewHoldingBreathTag)
+{
+
+	if (HoldingBreath != NewHoldingBreathTag)
+	{
+		const auto PreviousHoldingBreath{ HoldingBreath };
+
+		HoldingBreath = NewHoldingBreathTag;
+
+		OnHoldingBreathChanged(PreviousHoldingBreath);
+	}
+}
+
+void AALSXTCharacter::OnHoldingBreathChanged_Implementation(const FGameplayTag& PreviousHoldingBreathTag) {}
+
+// Emote
+
+void AALSXTCharacter::SetDesiredEmote(const FGameplayTag& NewEmoteTag)
+{
+	if (DesiredEmote != NewEmoteTag)
+	{
+		DesiredEmote = NewEmoteTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredEmote, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredEmote(NewEmoteTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredEmote_Implementation(const FGameplayTag& NewEmoteTag)
+{
+	SetDesiredEmote(NewEmoteTag);
+}
+
+void AALSXTCharacter::SetEmote(const FGameplayTag& NewEmoteTag)
+{
+
+	if (Emote != NewEmoteTag)
+	{
+		const auto PreviousEmote{ Emote };
+
+		Emote = NewEmoteTag;
+
+		OnEmoteChanged(PreviousEmote);
+	}
+}
+
+void AALSXTCharacter::OnEmoteChanged_Implementation(const FGameplayTag& PreviousEmoteTag) {}
+
+// ReloadingType
+
+void AALSXTCharacter::SetDesiredReloadingType(const FGameplayTag& NewReloadingTypeTag)
+{
+	if (DesiredReloadingType != NewReloadingTypeTag)
+	{
+		DesiredReloadingType = NewReloadingTypeTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredReloadingType, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredReloadingType(NewReloadingTypeTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredReloadingType_Implementation(const FGameplayTag& NewReloadingTypeTag)
+{
+	SetDesiredReloadingType(NewReloadingTypeTag);
+}
+
+void AALSXTCharacter::SetReloadingType(const FGameplayTag& NewReloadingTypeTag)
+{
+
+	if (ReloadingType != NewReloadingTypeTag)
+	{
+		const auto PreviousReloadingType{ ReloadingType };
+
+		ReloadingType = NewReloadingTypeTag;
+
+		OnReloadingTypeChanged(PreviousReloadingType);
+	}
+}
+
+void AALSXTCharacter::OnReloadingTypeChanged_Implementation(const FGameplayTag& PreviousReloadingTypeTag) {}
 
 void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 {

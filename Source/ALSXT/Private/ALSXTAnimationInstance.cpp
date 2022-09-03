@@ -39,5 +39,12 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	WeaponReadyPosition = ALSXTCharacter->GetDesiredWeaponReadyPosition();
 	Blocking = ALSXTCharacter->GetDesiredBlocking();
 	StationaryMode = ALSXTCharacter->GetStationaryMode();
+	HitReaction = ALSXTCharacter->GetHitReaction();
+	HitSurface = ALSXTCharacter->GetHitSurface();
+	BumpReaction = ALSXTCharacter->GetBumpReaction();
+	BumpSurface = ALSXTCharacter->GetBumpSurface();
+	HoldingBreath = ALSXTCharacter->GetHoldingBreath();
+	Emote = ALSXTCharacter->GetEmote();
+	ReloadingType = ALSXTCharacter->GetReloadingType();
 
 }
