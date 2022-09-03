@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Settings/AlsCharacterSettings.h"
 #include "Settings/ALSXTSlidingSettings.h"
+#include "Settings/ALSXTFPEyeFocusSettings.h"
 #include "ALSXTCharacterSettings.generated.h"
 
 /**
@@ -18,7 +19,10 @@ class ALSXT_API UALSXTCharacterSettings : public UAlsCharacterSettings
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		FALSXTSlidingSettings Sliding;
+	FALSXTSlidingSettings Sliding;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FALSXTFPEyeFocusSettings FirstPersonEyeFocus;
 
 	UALSXTCharacterSettings();
 	
