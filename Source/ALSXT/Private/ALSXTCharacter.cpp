@@ -114,7 +114,12 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SwitchShoulderAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchShoulder);
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
 		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleCombatReady);
+		EnhancedInput->BindAction(PrimaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryAction);
+		EnhancedInput->BindAction(SecondaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryAction);
+		EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryInteraction);
+		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
 		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::InputBlock);
+		EnhancedInput->BindAction(HoldBreathAction, ETriggerEvent::Triggered, this, &ThisClass::InputHoldBreath);
 	}
 }
 
@@ -144,21 +149,26 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 	const auto ForwardDirection{UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw))};
 	const auto RightDirection{UAlsMath::PerpendicularCounterClockwiseXY(ForwardDirection)};
 
+	const auto MeshYaw{ CharRotation.Yaw };
+	const auto MeshPitch{ CharRotation.Pitch };
+
 	const auto CharForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(CharRotation.Pitch)) };
 	const auto CharRightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(CharForwardDirection) };
 
-	MeshRotationYaw = FMath::GetMappedRangeValueClamped(FVector2D(-180.f, 180.f), FVector2D(0, 360.0f), MeshRotation.Yaw);
+	//MeshRotationYaw = FMath::GetMappedRangeValueClamped(FVector2D(-180.f, 180.f), FVector2D(0, 360.0f), MeshRotation.Yaw);
 
-	AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
+	//AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
 	if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
 	{
-		AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
-		MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
+		MeshRotationYaw = MeshYaw;
+		AddMovementInput(CharForwardDirection * Value.Y + MeshYaw * Value.X);
+		MovementInput = CharForwardDirection * Value.Y + MeshYaw * Value.X;
 		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, CharRotation.ToString());
 		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(MeshRotationYaw));
 	}
 	else
 	{
+		MeshRotationYaw = FMath::GetMappedRangeValueClamped(FVector2D(-180.f, 180.f), FVector2D(0, 360.0f), MeshRotation.Yaw);
 		AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
 		MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
 	}
@@ -304,6 +314,14 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 			SetDesiredFreelooking(ALSXTFreelookingTags::False);
 			// UnLockRotation();
 		}
+	}
+}
+
+void AALSXTCharacter::InputHoldBreath(const FInputActionValue& ActionValue)
+{
+	if (CanHoldBreath())
+	{
+		SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
 	}
 }
 

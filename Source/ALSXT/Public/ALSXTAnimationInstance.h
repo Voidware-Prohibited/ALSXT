@@ -73,4 +73,14 @@ public:
 
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
 
+protected:
+	// Spine Rotation
+	virtual bool IsSpineRotationAllowed() override;
+
+	// Rotate In Place
+	virtual bool IsRotateInPlaceAllowed() override;
+
+	// Turn In Place
+
+	virtual bool IsTurnInPlaceAllowed() override;
 };

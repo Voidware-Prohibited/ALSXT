@@ -48,3 +48,19 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	ReloadingType = ALSXTCharacter->GetReloadingType();
 
 }
+
+bool UALSXTAnimationInstance::IsSpineRotationAllowed()
+{
+	//return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming;
+	return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
+}
+
+bool UALSXTAnimationInstance::IsRotateInPlaceAllowed()
+{
+	return (ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming || ALSXTCharacter->GetViewMode() == AlsViewModeTags::FirstPerson) && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
+}
+
+bool UALSXTAnimationInstance::IsTurnInPlaceAllowed()
+{
+	return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::LookingDirection && ALSXTCharacter->GetViewMode() != AlsViewModeTags::FirstPerson && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
+}
