@@ -148,16 +148,13 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 
 	if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
 	{
-		//AddMovementInput(CharForwardDirection * Value.Y + CapsuleRotation.Yaw * Value.X);
 		AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
-		MovementInput = CharForwardDirection + CharRightDirection;
-		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, CapsuleRotation.ToString());
-		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(MeshRotationYaw));
+		MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
 	}
 	else
 	{
 		AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
-		MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
+		MovementInput = ForwardDirection * Value.Y + RightDirection * Value.X;
 	}
 }
 
@@ -293,13 +290,11 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 	{
 		if (ActionValue.Get<bool>())
 		{
-			SetDesiredFreelooking(ALSXTFreelookingTags::True);
-			// LockRotation(MeshRotationYaw);
+			ActivateFreelooking();
 		}
 		else
 		{
-			SetDesiredFreelooking(ALSXTFreelookingTags::False);
-			// UnLockRotation();
+			DeactivateFreelooking();
 		}
 	}
 }
@@ -450,6 +445,31 @@ bool AALSXTCharacter::IsFirstPersonEyeFocusActive() const
 }
 
 // Freelooking
+
+void AALSXTCharacter::IsFreelooking(bool& bIsFreelooking, bool& bIsFreelookingInFirstPerson) const
+{
+
+	bIsFreelooking = (GetDesiredFreelooking() == ALSXTFreelookingTags::True) ? true : false;
+	bIsFreelookingInFirstPerson = (bIsFreelooking && ((GetViewMode() == AlsViewModeTags::FirstPerson) ? true : false));
+}
+
+void AALSXTCharacter::ActivateFreelooking()
+{
+	//PreviousYaw = GetViewState().Rotation.Yaw;
+	PreviousYaw = FMath::GetMappedRangeValueClamped(FVector2D(0, 359.998993), FVector2D(0.0, 1.0), GetControlRotation().Yaw);
+	//FMath::GetMappedRangeValueClamped(FVector2D(-90,90), FVector2D(0,1), GetViewState().Rotation.Pitch)
+	PreviousPitch = FMath::GetMappedRangeValueClamped(FVector2D(89.900002, -89.899994), FVector2D(0.0, 1.0), GetViewState().Rotation.Pitch);
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("%f"), GetControlRotation().Yaw));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), PreviousYaw));
+	LockRotation(GetActorRotation().Yaw);
+	SetDesiredFreelooking(ALSXTFreelookingTags::True);
+}
+
+void AALSXTCharacter::DeactivateFreelooking()
+{
+	UnLockRotation();
+	SetDesiredFreelooking(ALSXTFreelookingTags::False);
+}
 
 void AALSXTCharacter::SetDesiredFreelooking(const FGameplayTag& NewFreelookingTag)
 {

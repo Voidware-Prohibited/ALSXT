@@ -268,6 +268,12 @@ public:
 		Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "deg/s"))
 	float LookRightRate{240.0f};
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	float PreviousYaw{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	float PreviousPitch{ 0.0f };
+
 public:
 	AALSXTCharacter();
 
@@ -470,6 +476,7 @@ protected:
 	// Desired Freelooking
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FGameplayTag& GetDesiredFreelooking() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFreelookingTag"))
@@ -481,6 +488,15 @@ public:
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerSetDesiredFreelooking(const FGameplayTag& NewFreelookingTag);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	void IsFreelooking(bool& bIsFreelooking, bool& bIsFreelookingInFirstPerson) const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	void ActivateFreelooking();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	void DeactivateFreelooking();
 
 	// Freelooking
 
