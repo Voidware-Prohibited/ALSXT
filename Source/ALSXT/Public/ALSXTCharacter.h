@@ -31,12 +31,6 @@ private:
 	TObjectPtr<UALSXTAnimationInstance> XTAnimationInstance;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Replicated, Meta = (AllowPrivateAccess))
-	FRotator MeshRotation;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Replicated, Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
-	float MeshRotationYaw{0.0f};
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Replicated, Meta = (AllowPrivateAccess))
 	FVector MovementInput;
 
 	// Footstep State

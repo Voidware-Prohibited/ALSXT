@@ -51,8 +51,8 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 
 bool UALSXTAnimationInstance::IsSpineRotationAllowed()
 {
-	//return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming;
-	return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
+	return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming;
+	//return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
 }
 
 bool UALSXTAnimationInstance::IsRotateInPlaceAllowed()
@@ -62,5 +62,5 @@ bool UALSXTAnimationInstance::IsRotateInPlaceAllowed()
 
 bool UALSXTAnimationInstance::IsTurnInPlaceAllowed()
 {
-	return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::LookingDirection && ALSXTCharacter->GetViewMode() != AlsViewModeTags::FirstPerson && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
+	return (ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::LookingDirection && ALSXTCharacter->GetViewMode() != AlsViewModeTags::FirstPerson) && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
 }

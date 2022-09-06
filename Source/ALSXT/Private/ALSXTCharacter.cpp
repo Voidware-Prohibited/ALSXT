@@ -76,8 +76,6 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredEmote, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
 
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MeshRotation, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MeshRotationYaw, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
 }
 
@@ -142,33 +140,22 @@ void AALSXTCharacter::InputLook(const FInputActionValue& ActionValue)
 void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 {
 	const auto Value{UAlsMath::ClampMagnitude012D(ActionValue.Get<FVector2D>())};
-
-	FRotator CharRotation = GetMesh()->GetComponentRotation();
-	MeshRotation = CharRotation;
-
+	FRotator CapsuleRotation = GetActorRotation();
 	const auto ForwardDirection{UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw))};
 	const auto RightDirection{UAlsMath::PerpendicularCounterClockwiseXY(ForwardDirection)};
-
-	const auto MeshYaw{ CharRotation.Yaw };
-	const auto MeshPitch{ CharRotation.Pitch };
-
-	const auto CharForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(CharRotation.Pitch)) };
+	const auto CharForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(CapsuleRotation.Yaw)) };
 	const auto CharRightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(CharForwardDirection) };
 
-	//MeshRotationYaw = FMath::GetMappedRangeValueClamped(FVector2D(-180.f, 180.f), FVector2D(0, 360.0f), MeshRotation.Yaw);
-
-	//AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
 	if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
 	{
-		MeshRotationYaw = MeshYaw;
-		AddMovementInput(CharForwardDirection * Value.Y + MeshYaw * Value.X);
-		MovementInput = CharForwardDirection * Value.Y + MeshYaw * Value.X;
-		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, CharRotation.ToString());
+		//AddMovementInput(CharForwardDirection * Value.Y + CapsuleRotation.Yaw * Value.X);
+		AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
+		MovementInput = CharForwardDirection + CharRightDirection;
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, CapsuleRotation.ToString());
 		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(MeshRotationYaw));
 	}
 	else
 	{
-		MeshRotationYaw = FMath::GetMappedRangeValueClamped(FVector2D(-180.f, 180.f), FVector2D(0, 360.0f), MeshRotation.Yaw);
 		AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
 		MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
 	}
