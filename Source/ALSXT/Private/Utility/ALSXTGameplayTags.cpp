@@ -41,8 +41,30 @@ namespace AlsLocomotionActionTags
 	UE_DEFINE_GAMEPLAY_TAG(TogglingFireMode, TEXT("Als.LocomotionAction.Firearm.TogglingFireMode"))
 	UE_DEFINE_GAMEPLAY_TAG(TogglingFirearmStance, TEXT("Als.LocomotionAction.Firearm.TogglingFirearmStance"))
 	UE_DEFINE_GAMEPLAY_TAG(Racking, TEXT("Als.LocomotionAction.Firearm.Racking"))
-		
-	
+}
+
+namespace ALSXTPlayerServerStateTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Loading, TEXT("Game.PlayerServerState.Loading"))
+	UE_DEFINE_GAMEPLAY_TAG(InLobby, TEXT("Game.PlayerServerState.InLobby"))
+	UE_DEFINE_GAMEPLAY_TAG(Spectating, TEXT("Game.PlayerServerState.Spectating"))
+	UE_DEFINE_GAMEPLAY_TAG(InGame, TEXT("Game.PlayerServerState.InGame"))
+	UE_DEFINE_GAMEPLAY_TAG(Disconnected, TEXT("Game.PlayerServerState.Disconnected"))
+}
+
+namespace ALSXTPlayerRoleTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(OrganizationLeader, TEXT("Game.PlayerRole.OrganizationLeader"))
+	UE_DEFINE_GAMEPLAY_TAG(SectionLeader, TEXT("Game.PlayerRole.SectionLeader"))
+	UE_DEFINE_GAMEPLAY_TAG(FireteamLeader, TEXT("Game.PlayerRole.FireteamLeader"))
+	UE_DEFINE_GAMEPLAY_TAG(Unit, TEXT("Game.PlayerRole.Unit"))
+}
+
+namespace ALSXTPlayerGameRoleTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(GameMaster, TEXT("Game.PlayerGameRole.GameMaster"))
+	UE_DEFINE_GAMEPLAY_TAG(Moderator, TEXT("Game.PlayerGameRole.Moderator"))
+	UE_DEFINE_GAMEPLAY_TAG(Player, TEXT("Game.PlayerGameRole.Player"))
 }
 
 namespace ALSXTSexTags
