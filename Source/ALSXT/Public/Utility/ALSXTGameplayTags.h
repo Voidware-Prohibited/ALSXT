@@ -50,7 +50,7 @@ namespace ALSXTPlayerServerStateTags
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Disconnected)
 }
 
-namespace ALSXTPlayerRoleTags
+namespace ALSXTPlayerGameRoleTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(OrganizationLeader)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(SectionLeader)
@@ -58,7 +58,7 @@ namespace ALSXTPlayerRoleTags
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Unit)
 }
 
-namespace ALSXTPlayerGameRoleTags
+namespace ALSXTPlayerServerRoleTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameMaster)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Moderator)

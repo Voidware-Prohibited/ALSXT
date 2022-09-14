@@ -53,19 +53,19 @@ namespace ALSXTPlayerServerStateTags
 	UE_DEFINE_GAMEPLAY_TAG(Disconnected, TEXT("Game.PlayerServerState.Disconnected"))
 }
 
-namespace ALSXTPlayerRoleTags
-{
-	UE_DEFINE_GAMEPLAY_TAG(OrganizationLeader, TEXT("Game.PlayerRole.OrganizationLeader"))
-	UE_DEFINE_GAMEPLAY_TAG(SectionLeader, TEXT("Game.PlayerRole.SectionLeader"))
-	UE_DEFINE_GAMEPLAY_TAG(FireteamLeader, TEXT("Game.PlayerRole.FireteamLeader"))
-	UE_DEFINE_GAMEPLAY_TAG(Unit, TEXT("Game.PlayerRole.Unit"))
-}
-
 namespace ALSXTPlayerGameRoleTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(GameMaster, TEXT("Game.PlayerGameRole.GameMaster"))
-	UE_DEFINE_GAMEPLAY_TAG(Moderator, TEXT("Game.PlayerGameRole.Moderator"))
-	UE_DEFINE_GAMEPLAY_TAG(Player, TEXT("Game.PlayerGameRole.Player"))
+	UE_DEFINE_GAMEPLAY_TAG(OrganizationLeader, TEXT("Game.PlayerGameRole.OrganizationLeader"))
+	UE_DEFINE_GAMEPLAY_TAG(SectionLeader, TEXT("Game.PlayerGameRole.SectionLeader"))
+	UE_DEFINE_GAMEPLAY_TAG(FireteamLeader, TEXT("Game.PlayerGameRole.FireteamLeader"))
+	UE_DEFINE_GAMEPLAY_TAG(Unit, TEXT("Game.PlayerGameRole.Unit"))
+}
+
+namespace ALSXTPlayerServerRoleTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(GameMaster, TEXT("Game.PlayerServerRole.GameMaster"))
+	UE_DEFINE_GAMEPLAY_TAG(Moderator, TEXT("Game.PlayerServerRole.Moderator"))
+	UE_DEFINE_GAMEPLAY_TAG(Player, TEXT("Game.PlayerServerRole.Player"))
 }
 
 namespace ALSXTSexTags
