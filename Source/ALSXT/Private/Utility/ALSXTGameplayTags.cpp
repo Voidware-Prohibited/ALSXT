@@ -47,6 +47,7 @@ namespace ALSXTPlayerServerStateTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Loading, TEXT("Game.PlayerServerState.Loading"))
 	UE_DEFINE_GAMEPLAY_TAG(InLobby, TEXT("Game.PlayerServerState.InLobby"))
+	UE_DEFINE_GAMEPLAY_TAG(InPreGame, TEXT("Game.PlayerServerState.InPreGame"))
 	UE_DEFINE_GAMEPLAY_TAG(Spectating, TEXT("Game.PlayerServerState.Spectating"))
 	UE_DEFINE_GAMEPLAY_TAG(InGame, TEXT("Game.PlayerServerState.InGame"))
 	UE_DEFINE_GAMEPLAY_TAG(Disconnected, TEXT("Game.PlayerServerState.Disconnected"))
