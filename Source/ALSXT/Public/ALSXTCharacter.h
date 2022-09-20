@@ -15,14 +15,22 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
+
 UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
 class ALSXT_API AALSXTCharacter : public AAlsCharacter
 {
 	GENERATED_BODY()
 
-private:
+public:
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Als Character", Meta = (AllowPrivateAccess))
 	TObjectPtr<UALSXTCharacterSettings> ALSXTSettings;
+
+	UPROPERTY(BlueprintAssignable)
+	FSetupPlayerInputComponentDelegate OnSetupPlayerInputComponentUpdated;
+
+private:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
@@ -283,7 +291,11 @@ public:
 
 	virtual void Crouch(bool bClientSimulation = false) override;
 
+	virtual void InputCrouch();
+
 	void ApplyDesiredStance() override;
+
+	void ALSXTRefreshRotationInstant(const float TargetYawAngle, const ETeleportType Teleport);
 
 	// Camera
 
@@ -292,7 +304,8 @@ protected:
 
 	// Input
 
-protected:
+public:
+	UFUNCTION()
 	virtual void SetupPlayerInputComponent(UInputComponent* Input) override;
 
 private:
@@ -305,8 +318,6 @@ private:
 	void InputSprint(const FInputActionValue& ActionValue);
 
 	void InputWalk();
-
-	void InputCrouch();
 
 	void InputJump(const FInputActionValue& ActionValue);
 

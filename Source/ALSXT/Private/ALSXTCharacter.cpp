@@ -118,6 +118,7 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
 		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::InputBlock);
 		EnhancedInput->BindAction(HoldBreathAction, ETriggerEvent::Triggered, this, &ThisClass::InputHoldBreath);
+		OnSetupPlayerInputComponentUpdated.Broadcast();
 	}
 }
 
@@ -331,6 +332,11 @@ void AALSXTCharacter::ApplyDesiredStance()
 	{
 		Crouch();
 	}
+}
+
+void AALSXTCharacter::ALSXTRefreshRotationInstant(const float TargetYawAngle, const ETeleportType Teleport)
+{
+	RefreshRotationInstant(TargetYawAngle, Teleport);
 }
 
 void AALSXTCharacter::Crouch(const bool bClientSimulation)
