@@ -45,6 +45,8 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	BumpSurface = ALSXTCharacter->GetBumpSurface();
 	HoldingBreath = ALSXTCharacter->GetHoldingBreath();
 	Emote = ALSXTCharacter->GetEmote();
+	Gesture = ALSXTCharacter->GetGesture();
+	GestureHand = ALSXTCharacter->GetGestureHand();
 	ReloadingType = ALSXTCharacter->GetReloadingType();
 
 }

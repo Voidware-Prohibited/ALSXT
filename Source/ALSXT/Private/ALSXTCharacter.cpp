@@ -74,6 +74,8 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHoldingBreath, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredEmote, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGesture, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGestureHand, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
@@ -1110,6 +1112,80 @@ void AALSXTCharacter::SetEmote(const FGameplayTag& NewEmoteTag)
 }
 
 void AALSXTCharacter::OnEmoteChanged_Implementation(const FGameplayTag& PreviousEmoteTag) {}
+
+// Gesture
+
+void AALSXTCharacter::SetDesiredGesture(const FGameplayTag& NewGestureTag)
+{
+	if (DesiredGesture != NewGestureTag)
+	{
+		DesiredGesture = NewGestureTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredGesture, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredGesture(NewGestureTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredGesture_Implementation(const FGameplayTag& NewGestureTag)
+{
+	SetDesiredGesture(NewGestureTag);
+}
+
+void AALSXTCharacter::SetGesture(const FGameplayTag& NewGestureTag)
+{
+
+	if (Gesture != NewGestureTag)
+	{
+		const auto PreviousGesture{ Gesture };
+
+		Gesture = NewGestureTag;
+
+		OnGestureChanged(PreviousGesture);
+	}
+}
+
+void AALSXTCharacter::OnGestureChanged_Implementation(const FGameplayTag& PreviousGestureTag) {}
+
+// GestureHand
+
+void AALSXTCharacter::SetDesiredGestureHand(const FGameplayTag& NewGestureHandTag)
+{
+	if (DesiredGestureHand != NewGestureHandTag)
+	{
+		DesiredGestureHand = NewGestureHandTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredGestureHand, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredGestureHand(NewGestureHandTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredGestureHand_Implementation(const FGameplayTag& NewGestureHandTag)
+{
+	SetDesiredGestureHand(NewGestureHandTag);
+}
+
+void AALSXTCharacter::SetGestureHand(const FGameplayTag& NewGestureHandTag)
+{
+
+	if (GestureHand != NewGestureHandTag)
+	{
+		const auto PreviousGestureHand{ GestureHand };
+
+		GestureHand = NewGestureHandTag;
+
+		OnGestureHandChanged(PreviousGestureHand);
+	}
+}
+
+void AALSXTCharacter::OnGestureHandChanged_Implementation(const FGameplayTag& PreviousGestureHandTag) {}
 
 // ReloadingType
 

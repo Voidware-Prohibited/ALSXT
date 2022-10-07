@@ -185,6 +185,22 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag Emote{FGameplayTag::EmptyTag};
 
+// Gesture
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredGesture{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Gesture{FGameplayTag::EmptyTag};
+
+// GestureHand
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredGestureHand{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag GestureHand{FGameplayTag::EmptyTag};
+
 // ReloadingType
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
@@ -926,6 +942,54 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnEmoteChanged(const FGameplayTag& PreviousEmoteTag);
 
+	// Desired Gesture
+
+public:
+	const FGameplayTag& GetDesiredGesture() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewGestureTag"))
+	void SetDesiredGesture(const FGameplayTag& NewGestureTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredGesture(const FGameplayTag& NewGestureTag);
+
+// Gesture
+
+public:
+	const FGameplayTag& GetGesture() const;
+
+private:
+	void SetGesture(const FGameplayTag& NewGestureTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnGestureChanged(const FGameplayTag& PreviousGestureTag);
+
+// Desired GestureHand
+
+public:
+	const FGameplayTag& GetDesiredGestureHand() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewGestureHandTag"))
+	void SetDesiredGestureHand(const FGameplayTag& NewGestureHandTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredGestureHand(const FGameplayTag& NewGestureHandTag);
+
+// GestureHand
+
+public:
+	const FGameplayTag& GetGestureHand() const;
+
+private:
+	void SetGestureHand(const FGameplayTag& NewGestureHandTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnGestureHandChanged(const FGameplayTag& PreviousGestureHandTag);
+
 	// Desired ReloadingType
 
 public:
@@ -1125,6 +1189,26 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredEmote() const
 inline const FGameplayTag& AALSXTCharacter::GetEmote() const
 {
 	return Emote;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredGesture() const
+{
+	return DesiredGesture;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetGesture() const
+{
+	return Gesture;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredGestureHand() const
+{
+	return DesiredGestureHand;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetGestureHand() const
+{
+	return GestureHand;
 }
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredReloadingType() const

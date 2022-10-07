@@ -209,6 +209,17 @@ namespace ALSXTEmoteTags
 	UE_DEFINE_GAMEPLAY_TAG(RunningMan, TEXT("Als.Emote.RunningMan"))
 }
 
+namespace ALSXTGestureTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Point, TEXT("Als.Gesture.Point"))
+}
+
+namespace ALSXTGestureHandTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.GestureHand.Left"))
+	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.GestureHand.Right"))
+}
+
 namespace ALSXTReloadingTypeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Drop, TEXT("Als.ReloadingType.Drop"))

@@ -65,6 +65,12 @@ private:
 	FGameplayTag Emote{FGameplayTag::EmptyTag};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Gesture{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag GestureHand{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag ReloadingType{FGameplayTag::EmptyTag};
 
 public:
