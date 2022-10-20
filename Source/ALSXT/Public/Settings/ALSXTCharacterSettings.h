@@ -8,6 +8,13 @@
 #include "Settings/ALSXTFPEyeFocusSettings.h"
 #include "ALSXTCharacterSettings.generated.h"
 
+UENUM(BlueprintType)
+enum class ESide : uint8
+{
+	Message UMETA(DisplayName = "Left"),
+	Warning UMETA(DisplayName = "Right"),
+};
+
 /**
  * 
  */
