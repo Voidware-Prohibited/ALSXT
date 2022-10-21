@@ -1,6 +1,7 @@
 #include "Notify/ALSXTAnimNotify_FootstepEffects.h"
 
 #include "AlsCharacter.h"
+#include "ALSXTAnimationInstance.h"
 #include "ALSXTCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "NiagaraComponent.h"
