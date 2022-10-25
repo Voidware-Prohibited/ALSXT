@@ -48,6 +48,8 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	Gesture = ALSXTCharacter->GetGesture();
 	GestureHand = ALSXTCharacter->GetGestureHand();
 	ReloadingType = ALSXTCharacter->GetReloadingType();
+	FirearmFingerAction = ALSXTCharacter->GetFirearmFingerAction();
+	FirearmFingerActionHand = ALSXTCharacter->GetFirearmFingerActionHand();
 
 }
 

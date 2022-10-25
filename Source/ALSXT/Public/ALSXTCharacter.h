@@ -209,6 +209,22 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag ReloadingType{FGameplayTag::EmptyTag};
 
+// FirearmFingerAction
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredFirearmFingerAction{ALSXTFirearmFingerActionTags::None};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag FirearmFingerAction{ALSXTFirearmFingerActionTags::None};
+
+// FirearmFingerActionHand
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredFirearmFingerActionHand{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag FirearmFingerActionHand{FGameplayTag::EmptyTag};
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -1013,6 +1029,54 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnReloadingTypeChanged(const FGameplayTag& PreviousReloadingTypeTag);
+
+// Desired FirearmFingerAction
+
+public:
+	const FGameplayTag& GetDesiredFirearmFingerAction() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFirearmFingerActionTag"))
+	void SetDesiredFirearmFingerAction(const FGameplayTag& NewFirearmFingerActionTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredFirearmFingerAction(const FGameplayTag& NewFirearmFingerActionTag);
+
+// FirearmFingerAction
+
+public:
+	const FGameplayTag& GetFirearmFingerAction() const;
+
+private:
+	void SetFirearmFingerAction(const FGameplayTag& NewFirearmFingerActionTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnFirearmFingerActionChanged(const FGameplayTag& PreviousFirearmFingerActionTag);
+
+// Desired FirearmFingerActionHand
+
+public:
+	const FGameplayTag& GetDesiredFirearmFingerActionHand() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFirearmFingerActionHandTag"))
+	void SetDesiredFirearmFingerActionHand(const FGameplayTag& NewFirearmFingerActionHandTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredFirearmFingerActionHand(const FGameplayTag& NewFirearmFingerActionHandTag);
+
+// FirearmFingerActionHand
+
+public:
+	const FGameplayTag& GetFirearmFingerActionHand() const;
+
+private:
+	void SetFirearmFingerActionHand(const FGameplayTag& NewFirearmFingerActionHandTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnFirearmFingerActionHandChanged(const FGameplayTag& PreviousFirearmFingerActionHandTag);
 };
 
 inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
@@ -1219,4 +1283,24 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredReloadingType() const
 inline const FGameplayTag& AALSXTCharacter::GetReloadingType() const
 {
 	return ReloadingType;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredFirearmFingerAction() const
+{
+	return DesiredFirearmFingerAction;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetFirearmFingerAction() const
+{
+	return FirearmFingerAction;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredFirearmFingerActionHand() const
+{
+	return DesiredFirearmFingerActionHand;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetFirearmFingerActionHand() const
+{
+	return FirearmFingerActionHand;
 }

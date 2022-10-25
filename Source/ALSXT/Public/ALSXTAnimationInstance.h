@@ -73,6 +73,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag ReloadingType{FGameplayTag::EmptyTag};
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag FirearmFingerAction {ALSXTFirearmFingerActionTags::None};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag FirearmFingerActionHand {FGameplayTag::EmptyTag};
+
 public:
 
 	virtual void NativeInitializeAnimation() override;

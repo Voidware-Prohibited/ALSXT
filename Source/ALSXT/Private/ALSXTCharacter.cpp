@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "Net/UnrealNetwork.h"
+#include "Utility/ALSXTGameplayTags.h"
 #include "Settings/ALSXTCharacterSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
@@ -77,6 +78,8 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGesture, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGestureHand, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerAction, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerActionHand, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
 }
@@ -241,7 +244,45 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 {
 	if (CanAim())
 	{
-		SetDesiredAiming(ActionValue.Get<bool>());
+		if (ActionValue.Get<bool>())
+		{
+			// SetDesiredAiming(ActionValue.Get<bool>());
+			SetDesiredRotationMode(AlsRotationModeTags::Aiming);
+			if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Ready)
+			{
+				SetDesiredCombatStance(ALSXTCombatStanceTags::Aiming);
+			}
+			if (IsHoldingAimableItem()) {
+				// if (GetDesiredWeaponReadyPosition() == ALSXTWeaponReadyPositionTags::LowReady)
+				// {
+				// 	SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Aiming);
+				// }
+				SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Aiming);
+			}
+			SetDesiredAiming(ActionValue.Get<bool>());
+		}
+		else 
+		{
+			// SetDesiredAiming(ActionValue.Get<bool>());
+			if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming)
+			{
+				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
+			}
+			if (IsHoldingAimableItem()) {
+				// if (GetDesiredWeaponReadyPosition() == ALSXTWeaponReadyPositionTags::Aiming)
+				// {
+				// 	SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+				// 	SetWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+				// }
+				SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+				// SetWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+			}
+			else 
+			{
+				SetDesiredRotationMode(AlsRotationModeTags::LookingDirection);
+			}
+			SetDesiredAiming(ActionValue.Get<bool>());
+		}
 	}
 }
 
@@ -402,16 +443,24 @@ void AALSXTCharacter::InputToggleCombatReady()
 {
 	if (CanToggleCombatReady())
 	{
-		if ((GetDesiredCombatStance() == FGameplayTag::EmptyTag) | (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral))
+		if ((GetDesiredCombatStance() == FGameplayTag::EmptyTag) || (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral))
 		{
 			if (CanBecomeCombatReady())
 			{
 				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
+				if (GetRotationMode() != AlsRotationModeTags::Aiming) 
+				{
+					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
+				}
+				else {
+					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+				}
 			}
 		}
 		else
 		{
 			SetDesiredCombatStance(ALSXTCombatStanceTags::Neutral);
+			SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::PatrolReady);
 		}
 	}
 }
@@ -632,12 +681,26 @@ void AALSXTCharacter::SetDesiredCombatStance(const FGameplayTag& NewCombatStance
 	if (DesiredCombatStance != NewCombatStanceTag)
 	{
 		DesiredCombatStance = NewCombatStanceTag;
+		const auto PreviousCombatStance{ CombatStance };
 
 		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredCombatStance, this)
 
 			if (GetLocalRole() == ROLE_AutonomousProxy)
 			{
 				ServerSetDesiredCombatStance(NewCombatStanceTag);
+				if (NewCombatStanceTag != ALSXTCombatStanceTags::Neutral)
+				{
+					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
+					SetDesiredRotationMode(AlsRotationModeTags::Aiming);
+				}
+				else
+				{
+					SetDesiredRotationMode(AlsRotationModeTags::LookingDirection);
+				}
+			}
+			else if (GetLocalRole() == ROLE_Authority)
+			{
+				OnCombatStanceChanged(PreviousCombatStance);
 			}
 	}
 }
@@ -1223,6 +1286,80 @@ void AALSXTCharacter::SetReloadingType(const FGameplayTag& NewReloadingTypeTag)
 }
 
 void AALSXTCharacter::OnReloadingTypeChanged_Implementation(const FGameplayTag& PreviousReloadingTypeTag) {}
+
+// FirearmFingerAction
+
+void AALSXTCharacter::SetDesiredFirearmFingerAction(const FGameplayTag& NewFirearmFingerActionTag)
+{
+	if (DesiredFirearmFingerAction != NewFirearmFingerActionTag)
+	{
+		DesiredFirearmFingerAction = NewFirearmFingerActionTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredFirearmFingerAction, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredFirearmFingerAction(NewFirearmFingerActionTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredFirearmFingerAction_Implementation(const FGameplayTag& NewFirearmFingerActionTag)
+{
+	SetDesiredFirearmFingerAction(NewFirearmFingerActionTag);
+}
+
+void AALSXTCharacter::SetFirearmFingerAction(const FGameplayTag& NewFirearmFingerActionTag)
+{
+
+	if (FirearmFingerAction != NewFirearmFingerActionTag)
+	{
+		const auto PreviousFirearmFingerAction{ FirearmFingerAction };
+
+		FirearmFingerAction = NewFirearmFingerActionTag;
+
+		OnFirearmFingerActionChanged(PreviousFirearmFingerAction);
+	}
+}
+
+void AALSXTCharacter::OnFirearmFingerActionChanged_Implementation(const FGameplayTag& PreviousFirearmFingerActionTag) {}
+
+// FirearmFingerActionHand
+
+void AALSXTCharacter::SetDesiredFirearmFingerActionHand(const FGameplayTag& NewFirearmFingerActionHandTag)
+{
+	if (DesiredFirearmFingerActionHand != NewFirearmFingerActionHandTag)
+	{
+		DesiredFirearmFingerActionHand = NewFirearmFingerActionHandTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredFirearmFingerActionHand, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredFirearmFingerActionHand(NewFirearmFingerActionHandTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredFirearmFingerActionHand_Implementation(const FGameplayTag& NewFirearmFingerActionHandTag)
+{
+	SetDesiredFirearmFingerActionHand(NewFirearmFingerActionHandTag);
+}
+
+void AALSXTCharacter::SetFirearmFingerActionHand(const FGameplayTag& NewFirearmFingerActionHandTag)
+{
+
+	if (FirearmFingerActionHand != NewFirearmFingerActionHandTag)
+	{
+		const auto PreviousFirearmFingerActionHand{ FirearmFingerActionHand };
+
+		FirearmFingerActionHand = NewFirearmFingerActionHandTag;
+
+		OnFirearmFingerActionHandChanged(PreviousFirearmFingerActionHand);
+	}
+}
+
+void AALSXTCharacter::OnFirearmFingerActionHandChanged_Implementation(const FGameplayTag& PreviousFirearmFingerActionHandTag) {}
 
 void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 {

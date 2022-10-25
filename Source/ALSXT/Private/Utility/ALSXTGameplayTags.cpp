@@ -40,7 +40,9 @@ namespace AlsLocomotionActionTags
 	UE_DEFINE_GAMEPLAY_TAG(Reloading, TEXT("Als.LocomotionAction.Firearm.Reloading"))
 	UE_DEFINE_GAMEPLAY_TAG(TogglingFireMode, TEXT("Als.LocomotionAction.Firearm.TogglingFireMode"))
 	UE_DEFINE_GAMEPLAY_TAG(TogglingFirearmStance, TEXT("Als.LocomotionAction.Firearm.TogglingFirearmStance"))
-	UE_DEFINE_GAMEPLAY_TAG(Racking, TEXT("Als.LocomotionAction.Firearm.Racking"))
+	UE_DEFINE_GAMEPLAY_TAG(Charging, TEXT("Als.LocomotionAction.Firearm.Charging"))
+	UE_DEFINE_GAMEPLAY_TAG(FixingMalfunction1, TEXT("Als.LocomotionAction.Firearm.FixingMalfunction1"))
+	UE_DEFINE_GAMEPLAY_TAG(FixingMalfunction2, TEXT("Als.LocomotionAction.Firearm.FixingMalfunction2"))
 }
 
 namespace ALSXTPlayerServerStateTags
@@ -166,7 +168,7 @@ namespace ALSXTCombatStanceTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Neutral, TEXT("Als.CombatStance.Neutral"))
 	UE_DEFINE_GAMEPLAY_TAG(Ready, TEXT("Als.CombatStance.Ready"))
-	UE_DEFINE_GAMEPLAY_TAG(LowReady, TEXT("Als.CombatStance.Aiming"))
+	UE_DEFINE_GAMEPLAY_TAG(Aiming, TEXT("Als.CombatStance.Aiming"))
 }
 
 namespace ALSXTWeaponFirearmStanceTags
@@ -201,6 +203,7 @@ namespace ALSXTBlockingTags
 namespace ALSXTStationaryModeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Sitting01, TEXT("Als.StationaryMode.Sitting01"))
+	UE_DEFINE_GAMEPLAY_TAG(SittingFloor01, TEXT("Als.StationaryMode.SittingFloor01"))
 	UE_DEFINE_GAMEPLAY_TAG(Petting, TEXT("Als.StationaryMode.Petting"))
 }
 
@@ -228,4 +231,25 @@ namespace ALSXTReloadingTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(DropAimed, TEXT("Als.ReloadingType.DropAimed"))
 	UE_DEFINE_GAMEPLAY_TAG(RetentionAimed, TEXT("Als.ReloadingType.RetentionAimed"))
 	UE_DEFINE_GAMEPLAY_TAG(TacticalAimed, TEXT("Als.ReloadingType.TacticalAimed"))
+}
+
+namespace ALSXTFirearmFingerActionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Als.FirearmFingerAction.None"))
+	UE_DEFINE_GAMEPLAY_TAG(OutsideGuard, TEXT("Als.FirearmFingerAction.OutsideGuard"))
+	UE_DEFINE_GAMEPLAY_TAG(MagazineRelease, TEXT("Als.FirearmFingerAction.MagazineRelease"))
+	UE_DEFINE_GAMEPLAY_TAG(SafetyOn, TEXT("Als.FirearmFingerAction.SafetyOn"))
+	UE_DEFINE_GAMEPLAY_TAG(SafetyOff, TEXT("Als.FirearmFingerAction.SafetyOff"))
+	UE_DEFINE_GAMEPLAY_TAG(SelectUp, TEXT("Als.FirearmFingerAction.SelectUp"))
+	UE_DEFINE_GAMEPLAY_TAG(SelectDown, TEXT("Als.FirearmFingerAction.SelectDown"))
+	UE_DEFINE_GAMEPLAY_TAG(OnTrigger, TEXT("Als.FirearmFingerAction.OnTrigger"))
+	UE_DEFINE_GAMEPLAY_TAG(PullingTrigger, TEXT("Als.FirearmFingerAction.PullingTrigger"))
+	UE_DEFINE_GAMEPLAY_TAG(TogglingAccessory1, TEXT("Als.FirearmFingerAction.TogglingAccessory1"))
+	UE_DEFINE_GAMEPLAY_TAG(TogglingAccessory2, TEXT("Als.FirearmFingerAction.TogglingAccessory2"))
+}
+
+namespace ALSXTFirearmFingerActionHandTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.FirearmFingerActionHand.Left"))
+	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.FirearmFingerActionHand.Right"))
 }
