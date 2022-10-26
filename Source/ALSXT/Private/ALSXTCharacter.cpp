@@ -246,36 +246,34 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 	{
 		if (ActionValue.Get<bool>())
 		{
-			// SetDesiredAiming(ActionValue.Get<bool>());
 			SetDesiredRotationMode(AlsRotationModeTags::Aiming);
 			if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Ready)
 			{
 				SetDesiredCombatStance(ALSXTCombatStanceTags::Aiming);
 			}
 			if (IsHoldingAimableItem()) {
-				// if (GetDesiredWeaponReadyPosition() == ALSXTWeaponReadyPositionTags::LowReady)
-				// {
-				// 	SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Aiming);
-				// }
-				SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Aiming);
+				if (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral)
+				{
+					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Aiming);
+				}
 			}
 			SetDesiredAiming(ActionValue.Get<bool>());
 		}
 		else 
 		{
-			// SetDesiredAiming(ActionValue.Get<bool>());
 			if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming)
 			{
 				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
 			}
 			if (IsHoldingAimableItem()) {
-				// if (GetDesiredWeaponReadyPosition() == ALSXTWeaponReadyPositionTags::Aiming)
-				// {
-				// 	SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
-				// 	SetWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
-				// }
-				SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
-				// SetWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+				if (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral)
+				{
+					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+				} 
+				else
+				{
+					SetDesiredRotationMode(AlsRotationModeTags::LookingDirection);
+				}
 			}
 			else 
 			{
