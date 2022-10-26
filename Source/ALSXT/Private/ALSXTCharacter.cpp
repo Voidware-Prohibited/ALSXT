@@ -446,11 +446,19 @@ void AALSXTCharacter::InputToggleCombatReady()
 			if (CanBecomeCombatReady())
 			{
 				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
-				if (GetRotationMode() != AlsRotationModeTags::Aiming) 
+				if (IsHoldingAimableItem())
 				{
-					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
+					if (GetRotationMode() != AlsRotationModeTags::Aiming)
+					{
+						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
+					}
+					else
+					{
+						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+					}
 				}
-				else {
+				else
+				{
 					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
 				}
 			}
@@ -489,9 +497,30 @@ void AALSXTCharacter::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& Deb
 
 bool AALSXTCharacter::IsFirstPersonEyeFocusActive() const
 {
-	if (!IsHoldingAimableItem() && IsDesiredAiming() && (GetViewMode() == AlsViewModeTags::FirstPerson))
+	if (GetViewMode() == AlsViewModeTags::FirstPerson) 
 	{
-		return true;
+		if (IsDesiredAiming()) 
+		{
+			if (IsHoldingAimableItem()) 
+			{
+				if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
 	}
 	else
 	{
@@ -688,7 +717,14 @@ void AALSXTCharacter::SetDesiredCombatStance(const FGameplayTag& NewCombatStance
 				ServerSetDesiredCombatStance(NewCombatStanceTag);
 				if (NewCombatStanceTag != ALSXTCombatStanceTags::Neutral)
 				{
-					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
+					if (IsHoldingAimableItem())
+					{
+						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
+					}
+					else
+					{
+						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+					}
 					SetDesiredRotationMode(AlsRotationModeTags::Aiming);
 				}
 				else
