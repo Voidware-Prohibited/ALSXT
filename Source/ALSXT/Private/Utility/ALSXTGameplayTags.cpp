@@ -220,6 +220,7 @@ namespace ALSXTWeaponReadyPositionTags
 	UE_DEFINE_GAMEPLAY_TAG(PatrolReady, TEXT("Als.Weapon Ready Position.Patrol Ready"))
 	UE_DEFINE_GAMEPLAY_TAG(LowReady, TEXT("Als.Weapon Ready Position.Low Ready"))
 	UE_DEFINE_GAMEPLAY_TAG(HighReady, TEXT("Als.Weapon Ready Position.High Ready"))
+	UE_DEFINE_GAMEPLAY_TAG(Sul, TEXT("Als.Weapon Ready Position.Sul"))
 	UE_DEFINE_GAMEPLAY_TAG(AroundCover, TEXT("Als.Weapon Ready Position.Around Cover"))
 	UE_DEFINE_GAMEPLAY_TAG(Retention, TEXT("Als.Weapon Ready Position.Retention"))
 	UE_DEFINE_GAMEPLAY_TAG(Hip, TEXT("Als.Weapon Ready Position.Hip"))

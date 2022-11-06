@@ -79,6 +79,18 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag FirearmFingerActionHand {FGameplayTag::EmptyTag};
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactType{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag WeaponCarryPosition{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag FirearmSightLocation{ALSXTFirearmFingerActionTags::None};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag VaultType {FGameplayTag::EmptyTag};
+
 public:
 
 	virtual void NativeInitializeAnimation() override;

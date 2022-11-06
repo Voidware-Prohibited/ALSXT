@@ -225,6 +225,38 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag FirearmFingerActionHand{FGameplayTag::EmptyTag};
 
+// ImpactType
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredImpactType{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactType{FGameplayTag::EmptyTag};
+
+// WeaponCarryPosition
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredWeaponCarryPosition{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag WeaponCarryPosition{FGameplayTag::EmptyTag};
+
+// FirearmSightLocation
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredFirearmSightLocation{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag FirearmSightLocation{FGameplayTag::EmptyTag};
+
+// VaultType
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredVaultType{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag VaultType{FGameplayTag::EmptyTag};
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -1077,6 +1109,102 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnFirearmFingerActionHandChanged(const FGameplayTag& PreviousFirearmFingerActionHandTag);
+
+// Desired ImpactType
+
+public:
+	const FGameplayTag& GetDesiredImpactType() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewImpactTypeTag"))
+	void SetDesiredImpactType(const FGameplayTag& NewImpactTypeTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredImpactType(const FGameplayTag& NewImpactTypeTag);
+
+// ImpactType
+
+public:
+	const FGameplayTag& GetImpactType() const;
+
+private:
+	void SetImpactType(const FGameplayTag& NewImpactTypeTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnImpactTypeChanged(const FGameplayTag& PreviousImpactTypeTag);
+
+// Desired WeaponCarryPosition
+
+public:
+	const FGameplayTag& GetDesiredWeaponCarryPosition() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewWeaponCarryPositionTag"))
+	void SetDesiredWeaponCarryPosition(const FGameplayTag& NewWeaponCarryPositionTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredWeaponCarryPosition(const FGameplayTag& NewWeaponCarryPositionTag);
+
+// WeaponCarryPosition
+
+public:
+	const FGameplayTag& GetWeaponCarryPosition() const;
+
+private:
+	void SetWeaponCarryPosition(const FGameplayTag& NewWeaponCarryPositionTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnWeaponCarryPositionChanged(const FGameplayTag& PreviousWeaponCarryPositionTag);
+
+// Desired FirearmSightLocation
+
+public:
+	const FGameplayTag& GetDesiredFirearmSightLocation() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFirearmSightLocationTag"))
+	void SetDesiredFirearmSightLocation(const FGameplayTag& NewFirearmSightLocationTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredFirearmSightLocation(const FGameplayTag& NewFirearmSightLocationTag);
+
+// FirearmSightLocation
+
+public:
+	const FGameplayTag& GetFirearmSightLocation() const;
+
+private:
+	void SetFirearmSightLocation(const FGameplayTag& NewFirearmSightLocationTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnFirearmSightLocationChanged(const FGameplayTag& PreviousFirearmSightLocationTag);
+
+// Desired VaultType
+
+public:
+	const FGameplayTag& GetDesiredVaultType() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewVaultTypeTag"))
+	void SetDesiredVaultType(const FGameplayTag& NewVaultTypeTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredVaultType(const FGameplayTag& NewVaultTypeTag);
+
+// VaultType
+
+public:
+	const FGameplayTag& GetVaultType() const;
+
+private:
+	void SetVaultType(const FGameplayTag& NewVaultTypeTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnVaultTypeChanged(const FGameplayTag& PreviousVaultTypeTag);
 };
 
 inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
@@ -1303,4 +1431,44 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredFirearmFingerActionHand() 
 inline const FGameplayTag& AALSXTCharacter::GetFirearmFingerActionHand() const
 {
 	return FirearmFingerActionHand;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredImpactType() const
+{
+	return DesiredImpactType;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetImpactType() const
+{
+	return ImpactType;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredWeaponCarryPosition() const
+{
+	return DesiredWeaponCarryPosition;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetWeaponCarryPosition() const
+{
+	return WeaponCarryPosition;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredFirearmSightLocation() const
+{
+	return DesiredFirearmSightLocation;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetFirearmSightLocation() const
+{
+	return FirearmSightLocation;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredVaultType() const
+{
+	return DesiredVaultType;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetVaultType() const
+{
+	return VaultType;
 }

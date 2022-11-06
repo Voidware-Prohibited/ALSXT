@@ -50,6 +50,10 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	ReloadingType = ALSXTCharacter->GetReloadingType();
 	FirearmFingerAction = ALSXTCharacter->GetFirearmFingerAction();
 	FirearmFingerActionHand = ALSXTCharacter->GetFirearmFingerActionHand();
+	ImpactType = ALSXTCharacter->GetImpactType();
+	WeaponCarryPosition = ALSXTCharacter->GetWeaponCarryPosition();
+	FirearmSightLocation = ALSXTCharacter->GetFirearmSightLocation();
+	VaultType = ALSXTCharacter->GetVaultType();
 
 }
 

@@ -80,6 +80,10 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerAction, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerActionHand, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredImpactType, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponCarryPosition, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmSightLocation, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredVaultType, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
 }
@@ -1394,6 +1398,154 @@ void AALSXTCharacter::SetFirearmFingerActionHand(const FGameplayTag& NewFirearmF
 }
 
 void AALSXTCharacter::OnFirearmFingerActionHandChanged_Implementation(const FGameplayTag& PreviousFirearmFingerActionHandTag) {}
+
+// ImpactType
+
+void AALSXTCharacter::SetDesiredImpactType(const FGameplayTag& NewImpactTypeTag)
+{
+	if (DesiredImpactType != NewImpactTypeTag)
+	{
+		DesiredImpactType = NewImpactTypeTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredImpactType, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredImpactType(NewImpactTypeTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredImpactType_Implementation(const FGameplayTag& NewImpactTypeTag)
+{
+	SetDesiredImpactType(NewImpactTypeTag);
+}
+
+void AALSXTCharacter::SetImpactType(const FGameplayTag& NewImpactTypeTag)
+{
+
+	if (ImpactType != NewImpactTypeTag)
+	{
+		const auto PreviousImpactType{ ImpactType };
+
+		ImpactType = NewImpactTypeTag;
+
+		OnImpactTypeChanged(PreviousImpactType);
+	}
+}
+
+void AALSXTCharacter::OnImpactTypeChanged_Implementation(const FGameplayTag& PreviousImpactTypeTag) {}
+
+// WeaponCarryPosition
+
+void AALSXTCharacter::SetDesiredWeaponCarryPosition(const FGameplayTag& NewWeaponCarryPositionTag)
+{
+	if (DesiredWeaponCarryPosition != NewWeaponCarryPositionTag)
+	{
+		DesiredWeaponCarryPosition = NewWeaponCarryPositionTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredWeaponCarryPosition, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredWeaponCarryPosition(NewWeaponCarryPositionTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredWeaponCarryPosition_Implementation(const FGameplayTag& NewWeaponCarryPositionTag)
+{
+	SetDesiredWeaponCarryPosition(NewWeaponCarryPositionTag);
+}
+
+void AALSXTCharacter::SetWeaponCarryPosition(const FGameplayTag& NewWeaponCarryPositionTag)
+{
+
+	if (WeaponCarryPosition != NewWeaponCarryPositionTag)
+	{
+		const auto PreviousWeaponCarryPosition{ WeaponCarryPosition };
+
+		WeaponCarryPosition = NewWeaponCarryPositionTag;
+
+		OnWeaponCarryPositionChanged(PreviousWeaponCarryPosition);
+	}
+}
+
+void AALSXTCharacter::OnWeaponCarryPositionChanged_Implementation(const FGameplayTag& PreviousWeaponCarryPositionTag) {}
+
+// FirearmSightLocation
+
+void AALSXTCharacter::SetDesiredFirearmSightLocation(const FGameplayTag& NewFirearmSightLocationTag)
+{
+	if (DesiredFirearmSightLocation != NewFirearmSightLocationTag)
+	{
+		DesiredFirearmSightLocation = NewFirearmSightLocationTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredFirearmSightLocation, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredFirearmSightLocation(NewFirearmSightLocationTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredFirearmSightLocation_Implementation(const FGameplayTag& NewFirearmSightLocationTag)
+{
+	SetDesiredFirearmSightLocation(NewFirearmSightLocationTag);
+}
+
+void AALSXTCharacter::SetFirearmSightLocation(const FGameplayTag& NewFirearmSightLocationTag)
+{
+
+	if (FirearmSightLocation != NewFirearmSightLocationTag)
+	{
+		const auto PreviousFirearmSightLocation{ FirearmSightLocation };
+
+		FirearmSightLocation = NewFirearmSightLocationTag;
+
+		OnFirearmSightLocationChanged(PreviousFirearmSightLocation);
+	}
+}
+
+void AALSXTCharacter::OnFirearmSightLocationChanged_Implementation(const FGameplayTag& PreviousFirearmSightLocationTag) {}
+
+// VaultType
+
+void AALSXTCharacter::SetDesiredVaultType(const FGameplayTag& NewVaultTypeTag)
+{
+	if (DesiredVaultType != NewVaultTypeTag)
+	{
+		DesiredVaultType = NewVaultTypeTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredVaultType, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredVaultType(NewVaultTypeTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredVaultType_Implementation(const FGameplayTag& NewVaultTypeTag)
+{
+	SetDesiredVaultType(NewVaultTypeTag);
+}
+
+void AALSXTCharacter::SetVaultType(const FGameplayTag& NewVaultTypeTag)
+{
+
+	if (VaultType != NewVaultTypeTag)
+	{
+		const auto PreviousVaultType{ VaultType };
+
+		VaultType = NewVaultTypeTag;
+
+		OnVaultTypeChanged(PreviousVaultType);
+	}
+}
+
+void AALSXTCharacter::OnVaultTypeChanged_Implementation(const FGameplayTag& PreviousVaultTypeTag) {}
 
 void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 {
