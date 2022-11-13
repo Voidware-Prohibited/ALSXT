@@ -91,6 +91,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag VaultType {FGameplayTag::EmptyTag};
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag WeaponObstruction {FGameplayTag::EmptyTag};
+
 public:
 
 	virtual void NativeInitializeAnimation() override;

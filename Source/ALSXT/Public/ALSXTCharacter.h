@@ -257,6 +257,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag VaultType{FGameplayTag::EmptyTag};
 
+// WeaponObstruction
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredWeaponObstruction{FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag WeaponObstruction{FGameplayTag::EmptyTag};
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -1205,6 +1213,31 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnVaultTypeChanged(const FGameplayTag& PreviousVaultTypeTag);
+
+// Desired WeaponObstruction
+
+public:
+	const FGameplayTag& GetDesiredWeaponObstruction() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewWeaponObstructionTag"))
+	void SetDesiredWeaponObstruction(const FGameplayTag& NewWeaponObstructionTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredWeaponObstruction(const FGameplayTag& NewWeaponObstructionTag);
+
+// WeaponObstruction
+
+public:
+	const FGameplayTag& GetWeaponObstruction() const;
+
+private:
+	void SetWeaponObstruction(const FGameplayTag& NewWeaponObstructionTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnWeaponObstructionChanged(const FGameplayTag& PreviousWeaponObstructionTag);
+
 };
 
 inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
@@ -1241,7 +1274,6 @@ inline const FGameplayTag& AALSXTCharacter::GetLocomotionVariant() const
 {
 	return LocomotionVariant;
 }
-
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredInjury() const
 {
@@ -1471,4 +1503,14 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredVaultType() const
 inline const FGameplayTag& AALSXTCharacter::GetVaultType() const
 {
 	return VaultType;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredWeaponObstruction() const
+{
+	return DesiredWeaponObstruction;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetWeaponObstruction() const
+{
+	return WeaponObstruction;
 }

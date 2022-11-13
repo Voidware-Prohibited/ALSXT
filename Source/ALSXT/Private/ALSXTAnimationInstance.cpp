@@ -54,6 +54,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	WeaponCarryPosition = ALSXTCharacter->GetWeaponCarryPosition();
 	FirearmSightLocation = ALSXTCharacter->GetFirearmSightLocation();
 	VaultType = ALSXTCharacter->GetVaultType();
+	WeaponObstruction = ALSXTCharacter->GetWeaponObstruction();
 
 }
 

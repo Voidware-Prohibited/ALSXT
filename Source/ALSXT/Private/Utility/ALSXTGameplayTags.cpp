@@ -120,6 +120,13 @@ namespace ALSXTHoldingBreathTags
 	UE_DEFINE_GAMEPLAY_TAG(True, TEXT("Als.Holding Breath.True"))
 }
 
+namespace ALSXTCursorLocationTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(ScreenCenter, TEXT("Als.Cursor Location.Screen Center"))
+	UE_DEFINE_GAMEPLAY_TAG(MouseLocation, TEXT("Als.Cursor Location.Mouse Location"))
+	UE_DEFINE_GAMEPLAY_TAG(Location, TEXT("Als.Cursor Location.Location"))
+}
+
 namespace ALSXTImpactTypeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Bump, TEXT("Als.Impact Type.Bump"))
@@ -296,4 +303,10 @@ namespace ALSXTFirearmFingerActionHandTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Firearm Finger Action Hand.Left"))
 	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Firearm Finger Action Hand.Right"))
+}
+
+namespace ALSXTWeaponObstructionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Environment, TEXT("Als.Weapon Obstruction.Environment"))
+	UE_DEFINE_GAMEPLAY_TAG(Flagging, TEXT("Als.Weapon Obstruction.Flagging"))
 }

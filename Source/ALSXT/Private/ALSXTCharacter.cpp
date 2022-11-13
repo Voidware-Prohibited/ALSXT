@@ -84,6 +84,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponCarryPosition, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmSightLocation, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredVaultType, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponObstruction, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
 }
@@ -1546,6 +1547,43 @@ void AALSXTCharacter::SetVaultType(const FGameplayTag& NewVaultTypeTag)
 }
 
 void AALSXTCharacter::OnVaultTypeChanged_Implementation(const FGameplayTag& PreviousVaultTypeTag) {}
+
+// WeaponObstruction
+
+void AALSXTCharacter::SetDesiredWeaponObstruction(const FGameplayTag& NewWeaponObstructionTag)
+{
+	if (DesiredWeaponObstruction != NewWeaponObstructionTag)
+	{
+		DesiredWeaponObstruction = NewWeaponObstructionTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredWeaponObstruction, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredWeaponObstruction(NewWeaponObstructionTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredWeaponObstruction_Implementation(const FGameplayTag& NewWeaponObstructionTag)
+{
+	SetDesiredWeaponObstruction(NewWeaponObstructionTag);
+}
+
+void AALSXTCharacter::SetWeaponObstruction(const FGameplayTag& NewWeaponObstructionTag)
+{
+
+	if (WeaponObstruction != NewWeaponObstructionTag)
+	{
+		const auto PreviousWeaponObstruction{ WeaponObstruction };
+
+		WeaponObstruction = NewWeaponObstructionTag;
+
+		OnWeaponObstructionChanged(PreviousWeaponObstruction);
+	}
+}
+
+void AALSXTCharacter::OnWeaponObstructionChanged_Implementation(const FGameplayTag& PreviousWeaponObstructionTag) {}
 
 void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 {
