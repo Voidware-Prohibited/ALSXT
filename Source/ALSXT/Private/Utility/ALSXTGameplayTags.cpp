@@ -310,3 +310,30 @@ namespace ALSXTWeaponObstructionTags
 	UE_DEFINE_GAMEPLAY_TAG(Environment, TEXT("Als.Weapon Obstruction.Environment"))
 	UE_DEFINE_GAMEPLAY_TAG(Flagging, TEXT("Als.Weapon Obstruction.Flagging"))
 }
+
+namespace ALSXTActionStrengthTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Light, TEXT("Als.Action Strength.Light"))
+	UE_DEFINE_GAMEPLAY_TAG(Medium, TEXT("Als.Action Strength.Medium"))
+	UE_DEFINE_GAMEPLAY_TAG(Heavy, TEXT("Als.Action Strength.Heavy"))
+}
+
+namespace ALSXTAttackTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Regular, TEXT("Als.Attack Type.Regular"))
+	UE_DEFINE_GAMEPLAY_TAG(Riposte, TEXT("Als.Attack Type.Riposte"))
+	UE_DEFINE_GAMEPLAY_TAG(Special, TEXT("Als.Attack Type.Special"))
+	UE_DEFINE_GAMEPLAY_TAG(TakeDown, TEXT("Als.Attack Type.Take Down"))
+	UE_DEFINE_GAMEPLAY_TAG(Cybernetic, TEXT("Als.Attack Type.Cybernetic"))
+	UE_DEFINE_GAMEPLAY_TAG(Device, TEXT("Als.Attack Type.Device"))
+}
+
+namespace ALSXTDefenseTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Regular, TEXT("Als.Defense Type.Regular"))
+	UE_DEFINE_GAMEPLAY_TAG(Parry, TEXT("Als.Defense Type.Parry"))
+	UE_DEFINE_GAMEPLAY_TAG(Dodge, TEXT("Als.Defense Type.Dodge"))
+	UE_DEFINE_GAMEPLAY_TAG(Redirection, TEXT("Als.Defense Type.Redirection"))
+	UE_DEFINE_GAMEPLAY_TAG(Cybernetic, TEXT("Als.Defense Type.Cybernetic"))
+	UE_DEFINE_GAMEPLAY_TAG(Device, TEXT("Als.Defense Type.Device"))
+}
