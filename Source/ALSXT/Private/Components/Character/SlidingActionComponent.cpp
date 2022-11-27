@@ -3,6 +3,9 @@
 
 #include "Components/Character/SlidingActionComponent.h"
 #include "AlsCharacter.h"
+#include "EnhancedInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Settings/ALSXTCharacterSettings.h"
 #include "Utility/AlsMacros.h"
 
 // Sets default values for this component's properties

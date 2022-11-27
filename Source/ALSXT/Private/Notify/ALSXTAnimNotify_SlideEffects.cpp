@@ -4,6 +4,7 @@
 #include "Notify/ALSXTAnimNotify_SlideEffects.h"
 
 #include "AlsCharacter.h"
+#include "ALSXTAnimationInstance.h"
 #include "ALSXTCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "NiagaraComponent.h"
@@ -13,11 +14,13 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Notify/ALSXTAnimNotify_FootstepEffects.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Utility/AlsConstants.h"
 #include "Utility/AlsEnumUtility.h"
 #include "Utility/AlsMacros.h"
 #include "Utility/AlsMath.h"
+#include "Utility/AlsUtility.h"
 
 FString UALSXTAnimNotify_SlideEffects::GetNotifyName_Implementation() const
 {

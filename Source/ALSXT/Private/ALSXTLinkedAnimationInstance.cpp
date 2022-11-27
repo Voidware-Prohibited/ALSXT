@@ -2,6 +2,8 @@
 
 
 #include "ALSXTLinkedAnimationInstance.h"
+
+#include "ALSXTAnimationInstance.h"
 #include "ALSXTCharacter.h"
 #include "Utility/AlsMacros.h"
 
