@@ -7,7 +7,7 @@
 #include "AcrobaticActionComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ALSXT_API UAcrobaticActionComponent : public UActorComponent
 {
 	GENERATED_BODY()

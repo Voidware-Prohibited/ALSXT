@@ -133,26 +133,48 @@ namespace ALSXTImpactTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(Hit, TEXT("Als.Impact Type.Hit"))
 }
 
-namespace ALSXTBumpReactionTags
+namespace ALSXTImpactFormTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(HeadBackLight, TEXT("Als.BumpReaction.Head.Back.Light"))
+	UE_DEFINE_GAMEPLAY_TAG(Push, TEXT("Als.Impact Form.Push"))
+	UE_DEFINE_GAMEPLAY_TAG(Blunt, TEXT("Als.Impact Form.Blunt"))
+	UE_DEFINE_GAMEPLAY_TAG(Blade, TEXT("Als.Impact Form.Blade"))
+	UE_DEFINE_GAMEPLAY_TAG(Bullet, TEXT("Als.Impact Form.Bullet"))
+	UE_DEFINE_GAMEPLAY_TAG(Explosion, TEXT("Als.Impact Form.Explosion"))
+	UE_DEFINE_GAMEPLAY_TAG(Electric, TEXT("Als.Impact Form.Electric"))	
 }
 
-namespace ALSXTBumpSurfaceTags
+namespace ALSXTImpactLocationTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Cloth, TEXT("Als.Bump Surface.Cloth"))
-
+	UE_DEFINE_GAMEPLAY_TAG(Head, TEXT("Als.Impact Location.Head"))
+	UE_DEFINE_GAMEPLAY_TAG(Neck, TEXT("Als.Impact Location.Neck"))
+	UE_DEFINE_GAMEPLAY_TAG(UpperTorso, TEXT("Als.Impact Location.Upper Torso"))
+	UE_DEFINE_GAMEPLAY_TAG(LowerTorso, TEXT("Als.Impact Location.Lower Torso"))
+	UE_DEFINE_GAMEPLAY_TAG(Hip, TEXT("Als.Impact Location.Hip"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftUpperArm, TEXT("Als.Impact Location.Left Upper Arm"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftForearm, TEXT("Als.Impact Location.Left Forearm"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftHand, TEXT("Als.Impact Location.Left Hand"))
+	UE_DEFINE_GAMEPLAY_TAG(RightUpperArm, TEXT("Als.Impact Location.Right Upper Arm"))
+	UE_DEFINE_GAMEPLAY_TAG(RightForearm, TEXT("Als.Impact Location.Right Forearm"))
+	UE_DEFINE_GAMEPLAY_TAG(RightHand, TEXT("Als.Impact Location.Right Hand"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftThigh, TEXT("Als.Impact Location.Left Thigh"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftLowerLeg, TEXT("Als.Impact Location.Left Lower Leg"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftFoot, TEXT("Als.Impact Location.Left Foot"))
+	UE_DEFINE_GAMEPLAY_TAG(RightThigh, TEXT("Als.Impact Location.Right Thigh"))
+	UE_DEFINE_GAMEPLAY_TAG(RightLowerLeg, TEXT("Als.Impact Location.Right Lower Leg"))
+	UE_DEFINE_GAMEPLAY_TAG(RightFoot, TEXT("Als.Impact Location.Right Foot"))
 }
 
-namespace ALSXTImpactReactionTags
+namespace ALSXTImpactSideTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(BluntHeadBackLight, TEXT("Als.Hit Reaction.Blunt.Head.Back.Light"))
-
+	UE_DEFINE_GAMEPLAY_TAG(Front, TEXT("Als.Impact Side.Front"))
+	UE_DEFINE_GAMEPLAY_TAG(Back, TEXT("Als.Impact Side.Back"))
+	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Impact Side.Left"))
+	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Impact Side.Right"))
 }
 
-namespace ALSXTImpactReactionTags
+namespace ALSXTImpactSurfaceTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Cloth, TEXT("Als.Hit Surface.Cloth"))
+	UE_DEFINE_GAMEPLAY_TAG(Cloth, TEXT("Als.Impact Surface.Cloth"))
 }
 
 namespace ALSXTLocomotionVariantTags
