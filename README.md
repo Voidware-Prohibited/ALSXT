@@ -2,7 +2,7 @@
 
 ![ALSXT](ALSXT.png)
 
-An Unreal Engine 5 plugin that extends Advanced Locomotion System Refactored with expanded Character States, Improved Foot Print system, Sliding, Vaulting and Wallrunning(XT) 
+An Unreal Engine 5 plugin that extends Advanced Locomotion System Refactored with expanded Character States, Improved Foot Print system, Sliding, Physical Animayion, Vaulting, Wallrunning and more(XT) 
 
 # Introduction
 
@@ -14,11 +14,25 @@ An Unreal Engine 5 plugin that extends Advanced Locomotion System Refactored wit
 - Camera FX Component.
 - Character Sound Component (Replicated).
 - Vaulting _Coming Soon_.
+- Impact Reactions (Blending reaction animations with Physical Animation) _Coming Soon_.
+- Stationary Modes ( Sitting etc) _Coming Soon_.
 - Wallrunning _Coming Soon_.
+- Gestures _Coming Soon_.
+- Emotes _Coming Soon_.
 
 **Dependecies**
 
 - [Advanced Locomotion System Refactored](https://github.com/Sixze/ALS-Refactored/)
+
+# Installation
+
+- Begin with an empty C++ Project
+- Install and setup Enhanced Plugin
+- Install and setup Metasounds Plugin
+- Install the latest version of ALS-Refactored via https://github.com/Sixze/ALS-Refactored#quick-start
+- Clone/download ALSXT into your projects Plugin folder (You should have both ALS-Refactored and ALSXT side by side)
+- Build your Solution in Visual Studio again
+- Once compilation is successful you can now begin using ALSXT in your project
 
 # License
 
