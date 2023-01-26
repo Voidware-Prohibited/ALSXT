@@ -29,10 +29,10 @@ namespace AlsLocomotionActionTags
 	UE_DEFINE_GAMEPLAY_TAG(Emote, TEXT("Als.LocomotionAction.Emote"))
 	UE_DEFINE_GAMEPLAY_TAG(EnteringStationary, TEXT("Als.LocomotionAction.Entering Stationary"))
 	UE_DEFINE_GAMEPLAY_TAG(ExitingStationary, TEXT("Als.LocomotionAction.Exiting Stationary"))
-	UE_DEFINE_GAMEPLAY_TAG(PrimaryInteraction, TEXT("Als.LocomotionAction.Primary Interaction"))
-	UE_DEFINE_GAMEPLAY_TAG(SecondaryInteraction, TEXT("Als.LocomotionAction.Secondary Interaction"))
 	UE_DEFINE_GAMEPLAY_TAG(PrimaryAction, TEXT("Als.LocomotionAction.Primary Action"))
 	UE_DEFINE_GAMEPLAY_TAG(SecondaryAction, TEXT("Als.LocomotionAction.Secondary Action"))
+	UE_DEFINE_GAMEPLAY_TAG(PrimaryInteraction, TEXT("Als.LocomotionAction.Primary Interaction"))
+	UE_DEFINE_GAMEPLAY_TAG(SecondaryInteraction, TEXT("Als.LocomotionAction.Secondary Interaction"))
 	UE_DEFINE_GAMEPLAY_TAG(EquipingItem, TEXT("Als.LocomotionAction.Equiping Item"))
 	UE_DEFINE_GAMEPLAY_TAG(UnequipingItem, TEXT("Als.LocomotionAction.Unequiping Item"))
 	UE_DEFINE_GAMEPLAY_TAG(InspectHeldItem, TEXT("Als.LocomotionAction.Inspect Held Item"))
@@ -180,6 +180,8 @@ namespace ALSXTImpactSideTags
 	UE_DEFINE_GAMEPLAY_TAG(Back, TEXT("Als.Impact Side.Back"))
 	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Impact Side.Left"))
 	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Impact Side.Right"))
+	UE_DEFINE_GAMEPLAY_TAG(Above, TEXT("Als.Impact Side.Above"))
+	UE_DEFINE_GAMEPLAY_TAG(Below, TEXT("Als.Impact Side.Below"))
 }
 
 namespace ALSXTImpactSurfaceTags
