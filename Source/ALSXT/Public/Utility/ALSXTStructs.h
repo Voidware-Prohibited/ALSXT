@@ -38,22 +38,7 @@ struct ALSXT_API FImpactReactionStrength
 	FGameplayTag Strength;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionSide Front;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionSide Back;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionSide Left;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionSide Right;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionSide Above;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionSide Below;
+	TArray <FImpactReactionSide> ImpactReactionSides;
 };
 
 USTRUCT(BlueprintType)
@@ -65,16 +50,7 @@ struct ALSXT_API FImpactReactionLocation
 	FGameplayTag ImpactLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionStrength Push;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionStrength Light;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionStrength Medium;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FImpactReactionStrength Heavy;
+	TArray <FImpactReactionStrength> ImpactReactionStrengths;
 };
 
 USTRUCT(BlueprintType)
@@ -98,13 +74,7 @@ struct ALSXT_API FUnarmedAttackStrength
 	FGameplayTag UnarmedAttackStrength;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FUnarmedAttackStance Standing;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FUnarmedAttackStance Crouched;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FUnarmedAttackStance InAir;
+	TArray <FUnarmedAttackStance> UnarmedAttackStances;
 };
 
 USTRUCT(BlueprintType)
@@ -116,14 +86,5 @@ struct ALSXT_API FUnarmedAttackType
 	FGameplayTag UnarmedAttackType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FUnarmedAttackStrength Push;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FUnarmedAttackStrength Light;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FUnarmedAttackStrength Medium;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FUnarmedAttackStrength Heavy;
+	TArray<FUnarmedAttackStrength> UnarmedAttackStrengths;
 };

@@ -1,7 +1,7 @@
 // MIT
 
-#include "Utility/AlsUtility.h"
 #include "Components/Character/UnarmedCombatComponent.h"
+#include "Utility/AlsUtility.h"
 
 // Sets default values for this component's properties
 UUnarmedCombatComponent::UUnarmedCombatComponent()
@@ -109,16 +109,48 @@ void UUnarmedCombatComponent::StartUnarmedAttack(const FGameplayTag& UnarmedAtta
 
 UAnimMontage* UUnarmedCombatComponent::SelectUnarmedAttackMontage_Implementation(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
 {
-	const FName UnarmedAttackTypeName{ UAlsUtility::GetSimpleTagName(UnarmedAttackType) };
-	const FName StanceName{ UAlsUtility::GetSimpleTagName(Stance) };
-	const FName StrengthName{ UAlsUtility::GetSimpleTagName(Strength) };
-
-	// Character->ALSXTSettings->UnarmedCombat.LeftFist.UnarmedAttackType == UnarmedAttackType
+	UAnimMontage& SelectedMontage = nullptr;
 	
-	// Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypeName.StrengthName.StanceName.Montage
-	
-	return Character->ALSXTSettings->UnarmedCombat.RightFist.Medium.Standing.Montage;
-	// return Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypeName.StrengthName.StanceName.Montage;
+	if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes.IsEmpty())
+	{
+		return nullptr;
+	}
+	else if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[0].UnarmedAttackStrengths.IsEmpty())
+	{
+		return nullptr;
+	}
+	else if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[0].UnarmedAttackStrengths[0].UnarmedAttackStances.IsEmpty())
+	{
+		return nullptr;
+	}
+	else if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[0].UnarmedAttackStrengths[0].UnarmedAttackStances[0].Montage = nullptr)
+	{
+		return nullptr;
+	}
+	else
+	{
+		for (int i = 0; i < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes.Num(); ++i)
+		{
+			if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackType == UnarmedAttackType)
+			{
+				for (int j = 0; j < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths.Num(); ++j)
+				{
+					if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStrength == Strength)
+					{
+						for (int k = 0; k < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances.Num(); ++k)
+						{
+							if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].UnarmedAttackStance == Stance)
+							{
+								SelectedMontage = Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].Montage;								
+								// return SelectedMontage;
+							}
+						}
+					}
+				}	
+			}
+		}
+	}
+	return SelectedMontage;
 }
 
 void UUnarmedCombatComponent::ServerStartUnarmedAttack_Implementation(UAnimMontage* Montage, const float PlayRate,
