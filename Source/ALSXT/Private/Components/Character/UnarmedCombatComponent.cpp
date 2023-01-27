@@ -109,7 +109,11 @@ void UUnarmedCombatComponent::StartUnarmedAttack(const FGameplayTag& UnarmedAtta
 
 UAnimMontage* UUnarmedCombatComponent::SelectUnarmedAttackMontage_Implementation(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
 {
-	UAnimMontage& SelectedMontage = nullptr;
+	// UAnimMontage* SelectedMontage = nullptr;
+	TObjectPtr<UAnimMontage> SelectedMontage = nullptr;
+	int i = 0;
+	int j = 0;
+	int k = 0;
 	
 	if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes.IsEmpty())
 	{
@@ -129,15 +133,15 @@ UAnimMontage* UUnarmedCombatComponent::SelectUnarmedAttackMontage_Implementation
 	}
 	else
 	{
-		for (int i = 0; i < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes.Num(); ++i)
+		for (i = 0; i < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes.Num(); ++i)
 		{
 			if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackType == UnarmedAttackType)
 			{
-				for (int j = 0; j < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths.Num(); ++j)
+				for (j = 0; j < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths.Num(); ++j)
 				{
 					if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStrength == Strength)
 					{
-						for (int k = 0; k < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances.Num(); ++k)
+						for (k = 0; k < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances.Num(); ++k)
 						{
 							if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].UnarmedAttackStance == Stance)
 							{
