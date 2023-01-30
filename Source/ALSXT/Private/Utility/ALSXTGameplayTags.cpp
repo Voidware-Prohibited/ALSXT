@@ -45,6 +45,14 @@ namespace AlsLocomotionActionTags
 	UE_DEFINE_GAMEPLAY_TAG(FixingMalfunction2, TEXT("Als.LocomotionAction.Firearm.Fixing Malfunction 2"))
 }
 
+namespace ALSXTActionStanceTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Prone, TEXT("Als.Action Stance.Prone"))
+	UE_DEFINE_GAMEPLAY_TAG(Crouched, TEXT("Als.Action Stance.Crouched"))
+	UE_DEFINE_GAMEPLAY_TAG(Standing, TEXT("Als.Action Stance.Standing"))
+	UE_DEFINE_GAMEPLAY_TAG(InAir, TEXT("Als.Action Stance.In Air"))
+}
+
 namespace ALSXTVaultTypeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(LowWalking, TEXT("Als.Vault Type.Low Walking"))
@@ -381,4 +389,14 @@ namespace ALSXTDefenseTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(Redirection, TEXT("Als.Defense Type.Redirection"))
 	UE_DEFINE_GAMEPLAY_TAG(Cybernetic, TEXT("Als.Defense Type.Cybernetic"))
 	UE_DEFINE_GAMEPLAY_TAG(Device, TEXT("Als.Defense Type.Device"))
+}
+
+namespace ALSXTClothingStateTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(HoodUp, TEXT("Als.Clothing State.Hood Up"))
+	UE_DEFINE_GAMEPLAY_TAG(Open, TEXT("Als.Clothing State.Open"))
+	UE_DEFINE_GAMEPLAY_TAG(Closed, TEXT("Als.Clothing State.Closed"))
+	UE_DEFINE_GAMEPLAY_TAG(Tucked, TEXT("Als.Clothing State.Tucked"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftSleeveUp, TEXT("Als.Clothing State.Left Sleeve Up"))
+	UE_DEFINE_GAMEPLAY_TAG(RightSleeveUp, TEXT("Als.Clothing State.Right Sleeve Up"))
 }

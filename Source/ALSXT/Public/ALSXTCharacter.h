@@ -30,6 +30,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FSetupPlayerInputComponentDelegate OnSetupPlayerInputComponentUpdated;
 
+	UPROPERTY(BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
+	AAlsCharacter* AlsCharacter{Cast<AAlsCharacter>(GetParentActor())};
+
 private:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
@@ -372,6 +375,7 @@ public:
 	// Camera
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo) override;
 
 	// Input
@@ -431,6 +435,9 @@ protected:
 	void OnViewModeChanged(const FGameplayTag& PreviousViewModeTag);
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void SetMovementModeLocked(bool bNewMovementModeLocked);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool CanSetToViewMode(const FGameplayTag& ViewModeTag) const;
 

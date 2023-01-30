@@ -1,6 +1,7 @@
 #include "ALSXTCharacter.h"
 
 #include "AlsCharacter.h"
+#include "AlsCharacterMovementComponent.h"
 #include "AlsCameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -87,6 +88,13 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponObstruction, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
+}
+
+void AALSXTCharacter::BeginPlay()
+{
+	AlsCharacter = Cast<AAlsCharacter>(GetParentActor());
+	Super::BeginPlay();
+
 }
 
 void AALSXTCharacter::CalcCamera(const float DeltaTime, FMinimalViewInfo& ViewInfo)
@@ -374,15 +382,23 @@ void AALSXTCharacter::ApplyDesiredStance()
 			UnCrouch();
 		}
 	}
-	else if ((GetLocomotionAction() == AlsLocomotionActionTags::Rolling && ALSXTSettings->Rolling.bCrouchOnStart) || (GetLocomotionAction() == AlsLocomotionActionTags::Sliding && ALSXTSettings->Sliding.bCrouchOnStart))
+	else
 	{
-		Crouch();
+		if ((GetLocomotionAction() == AlsLocomotionActionTags::Rolling && ALSXTSettings->Rolling.bCrouchOnStart) || (GetLocomotionAction() == AlsLocomotionActionTags::Sliding && ALSXTSettings->Sliding.bCrouchOnStart))
+		{
+			Crouch();
+		}
 	}
 }
 
 void AALSXTCharacter::ALSXTRefreshRotationInstant(const float TargetYawAngle, const ETeleportType Teleport)
 {
 	RefreshRotationInstant(TargetYawAngle, Teleport);
+}
+
+void AALSXTCharacter::SetMovementModeLocked(const bool bNewMovementModeLocked)
+{
+	AlsCharacterMovement->SetMovementModeLocked(bNewMovementModeLocked);
 }
 
 void AALSXTCharacter::Crouch(const bool bClientSimulation)

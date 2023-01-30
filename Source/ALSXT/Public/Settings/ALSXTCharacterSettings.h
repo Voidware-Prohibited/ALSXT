@@ -39,7 +39,7 @@ public:
 	FALSXTImpactReactionSettings ImpactReaction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FALSXTUnarmedCombatSettings UnarmedCombat;
+	FALSXTGeneralUnarmedCombatSettings UnarmedCombat;
 
 	UALSXTCharacterSettings();
 	

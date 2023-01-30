@@ -1,6 +1,8 @@
 // MIT
 
 #include "Components/Character/UnarmedCombatComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 #include "Utility/AlsUtility.h"
 
 // Sets default values for this component's properties
@@ -35,20 +37,34 @@ void UUnarmedCombatComponent::BeginPlay()
 void UUnarmedCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	RefreshUnarmedAttack(DeltaTime);
 }
 
 // UnarmedAttack
 
-void UUnarmedCombatComponent::UnarmedAttack(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate)
+void UUnarmedCombatComponent::UnarmedAttack(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate)
 {
-	if (Character->GetLocomotionMode() == AlsLocomotionModeTags::Grounded)
+	FGameplayTag NewStance = ALSXTActionStanceTags::Standing;
+
+	if (Character->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
 	{
-		 StartUnarmedAttack(UnarmedAttackType, Stance, Strength, BaseDamage, PlayRate, Character->ALSXTSettings->UnarmedCombat.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
+		NewStance = ALSXTActionStanceTags::InAir;
+	}
+	else
+	{
+		if (Character->GetDesiredStance() == AlsStanceTags::Standing)
+		{
+			NewStance = ALSXTActionStanceTags::Standing;
+		}
+		else
+		{
+			NewStance = ALSXTActionStanceTags::Crouched;
+		}
+	}
+	
+	StartUnarmedAttack(UnarmedAttackType, NewStance, Strength, BaseDamage, PlayRate, Character->ALSXTSettings->UnarmedCombat.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
 		 	? Character->GetLocomotionState().InputYawAngle
 		 	: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)));
-	}
 }
 
 void UUnarmedCombatComponent::SetupInputComponent(UEnhancedInputComponent* PlayerInputComponent)
@@ -61,10 +77,9 @@ void UUnarmedCombatComponent::SetupInputComponent(UEnhancedInputComponent* Playe
 
 void UUnarmedCombatComponent::InputPrimaryAction()
 {
-	if ((AlsCharacter->GetOverlayMode() == AlsOverlayModeTags::Default) && (Character->GetCombatStance() == ALSXTCombatStanceTags::Ready) && CanUnarmedAttack())
+	if ((AlsCharacter->GetOverlayMode() == AlsOverlayModeTags::Default) && ((Character->GetCombatStance() == ALSXTCombatStanceTags::Ready) || (Character->GetCombatStance() == ALSXTCombatStanceTags::Aiming)) && CanUnarmedAttack())
 	{
-		// StartSlideInternal();
-		UnarmedAttack(ALSXTUnarmedAttackTypeTags::RightFist, Character->GetStance(), ALSXTActionStrengthTags::Medium, 0.10f, 1.3f);
+		UnarmedAttack(ALSXTUnarmedAttackTypeTags::RightFist, ALSXTActionStrengthTags::Medium, 0.10f, 1.3f);
 	}
 }
 
@@ -93,8 +108,16 @@ void UUnarmedCombatComponent::StartUnarmedAttack(const FGameplayTag& UnarmedAtta
 
 	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
 
+	// Clear the character movement mode and set the locomotion action to mantling.
+
+	// Character->SetMovementModeLocked(true);
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	Character->DisableInput(PlayerController);
+
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
+		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
 		MulticastStartUnarmedAttack(Montage, PlayRate, StartYawAngle, TargetYawAngle);
 	}
 	else
@@ -107,33 +130,19 @@ void UUnarmedCombatComponent::StartUnarmedAttack(const FGameplayTag& UnarmedAtta
 	}
 }
 
+UALSXTUnarmedCombatSettings* UUnarmedCombatComponent::SelectUnarmedAttackSettings_Implementation()
+{
+	return nullptr;
+}
+
 UAnimMontage* UUnarmedCombatComponent::SelectUnarmedAttackMontage_Implementation(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
 {
-	// UAnimMontage* SelectedMontage = nullptr;
 	TObjectPtr<UAnimMontage> SelectedMontage = nullptr;
 	int i = 0;
 	int j = 0;
 	int k = 0;
-	
-	if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes.IsEmpty())
-	{
-		return nullptr;
-	}
-	else if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[0].UnarmedAttackStrengths.IsEmpty())
-	{
-		return nullptr;
-	}
-	else if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[0].UnarmedAttackStrengths[0].UnarmedAttackStances.IsEmpty())
-	{
-		return nullptr;
-	}
-	else if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[0].UnarmedAttackStrengths[0].UnarmedAttackStances[0].Montage = nullptr)
-	{
-		return nullptr;
-	}
-	else
-	{
-		for (i = 0; i < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes.Num(); ++i)
+
+	for (i = 0; i < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes.Num(); ++i)
 		{
 			if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackType == UnarmedAttackType)
 			{
@@ -145,7 +154,7 @@ UAnimMontage* UUnarmedCombatComponent::SelectUnarmedAttackMontage_Implementation
 						{
 							if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].UnarmedAttackStance == Stance)
 							{
-								SelectedMontage = Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].Montage;								
+								SelectedMontage = Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].Montage;
 								// return SelectedMontage;
 							}
 						}
@@ -153,7 +162,6 @@ UAnimMontage* UUnarmedCombatComponent::SelectUnarmedAttackMontage_Implementation
 				}	
 			}
 		}
-	}
 	return SelectedMontage;
 }
 
@@ -176,6 +184,7 @@ void UUnarmedCombatComponent::MulticastStartUnarmedAttack_Implementation(UAnimMo
 void UUnarmedCombatComponent::StartUnarmedAttackImplementation(UAnimMontage* Montage, const float PlayRate,
 	const float StartYawAngle, const float TargetYawAngle)
 {
+	
 	if (IsUnarmedAttackAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, PlayRate))
 	{
 		UnarmedCombatState.TargetYawAngle = TargetYawAngle;
@@ -189,24 +198,26 @@ void UUnarmedCombatComponent::StartUnarmedAttackImplementation(UAnimMontage* Mon
 
 void UUnarmedCombatComponent::RefreshUnarmedAttack(const float DeltaTime)
 {
-	if (Character->GetLocalRole() <= ROLE_SimulatedProxy ||
-		Character->GetMesh()->GetAnimInstance()->RootMotionMode <= ERootMotionMode::IgnoreRootMotion)
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::PrimaryAction)
 	{
-		// Refresh UnarmedAttack physics here because UUnarmedCombatComponent::PhysicsRotation()
-		// won't be called on simulated proxies or with ignored root motion.
-
+		StopUnarmedAttack();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
 		RefreshUnarmedAttackPhysics(DeltaTime);
 	}
 }
 
 void UUnarmedCombatComponent::RefreshUnarmedAttackPhysics(const float DeltaTime)
 {
-	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::PrimaryAction)
-	{
-		return;
-	}
-
-	auto TargetRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
+	float Offset = Character->ALSXTSettings->UnarmedCombat.RotationOffset;
+	auto ComponentRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	auto TargetRotation{ PlayerController->GetControlRotation() };
+	TargetRotation.Yaw = TargetRotation.Yaw + Offset;
+	TargetRotation.Pitch = ComponentRotation.Pitch;
+	TargetRotation.Roll = ComponentRotation.Roll;
 
 	if (Character->ALSXTSettings->UnarmedCombat.RotationInterpolationSpeed <= 0.0f)
 	{
@@ -223,3 +234,19 @@ void UUnarmedCombatComponent::RefreshUnarmedAttackPhysics(const float DeltaTime)
 		Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);
 	}
 }
+
+void UUnarmedCombatComponent::StopUnarmedAttack()
+{
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	Character->EnableInput(PlayerController);
+
+	OnUnarmedAttackEnded();
+}
+
+void UUnarmedCombatComponent::OnUnarmedAttackEnded_Implementation() {}

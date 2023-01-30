@@ -39,6 +39,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
 
+	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
@@ -48,11 +49,14 @@ public:
 	FALSXTUnarmedCombatState UnarmedCombatState;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	void UnarmedAttack(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage, float PlayRate = 1.0f);
+	void UnarmedAttack(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Strength, float BaseDamage, float PlayRate = 1.0f);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	UAnimMontage* SelectUnarmedAttackMontage(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UALSXTUnarmedCombatSettings* SelectUnarmedAttackSettings();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	void OnUnarmedAttackStarted(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float& BaseDamage);
@@ -75,4 +79,12 @@ private:
 	void RefreshUnarmedAttack(float DeltaTime);
 
 	void RefreshUnarmedAttackPhysics(float DeltaTime);
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void StopUnarmedAttack();
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	void OnUnarmedAttackEnded();
 };
