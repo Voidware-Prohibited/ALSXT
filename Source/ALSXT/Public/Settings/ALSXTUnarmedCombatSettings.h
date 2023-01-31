@@ -65,7 +65,7 @@ struct ALSXT_API FALSXTGeneralUnarmedCombatSettings
 	float RotationInterpolationSpeed{ 10.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180))
-	float RotationOffset{ 0.0f };
+	float RotationOffset{ 45.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FUnarmedAttackType> UnarmedAttackTypes;

@@ -3,6 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NativeGameplayTags.h"
+#include "InputAction.h"
+#include "ALSXTCharacter.h"
+#include "AlsCharacter.h"
 #include "Components/ActorComponent.h"
 #include "State/ALSXTUnarmedCombatState.h"
 #include "UnarmedCombatComponent.generated.h"

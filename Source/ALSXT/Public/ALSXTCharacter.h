@@ -447,6 +447,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
 	bool IsHoldingItem() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void GetTargetableOverlayModes(TArray<FGameplayTag>& TargetableOverlayModes) const;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Held Item")
 	void GetHeldItemTraceLocations(bool& Found, FVector& Start, FVector& End, float& Radius) const;
 

@@ -243,8 +243,15 @@ void UUnarmedCombatComponent::StopUnarmedAttack()
 	}
 
 	// Character->SetMovementModeLocked(false);
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	Character->EnableInput(PlayerController);
+
+	ULocalPlayer* LocalPlayer = Character->GetWorld()->GetFirstLocalPlayerFromController();
+
+	APlayerController* PlayerController = Character->GetWorld()->GetFirstPlayerController();
+
+	if (Character->IsPlayerControlled())
+	{
+		Character->EnableInput(PlayerController);
+	}
 
 	OnUnarmedAttackEnded();
 }

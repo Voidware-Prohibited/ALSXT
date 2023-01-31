@@ -18,6 +18,22 @@ struct ALSXT_API FDoubleHitResult
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FTargetHitResultEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float DistanceFromPlayer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float AngleFromCenter;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FHitResult HitResult;
+
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FImpactReactionSide
 {
 	GENERATED_BODY()
