@@ -504,6 +504,51 @@ void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
 	}
 }
 
+void AALSXTCharacter::InputLeanLeft()
+{
+	// 
+}
+
+void AALSXTCharacter::InputLeanRight()
+{
+	// 
+}
+
+void AALSXTCharacter::InputAcrobatic()
+{
+	// 
+}
+
+void AALSXTCharacter::InputSwitchTargetLeft()
+{
+	// 
+}
+
+void AALSXTCharacter::InputSwitchTargetRight()
+{
+	// 
+}
+
+void AALSXTCharacter::InputToggleWeaponFirearmStance()
+{
+	// 
+}
+
+void AALSXTCharacter::InputToggleWeaponReadyPosition()
+{
+	// 
+}
+
+void AALSXTCharacter::InputReload()
+{
+	// 
+}
+
+void AALSXTCharacter::InputReloadWithRetention()
+{
+	// 
+}
+
 void AALSXTCharacter::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalLocation)
 {
 	if (Camera->IsActive())
