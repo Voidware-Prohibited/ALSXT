@@ -23,10 +23,10 @@ struct ALSXT_API FTargetHitResultEntry
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float DistanceFromPlayer;
+	float DistanceFromPlayer{ 340282346638528859811704183484516925440.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float AngleFromCenter;
+	float AngleFromCenter {361.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FHitResult HitResult;

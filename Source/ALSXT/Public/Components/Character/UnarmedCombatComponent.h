@@ -7,6 +7,7 @@
 #include "InputAction.h"
 #include "ALSXTCharacter.h"
 #include "AlsCharacter.h"
+#include "AlsCameraComponent.h"
 #include "Components/ActorComponent.h"
 #include "State/ALSXTUnarmedCombatState.h"
 #include "UnarmedCombatComponent.generated.h"

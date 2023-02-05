@@ -2,6 +2,7 @@
 
 
 #include "Components/Character/TargetLockComponent.h"
+#include "Utility/ALSXTStructs.h"
 
 // Sets default values for this component's properties
 UTargetLockComponent::UTargetLockComponent()
@@ -19,7 +20,9 @@ void UTargetLockComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	Character = Cast<AALSXTCharacter>(GetOwner());
+	AlsCharacter = Cast<AAlsCharacter>(GetOwner());
+	Camera = Character->Camera;
 	
 }
 
@@ -29,6 +32,26 @@ void UTargetLockComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	// ...
+}
+
+void UTargetLockComponent::GetClosestTarget(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const
+{
+	// ...
+}
+
+void UTargetLockComponent::DisengageAllTargets()
+{
+	// ...
+}
+
+void UTargetLockComponent::GetTargetLeft(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const
+{
+	// ...
+}
+
+void UTargetLockComponent::GetTargetRight(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const
+{
 	// ...
 }
 

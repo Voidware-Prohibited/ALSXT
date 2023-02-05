@@ -33,10 +33,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
 	AAlsCharacter* AlsCharacter{Cast<AAlsCharacter>(GetParentActor())};
 
-private:
-
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
+
+private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess, ShowInnerProperties))
 	TObjectPtr<UALSXTAnimationInstance> XTAnimationInstance;
