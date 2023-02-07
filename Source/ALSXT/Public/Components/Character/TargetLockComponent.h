@@ -38,8 +38,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	UAlsCameraComponent* Camera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	FTargetHitResultEntry CurrentTarget;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALSXT|Target Lock")
 	void GetTargetableOverlayModes(TArray<FGameplayTag>& TargetableOverlayModes) const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	void TraceForTargets(bool DisplayDebug, float DebugDuration, TArray<FHitResult>& Targets);
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
 	void GetClosestTarget(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const;
