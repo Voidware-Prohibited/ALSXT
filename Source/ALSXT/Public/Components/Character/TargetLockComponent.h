@@ -9,6 +9,7 @@
 #include "AlsCharacter.h"
 #include "Utility/ALSXTStructs.h"
 #include "Engine/EngineTypes.h"
+#include "Utility/ALSXTEnums.h"
 #include "TargetLockComponent.generated.h"
 
 
@@ -29,6 +30,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	bool DebugMode;
+	
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
 
@@ -45,19 +49,24 @@ public:
 	void GetTargetableOverlayModes(TArray<FGameplayTag>& TargetableOverlayModes) const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
-	void TraceForTargets(bool DisplayDebug, float DebugDuration, TArray<FHitResult>& Targets);
+	float GetAngle(FVector Target);
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
-	void GetClosestTarget(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const;
+	void TraceForTargets(bool DisplayDebug, float DebugDuration, TArray<FTargetHitResultEntry>& Targets);
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	void GetClosestTarget(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target);
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
 	void DisengageAllTargets();
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
-	void GetTargetLeft(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const;
+	void GetTargetLeft(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target);
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
-	void GetTargetRight(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const;
+	void GetTargetRight(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target);
 
-		
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	void RotatePlayerToTarget(FTargetHitResultEntry Target);
+
 };

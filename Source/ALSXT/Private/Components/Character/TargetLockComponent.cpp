@@ -5,6 +5,11 @@
 #include "Utility/ALSXTStructs.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Utility/ALSXTEnums.h"
+#include "Math/Vector.h"
+#include "Interfaces/TargetLockInterface.h"
 
 // Sets default values for this component's properties
 UTargetLockComponent::UTargetLockComponent()
@@ -37,9 +42,31 @@ void UTargetLockComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// ...
 }
 
-void UTargetLockComponent::TraceForTargets(bool DisplayDebug, float DebugDuration, TArray<FHitResult>& Targets)
+float UTargetLockComponent::GetAngle(FVector Target)
 {
-	// ...
+	float resultAngleInRadians = 0.0f;
+	FVector PlayerLocation = Character->GetActorLocation();
+	PlayerLocation.Normalize();
+	Target.Normalize();
+
+	auto crossProduct = PlayerLocation.Cross(Target);
+	auto dotProduct = PlayerLocation.Dot(Target);
+
+	if (crossProduct.Z > 0)
+	{
+		resultAngleInRadians = acosf(dotProduct);
+	}
+	else
+	{
+		resultAngleInRadians = -1 * acosf(dotProduct);
+	}
+
+	auto resultAngleInDegrees = FMath::RadiansToDegrees(resultAngleInRadians);
+	return resultAngleInDegrees;
+}
+
+void UTargetLockComponent::TraceForTargets(bool DisplayDebug, float DebugDuration, TArray<FTargetHitResultEntry>& Targets)
+{
 	FRotator ControlRotation = Character->GetControlRotation();
 	FVector ForwardVector = Character->GetActorForwardVector();
 	FVector CameraLocation = Character->Camera->GetFirstPersonCameraLocation();
@@ -49,34 +76,73 @@ void UTargetLockComponent::TraceForTargets(bool DisplayDebug, float DebugDuratio
 	FVector CenterLocation = (StartLocation - EndLocation) / 8 + StartLocation;
 	FVector HalfSize = { 400.0f, 400.0f, 150.0f };
 	FCollisionShape CollisionShape = FCollisionShape::MakeBox(HalfSize);
-	// draw collision sphere
-	if (DisplayDebug)
+	TArray<FHitResult> OutHits;
+
+	// Display Debug Shape
+	if (DebugMode)
 	{
 		DrawDebugBox(GetWorld(), CenterLocation, HalfSize, ControlRotation.Quaternion(), FColor::Green, false, DebugDuration, 100, 2);
-		// DrawDebugBox(GetWorld(), StartLocation, HalfSize, FColor::Purple, ControlRotation, 50, 6, 1);
 	}
-	TArray<FHitResult> OutHits;
+	
 	bool isHit = GetWorld()->SweepMultiByChannel(OutHits, StartLocation, EndLocation, ControlRotation.Quaternion(), ECollisionChannel::ECC_Camera, CollisionShape);
 
 	if (isHit)
 	{
-		// loop through TArray
 		for (auto& Hit : OutHits)
 		{
-			if (GEngine)
+			if (Hit.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.GetActor() != Character)
 			{
-				// screen log information on what was hit
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.GetActor()->GetName()));
-				// uncommnet to see more info on sweeped actor
-				// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("All Hit Information: %s"), *Hit.ToString()));
+				FTargetHitResultEntry HitResultEntry;
+				HitResultEntry.Valid = true;
+				HitResultEntry.DistanceFromPlayer = FVector::Distance(Character->GetActorLocation(), Hit.Location);
+				HitResultEntry.AngleFromCenter = GetAngle(Hit.Location);
+				HitResultEntry.HitResult = Hit;
+				Targets.Add(HitResultEntry);
 			}
 		}
 	}
 }
 
-void UTargetLockComponent::GetClosestTarget(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const
+void UTargetLockComponent::GetClosestTarget(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target)
 {
-	// ...
+	TArray<FTargetHitResultEntry> OutHits;
+	TraceForTargets(true, 6, OutHits);
+	FTargetHitResultEntry FoundHit;
+
+	for (auto& Hit : OutHits)
+	{
+		if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
+		{
+			FTargetHitResultEntry HitResultEntry;
+			HitResultEntry.Valid = true;
+			HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
+			HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
+			HitResultEntry.HitResult = Hit.HitResult;
+			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.DistanceFromPlayer < CurrentTarget.DistanceFromPlayer))
+			{
+				if (!FoundHit.Valid)
+				{
+					FoundHit = Hit;
+					if (GEngine && DebugMode)
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
+					}
+				}
+				else
+				{
+					if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
+					{
+						FoundHit = Hit;
+						if (GEngine && DebugMode)
+						{
+							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
+						}
+					}
+				}
+			}
+		}
+	}
+	Target = FoundHit;
 }
 
 void UTargetLockComponent::DisengageAllTargets()
@@ -84,13 +150,92 @@ void UTargetLockComponent::DisengageAllTargets()
 	// ...
 }
 
-void UTargetLockComponent::GetTargetLeft(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const
+void UTargetLockComponent::GetTargetLeft(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target)
 {
-	// ...
+	TArray<FTargetHitResultEntry> OutHits;
+	TraceForTargets(true, 6, OutHits);
+	FTargetHitResultEntry FoundHit;
+	
+	for (auto& Hit : OutHits)
+	{
+		if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
+		{
+			FTargetHitResultEntry HitResultEntry;
+			HitResultEntry.Valid = true;
+			HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
+			HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
+			HitResultEntry.HitResult = Hit.HitResult;
+			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.AngleFromCenter < CurrentTarget.AngleFromCenter))
+			{
+				if (!FoundHit.Valid)
+				{
+					FoundHit = Hit;
+					if (GEngine && DebugMode)
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
+					}
+				}
+				else
+				{
+					if (Hit.AngleFromCenter < FoundHit.AngleFromCenter) 
+					{
+						FoundHit = Hit;
+						if (GEngine && DebugMode)
+						{
+							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
+						}
+					}
+				}
+			}
+		}
+	}
+	Target = FoundHit;
 }
 
-void UTargetLockComponent::GetTargetRight(const TArray<FHitResult>& HitResults, FTargetHitResultEntry& Target) const
+void UTargetLockComponent::GetTargetRight(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target)
 {
-	// ...
+	TArray<FTargetHitResultEntry> OutHits;
+	TraceForTargets(true, 6, OutHits);
+	FTargetHitResultEntry FoundHit;
+
+	for (auto& Hit : OutHits)
+	{
+		if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
+		{
+			FTargetHitResultEntry HitResultEntry;
+			HitResultEntry.Valid = true;
+			HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
+			HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
+			HitResultEntry.HitResult = Hit.HitResult;
+			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.AngleFromCenter > CurrentTarget.AngleFromCenter))
+			{
+				if (!FoundHit.Valid)
+				{
+					FoundHit = Hit;
+					if (GEngine && DebugMode)
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
+					}
+				}
+				else
+				{
+					if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
+					{
+						FoundHit = Hit;
+						if (GEngine && DebugMode)
+						{
+							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
+						}
+					}
+				}
+			}
+		}
+	}
+	Target = FoundHit;
 }
 
+void UTargetLockComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
+{
+	FRotator PlayerRotation = UKismetMathLibrary::FindLookAtRotation(Target.HitResult.Location, Character->GetActorLocation());
+	Character->SetActorRotation(PlayerRotation, ETeleportType::TeleportPhysics);
+}
