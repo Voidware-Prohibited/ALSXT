@@ -51,7 +51,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 	const auto* AnimationInstance{ Mesh->GetAnimInstance() };
 	const auto* ALSXTAnimationInstance{ Cast<UALSXTAnimationInstance>(Mesh->GetAnimInstance()) };
 
-	const auto FootBoneName{FootBone == EALSXTFootBone::Left ? UAlsConstants::FootLeftBone() : UAlsConstants::FootRightBone()};
+	const auto FootBoneName{FootBone == EALSXTFootBone::Left ? UAlsConstants::FootLeftBoneName() : UAlsConstants::FootRightBoneName()};
 	const auto FootTransform{Mesh->GetSocketTransform(FootBoneName)};
 
 	const auto FootZAxis{
@@ -68,7 +68,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 	TEnumAsByte<EPhysicalSurface> HitSurface;
 
 #if ENABLE_DRAW_DEBUG
-	const auto bDisplayDebug{ UAlsUtility::ShouldDisplayDebug(Mesh->GetOwner(), UAlsConstants::TracesDisplayName()) };
+	const auto bDisplayDebug{ UAlsUtility::ShouldDisplayDebugForActor(Mesh->GetOwner(), UAlsConstants::TracesDisplayName()) };
 #endif
 
 	FCollisionQueryParams QueryParameters{ ANSI_TO_TCHAR(__FUNCTION__), true, Mesh->GetOwner() };
@@ -150,7 +150,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 
 		if (!bIgnoreSlideSoundBlockCurve && IsValid(AnimationInstance))
 		{
-			VolumeMultiplier *= 1.0f - UAlsMath::Clamp01(AnimationInstance->GetCurveValue(UAlsConstants::FootstepSoundBlockCurve()));
+			VolumeMultiplier *= 1.0f - UAlsMath::Clamp01(AnimationInstance->GetCurveValue(UAlsConstants::FootstepSoundBlockCurveName()));
 		}
 
 		if (FAnimWeight::IsRelevant(VolumeMultiplier) && IsValid(EffectSettings->Sound.LoadSynchronous()))

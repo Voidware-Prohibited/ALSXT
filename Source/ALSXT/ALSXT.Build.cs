@@ -36,6 +36,9 @@ public class ALSXT : ModuleRules
 			{
 				"Slate",
 				"SlateCore",
+				"EnhancedInput",
+				"ALS",
+				"ALSCamera",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

@@ -11,6 +11,7 @@
 #include "Settings/ALSXTCharacterSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AALSXTCharacter::AALSXTCharacter()
@@ -398,7 +399,9 @@ void AALSXTCharacter::ALSXTRefreshRotationInstant(const float TargetYawAngle, co
 
 void AALSXTCharacter::SetMovementModeLocked(const bool bNewMovementModeLocked)
 {
-	AlsCharacterMovement->SetMovementModeLocked(bNewMovementModeLocked);
+	Cast<UAlsCharacterMovementComponent>(GetCharacterMovement())->SetMovementModeLocked(bNewMovementModeLocked);
+	// GetCharacterMovement<UAlsCharacterMovementComponent>()->SetMovementModeLocked(bNewMovementModeLocked);
+	// AAlsCharacter::AlsCharacterMovement->SetMovementModeLocked(bNewMovementModeLocked);
 }
 
 void AALSXTCharacter::Crouch(const bool bClientSimulation)

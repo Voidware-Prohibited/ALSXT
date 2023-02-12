@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Utility/ALSXTEnums.h"
 #include "Math/Vector.h"
+#include "GameFramework/Actor.h"
 #include "Interfaces/TargetLockInterface.h"
 
 // Sets default values for this component's properties
@@ -17,8 +18,6 @@ UTargetLockComponent::UTargetLockComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -39,7 +38,13 @@ void UTargetLockComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	TArray<FGameplayTag> TargetableOverlayModes;
+	GetTargetableOverlayModes(TargetableOverlayModes);
+
+	if (Character && TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming() && CurrentTarget.Valid)
+	{
+		RotatePlayerToTarget(CurrentTarget);
+	}
 }
 
 float UTargetLockComponent::GetAngle(FVector Target)
@@ -103,139 +108,146 @@ void UTargetLockComponent::TraceForTargets(bool DisplayDebug, float DebugDuratio
 	}
 }
 
-void UTargetLockComponent::GetClosestTarget(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target)
+void UTargetLockComponent::GetClosestTarget()
 {
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(true, 6, OutHits);
 	FTargetHitResultEntry FoundHit;
+	TArray<FGameplayTag> TargetableOverlayModes;
+	GetTargetableOverlayModes(TargetableOverlayModes);
 
-	for (auto& Hit : OutHits)
+	if (TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming())
 	{
-		if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
+		for (auto& Hit : OutHits)
 		{
-			FTargetHitResultEntry HitResultEntry;
-			HitResultEntry.Valid = true;
-			HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
-			HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
-			HitResultEntry.HitResult = Hit.HitResult;
-			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.DistanceFromPlayer < CurrentTarget.DistanceFromPlayer))
+			if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
 			{
-				if (!FoundHit.Valid)
+				FTargetHitResultEntry HitResultEntry;
+				HitResultEntry.Valid = true;
+				HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
+				HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
+				HitResultEntry.HitResult = Hit.HitResult;
+				if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.DistanceFromPlayer < CurrentTarget.DistanceFromPlayer))
 				{
-					FoundHit = Hit;
-					if (GEngine && DebugMode)
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
-					}
-				}
-				else
-				{
-					if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
+					if (!FoundHit.Valid)
 					{
 						FoundHit = Hit;
-						if (GEngine && DebugMode)
+					}
+					else
+					{
+						if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
 						{
-							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
+							FoundHit = Hit;
 						}
 					}
 				}
 			}
 		}
+		if (FoundHit.Valid)
+		{
+			RotatePlayerToTarget(FoundHit);
+		}
 	}
-	Target = FoundHit;
 }
 
 void UTargetLockComponent::DisengageAllTargets()
 {
-	// ...
+	CurrentTarget.Valid = false;
+	CurrentTarget.DistanceFromPlayer = 340282346638528859811704183484516925440.0f;
+	CurrentTarget.AngleFromCenter = 361.0f;
 }
 
-void UTargetLockComponent::GetTargetLeft(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target)
+void UTargetLockComponent::GetTargetLeft()
 {
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(true, 6, OutHits);
 	FTargetHitResultEntry FoundHit;
-	
-	for (auto& Hit : OutHits)
+	TArray<FGameplayTag> TargetableOverlayModes;
+	GetTargetableOverlayModes(TargetableOverlayModes);
+
+	if (TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming())
 	{
-		if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
+		for (auto& Hit : OutHits)
 		{
-			FTargetHitResultEntry HitResultEntry;
-			HitResultEntry.Valid = true;
-			HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
-			HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
-			HitResultEntry.HitResult = Hit.HitResult;
-			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.AngleFromCenter < CurrentTarget.AngleFromCenter))
+			if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
 			{
-				if (!FoundHit.Valid)
+				FTargetHitResultEntry HitResultEntry;
+				HitResultEntry.Valid = true;
+				HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
+				HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
+				HitResultEntry.HitResult = Hit.HitResult;
+				if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.AngleFromCenter < CurrentTarget.AngleFromCenter))
 				{
-					FoundHit = Hit;
-					if (GEngine && DebugMode)
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
-					}
-				}
-				else
-				{
-					if (Hit.AngleFromCenter < FoundHit.AngleFromCenter) 
+					if (!FoundHit.Valid)
 					{
 						FoundHit = Hit;
-						if (GEngine && DebugMode)
+					}
+					else
+					{
+						if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
 						{
-							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
+							FoundHit = Hit;
 						}
 					}
 				}
 			}
 		}
+		RotatePlayerToTarget(FoundHit);
 	}
-	Target = FoundHit;
 }
 
-void UTargetLockComponent::GetTargetRight(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target)
+void UTargetLockComponent::GetTargetRight()
 {
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(true, 6, OutHits);
 	FTargetHitResultEntry FoundHit;
+	TArray<FGameplayTag> TargetableOverlayModes;
+	GetTargetableOverlayModes(TargetableOverlayModes);
 
-	for (auto& Hit : OutHits)
+	if (TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming())
 	{
-		if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
+		for (auto& Hit : OutHits)
 		{
-			FTargetHitResultEntry HitResultEntry;
-			HitResultEntry.Valid = true;
-			HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
-			HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
-			HitResultEntry.HitResult = Hit.HitResult;
-			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.AngleFromCenter > CurrentTarget.AngleFromCenter))
+			if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
 			{
-				if (!FoundHit.Valid)
+				FTargetHitResultEntry HitResultEntry;
+				HitResultEntry.Valid = true;
+				HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
+				HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
+				HitResultEntry.HitResult = Hit.HitResult;
+				if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.AngleFromCenter > CurrentTarget.AngleFromCenter))
 				{
-					FoundHit = Hit;
-					if (GEngine && DebugMode)
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
-					}
-				}
-				else
-				{
-					if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
+					if (!FoundHit.Valid)
 					{
 						FoundHit = Hit;
-						if (GEngine && DebugMode)
+					}
+					else
+					{
+						if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
 						{
-							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.HitResult.GetActor()->GetName()));
+							FoundHit = Hit;
 						}
 					}
 				}
 			}
 		}
+		RotatePlayerToTarget(FoundHit);
 	}
-	Target = FoundHit;
 }
 
 void UTargetLockComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
 {
-	FRotator PlayerRotation = UKismetMathLibrary::FindLookAtRotation(Target.HitResult.Location, Character->GetActorLocation());
-	Character->SetActorRotation(PlayerRotation, ETeleportType::TeleportPhysics);
+	if (Target.Valid)
+	{
+		if (GEngine && DebugMode)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Target.HitResult.GetActor()->GetName()));
+		}
+		FRotator CurrentPlayerRotation = Character->GetActorRotation();
+		FVector TargetActorLocation = Target.HitResult.GetActor()->GetActorLocation();
+		FRotator NewPlayerRotation = UKismetMathLibrary::FindLookAtRotation(Character->GetActorLocation(), TargetActorLocation);
+		NewPlayerRotation.Pitch = CurrentPlayerRotation.Pitch;
+		NewPlayerRotation.Roll = CurrentPlayerRotation.Roll;
+		Character->SetActorRotation(NewPlayerRotation, ETeleportType::TeleportPhysics);
+	}
 }

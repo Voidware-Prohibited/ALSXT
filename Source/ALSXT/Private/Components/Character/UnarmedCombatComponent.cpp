@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Utility/AlsUtility.h"
+#include "GameFramework/Character.h"
 
 // Sets default values for this component's properties
 UUnarmedCombatComponent::UUnarmedCombatComponent()
@@ -110,9 +111,9 @@ void UUnarmedCombatComponent::StartUnarmedAttack(const FGameplayTag& UnarmedAtta
 
 	// Clear the character movement mode and set the locomotion action to mantling.
 
-	// Character->SetMovementModeLocked(true);
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	Character->DisableInput(PlayerController);
+	Character->SetMovementModeLocked(true);
+	// APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	// Character->DisableInput(PlayerController);
 
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
@@ -242,16 +243,18 @@ void UUnarmedCombatComponent::StopUnarmedAttack()
 		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
 	}
 
-	// Character->SetMovementModeLocked(false);
+	Character->SetMovementModeLocked(false);
+	// Character->Cast<UAlsCharacterMovementComponent>(GetCharacterMovement())->SetMovementModeLocked(false);
+	// Character->GetCharacterMovement<UAlsCharacterMovementComponent>()->SetMovementModeLocked(false);
 
-	ULocalPlayer* LocalPlayer = Character->GetWorld()->GetFirstLocalPlayerFromController();
-
-	APlayerController* PlayerController = Character->GetWorld()->GetFirstPlayerController();
-
-	if (Character->IsPlayerControlled())
-	{
-		Character->EnableInput(PlayerController);
-	}
+	// ULocalPlayer* LocalPlayer = Character->GetWorld()->GetFirstLocalPlayerFromController();
+	// 
+	// APlayerController* PlayerController = Character->GetWorld()->GetFirstPlayerController();
+	// 
+	// if (Character->IsPlayerControlled())
+	// {
+	// 	Character->EnableInput(PlayerController);
+	// }
 
 	OnUnarmedAttackEnded();
 }

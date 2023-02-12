@@ -55,16 +55,16 @@ public:
 	void TraceForTargets(bool DisplayDebug, float DebugDuration, TArray<FTargetHitResultEntry>& Targets);
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
-	void GetClosestTarget(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target);
+	void GetClosestTarget();
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
 	void DisengageAllTargets();
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
-	void GetTargetLeft(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target);
+	void GetTargetLeft();
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
-	void GetTargetRight(const TArray<FTargetHitResultEntry>& HitResults, FTargetHitResultEntry& Target);
+	void GetTargetRight();
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
 	void RotatePlayerToTarget(FTargetHitResultEntry Target);
