@@ -4,16 +4,58 @@
 #include "Animation/AnimMontage.h"
 #include "ALSXTStructs.generated.h"
 
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAttackTraceSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	bool Active{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector Start {0.0f, 0.0f, 0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector End {0.0f, 0.0f, 0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float Radius { 0.0f };
+
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FExtendedHitResult
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	bool Hit {false};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float Mass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector Impulse;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FHitResult HitResult;
+
+};
+
 USTRUCT(BlueprintType)
 struct ALSXT_API FDoubleHitResult
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FHitResult HitResult;
+	FExtendedHitResult HitResult;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FHitResult OriginHitResult;
+	FExtendedHitResult OriginHitResult;
 
 };
 

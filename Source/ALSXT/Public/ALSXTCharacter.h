@@ -4,6 +4,8 @@
 #include "GameFramework/Character.h"
 #include "State/AlsLocomotionState.h"
 #include "Utility/ALSXTGameplayTags.h"
+#include "Engine/EngineTypes.h"
+#include "Utility/ALSXTStructs.h"
 #include "State/ALSXTFootstepState.h"
 #include "State/ALSXTSlidingState.h"
 #include "ALSXTCharacter.generated.h"
@@ -139,6 +141,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag Focus{ALSXTFocusedTags::False};
+
+	// Attack Trace Settings
+
+	FTimerHandle AttackTraceHandle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FAttackTraceSettings AttackTraceSettings;
 
 	// HitReaction
 
@@ -908,6 +917,21 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 		void OnFocusChanged(const FGameplayTag& PreviousFocusTag);
+
+	// Attack Collision Trace
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void BeginAttackCollisionTrace(FAttackTraceSettings TraceSettings);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void AttackCollisionTrace(FDoubleHitResult& Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void EndAttackCollisionTrace();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnAttackCollision(FDoubleHitResult Hit);
 
 	// Desired HitReaction
 

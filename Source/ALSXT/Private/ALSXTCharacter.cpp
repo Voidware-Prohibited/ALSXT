@@ -8,11 +8,14 @@
 #include "Engine/LocalPlayer.h"
 #include "Net/UnrealNetwork.h"
 #include "Utility/ALSXTGameplayTags.h"
+#include "Utility/ALSXTStructs.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Settings/ALSXTCharacterSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interfaces/CollisionInterface.h"
 
 AALSXTCharacter::AALSXTCharacter()
 {
@@ -1056,6 +1059,60 @@ void AALSXTCharacter::SetFocus(const FGameplayTag& NewFocusTag)
 }
 
 void AALSXTCharacter::OnFocusChanged_Implementation(const FGameplayTag& PreviousFocusTag) {}
+
+// Attack Collision Trace
+
+void AALSXTCharacter::BeginAttackCollisionTrace(FAttackTraceSettings TraceSettings)
+{
+	// ..
+	// FDoubleHitResult Hit;
+	// GetWorld()->GetTimerManager().SetTimer(AttackTraceHandle, this, &AALSXTCharacter::AttackCollisionTrace, 0.1f, true);
+}
+
+void AALSXTCharacter::AttackCollisionTrace(FDoubleHitResult& Hit)
+{
+	if (AttackTraceSettings.Active)
+	{		
+		const TArray<AActor*> InitialIgnoredActors;
+		TArray<AActor*> OriginTraceIgnoredActors;
+		OriginTraceIgnoredActors.Add(this);
+		FHitResult HitResult;
+		bool isHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, HitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+
+		if (isHit)
+		{
+			FHitResult OriginHitResult;
+			bool isOriginHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, OriginTraceIgnoredActors, EDrawDebugTrace::ForDuration, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+
+			if (isOriginHit)
+			{
+				Hit.HitResult.HitResult = HitResult;
+				Hit.OriginHitResult.HitResult = OriginHitResult;
+				AActor* HitActor = Hit.HitResult.HitResult.GetActor();
+				if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UCollisionInterface::StaticClass()))
+				{
+					// Cast<ICollisionInterface>(OnAttackCollision(Hit));
+					// HitActor->OnAttackCollision(Hit);
+					// ICollisionInterface::OnAttackCollision(Hit);
+				}
+				// if (HitActor->GetClass()->ImplementsInterface(UCollisionInterface::StaticClass()))
+				// {
+				// 
+				// }
+			}
+		}
+	}
+}
+
+void AALSXTCharacter::EndAttackCollisionTrace()
+{
+	AttackTraceSettings.Active = false;
+	AttackTraceSettings.Start = { 0.0f, 0.0f, 0.0f };
+	AttackTraceSettings.End = { 0.0f, 0.0f, 0.0f };
+	AttackTraceSettings.Radius = { 0.0f };
+	GetWorld()->GetTimerManager().ClearTimer(AttackTraceHandle);
+}
+
 
 // HitReaction
 
