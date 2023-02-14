@@ -6,6 +6,7 @@
 #include "Settings/AlsCharacterSettings.h"
 #include "Settings/ALSXTSlidingSettings.h"
 #include "Settings/ALSXTFPEyeFocusSettings.h"
+#include "Settings/ALSXTAttackReactionSettings.h"
 #include "Settings/ALSXTImpactReactionSettings.h"
 #include "Settings/ALSXTUnarmedCombatSettings.h"
 #include "ALSXTCharacterSettings.generated.h"
@@ -36,7 +37,10 @@ public:
 	FALSXTFPEyeFocusSettings FirstPersonEyeFocus;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FALSXTImpactReactionSettings ImpactReaction;
+	FALSXTGeneralAttackReactionSettings AttackReaction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FALSXTGeneralImpactReactionSettings ImpactReaction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTGeneralUnarmedCombatSettings UnarmedCombat;

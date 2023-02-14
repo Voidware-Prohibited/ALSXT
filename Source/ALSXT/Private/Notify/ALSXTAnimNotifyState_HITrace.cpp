@@ -22,12 +22,17 @@ void UALSXTAnimNotifyState_HITrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 	auto* Character{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
 	if (IsValid(Character))
 	{
+		FAttackTraceSettings TraceSettings;
+		TraceSettings.Active = true;
+		TraceSettings.ImpactType = ImpactType;
+		TraceSettings.AttackStrength = AttackStrength;
 		bool Found;
-		FVector Start;
-		FVector End;
-		float Radius;
 
-		Character->GetHeldItemTraceLocations(Found, Start, End, Radius);
+		Character->GetHeldItemTraceLocations(Found, TraceSettings.Start, TraceSettings.End, TraceSettings.Radius);
+		if (Found)
+		{
+			Character->BeginAttackCollisionTrace(TraceSettings);
+		}
 	}
 }
 
@@ -40,6 +45,6 @@ void UALSXTAnimNotifyState_HITrace::NotifyEnd(USkeletalMeshComponent* Mesh, UAni
 
 	if (IsValid(Character))
 	{
-		// ..
+		Character->EndAttackCollisionTrace();
 	}
 }

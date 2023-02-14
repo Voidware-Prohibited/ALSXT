@@ -3,10 +3,10 @@
 #include "Utility/ALSXTStructs.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
-#include "ALSXTImpactReactionSettings.generated.h"
+#include "ALSXTAttackReactionSettings.generated.h"
 
 UCLASS(Blueprintable, BlueprintType)
-class ALSXT_API UALSXTImpactReactionSettings : public UDataAsset
+class ALSXT_API UALSXTAttackReactionSettings : public UDataAsset
 {
 	GENERATED_BODY()
 
@@ -40,23 +40,23 @@ public:
 	float CalculatePlayRate(float UnarmedAttackHeight) const;
 };
 
-inline float UALSXTImpactReactionSettings::CalculateStartTime(const float UnarmedAttackHeight) const
+inline float UALSXTAttackReactionSettings::CalculateStartTime(const float UnarmedAttackHeight) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, UnarmedAttackHeight);
 }
 
-inline float UALSXTImpactReactionSettings::CalculatePlayRate(const float UnarmedAttackHeight) const
+inline float UALSXTAttackReactionSettings::CalculatePlayRate(const float UnarmedAttackHeight) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, UnarmedAttackHeight);
 }
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTGeneralImpactReactionSettings
+struct ALSXT_API FALSXTGeneralAttackReactionSettings
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAllowImpactReaction{ true };
+	bool bAllowAttackReaction{ true };
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bRotateToInputOnStart{ true };
@@ -68,5 +68,5 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 	float RotationOffset{ 45.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FImpactReactionLocation> ImpactReactionLocations;
+	TArray<FImpactReactionLocation> AttackReactionLocations;
 };

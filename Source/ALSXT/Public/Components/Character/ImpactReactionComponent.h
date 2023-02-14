@@ -4,7 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Utility/ALSXTStructs.h"
+#include "ALSXTCharacter.h"
+#include "AlsCharacter.h"
 #include "Chaos/ChaosEngineInterface.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Components/AudioComponent.h" 
+#include "Settings/ALSXTImpactReactionSettings.h"
+#include "State/ALSXTImpactReactionState.h" 
 #include "ImpactReactionComponent.generated.h"
 
 
@@ -33,43 +42,76 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanReact();
 
-	// Desired BumpReaction
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void GetAttackReactionAnimation(FAttackDoubleHitResult Hit, const UAnimMontage* Montage);
 
-public:
-	UFUNCTION(BlueprintCallable, Category = "ALS|Impact Reaction", Meta = (AutoCreateRefTerm = "NewBumpReactionTag"))
-		void AddDesiredBumpReaction(const FGameplayTag& ImpactForm, const FGameplayTag& ImpactLocation, const FGameplayTag& ImpactSide, const FGameplayTag& ImpactStrength, EPhysicalSurface SurfaceType);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void GetImpactReactionAnimation(FDoubleHitResult Hit, const UAnimMontage* Montage);
 
-private:
-	UFUNCTION(Server, Reliable)
-		void ServerAddDesiredBumpReaction(const FGameplayTag& ImpactForm, const FGameplayTag& ImpactLocation, const FGameplayTag& ImpactSide, const FGameplayTag& ImpactStrength, EPhysicalSurface SurfaceType);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void GetImpactReactionParticle(FDoubleHitResult Hit, const UNiagaraSystem* Particle);
 
-	// BumpReaction
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void GetImpactReactionSound(FDoubleHitResult Hit, USoundBase* Audio);
 
-private:
-	void AddBumpReaction(const FGameplayTag& ImpactForm, const FGameplayTag& ImpactLocation, const FGameplayTag& ImpactSide, const FGameplayTag& ImpactStrength, EPhysicalSurface SurfaceType);
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void GetLocationFromBoneName(FName Hit, FGameplayTag& Location);
 
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Impact Reaction")
-		void OnBumpReaction(const FGameplayTag& ImpactForm, const FGameplayTag& ImpactLocation, const FGameplayTag& ImpactSide, const FGameplayTag& ImpactStrength, EPhysicalSurface SurfaceType);
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void GetSideFromHitLocation(FVector HitLocation, FGameplayTag& Side);
 
-	// Desired HitReaction
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength);
 
-public:
-	UFUNCTION(BlueprintCallable, Category = "ALS|Impact Reaction", Meta = (AutoCreateRefTerm = "NewHitReactionTag"))
-		void AddDesiredHitReaction(const FGameplayTag& ImpactForm, const FGameplayTag& ImpactLocation, const FGameplayTag& ImpactSide, const FGameplayTag& ImpactStrength, EPhysicalSurface SurfaceType);
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FALSXTImpactReactionState ImpactReactionState;
 
-private:
-	UFUNCTION(Server, Reliable)
-		void ServerAddDesiredHitReaction(const FGameplayTag& ImpactForm, const FGameplayTag& ImpactLocation, const FGameplayTag& ImpactSide, const FGameplayTag& ImpactStrength, EPhysicalSurface SurfaceType);
-
-	// HitReaction
-
-private:
-	void AddHitReaction(const FGameplayTag& ImpactForm, const FGameplayTag& ImpactLocation, const FGameplayTag& ImpactSide, const FGameplayTag& ImpactStrength, EPhysicalSurface SurfaceType);
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void ImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, const UNiagaraSystem* Particle, USoundBase* Audio);
 
 protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Impact Reaction")
-		void OnHitReaction(const FGameplayTag& ImpactForm, const FGameplayTag& ImpactLocation, const FGameplayTag& ImpactSide, const FGameplayTag& ImpactStrength, EPhysicalSurface SurfaceType);
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UAnimMontage* SelectAttackReactionMontage(FAttackDoubleHitResult Hit, const UAnimMontage* Montage);
 
-		
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UAnimMontage* SelectImpactReactionMontage(FDoubleHitResult Hit, const UAnimMontage* Montage);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UALSXTImpactReactionSettings* SelectImpactReactionSettings();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnAttackReactionStarted(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnImpactReactionStarted(FDoubleHitResult Hit);
+
+	// Desired UnarmedAttack
+
+private:
+	bool IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const;
+
+	void StartAttackReaction(FAttackDoubleHitResult Hit);
+	
+	void StartImpactReaction(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable)
+	void ServerStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	void RefreshImpactReaction(float DeltaTime);
+
+	void RefreshImpactReactionPhysics(float DeltaTime);
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void StopImpactReaction();
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	void OnImpactReactionEnded();
+
 };

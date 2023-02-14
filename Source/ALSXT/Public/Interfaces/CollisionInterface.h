@@ -20,6 +20,9 @@ public:
 	void GetVelocity(float& Velocity);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
-	void OnAttackCollision(FDoubleHitResult Hit);
+	void OnAttackCollision(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
+	void OnImpactCollision(FDoubleHitResult Hit);
 
 };

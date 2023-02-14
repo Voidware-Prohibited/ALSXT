@@ -17,7 +17,13 @@ class ALSXT_API UALSXTAnimNotifyState_UCTrace : public UAnimNotifyState
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FGameplayTag ImpactType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FGameplayTag UnarmedAttackType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FGameplayTag AttackStrength;
 
 public:
 	virtual FString GetNotifyName_Implementation() const override;

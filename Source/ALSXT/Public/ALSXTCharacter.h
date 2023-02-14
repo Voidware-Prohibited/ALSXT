@@ -144,42 +144,14 @@ private:
 
 	// Attack Trace Settings
 
-	FTimerHandle AttackTraceHandle;
+	FTimerHandle AttackTraceTimerHandle;	// Timer Handle for Attack Trace
+	FTimerDelegate AttackTraceTimerDelegate; // Delegate to bind function with parameters
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FAttackTraceSettings AttackTraceSettings;
 
-	// HitReaction
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredHitReaction{FGameplayTag::EmptyTag};
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag HitReaction{FGameplayTag::EmptyTag};
-
-	// HitSurface
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredHitSurface{FGameplayTag::EmptyTag};
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag HitSurface{FGameplayTag::EmptyTag};
-
-	// BumpReaction
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredBumpReaction{FGameplayTag::EmptyTag};
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag BumpReaction{FGameplayTag::EmptyTag};
-
-	// BumpSurface
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredBumpSurface{FGameplayTag::EmptyTag};
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag BumpSurface{FGameplayTag::EmptyTag};
+	TArray<AActor*> AttackTraceLastHitActors;
 
 	// HoldingBreath
 
@@ -236,14 +208,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag FirearmFingerActionHand{FGameplayTag::EmptyTag};
-
-// ImpactType
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredImpactType{FGameplayTag::EmptyTag};
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag ImpactType{FGameplayTag::EmptyTag};
 
 // WeaponCarryPosition
 
@@ -495,11 +459,20 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Held Item")
 	void GetUnarmedTraceLocations(const FGameplayTag& UnarmedAttackType, FVector& Start, FVector& End, float& Radius) const;
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Held Item")
+	void GetUnarmedAttackDamageInfo(const FGameplayTag& UnarmedAttackType, const FGameplayTag& UnarmedAttackStrength, float& BaseDamage, FGameplayTag& ImpactForm, FGameplayTag& DamageType) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Held Item")
+	void GetBlockingInfo(const FAttackDoubleHitResult& AttackDoubleHitResult, float& BaseDamage) const;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
 	bool IsHoldingItem() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Held Item")
 	void GetHeldItemTraceLocations(bool& Found, FVector& Start, FVector& End, float& Radius) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Held Item")
+	void GetHeldItemAttackDamageInfo(const FGameplayTag& HeldItemAttackType, const FGameplayTag& HeldItemAttackStrength, float& BaseDamage, FGameplayTag& ImpactForm, FGameplayTag& DamageType) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Aim Down Sights")
 	void GetHeldItemViewTarget(FTransform& Transform, float& FOV, float& VignetteIntensity, bool& Attachment) const;
@@ -925,109 +898,16 @@ public:
 	void BeginAttackCollisionTrace(FAttackTraceSettings TraceSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
-	void AttackCollisionTrace(FDoubleHitResult& Hit);
+	void AttackCollisionTrace(FAttackDoubleHitResult& Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void EndAttackCollisionTrace();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void OnAttackCollision(FDoubleHitResult Hit);
+	void OnAttackCollision(FAttackDoubleHitResult Hit);
 
-	// Desired HitReaction
-
-public:
-	const FGameplayTag& GetDesiredHitReaction() const;
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHitReactionTag"))
-		void SetDesiredHitReaction(const FGameplayTag& NewHitReactionTag);
-
-private:
-	UFUNCTION(Server, Reliable)
-		void ServerSetDesiredHitReaction(const FGameplayTag& NewHitReactionTag);
-
-	// HitReaction
-
-public:
-	const FGameplayTag& GetHitReaction() const;
-
-private:
-	void SetHitReaction(const FGameplayTag& NewHitReactionTag);
-
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-		void OnHitReactionChanged(const FGameplayTag& PreviousHitReactionTag);
-
-	// Desired HitSurface
-
-public:
-	const FGameplayTag& GetDesiredHitSurface() const;
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHitSurfaceTag"))
-		void SetDesiredHitSurface(const FGameplayTag& NewHitSurfaceTag);
-
-private:
-	UFUNCTION(Server, Reliable)
-		void ServerSetDesiredHitSurface(const FGameplayTag& NewHitSurfaceTag);
-
-	// HitSurface
-
-public:
-	const FGameplayTag& GetHitSurface() const;
-
-private:
-	void SetHitSurface(const FGameplayTag& NewHitSurfaceTag);
-
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-		void OnHitSurfaceChanged(const FGameplayTag& PreviousHitSurfaceTag);
-
-	// Desired BumpReaction
-
-public:
-	const FGameplayTag& GetDesiredBumpReaction() const;
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewBumpReactionTag"))
-		void SetDesiredBumpReaction(const FGameplayTag& NewBumpReactionTag);
-
-private:
-	UFUNCTION(Server, Reliable)
-		void ServerSetDesiredBumpReaction(const FGameplayTag& NewBumpReactionTag);
-
-	// BumpReaction
-
-public:
-	const FGameplayTag& GetBumpReaction() const;
-
-private:
-	void SetBumpReaction(const FGameplayTag& NewBumpReactionTag);
-
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-		void OnBumpReactionChanged(const FGameplayTag& PreviousBumpReactionTag);
-
-	// Desired BumpSurface
-
-public:
-	const FGameplayTag& GetDesiredBumpSurface() const;
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewBumpSurfaceTag"))
-		void SetDesiredBumpSurface(const FGameplayTag& NewBumpSurfaceTag);
-
-private:
-	UFUNCTION(Server, Reliable)
-		void ServerSetDesiredBumpSurface(const FGameplayTag& NewBumpSurfaceTag);
-
-	// BumpSurface
-
-public:
-	const FGameplayTag& GetBumpSurface() const;
-
-private:
-	void SetBumpSurface(const FGameplayTag& NewBumpSurfaceTag);
-
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-		void OnBumpSurfaceChanged(const FGameplayTag& PreviousBumpSurfaceTag);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnImpactCollision(FDoubleHitResult Hit);
 
 	// Desired HoldingBreath
 
@@ -1199,30 +1079,6 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnFirearmFingerActionHandChanged(const FGameplayTag& PreviousFirearmFingerActionHandTag);
-
-// Desired ImpactType
-
-public:
-	const FGameplayTag& GetDesiredImpactType() const;
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewImpactTypeTag"))
-	void SetDesiredImpactType(const FGameplayTag& NewImpactTypeTag);
-
-private:
-	UFUNCTION(Server, Reliable)
-	void ServerSetDesiredImpactType(const FGameplayTag& NewImpactTypeTag);
-
-// ImpactType
-
-public:
-	const FGameplayTag& GetImpactType() const;
-
-private:
-	void SetImpactType(const FGameplayTag& NewImpactTypeTag);
-
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	void OnImpactTypeChanged(const FGameplayTag& PreviousImpactTypeTag);
 
 // Desired WeaponCarryPosition
 
@@ -1437,46 +1293,6 @@ inline const FGameplayTag& AALSXTCharacter::GetFocus() const
 	return Focus;
 }
 
-inline const FGameplayTag& AALSXTCharacter::GetDesiredHitReaction() const
-{
-	return DesiredHitReaction;
-}
-
-inline const FGameplayTag& AALSXTCharacter::GetHitReaction() const
-{
-	return HitReaction;
-}
-
-inline const FGameplayTag& AALSXTCharacter::GetDesiredHitSurface() const
-{
-	return DesiredHitSurface;
-}
-
-inline const FGameplayTag& AALSXTCharacter::GetHitSurface() const
-{
-	return HitSurface;
-}
-
-inline const FGameplayTag& AALSXTCharacter::GetDesiredBumpReaction() const
-{
-	return DesiredBumpReaction;
-}
-
-inline const FGameplayTag& AALSXTCharacter::GetBumpReaction() const
-{
-	return BumpReaction;
-}
-
-inline const FGameplayTag& AALSXTCharacter::GetDesiredBumpSurface() const
-{
-	return DesiredBumpSurface;
-}
-
-inline const FGameplayTag& AALSXTCharacter::GetBumpSurface() const
-{
-	return BumpSurface;
-}
-
 inline const FGameplayTag& AALSXTCharacter::GetDesiredHoldingBreath() const
 {
 	return DesiredHoldingBreath;
@@ -1545,16 +1361,6 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredFirearmFingerActionHand() 
 inline const FGameplayTag& AALSXTCharacter::GetFirearmFingerActionHand() const
 {
 	return FirearmFingerActionHand;
-}
-
-inline const FGameplayTag& AALSXTCharacter::GetDesiredImpactType() const
-{
-	return DesiredImpactType;
-}
-
-inline const FGameplayTag& AALSXTCharacter::GetImpactType() const
-{
-	return ImpactType;
 }
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredWeaponCarryPosition() const

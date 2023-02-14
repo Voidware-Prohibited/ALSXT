@@ -138,7 +138,7 @@ UALSXTUnarmedCombatSettings* UUnarmedCombatComponent::SelectUnarmedAttackSetting
 
 UAnimMontage* UUnarmedCombatComponent::SelectUnarmedAttackMontage_Implementation(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
 {
-	TObjectPtr<UAnimMontage> SelectedMontage = nullptr;
+	UAnimMontage* SelectedMontage{ nullptr };
 	int i = 0;
 	int j = 0;
 	int k = 0;

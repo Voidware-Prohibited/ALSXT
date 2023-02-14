@@ -73,10 +73,6 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStatus, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFocus, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHitReaction, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHitSurface, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredBumpReaction, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredBumpSurface, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHoldingBreath, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredEmote, Parameters)
@@ -85,7 +81,6 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerAction, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerActionHand, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredImpactType, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponCarryPosition, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmSightLocation, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredVaultType, Parameters)
@@ -98,6 +93,8 @@ void AALSXTCharacter::BeginPlay()
 {
 	AlsCharacter = Cast<AAlsCharacter>(GetParentActor());
 	Super::BeginPlay();
+
+	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace", AttackTraceSettings);
 
 }
 
@@ -1064,41 +1061,68 @@ void AALSXTCharacter::OnFocusChanged_Implementation(const FGameplayTag& Previous
 
 void AALSXTCharacter::BeginAttackCollisionTrace(FAttackTraceSettings TraceSettings)
 {
-	// ..
-	// FDoubleHitResult Hit;
-	// GetWorld()->GetTimerManager().SetTimer(AttackTraceHandle, this, &AALSXTCharacter::AttackCollisionTrace, 0.1f, true);
+	AttackTraceSettings.Active = true;
+	GetWorld()->GetTimerManager().SetTimer(AttackTraceTimerHandle, AttackTraceTimerDelegate, 0.1f, false);
 }
 
-void AALSXTCharacter::AttackCollisionTrace(FDoubleHitResult& Hit)
+void AALSXTCharacter::AttackCollisionTrace(FAttackDoubleHitResult& Hit)
 {
 	if (AttackTraceSettings.Active)
 	{		
-		const TArray<AActor*> InitialIgnoredActors;
+		// Set Local Vars
+		TArray<AActor*> InitialIgnoredActors;
 		TArray<AActor*> OriginTraceIgnoredActors;
-		OriginTraceIgnoredActors.Add(this);
-		FHitResult HitResult;
-		bool isHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, HitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+		TArray<FHitResult> HitResults;
+		InitialIgnoredActors.Add(this);	// Add Self to Initial Trace Ignored Actors
+
+		// Initial Trace
+		bool isHit = UKismetSystemLibrary::SphereTraceMulti(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, HitResults, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
 
 		if (isHit)
 		{
-			FHitResult OriginHitResult;
-			bool isOriginHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, OriginTraceIgnoredActors, EDrawDebugTrace::ForDuration, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
-
-			if (isOriginHit)
+			// Loop through HitResults Array
+			for (auto& HitResult : HitResults)
 			{
-				Hit.HitResult.HitResult = HitResult;
-				Hit.OriginHitResult.HitResult = OriginHitResult;
-				AActor* HitActor = Hit.HitResult.HitResult.GetActor();
-				if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UCollisionInterface::StaticClass()))
+				// Check if not in AttackedActors Array
+				if (!AttackTraceLastHitActors.Contains(HitResult.GetActor()))
 				{
-					// Cast<ICollisionInterface>(OnAttackCollision(Hit));
-					// HitActor->OnAttackCollision(Hit);
-					// ICollisionInterface::OnAttackCollision(Hit);
+					// Add to AttackedActors Array
+					AttackTraceLastHitActors.AddUnique(HitResult.GetActor());
+					
+					// Populate Hit
+					Hit.DoubleHitResult.HitResult.HitResult = HitResult;
+
+					// Set Local Vars
+					AActor* HitActor = Hit.DoubleHitResult.HitResult.HitResult.GetActor();
+
+					// Setup Origin Trace
+					FHitResult OriginHitResult;
+					OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
+
+					// Perform Origin Trace
+					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, OriginTraceIgnoredActors, EDrawDebugTrace::ForDuration, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+					if (isOriginHit)
+					{
+						// Populate Origin Hit
+						Hit.DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
+
+						// Populate Values based if Holding Item
+						if (IsHoldingItem())
+						{
+							GetHeldItemAttackDamageInfo(Hit.Type, Hit.Strength, Hit.BaseDamage, Hit.DoubleHitResult.ImpactForm, Hit.DoubleHitResult.HitResult.DamageType);
+						}
+						else
+						{
+							GetUnarmedAttackDamageInfo(Hit.Type, Hit.Strength, Hit.BaseDamage, Hit.DoubleHitResult.ImpactForm, Hit.DoubleHitResult.HitResult.DamageType);
+						}
+
+						// Call OnAttackCollision on CollisionInterface
+						if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UCollisionInterface::StaticClass()))
+						{
+							ICollisionInterface::Execute_OnAttackCollision(HitActor, Hit);
+						}
+					}
 				}
-				// if (HitActor->GetClass()->ImplementsInterface(UCollisionInterface::StaticClass()))
-				// {
-				// 
-				// }
 			}
 		}
 	}
@@ -1106,161 +1130,18 @@ void AALSXTCharacter::AttackCollisionTrace(FDoubleHitResult& Hit)
 
 void AALSXTCharacter::EndAttackCollisionTrace()
 {
+	// Reset Attack Trace Settings
 	AttackTraceSettings.Active = false;
 	AttackTraceSettings.Start = { 0.0f, 0.0f, 0.0f };
 	AttackTraceSettings.End = { 0.0f, 0.0f, 0.0f };
 	AttackTraceSettings.Radius = { 0.0f };
-	GetWorld()->GetTimerManager().ClearTimer(AttackTraceHandle);
+
+	// Empty AttackTraceLastHitActors Array
+	AttackTraceLastHitActors.Empty();
+
+	// Clear Attack Trace Timer
+	GetWorld()->GetTimerManager().ClearTimer(AttackTraceTimerHandle);
 }
-
-
-// HitReaction
-
-void AALSXTCharacter::SetDesiredHitReaction(const FGameplayTag& NewHitReactionTag)
-{
-	if (DesiredHitReaction != NewHitReactionTag)
-	{
-		DesiredHitReaction = NewHitReactionTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredHitReaction, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredHitReaction(NewHitReactionTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredHitReaction_Implementation(const FGameplayTag& NewHitReactionTag)
-{
-	SetDesiredHitReaction(NewHitReactionTag);
-}
-
-void AALSXTCharacter::SetHitReaction(const FGameplayTag& NewHitReactionTag)
-{
-
-	if (HitReaction != NewHitReactionTag)
-	{
-		const auto PreviousHitReaction{ HitReaction };
-
-		HitReaction = NewHitReactionTag;
-
-		OnHitReactionChanged(PreviousHitReaction);
-	}
-}
-
-void AALSXTCharacter::OnHitReactionChanged_Implementation(const FGameplayTag& PreviousHitReactionTag) {}
-
-// HitSurface
-
-void AALSXTCharacter::SetDesiredHitSurface(const FGameplayTag& NewHitSurfaceTag)
-{
-	if (DesiredHitSurface != NewHitSurfaceTag)
-	{
-		DesiredHitSurface = NewHitSurfaceTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredHitSurface, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredHitSurface(NewHitSurfaceTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredHitSurface_Implementation(const FGameplayTag& NewHitSurfaceTag)
-{
-	SetDesiredHitSurface(NewHitSurfaceTag);
-}
-
-void AALSXTCharacter::SetHitSurface(const FGameplayTag& NewHitSurfaceTag)
-{
-
-	if (HitSurface != NewHitSurfaceTag)
-	{
-		const auto PreviousHitSurface{ HitSurface };
-
-		HitSurface = NewHitSurfaceTag;
-
-		OnHitSurfaceChanged(PreviousHitSurface);
-	}
-}
-
-void AALSXTCharacter::OnHitSurfaceChanged_Implementation(const FGameplayTag& PreviousHitSurfaceTag) {}
-
-// BumpReaction
-
-void AALSXTCharacter::SetDesiredBumpReaction(const FGameplayTag& NewBumpReactionTag)
-{
-	if (DesiredBumpReaction != NewBumpReactionTag)
-	{
-		DesiredBumpReaction = NewBumpReactionTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredBumpReaction, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredBumpReaction(NewBumpReactionTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredBumpReaction_Implementation(const FGameplayTag& NewBumpReactionTag)
-{
-	SetDesiredBumpReaction(NewBumpReactionTag);
-}
-
-void AALSXTCharacter::SetBumpReaction(const FGameplayTag& NewBumpReactionTag)
-{
-
-	if (BumpReaction != NewBumpReactionTag)
-	{
-		const auto PreviousBumpReaction{ BumpReaction };
-
-		BumpReaction = NewBumpReactionTag;
-
-		OnBumpReactionChanged(PreviousBumpReaction);
-	}
-}
-
-void AALSXTCharacter::OnBumpReactionChanged_Implementation(const FGameplayTag& PreviousBumpReactionTag) {}
-
-// BumpSurface
-
-void AALSXTCharacter::SetDesiredBumpSurface(const FGameplayTag& NewBumpSurfaceTag)
-{
-	if (DesiredBumpSurface != NewBumpSurfaceTag)
-	{
-		DesiredBumpSurface = NewBumpSurfaceTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredBumpSurface, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredBumpSurface(NewBumpSurfaceTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredBumpSurface_Implementation(const FGameplayTag& NewBumpSurfaceTag)
-{
-	SetDesiredBumpSurface(NewBumpSurfaceTag);
-}
-
-void AALSXTCharacter::SetBumpSurface(const FGameplayTag& NewBumpSurfaceTag)
-{
-
-	if (BumpSurface != NewBumpSurfaceTag)
-	{
-		const auto PreviousBumpSurface{ BumpSurface };
-
-		BumpSurface = NewBumpSurfaceTag;
-
-		OnBumpSurfaceChanged(PreviousBumpSurface);
-	}
-}
-
-void AALSXTCharacter::OnBumpSurfaceChanged_Implementation(const FGameplayTag& PreviousBumpSurfaceTag) {}
 
 // HoldingBreath
 
@@ -1520,43 +1401,6 @@ void AALSXTCharacter::SetFirearmFingerActionHand(const FGameplayTag& NewFirearmF
 }
 
 void AALSXTCharacter::OnFirearmFingerActionHandChanged_Implementation(const FGameplayTag& PreviousFirearmFingerActionHandTag) {}
-
-// ImpactType
-
-void AALSXTCharacter::SetDesiredImpactType(const FGameplayTag& NewImpactTypeTag)
-{
-	if (DesiredImpactType != NewImpactTypeTag)
-	{
-		DesiredImpactType = NewImpactTypeTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredImpactType, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredImpactType(NewImpactTypeTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredImpactType_Implementation(const FGameplayTag& NewImpactTypeTag)
-{
-	SetDesiredImpactType(NewImpactTypeTag);
-}
-
-void AALSXTCharacter::SetImpactType(const FGameplayTag& NewImpactTypeTag)
-{
-
-	if (ImpactType != NewImpactTypeTag)
-	{
-		const auto PreviousImpactType{ ImpactType };
-
-		ImpactType = NewImpactTypeTag;
-
-		OnImpactTypeChanged(PreviousImpactType);
-	}
-}
-
-void AALSXTCharacter::OnImpactTypeChanged_Implementation(const FGameplayTag& PreviousImpactTypeTag) {}
 
 // WeaponCarryPosition
 
