@@ -11,16 +11,8 @@ class ALSXT_API UALSXTAttackReactionSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimMontage> Montage;
-
-	// UnarmedAttack time to blend in amount curve.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UCurveFloat> BlendInCurve;
-
-	// UnarmedAttack time to interpolation, horizontal and vertical correction amounts curve.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UCurveVector> InterpolationAndCorrectionAmountsCurve;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactReactionLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
@@ -34,20 +26,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
 	FVector2D PlayRate{1.0f, 1.0f};
 
-public:
-	float CalculateStartTime(float UnarmedAttackHeight) const;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray <FImpactReactionStrength> ImpactReactionStrengths;
 
-	float CalculatePlayRate(float UnarmedAttackHeight) const;
+public:
+	float CalculateStartTime(float AttackHeight) const;
+
+	float CalculatePlayRate(float AttackHeight) const;
 };
 
-inline float UALSXTAttackReactionSettings::CalculateStartTime(const float UnarmedAttackHeight) const
+inline float UALSXTAttackReactionSettings::CalculateStartTime(const float AttackHeight) const
 {
-	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, UnarmedAttackHeight);
+	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, AttackHeight);
 }
 
-inline float UALSXTAttackReactionSettings::CalculatePlayRate(const float UnarmedAttackHeight) const
+inline float UALSXTAttackReactionSettings::CalculatePlayRate(const float AttackHeight) const
 {
-	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, UnarmedAttackHeight);
+	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, AttackHeight);
 }
 
 USTRUCT(BlueprintType)
@@ -66,6 +61,9 @@ struct ALSXT_API FALSXTGeneralAttackReactionSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180))
 	float RotationOffset{ 45.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FActionMontageInfo DefaultMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FImpactReactionLocation> AttackReactionLocations;

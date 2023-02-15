@@ -23,6 +23,9 @@ struct ALSXT_API FAttackTraceSettings
 	float Radius { 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector AttackOrigin {0.0f, 0.0f, 0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag ImpactType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
@@ -63,6 +66,9 @@ struct ALSXT_API FDoubleHitResult
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag CollisionType;
+		
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag ImpactType;
 		
@@ -119,6 +125,28 @@ struct ALSXT_API FTargetHitResultEntry
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FActionMontageInfo
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimMontage> Montage;
+
+	// UnarmedAttack time to blend in amount curve.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UCurveFloat> BlendInCurve;
+
+	// UnarmedAttack time to interpolation, horizontal and vertical correction amounts curve.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UCurveVector> InterpolationAndCorrectionAmountsCurve;
+
+	bool operator==(const FActionMontageInfo& other) const
+	{
+		return (other.Montage == Montage);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FImpactForm
 {
 	GENERATED_BODY()
@@ -127,7 +155,7 @@ struct ALSXT_API FImpactForm
 	FGameplayTag ImpactReactionForm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TObjectPtr<UAnimMontage> Montage{ nullptr };
+	TArray<FActionMontageInfo> MontageInfo;
 };
 
 USTRUCT(BlueprintType)
@@ -175,7 +203,7 @@ struct ALSXT_API FUnarmedAttackStance
 	FGameplayTag UnarmedAttackStance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TObjectPtr<UAnimMontage> Montage{ nullptr };
+	TArray<FActionMontageInfo> MontageInfo;
 };
 
 USTRUCT(BlueprintType)

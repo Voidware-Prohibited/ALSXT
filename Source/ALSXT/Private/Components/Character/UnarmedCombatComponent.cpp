@@ -131,7 +131,7 @@ void UUnarmedCombatComponent::StartUnarmedAttack(const FGameplayTag& UnarmedAtta
 	}
 }
 
-UALSXTUnarmedCombatSettings* UUnarmedCombatComponent::SelectUnarmedAttackSettings_Implementation()
+UALSXTUnarmedCombatSettings* UUnarmedCombatComponent::SelectUnarmedAttackSettings_Implementation(const FGameplayTag& Location)
 {
 	return nullptr;
 }
@@ -142,6 +142,7 @@ UAnimMontage* UUnarmedCombatComponent::SelectUnarmedAttackMontage_Implementation
 	int i = 0;
 	int j = 0;
 	int k = 0;
+	FActionMontageInfo LastAnimation{ nullptr };
 
 	for (i = 0; i < Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes.Num(); ++i)
 		{
@@ -155,8 +156,32 @@ UAnimMontage* UUnarmedCombatComponent::SelectUnarmedAttackMontage_Implementation
 						{
 							if (Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].UnarmedAttackStance == Stance)
 							{
-								SelectedMontage = Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].Montage;
-								// return SelectedMontage;
+								// Declare Local Copy of Montages Array
+								TArray<FActionMontageInfo> MontageArray{ Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].MontageInfo };
+
+								if (MontageArray.Num() > 1)
+								{
+									// If LastAnimation exists, remove it from Local Montages array to avoid duplicates
+									if (LastAnimation.Montage)
+									{
+										MontageArray.Remove(LastAnimation);
+									}
+
+									//Shuffle Array
+									for (int m = MontageArray.Max(); m >= 0; --m)
+									{
+										int n = FMath::Rand() % (m + 1);
+										if (m != n) MontageArray.Swap(m, n);
+									}
+
+									// Select Random Array Entry
+									int RandIndex = rand() % MontageArray.Max();
+									SelectedMontage = Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].MontageInfo[RandIndex].Montage;
+								}
+								else
+								{
+									SelectedMontage = Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].MontageInfo[0].Montage;
+								}
 							}
 						}
 					}

@@ -43,22 +43,16 @@ public:
 	bool CanReact();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void GetAttackReactionAnimation(FAttackDoubleHitResult Hit, const UAnimMontage* Montage);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void GetImpactReactionAnimation(FDoubleHitResult Hit, const UAnimMontage* Montage);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void GetImpactReactionParticle(FDoubleHitResult Hit, const UNiagaraSystem* Particle);
+	void GetImpactReactionParticle(FDoubleHitResult Hit, UNiagaraSystem* Particle);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	void GetImpactReactionSound(FDoubleHitResult Hit, USoundBase* Audio);
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character")
 	void GetLocationFromBoneName(FName Hit, FGameplayTag& Location);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	void GetSideFromHitLocation(FVector HitLocation, FGameplayTag& Side);
+	void GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength);
@@ -77,7 +71,10 @@ protected:
 	UAnimMontage* SelectImpactReactionMontage(FDoubleHitResult Hit, const UAnimMontage* Montage);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
-	UALSXTImpactReactionSettings* SelectImpactReactionSettings();
+	UALSXTImpactReactionSettings* SelectImpactReactionSettings(const FGameplayTag& Location);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UALSXTAttackReactionSettings* SelectAttackReactionSettings(const FGameplayTag& Location);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	void OnAttackReactionStarted(FAttackDoubleHitResult Hit);

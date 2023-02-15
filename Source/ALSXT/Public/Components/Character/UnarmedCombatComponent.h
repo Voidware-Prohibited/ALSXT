@@ -61,7 +61,7 @@ protected:
 	UAnimMontage* SelectUnarmedAttackMontage(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
-	UALSXTUnarmedCombatSettings* SelectUnarmedAttackSettings();
+	UALSXTUnarmedCombatSettings* SelectUnarmedAttackSettings(const FGameplayTag& Location);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	void OnUnarmedAttackStarted(const FGameplayTag& UnarmedAttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float& BaseDamage);

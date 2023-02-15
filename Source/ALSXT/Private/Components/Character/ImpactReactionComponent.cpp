@@ -3,6 +3,7 @@
 #include "Components/Character/ImpactReactionComponent.h"
 #include "Utility/ALSXTStructs.h"
 #include "Kismet/GameplayStatics.h"
+#include "Math/RandomStream.h"
 
 // Sets default values for this component's properties
 UImpactReactionComponent::UImpactReactionComponent()
@@ -37,11 +38,29 @@ void UImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 // UnarmedAttack
 
-void UImpactReactionComponent::GetLocationFromBoneName(FName Hit, FGameplayTag& Location) {}
+void UImpactReactionComponent::GetLocationFromBoneName_Implementation(FName Hit, FGameplayTag& Location) {}
 
-void UImpactReactionComponent::GetSideFromHitLocation(FVector HitLocation, FGameplayTag& Side) {}
+void UImpactReactionComponent::GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side) 
+{
+	float DotProduct { Character->GetDotProductTo(Hit.OriginHitResult.HitResult.GetActor()) };
 
-void UImpactReactionComponent::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength) {}
+	// 1 is face to face, 0 is side,, -1 is behind
+
+	FVector CrossProduct{ FVector::CrossProduct(Hit.HitResult.Impulse, Hit.HitResult.Impulse) };
+}
+
+void UImpactReactionComponent::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength) 
+{
+	float HitMass = Hit.HitResult.Mass;
+	float HitVelocity = Hit.HitResult.Velocity;
+	float HitMomentum = HitMass * HitVelocity;
+
+	float SelfMass = Hit.OriginHitResult.Mass;
+	float SelfVelocity = Hit.OriginHitResult.Velocity;
+	float SelfMomentum = SelfMass * SelfVelocity;
+
+	float MomemtumSum = HitMomentum + SelfMomentum;
+}
 
 void UImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, const UNiagaraSystem* Particle, USoundBase* Audio)
 {
@@ -50,10 +69,7 @@ void UImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit, UAnimMontage
 
 bool UImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const
 {
-	return !Character->GetLocomotionAction().IsValid() ||
-		// ReSharper disable once CppRedundantParentheses
-		(Character->GetLocomotionAction() == AlsLocomotionActionTags::PrimaryAction &&
-			!Character->GetMesh()->GetAnimInstance()->Montage_IsPlaying(Montage));
+	return (Montage != nullptr);
 }
 
 void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
@@ -142,7 +158,12 @@ void UImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	}
 }
 
-UALSXTImpactReactionSettings* UImpactReactionComponent::SelectImpactReactionSettings_Implementation()
+UALSXTImpactReactionSettings* UImpactReactionComponent::SelectImpactReactionSettings_Implementation(const FGameplayTag& Location)
+{
+	return nullptr;
+}
+
+UALSXTAttackReactionSettings* UImpactReactionComponent::SelectAttackReactionSettings_Implementation(const FGameplayTag& Location)
 {
 	return nullptr;
 }
@@ -157,7 +178,8 @@ UAnimMontage* UImpactReactionComponent::SelectAttackReactionMontage_Implementati
 	FGameplayTag HitLocation { FGameplayTag::EmptyTag };
 	GetLocationFromBoneName(Hit.DoubleHitResult.HitResult.HitResult.BoneName, HitLocation);
 	FGameplayTag Side { FGameplayTag::EmptyTag };
-	GetSideFromHitLocation(Hit.DoubleHitResult.HitResult.HitResult.Location, Side);
+	GetSideFromHit(Hit.DoubleHitResult, Side);
+	FActionMontageInfo LastAnimation{ nullptr };
 
 	 for (i = 0; i < Character->ALSXTSettings->AttackReaction.AttackReactionLocations.Num(); ++i)
 	 {
@@ -175,8 +197,32 @@ UAnimMontage* UImpactReactionComponent::SelectAttackReactionMontage_Implementati
 							{
 								if (Character->ALSXTSettings->AttackReaction.AttackReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].ImpactReactionForm == Hit.DoubleHitResult.ImpactForm)
 								{
-									SelectedMontage = Character->ALSXTSettings->AttackReaction.AttackReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].Montage;
+									// Declare Local Copy of Montages Array
+									TArray<FActionMontageInfo> MontageArray{ Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].MontageInfo };
+									
+									if (MontageArray.Num() > 1)
+									{
+										// If LastAnimation exists, remove it from Local Montages array to avoid duplicates
+										if (LastAnimation.Montage)
+										{
+											MontageArray.Remove(LastAnimation);
+										}
 
+										//Shuffle Array
+										for (int m = MontageArray.Max(); m >= 0; --m)
+										{
+											int n = FMath::Rand() % (m + 1);
+											if (m != n) MontageArray.Swap(m, n);
+										}
+
+										// Select Random Array Entry
+										int RandIndex = rand() % MontageArray.Max();
+										SelectedMontage = Character->ALSXTSettings->AttackReaction.AttackReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].MontageInfo[RandIndex].Montage;
+									}
+									else
+									{
+										SelectedMontage = Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].MontageInfo[0].Montage;
+									}
 								}
 							}
 	 					}
@@ -200,7 +246,8 @@ UAnimMontage* UImpactReactionComponent::SelectImpactReactionMontage_Implementati
 	FGameplayTag Strength { FGameplayTag::EmptyTag };
 	GetStrengthFromHit(Hit, Strength);
 	FGameplayTag Side { FGameplayTag::EmptyTag };
-	GetSideFromHitLocation(Hit.HitResult.HitResult.Location, Side);
+	GetSideFromHit(Hit, Side);
+	FActionMontageInfo LastAnimation { nullptr };
 
 	for (i = 0; i < Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations.Num(); ++i)
 	{
@@ -218,8 +265,32 @@ UAnimMontage* UImpactReactionComponent::SelectImpactReactionMontage_Implementati
 							{
 								if (Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].ImpactReactionForm == Hit.ImpactForm)
 								{
-									SelectedMontage = Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].Montage;
+									// Declare Local Copy of Montages Array
+									TArray<FActionMontageInfo> MontageArray { Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].MontageInfo };
+									
+									if (MontageArray.Num() > 1)
+									{
+										// If LastAnimation exists, remove it from Local Montages array to avoid duplicates
+										if (LastAnimation.Montage)
+										{
+											MontageArray.Remove(LastAnimation);
+										}
 
+										//Shuffle Array
+										for (int m = MontageArray.Max(); m >= 0; --m)
+										{
+											int n = FMath::Rand() % (m + 1);
+											if (m != n) MontageArray.Swap(m, n);
+										}
+
+										// Select Random Array Entry
+										int RandIndex = rand() % MontageArray.Max();
+										SelectedMontage = Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].MontageInfo[RandIndex].Montage;
+									}
+									else
+									{
+										SelectedMontage = Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].MontageInfo[0].Montage;
+									}
 								}
 							}
 						}
@@ -266,18 +337,24 @@ void UImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResul
 		FQuat NewQuat = Quat * RootQuat;
 		FRotator NewRotation = NewQuat.Rotator();
 
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Particle, Hit.HitResult.HitResult.Location, NewRotation, FVector(1.0f, 1.0f, 1.0f), true, true, ENCPoolMethod::None, true);
-
-		if (GetWorld()->WorldType == EWorldType::EditorPreview)
+		if (Particle)
 		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), Audio, Hit.HitResult.HitResult.Location,
-				1.0f, 1.0f);
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Particle, Hit.HitResult.HitResult.Location, NewRotation, FVector(1.0f, 1.0f, 1.0f), true, true, ENCPoolMethod::None, true);
 		}
-		else
+
+		if (Audio)
 		{
-			AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Audio, Hit.HitResult.HitResult.Location,
-				NewRotation,
-				1.0f, 1.0f);
+			if (GetWorld()->WorldType == EWorldType::EditorPreview)
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Audio, Hit.HitResult.HitResult.Location,
+					1.0f, 1.0f);
+			}
+			else
+			{
+				AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Audio, Hit.HitResult.HitResult.Location,
+					NewRotation,
+					1.0f, 1.0f);
+			}
 		}
 
 		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);

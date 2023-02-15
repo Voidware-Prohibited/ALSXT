@@ -397,11 +397,9 @@ void AALSXTCharacter::ALSXTRefreshRotationInstant(const float TargetYawAngle, co
 	RefreshRotationInstant(TargetYawAngle, Teleport);
 }
 
-void AALSXTCharacter::SetMovementModeLocked(const bool bNewMovementModeLocked)
+void AALSXTCharacter::SetMovementModeLocked(bool bNewMovementModeLocked)
 {
-	Cast<UAlsCharacterMovementComponent>(GetCharacterMovement())->SetMovementModeLocked(bNewMovementModeLocked);
-	// GetCharacterMovement<UAlsCharacterMovementComponent>()->SetMovementModeLocked(bNewMovementModeLocked);
-	// AAlsCharacter::AlsCharacterMovement->SetMovementModeLocked(bNewMovementModeLocked);
+	AlsCharacterMovement->SetMovementModeLocked(bNewMovementModeLocked);
 }
 
 void AALSXTCharacter::Crouch(const bool bClientSimulation)
