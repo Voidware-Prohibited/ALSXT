@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "AlsCharacter.h"
+#include "ALSXTCharacter.h"
+#include "NativeGameplayTags.h"
 #include "EmoteComponent.generated.h"
 
 

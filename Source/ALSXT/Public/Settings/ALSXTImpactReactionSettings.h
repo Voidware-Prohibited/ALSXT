@@ -23,7 +23,10 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	float ImpactHeight{0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FGameplayTag ImpactType{FGameplayTag::EmptyTag};
+	FDoubleHitResult Hit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag ImpactLocation{FGameplayTag::EmptyTag};
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -33,7 +36,13 @@ class ALSXT_API UALSXTImpactReactionSettings : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag ImpactReactionLocation;
+	FGameplayTag ImpactReactionLocation {FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FActionMontageInfo LocationDefaultMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray <FImpactReactionStrength> ImpactReactionStrengths;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
@@ -47,23 +56,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
 	FVector2D PlayRate{1.0f, 1.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FImpactReactionStrength> ImpactReactionStrengths;
-
 public:
-	float CalculateStartTime(float ImpactReactionHeight) const;
+	float CalculateStartTime(float ImpactHeight) const;
 
-	float CalculatePlayRate(float ImpactReactionHeight) const;
+	float CalculatePlayRate(float ImpactHeight) const;
 };
 
-inline float UALSXTImpactReactionSettings::CalculateStartTime(const float ImpactReactionHeight) const
+inline float UALSXTImpactReactionSettings::CalculateStartTime(const float ImpactHeight) const
 {
-	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, ImpactReactionHeight);
+	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, ImpactHeight);
 }
 
-inline float UALSXTImpactReactionSettings::CalculatePlayRate(const float ImpactReactionHeight) const
+inline float UALSXTImpactReactionSettings::CalculatePlayRate(const float ImpactHeight) const
 {
-	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, ImpactReactionHeight);
+	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, ImpactHeight);
 }
 
 USTRUCT(BlueprintType)
@@ -84,7 +90,7 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 	float RotationOffset{ 45.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FActionMontageInfo DefaultMontage;
+	FActionMontageInfo FallbackDefaultMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FImpactReactionLocation> ImpactReactionLocations;

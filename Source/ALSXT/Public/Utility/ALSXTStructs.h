@@ -2,8 +2,12 @@
 
 #include "NativeGameplayTags.h"
 #include "Animation/AnimMontage.h"
+#include "Engine/EngineTypes.h"
 #include "ALSXTStructs.generated.h"
 
+class UAnimMontage;
+class UCurveFloat;
+class UCurveVector;
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FAttackTraceSettings
@@ -130,19 +134,19 @@ struct ALSXT_API FActionMontageInfo
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimMontage> Montage;
+		TObjectPtr<UAnimMontage> Montage { nullptr };
 
 	// UnarmedAttack time to blend in amount curve.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UCurveFloat> BlendInCurve;
+	TObjectPtr<UCurveFloat> BlendInCurve { nullptr };
 
 	// UnarmedAttack time to interpolation, horizontal and vertical correction amounts curve.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UCurveVector> InterpolationAndCorrectionAmountsCurve;
+	TObjectPtr<UCurveVector> InterpolationAndCorrectionAmountsCurve { nullptr };
 
 	bool operator==(const FActionMontageInfo& other) const
 	{
-		return (other.Montage == Montage);
+		return (other.Montage == Montage) && (other.BlendInCurve == BlendInCurve) && (other.InterpolationAndCorrectionAmountsCurve == InterpolationAndCorrectionAmountsCurve);
 	}
 };
 

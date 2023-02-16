@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Settings/AlsCharacterSettings.h"
+#include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTSlidingSettings.h"
 #include "Settings/ALSXTFPEyeFocusSettings.h"
 #include "Settings/ALSXTAttackReactionSettings.h"
@@ -30,6 +31,9 @@ class ALSXT_API UALSXTCharacterSettings : public UAlsCharacterSettings
 
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FALSXTGeneralVaultingSettings Vaulting;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTSlidingSettings Sliding;
 

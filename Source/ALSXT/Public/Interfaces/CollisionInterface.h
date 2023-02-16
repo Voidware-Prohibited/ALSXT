@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NativeGameplayTags.h"
 #include "Utility/ALSXTStructs.h"
 #include "CollisionInterface.generated.h"
 
@@ -18,6 +19,12 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void GetVelocity(float& Velocity);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
+	void GetPhysicsStates(FGameplayTag& PhysicalMaterial, const TArray<FGameplayTag>& PhysicalStates);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
+	void GetPhysicsDamageInfo(FGameplayTag& DamageType, float& PhysicsBaseDamage, float& PhysicsDamageFrequency);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void OnAttackCollision(FAttackDoubleHitResult Hit);

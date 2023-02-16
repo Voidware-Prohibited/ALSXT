@@ -2,6 +2,7 @@
 
 #include "AlsCharacter.h"
 #include "GameFramework/Character.h"
+#include "Settings/ALSXTVaultingSettings.h"
 #include "State/AlsLocomotionState.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Engine/EngineTypes.h"
@@ -37,6 +38,11 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
+	int32 VaultingRootMotionSourceId;
 
 private:
 
@@ -490,6 +496,44 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanSprint() const;
 	void CanSprint_Implementation();
+
+	// Vaulting
+
+public:
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	bool IsVaultingAllowedToStart() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	bool TryStartVaultingGrounded();
+
+private:
+	bool TryStartVaultingInAir();
+
+	bool TryStartVaulting(const FALSXTVaultingTraceSettings& TraceSettings);
+
+	UFUNCTION(Server, Reliable)
+	void ServerStartVaulting(const FALSXTVaultingParameters& Parameters);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartVaulting(const FALSXTVaultingParameters& Parameters);
+
+	void StartVaultingImplementation(const FALSXTVaultingParameters& Parameters);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UALSXTVaultingSettings* SelectVaultingSettings(EAlsMantlingType MantlingType);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	void OnVaultingStarted(const FALSXTVaultingParameters& Parameters);
+
+private:
+	void RefreshVaulting();
+
+	void StopVaulting();
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	void OnVaultingEnded();
 
 	// Sliding
 

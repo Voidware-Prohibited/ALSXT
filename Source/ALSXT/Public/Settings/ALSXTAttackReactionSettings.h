@@ -5,6 +5,30 @@
 #include "Engine/EngineTypes.h"
 #include "ALSXTAttackReactionSettings.generated.h"
 
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTAttackReactionParameters
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FVector_NetQuantize100 TargetRelativeLocation{ForceInit};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FRotator TargetRelativeRotation{ForceInit};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm"))
+	float ImpactHeight{0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FDoubleHitResult Hit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag ImpactLocation{FGameplayTag::EmptyTag};
+};
+
 UCLASS(Blueprintable, BlueprintType)
 class ALSXT_API UALSXTAttackReactionSettings : public UDataAsset
 {
