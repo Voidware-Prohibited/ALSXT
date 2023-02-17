@@ -3,6 +3,7 @@
 #include "AlsCharacter.h"
 #include "GameFramework/Character.h"
 #include "Settings/ALSXTVaultingSettings.h"
+#include "Settings/ALSXTUnarmedCombatSettings.h"
 #include "State/AlsLocomotionState.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Engine/EngineTypes.h"
@@ -154,7 +155,7 @@ private:
 	FTimerDelegate AttackTraceTimerDelegate; // Delegate to bind function with parameters
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FAttackTraceSettings AttackTraceSettings;
+	FALSXTAttackTraceSettings AttackTraceSettings;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	TArray<AActor*> AttackTraceLastHitActors;
@@ -939,7 +940,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
-	void BeginAttackCollisionTrace(FAttackTraceSettings TraceSettings);
+	void BeginAttackCollisionTrace(FALSXTAttackTraceSettings TraceSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void AttackCollisionTrace(FAttackDoubleHitResult& Hit);

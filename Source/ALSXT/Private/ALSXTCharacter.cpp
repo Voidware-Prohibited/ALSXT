@@ -11,6 +11,8 @@
 #include "Utility/ALSXTStructs.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Settings/ALSXTCharacterSettings.h"
+#include "Settings/ALSXTVaultingSettings.h"
+#include "Settings/ALSXTUnarmedCombatSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
@@ -236,7 +238,6 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 			}
 			if (TryStartVaultingGrounded())
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("TryStartVaultingGrounded()")));
 				return;
 			}
 			if (TryStartMantlingGrounded())
@@ -777,24 +778,42 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	}
 
 	FHitResult DepthTraceHit;
-	FVector HitLocation = ForwardTraceHit.Location;
-	FVector HitNormal = ForwardTraceHit.Normal;
-	FVector DepthStartLocation = HitNormal + (HitNormal * TraceSettings.MaxDepth);
+	FVector HitLocation = ForwardTraceHit.ImpactPoint;
+	FVector HitNormal = ForwardTraceHit.ImpactNormal;
+	FVector DepthStartLocation = HitLocation + (ForwardTraceHit.ImpactNormal * (TraceSettings.MaxDepth * -1));
+	FVector DepthEndLocation = ForwardTraceHit.ImpactPoint + (ForwardTraceHit.ImpactNormal * (1 * -1));
 
-	GetWorld()->SweepSingleByObjectType(DepthTraceHit, DepthStartLocation, ForwardTraceHit.Location, FQuat::Identity, ObjectQueryParameters,
+	GetWorld()->SweepSingleByObjectType(DepthTraceHit, DepthStartLocation, DepthEndLocation, FQuat::Identity, ObjectQueryParameters,
 		FCollisionShape::MakeCapsule(TraceCapsuleRadius, ForwardTraceCapsuleHalfHeight),
 		{ ForwardTraceTag, false, this });
 
-	if(ForwardTraceHit.IsValidBlockingHit())
+
+
+	if(!DepthTraceHit.IsValidBlockingHit())
 	{
-		UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, ForwardTraceHit.Location, TraceCapsuleRadius,
+
+#if ENABLE_DRAW_DEBUG
+		if (bDisplayDebug)
+		{
+			UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, DepthEndLocation, TraceCapsuleRadius,
+				ForwardTraceCapsuleHalfHeight, false, DepthTraceHit, { 0.0f, 0.25f, 1.0f },
+				{ 0.0f, 0.75f, 1.0f }, TraceSettings.bDrawFailedTraces ? 5.0f : 5.0f);
+		}
+#endif
+
+		return false;
+	}
+
+#if ENABLE_DRAW_DEBUG
+	if (bDisplayDebug)
+	{
+		UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, DepthEndLocation, TraceCapsuleRadius,
 			ForwardTraceCapsuleHalfHeight, false, DepthTraceHit, { 0.0f, 0.25f, 1.0f },
 			{ 0.0f, 0.75f, 1.0f }, TraceSettings.bDrawFailedTraces ? 5.0f : 5.0f);
 	}
+#endif
 
-	UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, ForwardTraceHit.Location, TraceCapsuleRadius,
-		ForwardTraceCapsuleHalfHeight, false, DepthTraceHit, { 0.0f, 0.25f, 1.0f },
-		{ 0.0f, 0.75f, 1.0f }, TraceSettings.bDrawFailedTraces ? 5.0f : 5.0f);
+	
 
 	auto* DepthPrimitive{ DepthTraceHit.GetComponent() };
 
@@ -841,6 +860,14 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 
 		return false;
 	}
+
+	UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
+		ForwardTraceCapsuleHalfHeight, true, ForwardTraceHit, { 0.0f, 0.25f, 1.0f },
+		{ 0.0f, 0.75f, 1.0f }, TraceSettings.bDrawFailedTraces ? 5.0f : 0.0f);
+
+	UAlsUtility::DrawDebugSweepSingleSphere(GetWorld(), DownwardTraceStart, DownwardTraceEnd, TraceCapsuleRadius,
+		false, DownwardTraceHit, { 0.25f, 0.0f, 1.0f }, { 0.75f, 0.0f, 1.0f },
+		TraceSettings.bDrawFailedTraces ? 7.5f : 0.0f);
 
 	// Check if the capsule has room to stand at the downward trace's location. If so,
 	// set that location as the target transform and calculate the Vaulting height.
@@ -1508,14 +1535,17 @@ void AALSXTCharacter::OnFocusChanged_Implementation(const FGameplayTag& Previous
 
 // Attack Collision Trace
 
-void AALSXTCharacter::BeginAttackCollisionTrace(FAttackTraceSettings TraceSettings)
+void AALSXTCharacter::BeginAttackCollisionTrace(FALSXTAttackTraceSettings TraceSettings)
 {
-	AttackTraceSettings.Active = true;
-	GetWorld()->GetTimerManager().SetTimer(AttackTraceTimerHandle, AttackTraceTimerDelegate, 0.1f, false);
+	// AttackTraceSettings.Active = true;
+	AttackTraceSettings = TraceSettings;
+
+	GetWorld()->GetTimerManager().SetTimer(AttackTraceTimerHandle, AttackTraceTimerDelegate, 0.1f, true);
 }
 
 void AALSXTCharacter::AttackCollisionTrace(FAttackDoubleHitResult& Hit)
 {
+	
 	if (AttackTraceSettings.Active)
 	{		
 		// Set Local Vars
@@ -1524,8 +1554,13 @@ void AALSXTCharacter::AttackCollisionTrace(FAttackDoubleHitResult& Hit)
 		TArray<FHitResult> HitResults;
 		InitialIgnoredActors.Add(this);	// Add Self to Initial Trace Ignored Actors
 
+		TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
+		AttackTraceObjectTypes = ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes;
+
 		// Initial Trace
-		bool isHit = UKismetSystemLibrary::SphereTraceMulti(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, HitResults, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+		// bool isHit = UKismetSystemLibrary::SphereTraceMulti(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, HitResults, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+
+		bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, HitResults, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
 
 		if (isHit)
 		{
@@ -1537,39 +1572,52 @@ void AALSXTCharacter::AttackCollisionTrace(FAttackDoubleHitResult& Hit)
 				{
 					// Add to AttackedActors Array
 					AttackTraceLastHitActors.AddUnique(HitResult.GetActor());
+
+					FAttackDoubleHitResult CurrentHitResult;
 					
 					// Populate Hit
-					Hit.DoubleHitResult.HitResult.HitResult = HitResult;
+					CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
 
 					// Set Local Vars
-					AActor* HitActor = Hit.DoubleHitResult.HitResult.HitResult.GetActor();
+					AActor* HitActor = CurrentHitResult.DoubleHitResult.HitResult.HitResult.GetActor();
+
+					// FString HitActorDebugName = HitActor->GetActorNameOrLabel();
+					FString HitActorDebugName = HitActor->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitActorDebugName);
 
 					// Setup Origin Trace
 					FHitResult OriginHitResult;
 					OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
 
 					// Perform Origin Trace
-					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, OriginTraceIgnoredActors, EDrawDebugTrace::ForDuration, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+					// bool isOriginHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, OriginTraceIgnoredActors, EDrawDebugTrace::ForDuration, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+
+					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::ForDuration, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+
 					if (isOriginHit)
 					{
 						// Populate Origin Hit
-						Hit.DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
-
+						CurrentHitResult.DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
+					
 						// Populate Values based if Holding Item
 						if (IsHoldingItem())
 						{
-							GetHeldItemAttackDamageInfo(Hit.Type, Hit.Strength, Hit.BaseDamage, Hit.DoubleHitResult.ImpactForm, Hit.DoubleHitResult.HitResult.DamageType);
+							GetHeldItemAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
 						}
 						else
 						{
-							GetUnarmedAttackDamageInfo(Hit.Type, Hit.Strength, Hit.BaseDamage, Hit.DoubleHitResult.ImpactForm, Hit.DoubleHitResult.HitResult.DamageType);
+							GetUnarmedAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
 						}
-
+					
+						FString HitActorname = OriginHitResult.GetActor()->GetName();
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitActorname);
+					
 						// Call OnAttackCollision on CollisionInterface
 						if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UCollisionInterface::StaticClass()))
 						{
-							ICollisionInterface::Execute_OnAttackCollision(HitActor, Hit);
+							ICollisionInterface::Execute_OnAttackCollision(HitActor, CurrentHitResult);
 						}
+						// Hit = CurrentHitResult;
 					}
 				}
 			}

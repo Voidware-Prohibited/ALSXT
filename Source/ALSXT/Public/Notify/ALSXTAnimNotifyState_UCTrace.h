@@ -26,6 +26,8 @@ protected:
 	FGameplayTag AttackStrength;
 
 public:
+	UALSXTAnimNotifyState_UCTrace();
+
 	virtual FString GetNotifyName_Implementation() const override;
 
 	virtual void NotifyBegin(USkeletalMeshComponent* Mesh, UAnimSequenceBase* Animation,

@@ -72,6 +72,37 @@ inline float UALSXTUnarmedCombatSettings::CalculatePlayRate(const float UnarmedA
 }
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTAttackTraceSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	bool Active{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector Start {0.0f, 0.0f, 0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector End {0.0f, 0.0f, 0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float Radius { 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector AttackOrigin {0.0f, 0.0f, 0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactForm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag AttackStrength;
+
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTGeneralUnarmedCombatSettings
 {
 	GENERATED_BODY()
@@ -87,6 +118,9 @@ struct ALSXT_API FALSXTGeneralUnarmedCombatSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180))
 	float RotationOffset{ 45.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FUnarmedAttackType> UnarmedAttackTypes;

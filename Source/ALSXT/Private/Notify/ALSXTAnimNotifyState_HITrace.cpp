@@ -7,9 +7,14 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Utility/AlsUtility.h"
 
+UALSXTAnimNotifyState_HITrace::UALSXTAnimNotifyState_HITrace()
+{
+	bIsNativeBranchingPoint = true;
+}
+
 FString UALSXTAnimNotifyState_HITrace::GetNotifyName_Implementation() const
 {
-	return FString::Format(TEXT("Als Set Locomotion Action: {0}"), {
+	return FString::Format(TEXT("Held Time Attack Type: {0}"), {
 							   FName::NameToDisplayString(UAlsUtility::GetSimpleTagName(OverlayMode).ToString(), false)
 		});
 }
@@ -22,7 +27,7 @@ void UALSXTAnimNotifyState_HITrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 	auto* Character{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
 	if (IsValid(Character))
 	{
-		FAttackTraceSettings TraceSettings;
+		FALSXTAttackTraceSettings TraceSettings;
 		TraceSettings.Active = true;
 		TraceSettings.ImpactType = ImpactType;
 		TraceSettings.AttackStrength = AttackStrength;

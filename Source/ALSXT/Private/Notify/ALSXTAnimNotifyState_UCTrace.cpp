@@ -7,9 +7,14 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Utility/AlsUtility.h"
 
+UALSXTAnimNotifyState_UCTrace::UALSXTAnimNotifyState_UCTrace()
+{
+	bIsNativeBranchingPoint = true;
+}
+
 FString UALSXTAnimNotifyState_UCTrace::GetNotifyName_Implementation() const
 {
-	return FString::Format(TEXT("Als Set Locomotion Action: {0}"), {
+	return FString::Format(TEXT("Unarmed Attack Type: {0}"), {
 							   FName::NameToDisplayString(UAlsUtility::GetSimpleTagName(UnarmedAttackType).ToString(), false)
 		});
 }
@@ -22,13 +27,17 @@ void UALSXTAnimNotifyState_UCTrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 	auto* Character{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
 	if (IsValid(Character))
 	{
-		FAttackTraceSettings TraceSettings;
+		FALSXTAttackTraceSettings TraceSettings;
 		TraceSettings.Active = true;
 		TraceSettings.ImpactType = ImpactType;
 		TraceSettings.AttackStrength = AttackStrength;
+		FString DebugString;
+		ImpactType.GetTagName().ToString().Append(DebugString);
+		AttackStrength.GetTagName().ToString().Append(DebugString);
 
 		Character->GetUnarmedTraceLocations(UnarmedAttackType, TraceSettings.Start, TraceSettings.End, TraceSettings.Radius);
 		Character->BeginAttackCollisionTrace(TraceSettings);
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, DebugString);
 	}
 }
 
@@ -42,5 +51,5 @@ void UALSXTAnimNotifyState_UCTrace::NotifyEnd(USkeletalMeshComponent* Mesh, UAni
 	if (IsValid(Character))
 	{
 		Character->EndAttackCollisionTrace();
-	}
+	}	
 }

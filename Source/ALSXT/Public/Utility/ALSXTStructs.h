@@ -10,37 +10,6 @@ class UCurveFloat;
 class UCurveVector;
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FAttackTraceSettings
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	bool Active{ false };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FVector Start {0.0f, 0.0f, 0.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FVector End {0.0f, 0.0f, 0.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float Radius { 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FVector AttackOrigin {0.0f, 0.0f, 0.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag ImpactType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag ImpactForm;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag AttackStrength;
-
-};
-
-USTRUCT(BlueprintType)
 struct ALSXT_API FExtendedHitResult
 {
 	GENERATED_BODY()
