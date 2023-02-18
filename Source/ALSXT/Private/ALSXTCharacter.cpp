@@ -25,6 +25,7 @@
 #include "Utility/AlsMacros.h"
 #include "Utility/AlsUtility.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AALSXTCharacter::AALSXTCharacter()
 {
@@ -777,18 +778,23 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		return false;
 	}
 
+	// Set Local Variables
 	FHitResult DepthTraceHit;
+	static const FName DepthTraceTag{ __FUNCTION__ TEXT(" (Depth Trace)") };
 	FVector HitLocation = ForwardTraceHit.ImpactPoint;
 	FVector HitNormal = ForwardTraceHit.ImpactNormal;
+
+	// Depth Trace Start Location.
 	FVector DepthStartLocation = HitLocation + (ForwardTraceHit.ImpactNormal * (TraceSettings.MaxDepth * -1));
 	FVector DepthEndLocation = ForwardTraceHit.ImpactPoint + (ForwardTraceHit.ImpactNormal * (1 * -1));
 
+	// Depth Trace. Check if less than max depth.
 	GetWorld()->SweepSingleByObjectType(DepthTraceHit, DepthStartLocation, DepthEndLocation, FQuat::Identity, ObjectQueryParameters,
 		FCollisionShape::MakeCapsule(TraceCapsuleRadius, ForwardTraceCapsuleHalfHeight),
-		{ ForwardTraceTag, false, this });
+		{ DepthTraceTag, false, this });
 
 
-
+	// Check if object is thicker than MaxDepth
 	if(!DepthTraceHit.IsValidBlockingHit())
 	{
 
@@ -796,7 +802,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		if (bDisplayDebug)
 		{
 			UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, DepthEndLocation, TraceCapsuleRadius,
-				ForwardTraceCapsuleHalfHeight, false, DepthTraceHit, { 0.0f, 0.25f, 1.0f },
+				ForwardTraceCapsuleHalfHeight, false, DepthTraceHit, FLinearColor::Yellow,
 				{ 0.0f, 0.75f, 1.0f }, TraceSettings.bDrawFailedTraces ? 5.0f : 5.0f);
 		}
 #endif
@@ -808,12 +814,10 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	if (bDisplayDebug)
 	{
 		UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, DepthEndLocation, TraceCapsuleRadius,
-			ForwardTraceCapsuleHalfHeight, false, DepthTraceHit, { 0.0f, 0.25f, 1.0f },
+			ForwardTraceCapsuleHalfHeight, false, DepthTraceHit, FLinearColor::Yellow,
 			{ 0.0f, 0.75f, 1.0f }, TraceSettings.bDrawFailedTraces ? 5.0f : 5.0f);
 	}
 #endif
-
-	
 
 	auto* DepthPrimitive{ DepthTraceHit.GetComponent() };
 
@@ -860,14 +864,6 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 
 		return false;
 	}
-
-	UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
-		ForwardTraceCapsuleHalfHeight, true, ForwardTraceHit, { 0.0f, 0.25f, 1.0f },
-		{ 0.0f, 0.75f, 1.0f }, TraceSettings.bDrawFailedTraces ? 5.0f : 0.0f);
-
-	UAlsUtility::DrawDebugSweepSingleSphere(GetWorld(), DownwardTraceStart, DownwardTraceEnd, TraceCapsuleRadius,
-		false, DownwardTraceHit, { 0.25f, 0.0f, 1.0f }, { 0.75f, 0.0f, 1.0f },
-		TraceSettings.bDrawFailedTraces ? 7.5f : 0.0f);
 
 	// Check if the capsule has room to stand at the downward trace's location. If so,
 	// set that location as the target transform and calculate the Vaulting height.
@@ -918,12 +914,35 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	}
 #endif
 
+	// Vaulting Room Trace
+
+	// Vaulting Room Trace Hit Result
+	FHitResult LandingTraceHit;
+	static const FName LandingTraceTag{ __FUNCTION__ TEXT(" (Landing Trace)") };
+
+	// Set Local Variables
+	const FVector LandingStartLocation{	TargetCapsuleLocation + (DepthTraceHit.Normal * 60) + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1)) };
+	const FVector LandingEndLocation{ LandingStartLocation.X, LandingStartLocation.Y, GetActorLocation().Z };
+	TArray<FHitResult> HitResults;
+	TArray<AActor*> IgnoreActors;
+	// EDrawDebugTrace VaultRoomDebugType;
+	// TEnumAsByte<EDrawDebugTrace::None>* DebugTrace;
+
+	// Trace for room for Vaulting action
+	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), LandingStartLocation, LandingEndLocation, CapsuleRadius, CapsuleHalfHeight, ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
+	{
+		FString LandingHit = HitResults[0].GetActor()->GetName();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LandingHit);
+		return false;
+	}
+
 	const auto TargetRotation{(-ForwardTraceHit.ImpactNormal.GetSafeNormal2D()).ToOrientationQuat()};
 
 	FALSXTVaultingParameters Parameters;
 
 	Parameters.TargetPrimitive = TargetPrimitive;
-	Parameters.VaultingHeight = UE_REAL_TO_FLOAT((TargetLocation.Z - CapsuleBottomLocation.Z) / CapsuleScale);
+	// Parameters.VaultingHeight = UE_REAL_TO_FLOAT((TargetLocation.Z - CapsuleBottomLocation.Z) / CapsuleScale);
+	Parameters.VaultingHeight = UE_REAL_TO_FLOAT(LandingEndLocation.Z);
 
 	// Determine the Vaulting type by checking the movement mode and Vaulting height.
 
@@ -938,8 +957,15 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 
 	if (MovementBaseUtility::UseRelativeLocation(TargetPrimitive))
 	{
+		// const auto TargetRelativeTransform{
+		// 	TargetPrimitive->GetComponentTransform().GetRelativeTransform({TargetRotation, TargetLocation})
+		// };
+		// 
+		// Parameters.TargetRelativeLocation = TargetRelativeTransform.GetLocation();
+		// Parameters.TargetRelativeRotation = TargetRelativeTransform.Rotator();
+
 		const auto TargetRelativeTransform{
-			TargetPrimitive->GetComponentTransform().GetRelativeTransform({TargetRotation, TargetLocation})
+			TargetPrimitive->GetComponentTransform().GetRelativeTransform({TargetRotation, LandingEndLocation + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1))})
 		};
 
 		Parameters.TargetRelativeLocation = TargetRelativeTransform.GetLocation();
@@ -947,20 +973,24 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	}
 	else
 	{
-		Parameters.TargetRelativeLocation = TargetLocation;
+		// Parameters.TargetRelativeLocation = TargetLocation;
+		// Parameters.TargetRelativeRotation = TargetRotation.Rotator();
+		
+		Parameters.TargetRelativeLocation = LandingEndLocation + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1));
 		Parameters.TargetRelativeRotation = TargetRotation.Rotator();
+
 	}
 
 	if (GetLocalRole() >= ROLE_Authority)
 	{
-		// MulticastStartVaulting(Parameters);
+		MulticastStartVaulting(Parameters);
 	}
 	else
 	{
-		// GetCharacterMovement()->FlushServerMoves();
+		GetCharacterMovement()->FlushServerMoves();
 
-		// StartVaultingImplementation(Parameters);
-		// ServerStartVaulting(Parameters);
+		StartVaultingImplementation(Parameters);
+		ServerStartVaulting(Parameters);
 	}
 
 	return true;
@@ -1543,11 +1573,14 @@ void AALSXTCharacter::BeginAttackCollisionTrace(FALSXTAttackTraceSettings TraceS
 	GetWorld()->GetTimerManager().SetTimer(AttackTraceTimerHandle, AttackTraceTimerDelegate, 0.1f, true);
 }
 
-void AALSXTCharacter::AttackCollisionTrace(FAttackDoubleHitResult& Hit)
+void AALSXTCharacter::AttackCollisionTrace()
 {
 	
 	if (AttackTraceSettings.Active)
 	{		
+		// Update AttackTraceSettings
+		GetUnarmedTraceLocations(AttackTraceSettings.AttackType, AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius);
+
 		// Set Local Vars
 		TArray<AActor*> InitialIgnoredActors;
 		TArray<AActor*> OriginTraceIgnoredActors;
@@ -1558,8 +1591,6 @@ void AALSXTCharacter::AttackCollisionTrace(FAttackDoubleHitResult& Hit)
 		AttackTraceObjectTypes = ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes;
 
 		// Initial Trace
-		// bool isHit = UKismetSystemLibrary::SphereTraceMulti(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, HitResults, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
-
 		bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, HitResults, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
 
 		if (isHit)
@@ -1617,7 +1648,6 @@ void AALSXTCharacter::AttackCollisionTrace(FAttackDoubleHitResult& Hit)
 						{
 							ICollisionInterface::Execute_OnAttackCollision(HitActor, CurrentHitResult);
 						}
-						// Hit = CurrentHitResult;
 					}
 				}
 			}

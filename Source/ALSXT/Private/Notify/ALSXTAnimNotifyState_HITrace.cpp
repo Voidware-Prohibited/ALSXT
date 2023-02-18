@@ -29,7 +29,7 @@ void UALSXTAnimNotifyState_HITrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 	{
 		FALSXTAttackTraceSettings TraceSettings;
 		TraceSettings.Active = true;
-		TraceSettings.ImpactType = ImpactType;
+		TraceSettings.ImpactType = ALSXTImpactTypeTags::Hit;
 		TraceSettings.AttackStrength = AttackStrength;
 		bool Found;
 

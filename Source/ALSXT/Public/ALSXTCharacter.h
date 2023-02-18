@@ -943,7 +943,7 @@ public:
 	void BeginAttackCollisionTrace(FALSXTAttackTraceSettings TraceSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
-	void AttackCollisionTrace(FAttackDoubleHitResult& Hit);
+	void AttackCollisionTrace();
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void EndAttackCollisionTrace();

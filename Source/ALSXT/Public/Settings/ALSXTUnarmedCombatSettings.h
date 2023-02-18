@@ -98,6 +98,9 @@ struct ALSXT_API FALSXTAttackTraceSettings
 	FGameplayTag ImpactForm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag AttackType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag AttackStrength;
 
 };
