@@ -954,6 +954,19 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	void OnImpactCollision(FDoubleHitResult Hit);
 
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character")
+	void GetLocationFromBoneName(FName Hit, FGameplayTag& Location);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void GetFormFromHit(FDoubleHitResult Hit, FGameplayTag& Form);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength);
+
 	// Desired HoldingBreath
 
 public:

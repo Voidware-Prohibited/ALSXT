@@ -15,21 +15,21 @@ class ALSXT_API ICollisionInterface {
 public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
-	void GetMass(float& Mass);
+	void GetActorMass(float& Mass);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
-	void GetVelocity(float& Velocity);
+	void GetActorVelocity(float& Velocity);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
-	void GetPhysicsStates(FGameplayTag& PhysicalMaterial, const TArray<FGameplayTag>& PhysicalStates);
+	void GetActorPhysicsStates(FGameplayTag& PhysicalMaterial, const TArray<FGameplayTag>& PhysicalStates);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
-	void GetPhysicsDamageInfo(FGameplayTag& DamageType, float& PhysicsBaseDamage, float& PhysicsDamageFrequency);
+	void GetActorPhysicsDamageInfo(FGameplayTag& DamageType, float& PhysicsBaseDamage, float& PhysicsDamageFrequency);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
-	void OnAttackCollision(FAttackDoubleHitResult Hit);
+	void OnActorAttackCollision(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
-	void OnImpactCollision(FDoubleHitResult Hit);
+	void OnActorImpactCollision(FDoubleHitResult Hit);
 
 };

@@ -49,6 +49,15 @@ struct ALSXT_API FDoubleHitResult
 	FGameplayTag ImpactForm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactLocation; // Calculated from Get Location from Bone Name
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactSide; // Calculated from Get Side from Hit
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag Strength; // Calculated by Mass and Volume
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FExtendedHitResult HitResult;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
@@ -68,7 +77,7 @@ struct ALSXT_API FAttackDoubleHitResult
 	FGameplayTag Type;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag Strength;
+	FGameplayTag Strength; // Explicitly set in AnimNotify or Attack code
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float BaseDamage;

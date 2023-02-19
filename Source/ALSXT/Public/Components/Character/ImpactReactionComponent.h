@@ -43,32 +43,26 @@ public:
 	bool CanReact();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void GetImpactReactionParticle(FDoubleHitResult Hit, UNiagaraSystem* Particle);
+	void GetImpactReactionParticle(FDoubleHitResult Hit, const UNiagaraSystem* Particle);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void GetImpactReactionSound(FDoubleHitResult Hit, USoundBase* Audio);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character")
-	void GetLocationFromBoneName(FName Hit, FGameplayTag& Location);
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	void GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side);
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	void GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength);
+	void GetImpactReactionSound(FDoubleHitResult Hit, const USoundBase* Audio);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FALSXTImpactReactionState ImpactReactionState;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	void ImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, const UNiagaraSystem* Particle, USoundBase* Audio);
+	void ImpactReaction(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void AttackReaction(FAttackDoubleHitResult Hit);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	UAnimMontage* SelectAttackReactionMontage(FAttackDoubleHitResult Hit, const UAnimMontage* Montage);
+	UAnimMontage* SelectAttackReactionMontage(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	UAnimMontage* SelectImpactReactionMontage(FDoubleHitResult Hit, const UAnimMontage* Montage);
+	UAnimMontage* SelectImpactReactionMontage(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	UALSXTImpactReactionSettings* SelectImpactReactionSettings(const FGameplayTag& Location);

@@ -1056,9 +1056,9 @@ void AALSXTCharacter::StartVaultingImplementation(const FALSXTVaultingParameters
 
 	// Clear the character movement mode and set the locomotion action to Vaulting.
 
-	GetCharacterMovement()->SetMovementMode(MOVE_Custom);
+	// GetCharacterMovement()->SetMovementMode(MOVE_Custom);
 	GetCharacterMovement()->SetBase(Parameters.TargetPrimitive.Get());
-	AlsCharacterMovement->SetMovementModeLocked(true);
+	// AlsCharacterMovement->SetMovementModeLocked(true);
 
 	if (GetLocalRole() >= ROLE_Authority)
 	{
@@ -1565,6 +1565,31 @@ void AALSXTCharacter::OnFocusChanged_Implementation(const FGameplayTag& Previous
 
 // Attack Collision Trace
 
+void AALSXTCharacter::GetLocationFromBoneName_Implementation(FName Hit, FGameplayTag& Location) {}
+
+void AALSXTCharacter::GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side)
+{
+	float DotProduct { this->GetDotProductTo(Hit.OriginHitResult.HitResult.GetActor()) };
+
+	// 1 is face to face, 0 is side,, -1 is behind
+
+	FVector CrossProduct{ FVector::CrossProduct(Hit.HitResult.Impulse, Hit.HitResult.Impulse) };
+	Side = ALSXTImpactSideTags::Front;
+}
+
+void AALSXTCharacter::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength)
+{
+	float HitMass = Hit.HitResult.Mass;
+	float HitVelocity = Hit.HitResult.Velocity;
+	float HitMomentum = HitMass * HitVelocity;
+
+	float SelfMass = Hit.OriginHitResult.Mass;
+	float SelfVelocity = Hit.OriginHitResult.Velocity;
+	float SelfMomentum = SelfMass * SelfVelocity;
+
+	float MomemtumSum = HitMomentum + SelfMomentum;
+}
+
 void AALSXTCharacter::BeginAttackCollisionTrace(FALSXTAttackTraceSettings TraceSettings)
 {
 	// AttackTraceSettings.Active = true;
@@ -1608,21 +1633,27 @@ void AALSXTCharacter::AttackCollisionTrace()
 					
 					// Populate Hit
 					CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
+					FGameplayTag ImpactLoc;
+					GetLocationFromBoneName(CurrentHitResult.DoubleHitResult.HitResult.HitResult.BoneName, ImpactLoc);
+					CurrentHitResult.DoubleHitResult.ImpactLocation = ImpactLoc;
+					CurrentHitResult.Type = AttackTraceSettings.AttackType;
+					FGameplayTag ImpactSide;
+					GetSideFromHit(CurrentHitResult.DoubleHitResult, ImpactSide);
+					CurrentHitResult.DoubleHitResult.ImpactSide = ImpactSide;
+					CurrentHitResult.Strength = AttackTraceSettings.AttackStrength;
+					FGameplayTag ImpactForm;
+					// Some Function that gets form from Hit/Location
+					GetFormFromHit(CurrentHitResult.DoubleHitResult, ImpactForm);
+					CurrentHitResult.DoubleHitResult.ImpactForm = ImpactForm;
 
 					// Set Local Vars
 					AActor* HitActor = CurrentHitResult.DoubleHitResult.HitResult.HitResult.GetActor();
-
-					// FString HitActorDebugName = HitActor->GetActorNameOrLabel();
-					FString HitActorDebugName = HitActor->GetName();
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitActorDebugName);
 
 					// Setup Origin Trace
 					FHitResult OriginHitResult;
 					OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
 
 					// Perform Origin Trace
-					// bool isOriginHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ETraceTypeQuery::TraceTypeQuery1, false, OriginTraceIgnoredActors, EDrawDebugTrace::ForDuration, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
-
 					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::ForDuration, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
 
 					if (isOriginHit)
@@ -1641,12 +1672,11 @@ void AALSXTCharacter::AttackCollisionTrace()
 						}
 					
 						FString HitActorname = OriginHitResult.GetActor()->GetName();
-						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitActorname);
 					
-						// Call OnAttackCollision on CollisionInterface
+						// Call OnActorAttackCollision on CollisionInterface
 						if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UCollisionInterface::StaticClass()))
 						{
-							ICollisionInterface::Execute_OnAttackCollision(HitActor, CurrentHitResult);
+							ICollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
 						}
 					}
 				}

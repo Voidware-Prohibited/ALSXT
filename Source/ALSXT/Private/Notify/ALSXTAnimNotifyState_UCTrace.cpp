@@ -29,16 +29,14 @@ void UALSXTAnimNotifyState_UCTrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 	{
 		FALSXTAttackTraceSettings TraceSettings;
 		TraceSettings.Active = true;
+		TraceSettings.Overlay = Character->GetOverlayMode();
 		TraceSettings.ImpactType = ALSXTImpactTypeTags::Hit;
 		TraceSettings.AttackType = UnarmedAttackType;
+		TraceSettings.ImpactForm = ALSXTImpactFormTags::Blunt;
 		TraceSettings.AttackStrength = AttackStrength;
-		FString DebugString;
-		// TraceSettings.AttackType.GetTagName().ToString().Append(DebugString);
-		// AttackStrength.GetTagName().ToString().Append(DebugString);
 
 		Character->GetUnarmedTraceLocations(UnarmedAttackType, TraceSettings.Start, TraceSettings.End, TraceSettings.Radius);
 		Character->BeginAttackCollisionTrace(TraceSettings);
-		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, DebugString);
 	}
 }
 
