@@ -101,7 +101,7 @@ struct ALSXT_API FTargetHitResultEntry
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float AngleFromCenter {361.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	FHitResult HitResult;
 
 };
@@ -137,7 +137,13 @@ struct ALSXT_API FImpactForm
 	FGameplayTag ImpactReactionForm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FActionMontageInfo> MontageInfo;
+	TArray<FActionMontageInfo> BlockingMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FActionMontageInfo> RegularMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FActionMontageInfo DefaultFallbackMontage;
 };
 
 USTRUCT(BlueprintType)
@@ -174,6 +180,18 @@ struct ALSXT_API FImpactReactionLocation
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray <FImpactReactionStrength> ImpactReactionStrengths;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FImpactReactionOverlayMode
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag OverlayMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray <FImpactReactionLocation> ImpactReactionLocations;
 };
 
 USTRUCT(BlueprintType)

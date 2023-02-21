@@ -36,10 +36,16 @@ class ALSXT_API UALSXTImpactReactionSettings : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactReactionOverlayMode {FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag ImpactReactionLocation {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FActionMontageInfo LocationDefaultMontage;
+	FActionMontageInfo LocationFallbackDefaultMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray <FImpactReactionLocation> ImpactReactionLocations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray <FImpactReactionStrength> ImpactReactionStrengths;

@@ -16,6 +16,9 @@
 #include "State/ALSXTImpactReactionState.h" 
 #include "ImpactReactionComponent.generated.h"
 
+class AAlsCharacter;
+class AALSXTCharacter;
+
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ALSXT_API UImpactReactionComponent : public UActorComponent
@@ -43,10 +46,10 @@ public:
 	bool CanReact();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void GetImpactReactionParticle(FDoubleHitResult Hit, const UNiagaraSystem* Particle);
+	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void GetImpactReactionSound(FDoubleHitResult Hit, const USoundBase* Audio);
+	USoundBase* GetImpactReactionSound(FDoubleHitResult Hit);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FALSXTImpactReactionState ImpactReactionState;
@@ -86,12 +89,24 @@ private:
 	void StartImpactReaction(FDoubleHitResult Hit);
 
 	UFUNCTION(Server, Reliable)
-	void ServerStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+	void ServerAttackReaction(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+	void MulticastAttackReaction(FAttackDoubleHitResult Hit);
 
-	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+	UFUNCTION(Server, Reliable)
+	void ServerImpactReaction(FDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastImpactReaction(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable)
+	void ServerStartImpactReaction(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartImpactReaction(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	void StartImpactReactionImplementation(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	void RefreshImpactReaction(float DeltaTime);
 

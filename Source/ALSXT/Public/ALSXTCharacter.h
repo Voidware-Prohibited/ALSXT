@@ -4,6 +4,8 @@
 #include "GameFramework/Character.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTUnarmedCombatSettings.h"
+#include "Settings/ALSXTAttackReactionSettings.h"
+#include "Settings/ALSXTImpactReactionSettings.h"
 #include "State/AlsLocomotionState.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Engine/EngineTypes.h"
@@ -154,11 +156,14 @@ private:
 	FTimerHandle AttackTraceTimerHandle;	// Timer Handle for Attack Trace
 	FTimerDelegate AttackTraceTimerDelegate; // Delegate to bind function with parameters
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
 	FALSXTAttackTraceSettings AttackTraceSettings;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
 	TArray<AActor*> AttackTraceLastHitActors;
+
+private:
 
 	// HoldingBreath
 
@@ -937,7 +942,6 @@ protected:
 		void OnFocusChanged(const FGameplayTag& PreviousFocusTag);
 
 	// Attack Collision Trace
-
 public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void BeginAttackCollisionTrace(FALSXTAttackTraceSettings TraceSettings);

@@ -4,7 +4,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Utility/AlsUtility.h"
+#include "Utility/AlsMacros.h"
 #include "GameFramework/Character.h"
+#include "ALSXTCharacter.h"
 
 // Sets default values for this component's properties
 UUnarmedCombatComponent::UUnarmedCombatComponent()

@@ -8,6 +8,9 @@
 #include "State/ALSXTSlidingState.h"
 #include "SlidingActionComponent.generated.h"
 
+class AAlsCharacter;
+class AALSXTCharacter;
+
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ALSXT_API USlidingActionComponent : public UActorComponent
 {

@@ -27,7 +27,7 @@ void UALSXTAnimNotifyState_UCTrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 	auto* Character{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
 	if (IsValid(Character))
 	{
-		FALSXTAttackTraceSettings TraceSettings;
+		// FALSXTAttackTraceSettings TraceSettings1;
 		TraceSettings.Active = true;
 		TraceSettings.Overlay = Character->GetOverlayMode();
 		TraceSettings.ImpactType = ALSXTImpactTypeTags::Hit;
@@ -36,6 +36,8 @@ void UALSXTAnimNotifyState_UCTrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 		TraceSettings.AttackStrength = AttackStrength;
 
 		Character->GetUnarmedTraceLocations(UnarmedAttackType, TraceSettings.Start, TraceSettings.End, TraceSettings.Radius);
+		FString DebugMsg;
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::White, TEXT("Trace Start"));
 		Character->BeginAttackCollisionTrace(TraceSettings);
 	}
 }

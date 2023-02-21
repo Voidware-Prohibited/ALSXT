@@ -36,7 +36,10 @@ class ALSXT_API UALSXTAttackReactionSettings : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag ImpactReactionLocation;
+	FActionMontageInfo LocationFallbackDefaultMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray <FImpactReactionLocation> ImpactReactionLocations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
@@ -49,9 +52,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
 	FVector2D PlayRate{1.0f, 1.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FImpactReactionStrength> ImpactReactionStrengths;
 
 public:
 	float CalculateStartTime(float AttackHeight) const;
@@ -87,7 +87,7 @@ struct ALSXT_API FALSXTGeneralAttackReactionSettings
 	float RotationOffset{ 45.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FActionMontageInfo DefaultMontage;
+	FActionMontageInfo FallbackDefaultMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FImpactReactionLocation> AttackReactionLocations;

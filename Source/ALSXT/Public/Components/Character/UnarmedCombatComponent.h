@@ -12,7 +12,6 @@
 #include "State/ALSXTUnarmedCombatState.h"
 #include "UnarmedCombatComponent.generated.h"
 
-
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ALSXT_API UUnarmedCombatComponent : public UActorComponent
 {

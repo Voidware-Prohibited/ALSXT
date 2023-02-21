@@ -2,9 +2,11 @@
 
 #include "Components/Character/ImpactReactionComponent.h"
 #include "Utility/ALSXTStructs.h"
+#include "ALSXTCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/RandomStream.h"
 #include "Settings/ALSXTAttackReactionSettings.h"
+#include "Utility/AlsMacros.h"
 
 // Sets default values for this component's properties
 UImpactReactionComponent::UImpactReactionComponent()
@@ -46,7 +48,22 @@ void UImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit)
 
 void UImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("1 - AttackReaction"));
 	StartAttackReaction(Hit);
+	// MulticastAttackReaction(Hit);
+	// ServerAttackReaction(Hit);
+
+	// if (Character->GetLocalRole() >= ROLE_Authority)
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("1.5 - Authority"));
+	// 	MulticastAttackReaction(Hit);
+	// }
+	// else
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("1.5 - Not Authority"));
+	// 	// ServerAttackReaction(Hit);
+	// 	StartAttackReaction(Hit);
+	// }
 }
 
 bool UImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const
@@ -56,17 +73,19 @@ bool UImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMontage
 
 void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 {
-	if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
-	{
-		return;
-	}
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("2 - StartAttackReaction"));
+	// if (GetOwnerRole() <= ROLE_SimulatedProxy)
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("3 - return false: Role: Simulated Proxy"));
+	// 	return;
+	// }
 	UAnimMontage* Montage{ nullptr };
 	UNiagaraSystem* Particle{ nullptr };
 	USoundBase* Audio{ nullptr };
 
 	Montage = SelectAttackReactionMontage(Hit);
-	GetImpactReactionParticle(Hit.DoubleHitResult, Particle);
-	GetImpactReactionSound(Hit.DoubleHitResult, Audio);	
+	Particle = GetImpactReactionParticle(Hit.DoubleHitResult);
+	Audio = GetImpactReactionSound(Hit.DoubleHitResult);
 
 	if (!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage))
 	{
@@ -82,18 +101,19 @@ void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 	// APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	// Character->DisableInput(PlayerController);
 
-	if (Character->GetLocalRole() >= ROLE_Authority)
+	if (GetOwnerRole() >= ROLE_Authority)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("3 - Authority"));
 		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
 		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
-		MulticastStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
+		MulticastStartImpactReaction(Hit.DoubleHitResult.HitResult.HitResult, Montage, Particle, Audio);
 	}
 	else
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("3 - Not Authority"));
 		Character->GetCharacterMovement()->FlushServerMoves();
-
-		StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, Particle, Audio);
-		ServerStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
+		StartImpactReactionImplementation(Hit.DoubleHitResult.HitResult.HitResult, Montage, Particle, Audio);
+		// ServerStartImpactReaction(Hit.DoubleHitResult.HitResult.HitResult, Montage, Particle, Audio);
 		OnImpactReactionStarted(Hit.DoubleHitResult);
 	}
 }
@@ -109,8 +129,8 @@ void UImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	USoundBase* Audio {nullptr};
 
 	Montage = SelectImpactReactionMontage(Hit);
-	GetImpactReactionParticle(Hit, Particle);
-	GetImpactReactionSound(Hit, Audio);
+	Particle = GetImpactReactionParticle(Hit);
+	Audio = GetImpactReactionSound(Hit);
 
 	if (!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage))
 	{
@@ -130,14 +150,14 @@ void UImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	{
 		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
 		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
-		MulticastStartImpactReaction(Hit, Montage, Particle, Audio);
+		MulticastStartImpactReaction(Hit.HitResult.HitResult, Montage, Particle, Audio);
 	}
 	else
 	{
 		Character->GetCharacterMovement()->FlushServerMoves();
 
-		StartImpactReactionImplementation(Hit, Montage, Particle, Audio);
-		ServerStartImpactReaction(Hit, Montage, Particle, Audio);
+		StartImpactReactionImplementation(Hit.HitResult.HitResult, Montage, Particle, Audio);
+		ServerStartImpactReaction(Hit.HitResult.HitResult, Montage, Particle, Audio);
 		OnImpactReactionStarted(Hit);
 	}
 }
@@ -155,112 +175,70 @@ UALSXTAttackReactionSettings* UImpactReactionComponent::SelectAttackReactionSett
 UAnimMontage* UImpactReactionComponent::SelectAttackReactionMontage_Implementation(FAttackDoubleHitResult Hit)
 {
 	UAnimMontage* SelectedMontage{ nullptr };
-	int i = 0;
-	int j = 0;
-	int k = 0;
-	int l = 0;
 	FActionMontageInfo LastAnimation{ nullptr };
 	FGameplayTag ImpactLoc = Hit.DoubleHitResult.ImpactLocation;
 
 	UALSXTAttackReactionSettings* AttackReactionSettings = SelectAttackReactionSettings(ImpactLoc);
 
-	 for (i = 0; i < AttackReactionSettings->ImpactReactionStrengths.Num(); ++i)
-	 {
-	 	if (AttackReactionSettings->ImpactReactionStrengths[i].ImpactReactionStrength == Hit.Strength)
-	 	{
-	 		for (j = 0; j < AttackReactionSettings->ImpactReactionStrengths[i].ImpactReactionSides.Num(); ++j)
-	 		{
-	 			if (AttackReactionSettings->ImpactReactionStrengths[i].ImpactReactionSides[j].ImpactReactionSide == Hit.DoubleHitResult.ImpactSide)
-	 			{
-	 				for (k = 0; k < AttackReactionSettings->ImpactReactionStrengths[i].ImpactReactionSides[j].ImpactReactionForms.Num(); ++k)
-	 				{
-	 					if (AttackReactionSettings->ImpactReactionStrengths[i].ImpactReactionSides[j].ImpactReactionForms[k].ImpactReactionForm == Hit.DoubleHitResult.ImpactForm)
-	 					{
-							// Declare Local Copy of Montages Array
-							TArray<FActionMontageInfo> MontageArray{ AttackReactionSettings->ImpactReactionStrengths[i].ImpactReactionSides[j].ImpactReactionForms[k].MontageInfo };
-							
-							if (MontageArray.Num() > 1)
-							{
-								// If LastAnimation exists, remove it from Local Montages array to avoid duplicates
-								if (LastAnimation.Montage)
-								{
-									MontageArray.Remove(LastAnimation);
-								}
-
-								//Shuffle Array
-								for (int m = MontageArray.Max(); m >= 0; --m)
-								{
-									int n = FMath::Rand() % (m + 1);
-									if (m != n) MontageArray.Swap(m, n);
-								}
-
-								// Select Random Array Entry
-								int RandIndex = rand() % MontageArray.Max();
-								SelectedMontage = AttackReactionSettings->ImpactReactionStrengths[i].ImpactReactionSides[j].ImpactReactionForms[k].MontageInfo[RandIndex].Montage;
-							}
-							else
-							{
-								SelectedMontage = AttackReactionSettings->ImpactReactionStrengths[i].ImpactReactionSides[j].ImpactReactionForms[k].MontageInfo[0].Montage;
-							}
-	 					}
-	 				}
-	 			}
-	 		}
-	 	}
-	 }
-	return SelectedMontage;
-}
-
-UAnimMontage* UImpactReactionComponent::SelectImpactReactionMontage_Implementation(FDoubleHitResult Hit)
-{
-	UAnimMontage* SelectedMontage { nullptr };
-	int i = 0;
-	int j = 0;
-	int k = 0;
-	int l = 0;
-	FActionMontageInfo LastAnimation { nullptr };
-
-	for (i = 0; i < Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations.Num(); ++i)
+	for (int i = 0; i < AttackReactionSettings->ImpactReactionLocations.Num(); ++i)
 	{
-		if (Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionLocation == Hit.ImpactLocation)
+		if (AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionLocation == Hit.DoubleHitResult.ImpactLocation)
 		{
-			for (j = 0; j < Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths.Num(); ++j)
+			for (int j = 0; j < AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths.Num(); ++j)
 			{
-				if (Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionStrength == Hit.Strength)
+				if (AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionStrength == Hit.Strength)
 				{
-					for (k = 0; k < Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides.Num(); ++k)
+					for (int k = 0; k < AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides.Num(); ++k)
 					{
-						if (Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionSide == Hit.ImpactSide)
+						if (AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionSide == Hit.DoubleHitResult.ImpactSide)
 						{
-							for (l = 0; l < Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms.Num(); ++l)
+							for (int l = 0; l < AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms.Num(); ++l)
 							{
-								if (Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].ImpactReactionForm == Hit.ImpactForm)
+								if (AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].ImpactReactionForm == Hit.DoubleHitResult.ImpactForm)
 								{
-									// Declare Local Copy of Montages Array
-									TArray<FActionMontageInfo> MontageArray { Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].MontageInfo };
-									
+									FImpactForm SelectedEntry { AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l] };
+
+									// Determine if Blocking and Declare Local Copy of Montages Array
+									TArray<FActionMontageInfo> MontageArray;
+									if (Character->IsBlocking()) 
+									{
+										MontageArray = SelectedEntry.BlockingMontages;
+									}
+									else
+									{
+										MontageArray = SelectedEntry.RegularMontages;
+									}
+	
 									if (MontageArray.Num() > 1)
 									{
 										// If LastAnimation exists, remove it from Local Montages array to avoid duplicates
-										if (LastAnimation.Montage)
-										{
-											MontageArray.Remove(LastAnimation);
-										}
-
+										// if (LastAnimation.Montage)
+										// {
+										// 	MontageArray.Remove(LastAnimation);
+										// }
+	
 										//Shuffle Array
 										for (int m = MontageArray.Max(); m >= 0; --m)
 										{
 											int n = FMath::Rand() % (m + 1);
 											if (m != n) MontageArray.Swap(m, n);
 										}
-
+	
 										// Select Random Array Entry
 										int RandIndex = rand() % MontageArray.Max();
-										SelectedMontage = Character->ALSXTSettings->ImpactReaction.ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].MontageInfo[RandIndex].Montage;
+										SelectedMontage = MontageArray[RandIndex].Montage;
 									}
 									else
 									{
-										SelectedMontage = Character->ALSXTSettings->UnarmedCombat.UnarmedAttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].MontageInfo[0].Montage;
+										if (MontageArray[0].Montage) 
+										{
+											SelectedMontage = MontageArray[0].Montage;
+										}
+										else
+										{
+											SelectedMontage = SelectedEntry.DefaultFallbackMontage.Montage;
+										}
+										
 									}
 								}
 							}
@@ -273,7 +251,98 @@ UAnimMontage* UImpactReactionComponent::SelectImpactReactionMontage_Implementati
 	return SelectedMontage;
 }
 
-void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
+UAnimMontage* UImpactReactionComponent::SelectImpactReactionMontage_Implementation(FDoubleHitResult Hit)
+{
+	UAnimMontage* SelectedMontage { nullptr };
+	FActionMontageInfo LastAnimation { nullptr };
+	FGameplayTag ImpactLoc = Hit.ImpactLocation;
+
+	UALSXTImpactReactionSettings* ImpactReactionSettings = SelectImpactReactionSettings(ImpactLoc);
+
+	for (int i = 0; i < ImpactReactionSettings->ImpactReactionLocations.Num(); ++i)
+	{
+		if (ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionLocation == Hit.ImpactLocation)
+		{
+			for (int j = 0; j < ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths.Num(); ++j)
+			{
+				if (ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionStrength == Hit.Strength)
+				{
+					for (int k = 0; k < ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides.Num(); ++k)
+					{
+						if (ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionSide == Hit.ImpactSide)
+						{
+							for (int l = 0; l < ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms.Num(); ++l)
+							{
+								if (ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].ImpactReactionForm == Hit.ImpactForm)
+								{
+									
+									// Determine if Blocking and Declare Local Copy of Montages Array
+									TArray<FActionMontageInfo> MontageArray;
+									if (Character->IsBlocking())
+									{
+										MontageArray = ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].BlockingMontages;
+									}
+									else
+									{
+										MontageArray = ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].RegularMontages;
+									}
+									if (MontageArray.Num() > 1)
+									{
+										// If LastAnimation exists, remove it from Local Montages array to avoid duplicates
+										// if (LastAnimation.Montage)
+										// {
+										// 	MontageArray.Remove(LastAnimation);
+										// }
+
+										//Shuffle Array
+										for (int m = MontageArray.Max(); m >= 0; --m)
+										{
+											int n = FMath::Rand() % (m + 1);
+											if (m != n) MontageArray.Swap(m, n);
+										}
+
+										// Select Random Array Entry
+										int RandIndex = rand() % MontageArray.Max();
+										SelectedMontage = MontageArray[RandIndex].Montage;
+									}
+									else
+									{
+										SelectedMontage = MontageArray[0].Montage;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return SelectedMontage;
+}
+
+void UImpactReactionComponent::ServerAttackReaction_Implementation(FAttackDoubleHitResult Hit)
+{
+	MulticastAttackReaction(Hit);
+	Character->ForceNetUpdate();
+}
+
+void UImpactReactionComponent::MulticastAttackReaction_Implementation(FAttackDoubleHitResult Hit)
+{
+	StartAttackReaction(Hit);
+}
+
+void UImpactReactionComponent::ServerImpactReaction_Implementation(FDoubleHitResult Hit)
+{
+	MulticastImpactReaction(Hit);
+	Character->ForceNetUpdate();
+}
+
+void UImpactReactionComponent::MulticastImpactReaction_Implementation(FDoubleHitResult Hit)
+{
+	StartImpactReaction(Hit);
+}
+
+void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
 {
 	if (IsImpactReactionAllowedToStart(Montage))
 	{
@@ -282,57 +351,62 @@ void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FDoubleH
 	}
 }
 
-void UImpactReactionComponent::MulticastStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
+void UImpactReactionComponent::MulticastStartImpactReaction_Implementation(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
 {
 	StartImpactReactionImplementation(Hit, Montage, Particle, Audio);
 }
 
-void UImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("StartImpactReactionImplementation, !IsImpactReactionAllowedToStart"));
-	if (IsImpactReactionAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, 1.0f))
+void UImpactReactionComponent::StartImpactReactionImplementation(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
+{	
+	//if (IsImpactReactionAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, 1.0f))
+	if (IsImpactReactionAllowedToStart(Montage))
 	{
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, 1.0f);
 		// ImpactReactionState.TargetYawAngle = TargetYawAngle;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("StartImpactReactionImplementation"));
 
 		UAudioComponent* AudioComponent{ nullptr };
 
 		//Calculate Rotation from Normal Vector
-		FVector UpVector = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetUpVector();
-		FVector NormalVector = Hit.HitResult.HitResult.ImpactNormal;
+		FVector UpVector = Hit.GetActor()->GetRootComponent()->GetUpVector();
+		FVector NormalVector = Hit.ImpactNormal;
 		FVector RotationAxis = FVector::CrossProduct(UpVector, NormalVector);
 		RotationAxis.Normalize();
 		float DotProduct = FVector::DotProduct(UpVector, NormalVector);
 		float RotationAngle = acosf(DotProduct);
 		FQuat Quat = FQuat(RotationAxis, RotationAngle);
-		FQuat RootQuat = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetComponentQuat();
+		FQuat RootQuat = Hit.GetActor()->GetRootComponent()->GetComponentQuat();
 		FQuat NewQuat = Quat * RootQuat;
 		FRotator NewRotation = NewQuat.Rotator();
 
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("4 - Reaction"));
+
 		if (Particle)
 		{
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Particle, Hit.HitResult.HitResult.Location, NewRotation, FVector(1.0f, 1.0f, 1.0f), true, true, ENCPoolMethod::None, true);
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Particle, Hit.ImpactPoint, NewRotation, FVector(1.0f, 1.0f, 1.0f), true, true, ENCPoolMethod::None, true);
 		}
 
 		if (Audio)
 		{
 			if (GetWorld()->WorldType == EWorldType::EditorPreview)
 			{
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Audio, Hit.HitResult.HitResult.Location,
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Audio, Hit.ImpactPoint,
 					1.0f, 1.0f);
 			}
 			else
 			{
-				AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Audio, Hit.HitResult.HitResult.Location,
+				AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Audio, Hit.ImpactPoint,
 					NewRotation,
 					1.0f, 1.0f);
 			}
 		}
 
 		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
-
 		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::HitReaction);
 		// Crouch(); //Hack
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Cannot Start"));
 	}
 }
 

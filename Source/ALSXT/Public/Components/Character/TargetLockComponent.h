@@ -12,6 +12,8 @@
 #include "Utility/ALSXTEnums.h"
 #include "TargetLockComponent.generated.h"
 
+class AAlsCharacter;
+class AALSXTCharacter;
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ALSXT_API UTargetLockComponent : public UActorComponent
