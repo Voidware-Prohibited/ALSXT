@@ -71,6 +71,20 @@ namespace ALSXTVaultTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(FenceSprinting, TEXT("Als.Vault Type.Fence Sprinting"))
 }
 
+namespace ALSXTPhysAnimModeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Game.Phys Anim Mode.None"))
+	UE_DEFINE_GAMEPLAY_TAG(Bump, TEXT("Game.Phys Anim Mode.Bump"))
+	UE_DEFINE_GAMEPLAY_TAG(Hit, TEXT("Game.Phys Anim Mode.Hit"))
+}
+
+namespace ALSXTReactionAnimationTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Impact, TEXT("Game.Reaction Animation Type.Impact"))
+	UE_DEFINE_GAMEPLAY_TAG(WithRecvovery, TEXT("Game.Reaction Animation Type.WithRecvovery"))
+	UE_DEFINE_GAMEPLAY_TAG(Synced, TEXT("Game.Reaction Animation Type.Synced"))
+}
+
 namespace ALSXTPlayerServerStateTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Loading, TEXT("Game.Player Server State.Loading"))

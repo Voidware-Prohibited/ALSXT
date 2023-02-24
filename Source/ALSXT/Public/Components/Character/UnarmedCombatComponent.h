@@ -40,11 +40,44 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	bool DebugMode;
+
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
 
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
+
+	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	UAlsCameraComponent* Camera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	FTargetHitResultEntry CurrentTarget;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALSXT|Target Lock")
+	void GetTargetableOverlayModes(TArray<FGameplayTag>& TargetableOverlayModes) const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	float GetAngle(FVector Target);
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	void TraceForTargets(bool DisplayDebug, float DebugDuration, TArray<FTargetHitResultEntry>& Targets);
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	void GetClosestTarget();
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	void DisengageAllTargets();
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	void GetTargetLeft();
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	void GetTargetRight();
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	void RotatePlayerToTarget(FTargetHitResultEntry Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanUnarmedAttack();

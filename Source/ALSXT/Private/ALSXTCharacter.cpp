@@ -18,6 +18,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/CollisionInterface.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 //
 #include "Curves/CurveVector.h"
 #include "RootMotionSources/ALSXTRootMotionSource_Vaulting.h"
@@ -32,6 +33,22 @@ AALSXTCharacter::AALSXTCharacter()
 	Camera = CreateDefaultSubobject<UAlsCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(GetMesh());
 	Camera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
+
+	// Add Character Sound Component
+	// CharacterSound = CreateDefaultSubobject<UALSXTCharacterSoundComponent>(TEXT("Character Sound"));
+	// 
+	// // Add Sliding Action Component
+	// SlidingAction = CreateDefaultSubobject<USlidingActionComponent>(TEXT("Sliding Action"));
+	// 
+	// // Add Combat Component
+	// Combat = CreateDefaultSubobject<UUnarmedCombatComponent>(TEXT("Combat"));
+	// 
+	// // Add Impact Reaction Component
+	// ImpactReaction = CreateDefaultSubobject<UImpactReactionComponent>(TEXT("Impact Reaction"));
+	// 
+	// Add Physical Animation Component
+	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
+	AddOwnedComponent(PhysicalAnimation);
 }
 
 void AALSXTCharacter::NotifyControllerChanged()
@@ -105,7 +122,6 @@ void AALSXTCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace", AttackTraceSettings);
-
 }
 
 void AALSXTCharacter::CalcCamera(const float DeltaTime, FMinimalViewInfo& ViewInfo)
@@ -1592,22 +1608,16 @@ void AALSXTCharacter::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Str
 
 void AALSXTCharacter::BeginAttackCollisionTrace(FALSXTAttackTraceSettings TraceSettings)
 {
-	// AttackTraceSettings.Active = true;
 	AttackTraceSettings = TraceSettings;
-	AttackTraceSettings.Active = true;
-
 	GetWorld()->GetTimerManager().SetTimer(AttackTraceTimerHandle, AttackTraceTimerDelegate, 0.1f, true);
 }
 
 void AALSXTCharacter::AttackCollisionTrace()
 {
-	
-	// if (AttackTraceSettings.Active)
-	// {		
 		// Update AttackTraceSettings
 		GetUnarmedTraceLocations(AttackTraceSettings.AttackType, AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius);
 
-		// Set Local Vars
+		// Declare Local Vars
 		TArray<AActor*> InitialIgnoredActors;
 		TArray<AActor*> OriginTraceIgnoredActors;
 		TArray<FHitResult> HitResults;
@@ -1617,7 +1627,7 @@ void AALSXTCharacter::AttackCollisionTrace()
 		AttackTraceObjectTypes = ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes;
 
 		// Initial Trace
-		bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, HitResults, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+		bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
 
 		if (isHit)
 		{
@@ -1630,33 +1640,55 @@ void AALSXTCharacter::AttackCollisionTrace()
 					// Add to AttackedActors Array
 					AttackTraceLastHitActors.AddUnique(HitResult.GetActor());
 
+					// Declare Local Vars
 					FAttackDoubleHitResult CurrentHitResult;
-					
-					// Populate Hit
-					CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
 					FGameplayTag ImpactLoc;
+					FGameplayTag ImpactSide;
+					FGameplayTag ImpactForm;
+					AActor* HitActor{ nullptr };
+					FString HitActorname;
+					float HitActorVelocity { 0.0f };
+					float HitActorMass { 0.0f };
+					float HitActorAttackVelocity { 0.0f };
+					float HitActorAttackMass { 0.0f };
+					float TotalImpactEnergy { 0.0f };
+
+					// Populate Hit
+					// 
+					
+					// Call OnActorAttackCollision on CollisionInterface
+					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UCollisionInterface::StaticClass()))
+					{
+						ICollisionInterface::Execute_GetActorVelocity(HitActor, HitActorVelocity);
+						ICollisionInterface::Execute_GetActorMass(HitActor, HitActorMass);
+					}
+
+					// Get Attack Physics
+					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
+					{
+						IALSXTCharacterInterface::Execute_GetCombatAttackPhysics(HitActor, HitActorAttackMass, HitActorAttackVelocity);
+					}
+
+					TotalImpactEnergy = (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
+					// FMath::Square(TossSpeed)
+					CurrentHitResult.DoubleHitResult.HitResult.Impulse = HitResult.Normal * TotalImpactEnergy;
+					CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
 					GetLocationFromBoneName(CurrentHitResult.DoubleHitResult.HitResult.HitResult.BoneName, ImpactLoc);
 					CurrentHitResult.DoubleHitResult.ImpactLocation = ImpactLoc;
 					CurrentHitResult.Type = AttackTraceSettings.AttackType;
-					FGameplayTag ImpactSide;
 					GetSideFromHit(CurrentHitResult.DoubleHitResult, ImpactSide);
 					CurrentHitResult.DoubleHitResult.ImpactSide = ImpactSide;
 					CurrentHitResult.Strength = AttackTraceSettings.AttackStrength;
-					FGameplayTag ImpactForm;
-					// Some Function that gets form from Hit/Location
 					GetFormFromHit(CurrentHitResult.DoubleHitResult, ImpactForm);
-					// CurrentHitResult.DoubleHitResult.ImpactForm = ImpactForm;
-
-					// Set Local Vars
-					AActor* HitActor = CurrentHitResult.DoubleHitResult.HitResult.HitResult.GetActor();
-					FString HitActorname = HitActor->GetName();
+					HitActor = CurrentHitResult.DoubleHitResult.HitResult.HitResult.GetActor();
+					HitActorname = HitActor->GetName();
 
 					// Setup Origin Trace
 					FHitResult OriginHitResult;
 					OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
 
 					// Perform Origin Trace
-					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::ForDuration, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
 
 					// Perform Origin Hit Trace to get PhysMat eyc for ImpactLocation
 					if (isOriginHit)
@@ -1674,21 +1706,17 @@ void AALSXTCharacter::AttackCollisionTrace()
 							GetUnarmedAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
 						}
 						FString OriginHitActorname = OriginHitResult.GetActor()->GetName();
-						// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, OriginHitActorname);
 						
 					}
 					// Call OnActorAttackCollision on CollisionInterface
 					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UCollisionInterface::StaticClass()))
 					{
-						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, HitActorname);
+						// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, HitActorname);
 						ICollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
 					}
 				}
-				// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Already Hit"));
 			}
 		}
-	// }
-	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Trace Not Active"));
 }
 
 void AALSXTCharacter::EndAttackCollisionTrace()
@@ -1696,10 +1724,7 @@ void AALSXTCharacter::EndAttackCollisionTrace()
 	// Clear Attack Trace Timer
 	GetWorld()->GetTimerManager().ClearTimer(AttackTraceTimerHandle);
 
-	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::White, TEXT("End Trace"));
-	
 	// Reset Attack Trace Settings
-	AttackTraceSettings.Active = false;
 	AttackTraceSettings.Start = { 0.0f, 0.0f, 0.0f };
 	AttackTraceSettings.End = { 0.0f, 0.0f, 0.0f };
 	AttackTraceSettings.Radius = { 0.0f };

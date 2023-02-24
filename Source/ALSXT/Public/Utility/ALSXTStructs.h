@@ -112,7 +112,7 @@ struct ALSXT_API FActionMontageInfo
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-		TObjectPtr<UAnimMontage> Montage { nullptr };
+	TObjectPtr<UAnimMontage> Montage { nullptr };
 
 	// UnarmedAttack time to blend in amount curve.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
@@ -126,6 +126,19 @@ struct ALSXT_API FActionMontageInfo
 	{
 		return (other.Montage == Montage) && (other.BlendInCurve == BlendInCurve) && (other.InterpolationAndCorrectionAmountsCurve == InterpolationAndCorrectionAmountsCurve);
 	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FSyncedActionMontageInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FActionMontageInfo> AttackerSyncedMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FActionMontageInfo> TargetSyncedMontages;
+
 };
 
 USTRUCT(BlueprintType)
@@ -144,6 +157,9 @@ struct ALSXT_API FImpactForm
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FActionMontageInfo DefaultFallbackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FActionMontageInfo> RecoveryMontages;
 };
 
 USTRUCT(BlueprintType)
@@ -203,7 +219,16 @@ struct ALSXT_API FUnarmedAttackStance
 	FGameplayTag UnarmedAttackStance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag AnimationType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FActionMontageInfo> MontageInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FActionMontageInfo> RegularMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FSyncedActionMontageInfo> SyncedMontages;
 };
 
 USTRUCT(BlueprintType)

@@ -2,6 +2,7 @@
 
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
+#include "Settings/AlsMantlingSettings.h"
 #include "ALSXTVaultingSettings.generated.h"
 
 class UAnimMontage;

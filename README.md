@@ -51,3 +51,5 @@ Original content and code in this repository is under the MIT license. Any git s
 - [Tactical Axe 2](https://sketchfab.com/3d-models/tactical-axe2-e4fa55bab1d1433aaa8e8f563fd7ac05) by [TORI106](https://sketchfab.com/TORI106) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to optimize textures
 
 - [Bench 02](https://sketchfab.com/3d-models/bench-02-0fc91c47c6b04717bb4400c247de573e) by [Ricardo Sanchez](https://sketchfab.com/380660711785) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/)
+
+- [swipes and whooshes tshirt fast and short swings stereo ORTF 8040.wav](https://freesound.org/people/Soundholder/sounds/425856/) by [Soundholder](https://freesound.org/people/Soundholder/) [License: CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) Modified to be seperate sounds

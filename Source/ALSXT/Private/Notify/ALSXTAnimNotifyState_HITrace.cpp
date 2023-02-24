@@ -28,7 +28,6 @@ void UALSXTAnimNotifyState_HITrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 	if (IsValid(Character))
 	{
 		FALSXTAttackTraceSettings TraceSettings;
-		TraceSettings.Active = true;
 		TraceSettings.Overlay = Character->GetOverlayMode();
 		TraceSettings.ImpactType = ALSXTImpactTypeTags::Hit;
 		TraceSettings.AttackType = ALSXTAttackTypeTags::Regular;

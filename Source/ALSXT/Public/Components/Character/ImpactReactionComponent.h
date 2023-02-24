@@ -16,10 +16,6 @@
 #include "State/ALSXTImpactReactionState.h" 
 #include "ImpactReactionComponent.generated.h"
 
-class AAlsCharacter;
-class AALSXTCharacter;
-
-
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ALSXT_API UImpactReactionComponent : public UActorComponent
 {
@@ -101,12 +97,12 @@ private:
 	void MulticastImpactReaction(FDoubleHitResult Hit);
 
 	UFUNCTION(Server, Reliable)
-	void ServerStartImpactReaction(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+	void ServerStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartImpactReaction(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+	void MulticastStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
-	void StartImpactReactionImplementation(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	void RefreshImpactReaction(float DeltaTime);
 

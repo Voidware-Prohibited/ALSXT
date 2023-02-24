@@ -42,6 +42,21 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	class UALSXTCharacterSoundComponent* CharacterSound;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	class USlidingActionComponent* SlidingAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	class UImpactReactionComponent* ImpactReaction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	class UUnarmedCombatComponent* Combat;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	class UPhysicalAnimationComponent* PhysicalAnimation;
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
@@ -956,7 +971,13 @@ public:
 	void OnAttackCollision(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnAttackHit(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	void OnImpactCollision(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnImpactHit(FDoubleHitResult Hit);
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character")

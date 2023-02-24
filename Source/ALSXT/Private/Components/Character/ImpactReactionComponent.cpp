@@ -14,6 +14,7 @@ UImpactReactionComponent::UImpactReactionComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicated(true);
 
 	// ...
 }
@@ -48,7 +49,7 @@ void UImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit)
 
 void UImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("1 - AttackReaction"));
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("1 - AttackReaction"));
 	StartAttackReaction(Hit);
 	// MulticastAttackReaction(Hit);
 	// ServerAttackReaction(Hit);
@@ -73,7 +74,7 @@ bool UImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMontage
 
 void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("2 - StartAttackReaction"));
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("2 - StartAttackReaction"));
 	// if (GetOwnerRole() <= ROLE_SimulatedProxy)
 	// {
 	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("3 - return false: Role: Simulated Proxy"));
@@ -106,13 +107,13 @@ void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("3 - Authority"));
 		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
 		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
-		MulticastStartImpactReaction(Hit.DoubleHitResult.HitResult.HitResult, Montage, Particle, Audio);
+		MulticastStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("3 - Not Authority"));
 		Character->GetCharacterMovement()->FlushServerMoves();
-		StartImpactReactionImplementation(Hit.DoubleHitResult.HitResult.HitResult, Montage, Particle, Audio);
+		StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, Particle, Audio);
 		// ServerStartImpactReaction(Hit.DoubleHitResult.HitResult.HitResult, Montage, Particle, Audio);
 		OnImpactReactionStarted(Hit.DoubleHitResult);
 	}
@@ -150,14 +151,14 @@ void UImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	{
 		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
 		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
-		MulticastStartImpactReaction(Hit.HitResult.HitResult, Montage, Particle, Audio);
+		MulticastStartImpactReaction(Hit, Montage, Particle, Audio);
 	}
 	else
 	{
 		Character->GetCharacterMovement()->FlushServerMoves();
 
-		StartImpactReactionImplementation(Hit.HitResult.HitResult, Montage, Particle, Audio);
-		ServerStartImpactReaction(Hit.HitResult.HitResult, Montage, Particle, Audio);
+		StartImpactReactionImplementation(Hit, Montage, Particle, Audio);
+		ServerStartImpactReaction(Hit, Montage, Particle, Audio);
 		OnImpactReactionStarted(Hit);
 	}
 }
@@ -342,7 +343,7 @@ void UImpactReactionComponent::MulticastImpactReaction_Implementation(FDoubleHit
 	StartImpactReaction(Hit);
 }
 
-void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
+void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
 {
 	if (IsImpactReactionAllowedToStart(Montage))
 	{
@@ -351,12 +352,12 @@ void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FHitResu
 	}
 }
 
-void UImpactReactionComponent::MulticastStartImpactReaction_Implementation(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
+void UImpactReactionComponent::MulticastStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
 {
 	StartImpactReactionImplementation(Hit, Montage, Particle, Audio);
 }
 
-void UImpactReactionComponent::StartImpactReactionImplementation(FHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
+void UImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
 {	
 	//if (IsImpactReactionAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, 1.0f))
 	if (IsImpactReactionAllowedToStart(Montage))
@@ -367,38 +368,41 @@ void UImpactReactionComponent::StartImpactReactionImplementation(FHitResult Hit,
 		UAudioComponent* AudioComponent{ nullptr };
 
 		//Calculate Rotation from Normal Vector
-		FVector UpVector = Hit.GetActor()->GetRootComponent()->GetUpVector();
-		FVector NormalVector = Hit.ImpactNormal;
+		FVector UpVector = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetUpVector();
+		FVector NormalVector = Hit.HitResult.HitResult.ImpactNormal;
 		FVector RotationAxis = FVector::CrossProduct(UpVector, NormalVector);
 		RotationAxis.Normalize();
 		float DotProduct = FVector::DotProduct(UpVector, NormalVector);
 		float RotationAngle = acosf(DotProduct);
 		FQuat Quat = FQuat(RotationAxis, RotationAngle);
-		FQuat RootQuat = Hit.GetActor()->GetRootComponent()->GetComponentQuat();
+		FQuat RootQuat = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetComponentQuat();
 		FQuat NewQuat = Quat * RootQuat;
 		FRotator NewRotation = NewQuat.Rotator();
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("4 - Reaction"));
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("4 - Reaction"));
 
 		if (Particle)
 		{
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Particle, Hit.ImpactPoint, NewRotation, FVector(1.0f, 1.0f, 1.0f), true, true, ENCPoolMethod::None, true);
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Particle, Hit.HitResult.HitResult.ImpactPoint, NewRotation, FVector(1.0f, 1.0f, 1.0f), true, true, ENCPoolMethod::None, true);
 		}
 
 		if (Audio)
 		{
 			if (GetWorld()->WorldType == EWorldType::EditorPreview)
 			{
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Audio, Hit.ImpactPoint,
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Audio, Hit.HitResult.HitResult.ImpactPoint,
 					1.0f, 1.0f);
 			}
 			else
 			{
-				AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Audio, Hit.ImpactPoint,
+				AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Audio, Hit.HitResult.HitResult.ImpactPoint,
 					NewRotation,
 					1.0f, 1.0f);
 			}
 		}
+		Character->GetMesh()->SetSimulatePhysics(true);
+		Character->GetMesh()->AddImpulseAtLocation(Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
+		Character->GetMesh()->SetSimulatePhysics(false);
 
 		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
 		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::HitReaction);
