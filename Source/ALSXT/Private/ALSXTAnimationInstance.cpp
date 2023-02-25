@@ -40,7 +40,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	Blocking = ALSXTCharacter->GetDesiredBlocking();
 	StationaryMode = ALSXTCharacter->GetStationaryMode();
 	HoldingBreath = ALSXTCharacter->GetHoldingBreath();
-	Emote = ALSXTCharacter->GetEmote();
+	PhysicalAnimationMode = ALSXTCharacter->GetPhysicalAnimationMode();
 	Gesture = ALSXTCharacter->GetGesture();
 	GestureHand = ALSXTCharacter->GetGestureHand();
 	ReloadingType = ALSXTCharacter->GetReloadingType();

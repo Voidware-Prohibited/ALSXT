@@ -451,28 +451,29 @@ void UUnarmedCombatComponent::RefreshUnarmedAttack(const float DeltaTime)
 
 void UUnarmedCombatComponent::RefreshUnarmedAttackPhysics(const float DeltaTime)
 {
-	float Offset = Character->ALSXTSettings->UnarmedCombat.RotationOffset;
+	// float Offset = Character->ALSXTSettings->UnarmedCombat.RotationOffset;
 	auto ComponentRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	auto TargetRotation{ PlayerController->GetControlRotation() };
-	TargetRotation.Yaw = TargetRotation.Yaw + Offset;
+	// TargetRotation.Yaw = TargetRotation.Yaw + Offset;
+	TargetRotation.Yaw = TargetRotation.Yaw;
 	TargetRotation.Pitch = ComponentRotation.Pitch;
 	TargetRotation.Roll = ComponentRotation.Roll;
 
-	if (Character->ALSXTSettings->UnarmedCombat.RotationInterpolationSpeed <= 0.0f)
-	{
-		TargetRotation.Yaw = UnarmedCombatState.TargetYawAngle;
-
-		Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false, nullptr, ETeleportType::TeleportPhysics);
-	}
-	else
-	{
-		TargetRotation.Yaw = UAlsMath::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
-			UnarmedCombatState.TargetYawAngle, DeltaTime,
-			Character->ALSXTSettings->UnarmedCombat.RotationInterpolationSpeed);
-
-		Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);
-	}
+	// if (Character->ALSXTSettings->UnarmedCombat.RotationInterpolationSpeed <= 0.0f)
+	// {
+	// 	TargetRotation.Yaw = UnarmedCombatState.TargetYawAngle;
+	// 
+	// 	Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false, nullptr, ETeleportType::TeleportPhysics);
+	// }
+	// else
+	// {
+	// 	TargetRotation.Yaw = UAlsMath::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
+	// 		UnarmedCombatState.TargetYawAngle, DeltaTime,
+	// 		Character->ALSXTSettings->UnarmedCombat.RotationInterpolationSpeed);
+	// 
+	// 	Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);
+	// }
 }
 
 void UUnarmedCombatComponent::StopUnarmedAttack()

@@ -71,11 +71,11 @@ namespace ALSXTVaultTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(FenceSprinting, TEXT("Als.Vault Type.Fence Sprinting"))
 }
 
-namespace ALSXTPhysAnimModeTags
+namespace ALSXTPhysicalAnimationModeTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Game.Phys Anim Mode.None"))
-	UE_DEFINE_GAMEPLAY_TAG(Bump, TEXT("Game.Phys Anim Mode.Bump"))
-	UE_DEFINE_GAMEPLAY_TAG(Hit, TEXT("Game.Phys Anim Mode.Hit"))
+	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Game.Physical Animation Mode.None"))
+	UE_DEFINE_GAMEPLAY_TAG(Bump, TEXT("Game.Physical Animation Mode.Bump"))
+	UE_DEFINE_GAMEPLAY_TAG(Hit, TEXT("Game.Physical Animation Mode.Hit"))
 }
 
 namespace ALSXTReactionAnimationTypeTags

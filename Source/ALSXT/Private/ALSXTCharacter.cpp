@@ -27,6 +27,7 @@
 #include "Utility/AlsUtility.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 AALSXTCharacter::AALSXTCharacter()
 {
@@ -102,7 +103,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFocus, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHoldingBreath, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredEmote, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredPhysicalAnimationMode, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGesture, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGestureHand, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
@@ -121,6 +122,8 @@ void AALSXTCharacter::BeginPlay()
 	AlsCharacter = Cast<AAlsCharacter>(GetParentActor());
 	Super::BeginPlay();
 
+	PhysicalAnimation->SetSkeletalMeshComponent(GetMesh());
+	SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace", AttackTraceSettings);
 }
 
@@ -425,7 +428,8 @@ void AALSXTCharacter::ALSXTRefreshRotationInstant(const float TargetYawAngle, co
 
 void AALSXTCharacter::SetMovementModeLocked(bool bNewMovementModeLocked)
 {
-	AlsCharacterMovement->SetMovementModeLocked(bNewMovementModeLocked);
+	// AlsCharacterMovement->SetMovementModeLocked(bNewMovementModeLocked);
+	Cast<UAlsCharacterMovementComponent>(GetCharacterMovement())->SetMovementModeLocked(bNewMovementModeLocked);
 }
 
 void AALSXTCharacter::Crouch(const bool bClientSimulation)
@@ -1579,7 +1583,19 @@ void AALSXTCharacter::SetFocus(const FGameplayTag& NewFocusTag)
 
 void AALSXTCharacter::OnFocusChanged_Implementation(const FGameplayTag& PreviousFocusTag) {}
 
-// Attack Collision Trace
+// Attack Collision Trace}
+
+void AALSXTCharacter::OnAttackHit_Implementation(FAttackDoubleHitResult Hit)
+{
+	TSubclassOf<UCameraShakeBase> CameraShakeClass;
+	float Scale;
+	GetCameraShakeInfoFromHit(Hit, CameraShakeClass, Scale);
+	if (CameraShakeClass != nullptr)
+	{
+		// UGameplayStatics::GetPlayerController(GetWorld(), 0)->ClientStartCameraShake(CameraShakeClass, Scale);
+		UGameplayStatics::GetPlayerController(this, 0)->ClientStartCameraShake(CameraShakeClass, Scale);
+	}
+}
 
 void AALSXTCharacter::GetLocationFromBoneName_Implementation(FName Hit, FGameplayTag& Location) {}
 
@@ -1714,6 +1730,7 @@ void AALSXTCharacter::AttackCollisionTrace()
 						// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, HitActorname);
 						ICollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
 					}
+					OnAttackHit(CurrentHitResult);
 				}
 			}
 		}
@@ -1770,42 +1787,77 @@ void AALSXTCharacter::SetHoldingBreath(const FGameplayTag& NewHoldingBreathTag)
 
 void AALSXTCharacter::OnHoldingBreathChanged_Implementation(const FGameplayTag& PreviousHoldingBreathTag) {}
 
-// Emote
+// PhysicalAnimationMode
 
-void AALSXTCharacter::SetDesiredEmote(const FGameplayTag& NewEmoteTag)
+void AALSXTCharacter::SetDesiredPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName)
 {
-	if (DesiredEmote != NewEmoteTag)
+	FString Tag = NewPhysicalAnimationModeTag.ToString();
+	FString ClientRole;
+	ClientRole = UEnum::GetValueAsString(GetLocalRole());
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, Tag);
+	if (DesiredPhysicalAnimationMode != NewPhysicalAnimationModeTag)
 	{
-		DesiredEmote = NewEmoteTag;
+		DesiredPhysicalAnimationMode = NewPhysicalAnimationModeTag;
 
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredEmote, this)
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredPhysicalAnimationMode, this)
 
-			if (GetLocalRole() == ROLE_AutonomousProxy)
+			if (GetLocalRole() == ROLE_Authority)
 			{
-				ServerSetDesiredEmote(NewEmoteTag);
+				ServerSetDesiredPhysicalAnimationMode(NewPhysicalAnimationModeTag, BoneName);
+			}
+			else if (GetLocalRole() >= ROLE_SimulatedProxy)
+			{
+				SetPhysicalAnimationMode(NewPhysicalAnimationModeTag, BoneName);
 			}
 	}
 }
 
-void AALSXTCharacter::ServerSetDesiredEmote_Implementation(const FGameplayTag& NewEmoteTag)
+void AALSXTCharacter::ServerSetDesiredPhysicalAnimationMode_Implementation(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName)
 {
-	SetDesiredEmote(NewEmoteTag);
+	SetDesiredPhysicalAnimationMode(NewPhysicalAnimationModeTag, BoneName);
 }
 
-void AALSXTCharacter::SetEmote(const FGameplayTag& NewEmoteTag)
+void AALSXTCharacter::SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName)
 {
 
-	if (Emote != NewEmoteTag)
+	if (PhysicalAnimationMode != NewPhysicalAnimationModeTag)
 	{
-		const auto PreviousEmote{ Emote };
+		const auto PreviousPhysicalAnimationMode{ PhysicalAnimationMode };
 
-		Emote = NewEmoteTag;
+		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::None)
+		{
+			
+			GetMesh()->SetCollisionProfileName("CharacterMesh");
+			GetMesh()->UpdateCollisionProfile();
+			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("pelvis", "Default", true, false);
+			GetCapsuleComponent()->SetCapsuleRadius(30);
+			GetMesh()->SetAllBodiesPhysicsBlendWeight(0, false);
+			GetMesh()->SetPhysicsBlendWeight(0);
+		}
+		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::Bump)
+		{
+			GetMesh()->SetCollisionProfileName("PhysicalAnimation");
+			GetMesh()->UpdateCollisionProfile();
+			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow(BoneName, "Bump", true, false);
+			GetCapsuleComponent()->SetCapsuleRadius(14);
+			GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 1, false, true);
+		}
+		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::Hit)
+		{
+			GetMesh()->SetCollisionProfileName("PhysicalAnimation");
+			GetMesh()->UpdateCollisionProfile();
+			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow(BoneName, "Hit", true, false);
+			GetCapsuleComponent()->SetCapsuleRadius(8);
+			GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 1, false, true);
+		}
 
-		OnEmoteChanged(PreviousEmote);
+		PhysicalAnimationMode = NewPhysicalAnimationModeTag;
+
+		OnPhysicalAnimationModeChanged(PreviousPhysicalAnimationMode);
 	}
 }
 
-void AALSXTCharacter::OnEmoteChanged_Implementation(const FGameplayTag& PreviousEmoteTag) {}
+void AALSXTCharacter::OnPhysicalAnimationModeChanged_Implementation(const FGameplayTag& PreviousPhysicalAnimationModeTag) {}
 
 // Gesture
 

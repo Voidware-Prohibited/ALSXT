@@ -188,13 +188,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag HoldingBreath{FGameplayTag::EmptyTag};
 
-// Emote
+// PhysicalAnimationMode
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredEmote{FGameplayTag::EmptyTag};
+	FGameplayTag DesiredPhysicalAnimationMode{FGameplayTag::EmptyTag};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag Emote{FGameplayTag::EmptyTag};
+	FGameplayTag PhysicalAnimationMode{FGameplayTag::EmptyTag};
 
 // Gesture
 
@@ -971,6 +971,12 @@ public:
 	void OnAttackCollision(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void GetCameraShakeInfoFromHit(FAttackDoubleHitResult Hit, TSubclassOf<UCameraShakeBase>& CameraShakeClass, float& Scale);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void GetFirearmCameraShakeInfo(TSubclassOf<UCameraShakeBase>& CameraShakeClass, float& Scale);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnAttackHit(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
@@ -1019,29 +1025,31 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnHoldingBreathChanged(const FGameplayTag& PreviousHoldingBreathTag);
 
-	// Desired Emote
+	// Desired PhysicalAnimationMode
 
 public:
-	const FGameplayTag& GetDesiredEmote() const;
+	const FGameplayTag& GetDesiredPhysicalAnimationMode() const;
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewEmoteTag"))
-	void SetDesiredEmote(const FGameplayTag& NewEmoteTag);
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewPhysicalAnimationModeTag"))
+	void SetDesiredPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName);
 
 private:
 	UFUNCTION(Server, Reliable)
-	void ServerSetDesiredEmote(const FGameplayTag& NewEmoteTag);
+	void ServerSetDesiredPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName);
 
-	// Emote
+	// PhysicalAnimationMode
 
 public:
-	const FGameplayTag& GetEmote() const;
+	const FGameplayTag& GetPhysicalAnimationMode() const;
 
 private:
-	void SetEmote(const FGameplayTag& NewEmoteTag);
+	void SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	void OnEmoteChanged(const FGameplayTag& PreviousEmoteTag);
+	void OnPhysicalAnimationModeChanged(const FGameplayTag& PreviousPhysicalAnimationModeTag);
+
+
 
 	// Desired Gesture
 
@@ -1386,14 +1394,14 @@ inline const FGameplayTag& AALSXTCharacter::GetHoldingBreath() const
 	return HoldingBreath;
 }
 
-inline const FGameplayTag& AALSXTCharacter::GetDesiredEmote() const
+inline const FGameplayTag& AALSXTCharacter::GetDesiredPhysicalAnimationMode() const
 {
-	return DesiredEmote;
+	return DesiredPhysicalAnimationMode;
 }
 
-inline const FGameplayTag& AALSXTCharacter::GetEmote() const
+inline const FGameplayTag& AALSXTCharacter::GetPhysicalAnimationMode() const
 {
-	return Emote;
+	return PhysicalAnimationMode;
 }
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredGesture() const

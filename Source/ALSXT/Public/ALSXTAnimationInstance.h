@@ -62,7 +62,7 @@ private:
 	FGameplayTag HoldingBreath{FGameplayTag::EmptyTag};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag Emote{FGameplayTag::EmptyTag};
+	FGameplayTag PhysicalAnimationMode{FGameplayTag::EmptyTag};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag Gesture{FGameplayTag::EmptyTag};

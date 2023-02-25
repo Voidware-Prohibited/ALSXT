@@ -104,17 +104,19 @@ void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 
 	if (GetOwnerRole() >= ROLE_Authority)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("3 - Authority"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AutonomousProxy"));
 		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
 		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
-		MulticastStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
+		// MulticastStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
+		ServerStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
+		OnImpactReactionStarted(Hit.DoubleHitResult);
 	}
-	else
+	else if (GetOwnerRole() >= ROLE_SimulatedProxy)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("3 - Not Authority"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SimulatedProxy"));
 		Character->GetCharacterMovement()->FlushServerMoves();
 		StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, Particle, Audio);
-		// ServerStartImpactReaction(Hit.DoubleHitResult.HitResult.HitResult, Montage, Particle, Audio);
+		// ServerStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
 		OnImpactReactionStarted(Hit.DoubleHitResult);
 	}
 }
@@ -400,9 +402,9 @@ void UImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResul
 					1.0f, 1.0f);
 			}
 		}
-		Character->GetMesh()->SetSimulatePhysics(true);
-		Character->GetMesh()->AddImpulseAtLocation(Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
-		Character->GetMesh()->SetSimulatePhysics(false);
+		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Hit, Hit.HitResult.HitResult.BoneName);
+		// Character->GetMesh()->AddImpulseAtLocation(Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
+		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, Hit.HitResult.HitResult.BoneName);
 
 		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
 		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::HitReaction);
