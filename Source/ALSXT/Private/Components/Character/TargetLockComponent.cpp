@@ -42,9 +42,25 @@ void UTargetLockComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	TArray<FGameplayTag> TargetableOverlayModes;
 	GetTargetableOverlayModes(TargetableOverlayModes);
 
-	if (Character && TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming() && CurrentTarget.Valid)
+	if (Character && TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming() && IsValid(CurrentTarget.HitResult.GetActor()))
 	{
-		RotatePlayerToTarget(CurrentTarget);
+		// if (CurrentTarget.HitResult.GetActor()->GetDistanceTo(Character) > MaxLockDistance)
+		// {
+		// 
+		// }
+		if (UnlockWhenTargetIsObstructed && !IsTartgetObstructed()) {
+			if (CurrentTarget.Valid)
+			{
+				RotatePlayerToTarget(CurrentTarget);
+			}
+		}
+		else
+		{
+			if (CurrentTarget.Valid)
+			{
+				RotatePlayerToTarget(CurrentTarget);
+			}
+		}	
 	}
 }
 
@@ -57,6 +73,9 @@ float UTargetLockComponent::GetAngle(FVector Target)
 
 	auto crossProduct = PlayerLocation.Cross(Target);
 	auto dotProduct = PlayerLocation.Dot(Target);
+	FVector UnitVector = UKismetMathLibrary::GetDirectionUnitVector(Target, PlayerLocation);
+	FRotator RotX = UKismetMathLibrary::MakeRotFromX(UnitVector);
+	FRotator Delta = UKismetMathLibrary::NormalizedDeltaRotator(Character->GetActorRotation(), RotX);
 
 	if (crossProduct.Z > 0)
 	{
@@ -68,10 +87,36 @@ float UTargetLockComponent::GetAngle(FVector Target)
 	}
 
 	auto resultAngleInDegrees = FMath::RadiansToDegrees(resultAngleInRadians);
-	return resultAngleInDegrees;
+	//return resultAngleInDegrees;
+	return FRotator::ClampAxis(Delta.Yaw);
 }
 
-void UTargetLockComponent::TraceForTargets(bool DisplayDebug, float DebugDuration, TArray<FTargetHitResultEntry>& Targets)
+bool UTargetLockComponent::IsTartgetObstructed()
+{
+	FVector CharLoc = Character->GetActorLocation();
+	TArray<FHitResult> OutHits;
+
+	FCollisionObjectQueryParams ObjectQueryParameters;
+	for (const auto ObjectType : ObstructionTraceObjectTypes)
+	{
+		ObjectQueryParameters.AddObjectTypesToQuery(UCollisionProfile::Get()->ConvertToCollisionChannel(false, ObjectType));
+	}
+
+	if (GetWorld()->LineTraceMultiByObjectType(OutHits, CharLoc, CurrentTarget.HitResult.GetActor()->GetActorLocation(), ObjectQueryParameters))
+	{
+		if (UnlockWhenTargetIsObstructed)
+		{
+			ClearCurrentTarget();
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void UTargetLockComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targets)
 {
 	FRotator ControlRotation = Character->GetControlRotation();
 	FVector ForwardVector = Character->GetActorForwardVector();
@@ -87,7 +132,7 @@ void UTargetLockComponent::TraceForTargets(bool DisplayDebug, float DebugDuratio
 	// Display Debug Shape
 	if (DebugMode)
 	{
-		DrawDebugBox(GetWorld(), CenterLocation, HalfSize, ControlRotation.Quaternion(), FColor::Green, false, DebugDuration, 100, 2);
+		DrawDebugBox(GetWorld(), CenterLocation, TraceAreaHalfSize, ControlRotation.Quaternion(), FColor::Yellow, false, DebugDuration, 100, 2);
 	}
 	
 	bool isHit = GetWorld()->SweepMultiByChannel(OutHits, StartLocation, EndLocation, ControlRotation.Quaternion(), ECollisionChannel::ECC_Camera, CollisionShape);
@@ -112,7 +157,7 @@ void UTargetLockComponent::TraceForTargets(bool DisplayDebug, float DebugDuratio
 void UTargetLockComponent::GetClosestTarget()
 {
 	TArray<FTargetHitResultEntry> OutHits;
-	TraceForTargets(true, 6, OutHits);
+	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
 	TArray<FGameplayTag> TargetableOverlayModes;
 	GetTargetableOverlayModes(TargetableOverlayModes);
@@ -121,7 +166,7 @@ void UTargetLockComponent::GetClosestTarget()
 	{
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
+			if (Hit.HitResult.GetActor() != Character)
 			{
 				FTargetHitResultEntry HitResultEntry;
 				HitResultEntry.Valid = true;
@@ -144,11 +189,57 @@ void UTargetLockComponent::GetClosestTarget()
 				}
 			}
 		}
-		if (FoundHit.Valid)
+		if (FoundHit.Valid && FoundHit.HitResult.GetActor())
 		{
-			RotatePlayerToTarget(FoundHit);
+			SetCurrentTarget(FoundHit);
+			USkeletalMeshComponent* HitMesh = Cast<AALSXTCharacter>(FoundHit.HitResult.GetActor())->GetMesh();
+			TArray<UMaterialInterface*> CharMaterials = HitMesh->GetMaterials();
+			if (CharMaterials[0]) 
+			{
+				for (int m = 0;  m < CharMaterials.Num(); m++)
+				{
+					UMaterialInstanceDynamic* CharDynMaterial = HitMesh->CreateAndSetMaterialInstanceDynamic(m);
+					CharDynMaterial->SetScalarParameterValue(HighlightMaterialParameterName, 1.0f);
+					HitMesh->SetMaterial(m, CharDynMaterial);
+				}
+			}	
+			if (GEngine && DebugMode)
+			{
+				FString DebugMsg = FString::SanitizeFloat(FoundHit.AngleFromCenter);
+				DebugMsg.Append(" Hit Result: ");
+				DebugMsg.Append(FoundHit.HitResult.GetActor()->GetName());
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DebugMsg);
+			}
 		}
 	}
+}
+
+void UTargetLockComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTarget)
+{
+	CurrentTarget = NewTarget;
+}
+
+void UTargetLockComponent::ClearCurrentTarget()
+{
+	CurrentTarget.Valid = false;
+	CurrentTarget.DistanceFromPlayer = 340282346638528859811704183484516925440.0f;
+	CurrentTarget.AngleFromCenter = 361.0f;
+
+	if (Cast<AALSXTCharacter>(CurrentTarget.HitResult.GetActor()))
+	{
+		USkeletalMeshComponent* HitMesh = Cast<AALSXTCharacter>(CurrentTarget.HitResult.GetActor())->GetMesh();
+		TArray<UMaterialInterface*> CharMaterials = HitMesh->GetMaterials();
+		if (CharMaterials[0])
+		{
+			for (int m = 0; m < CharMaterials.Num(); m++)
+			{
+				UMaterialInstanceDynamic* CharDynMaterial = HitMesh->CreateAndSetMaterialInstanceDynamic(m);
+				CharDynMaterial->SetScalarParameterValue(HighlightMaterialParameterName, 0.0f);
+				HitMesh->SetMaterial(m, CharDynMaterial);
+			}
+		}
+	}
+	CurrentTarget.HitResult = FHitResult(ForceInit);
 }
 
 void UTargetLockComponent::DisengageAllTargets()
@@ -156,12 +247,13 @@ void UTargetLockComponent::DisengageAllTargets()
 	CurrentTarget.Valid = false;
 	CurrentTarget.DistanceFromPlayer = 340282346638528859811704183484516925440.0f;
 	CurrentTarget.AngleFromCenter = 361.0f;
+	CurrentTarget.HitResult.Init();
 }
 
 void UTargetLockComponent::GetTargetLeft()
 {
 	TArray<FTargetHitResultEntry> OutHits;
-	TraceForTargets(true, 6, OutHits);
+	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
 	TArray<FGameplayTag> TargetableOverlayModes;
 	GetTargetableOverlayModes(TargetableOverlayModes);
@@ -170,37 +262,29 @@ void UTargetLockComponent::GetTargetLeft()
 	{
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
+			if (Hit.HitResult.GetActor() != Character && (Hit.AngleFromCenter < CurrentTarget.AngleFromCenter))
 			{
-				FTargetHitResultEntry HitResultEntry;
-				HitResultEntry.Valid = true;
-				HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
-				HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
-				HitResultEntry.HitResult = Hit.HitResult;
-				if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.AngleFromCenter < CurrentTarget.AngleFromCenter))
+				if (!FoundHit.Valid)
 				{
-					if (!FoundHit.Valid)
+					FoundHit = Hit;
+				}
+				else
+				{
+					if(Hit.AngleFromCenter > FoundHit.AngleFromCenter)
 					{
 						FoundHit = Hit;
-					}
-					else
-					{
-						if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
-						{
-							FoundHit = Hit;
-						}
 					}
 				}
 			}
 		}
-		RotatePlayerToTarget(FoundHit);
+		SetCurrentTarget(FoundHit);
 	}
 }
 
 void UTargetLockComponent::GetTargetRight()
 {
 	TArray<FTargetHitResultEntry> OutHits;
-	TraceForTargets(true, 6, OutHits);
+	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
 	TArray<FGameplayTag> TargetableOverlayModes;
 	GetTargetableOverlayModes(TargetableOverlayModes);
@@ -209,46 +293,40 @@ void UTargetLockComponent::GetTargetRight()
 	{
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.HitResult.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.HitResult.GetActor() != Character)
+			if (Hit.HitResult.GetActor() != Character && (Hit.AngleFromCenter > CurrentTarget.AngleFromCenter))
 			{
-				FTargetHitResultEntry HitResultEntry;
-				HitResultEntry.Valid = true;
-				HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
-				HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
-				HitResultEntry.HitResult = Hit.HitResult;
-				if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.AngleFromCenter > CurrentTarget.AngleFromCenter))
+				if (!FoundHit.Valid)
 				{
-					if (!FoundHit.Valid)
+					FoundHit = Hit;
+				}
+				else
+				{
+					if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
 					{
 						FoundHit = Hit;
-					}
-					else
-					{
-						if (Hit.AngleFromCenter < FoundHit.AngleFromCenter)
-						{
-							FoundHit = Hit;
-						}
 					}
 				}
 			}
 		}
-		RotatePlayerToTarget(FoundHit);
+		SetCurrentTarget(FoundHit);
 	}
 }
 
 void UTargetLockComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
 {
-	if (Target.Valid)
+	if (IsValid(Character) && IsValid(Character->GetController()) && Target.Valid && IsValid(Target.HitResult.GetActor()))
 	{
-		if (GEngine && DebugMode)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Target.HitResult.GetActor()->GetName()));
-		}
 		FRotator CurrentPlayerRotation = Character->GetActorRotation();
+		FRotator CurrentPlayerControlRotation = Character->GetController()->GetControlRotation();
 		FVector TargetActorLocation = Target.HitResult.GetActor()->GetActorLocation();
 		FRotator NewPlayerRotation = UKismetMathLibrary::FindLookAtRotation(Character->GetActorLocation(), TargetActorLocation);
 		NewPlayerRotation.Pitch = CurrentPlayerRotation.Pitch;
 		NewPlayerRotation.Roll = CurrentPlayerRotation.Roll;
-		Character->SetActorRotation(NewPlayerRotation, ETeleportType::TeleportPhysics);
+		
+		if ((NewPlayerRotation != CurrentPlayerControlRotation) && IsValid(Target.HitResult.GetActor()))
+		{
+			// Character->SetActorRotation(NewPlayerRotation, ETeleportType::TeleportPhysics);
+			Character->GetController()->SetControlRotation(NewPlayerRotation);
+		}
 	}
 }

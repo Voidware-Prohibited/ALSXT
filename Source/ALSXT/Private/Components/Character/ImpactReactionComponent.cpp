@@ -67,6 +67,11 @@ void UImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 	// }
 }
 
+void UImpactReactionComponent::ImpactTimelineUpdate(float Value)
+{
+	//...
+}
+
 bool UImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const
 {
 	return (Montage != nullptr);
@@ -82,10 +87,12 @@ void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 	// }
 	UAnimMontage* Montage{ nullptr };
 	UNiagaraSystem* Particle{ nullptr };
+	TSubclassOf<AActor> ParticleActor{ nullptr };
 	USoundBase* Audio{ nullptr };
 
 	Montage = SelectAttackReactionMontage(Hit);
 	Particle = GetImpactReactionParticle(Hit.DoubleHitResult);
+	ParticleActor = GetImpactReactionParticleActor(Hit.DoubleHitResult);
 	Audio = GetImpactReactionSound(Hit.DoubleHitResult);
 
 	if (!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage))
@@ -108,14 +115,14 @@ void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
 		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
 		// MulticastStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
-		ServerStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
+		ServerStartImpactReaction(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
 		OnImpactReactionStarted(Hit.DoubleHitResult);
 	}
 	else if (GetOwnerRole() >= ROLE_SimulatedProxy)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SimulatedProxy"));
 		Character->GetCharacterMovement()->FlushServerMoves();
-		StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, Particle, Audio);
+		StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
 		// ServerStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
 		OnImpactReactionStarted(Hit.DoubleHitResult);
 	}
@@ -128,6 +135,7 @@ void UImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 		return;
 	}
 	UAnimMontage* Montage { nullptr};
+	TSubclassOf<AActor> ParticleActor{ nullptr };
 	UNiagaraSystem* Particle {nullptr};
 	USoundBase* Audio {nullptr};
 
@@ -153,14 +161,14 @@ void UImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	{
 		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
 		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
-		MulticastStartImpactReaction(Hit, Montage, Particle, Audio);
+		MulticastStartImpactReaction(Hit, Montage, ParticleActor, Particle, Audio);
 	}
 	else
 	{
 		Character->GetCharacterMovement()->FlushServerMoves();
 
-		StartImpactReactionImplementation(Hit, Montage, Particle, Audio);
-		ServerStartImpactReaction(Hit, Montage, Particle, Audio);
+		StartImpactReactionImplementation(Hit, Montage, ParticleActor, Particle, Audio);
+		ServerStartImpactReaction(Hit, Montage, ParticleActor, Particle, Audio);
 		OnImpactReactionStarted(Hit);
 	}
 }
@@ -345,21 +353,21 @@ void UImpactReactionComponent::MulticastImpactReaction_Implementation(FDoubleHit
 	StartImpactReaction(Hit);
 }
 
-void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
+void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
 {
 	if (IsImpactReactionAllowedToStart(Montage))
 	{
-		MulticastStartImpactReaction(Hit, Montage, Particle, Audio);
+		MulticastStartImpactReaction(Hit, Montage, ParticleActor, Particle, Audio);
 		Character->ForceNetUpdate();
 	}
 }
 
-void UImpactReactionComponent::MulticastStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
+void UImpactReactionComponent::MulticastStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
 {
-	StartImpactReactionImplementation(Hit, Montage, Particle, Audio);
+	StartImpactReactionImplementation(Hit, Montage, ParticleActor, Particle, Audio);
 }
 
-void UImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio)
+void UImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
 {	
 	//if (IsImpactReactionAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, 1.0f))
 	if (IsImpactReactionAllowedToStart(Montage))
@@ -401,6 +409,16 @@ void UImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResul
 					NewRotation,
 					1.0f, 1.0f);
 			}
+		}
+		if (UKismetSystemLibrary::IsValidClass(ParticleActor))
+		{
+			FTransform SpawnTransform = FTransform(NewRotation, Hit.HitResult.HitResult.ImpactPoint, {1.0f, 1.0f, 1.0f});
+			AActor* SpawnedActor;
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			GetWorld()->SpawnActor<AActor>(ParticleActor->StaticClass(), SpawnTransform, SpawnInfo);
+			SpawnedActor = GetWorld()->SpawnActor<AActor>(ParticleActor->StaticClass(), SpawnTransform, SpawnInfo);
+
 		}
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Hit, Hit.HitResult.HitResult.BoneName);
 		// Character->GetMesh()->AddImpulseAtLocation(Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);

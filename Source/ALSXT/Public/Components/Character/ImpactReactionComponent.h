@@ -14,6 +14,7 @@
 #include "Components/AudioComponent.h" 
 #include "Settings/ALSXTImpactReactionSettings.h"
 #include "State/ALSXTImpactReactionState.h" 
+#include "Components/TimelineComponent.h"
 #include "ImpactReactionComponent.generated.h"
 
 UCLASS(Blueprintable, ClassGroup=(Physics), meta=(BlueprintSpawnableComponent) )
@@ -38,11 +39,18 @@ public:
 
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 
+	/*Curve float reference*/
+	UPROPERTY(EditAnywhere, Category = "Impact Reaction Timeline")
+	UCurveFloat* CurveFloat;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanReact();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	TSubclassOf<AActor> GetImpactReactionParticleActor(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	USoundBase* GetImpactReactionSound(FDoubleHitResult Hit);
@@ -78,6 +86,11 @@ protected:
 	// Desired UnarmedAttack
 
 private:
+	FTimeline ImpactTimeline;
+
+	UFUNCTION()
+	void ImpactTimelineUpdate(float Value);
+
 	bool IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const;
 
 	void StartAttackReaction(FAttackDoubleHitResult Hit);
@@ -97,12 +110,12 @@ private:
 	void MulticastImpactReaction(FDoubleHitResult Hit);
 
 	UFUNCTION(Server, Unreliable)
-	void ServerStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+	void ServerStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+	void MulticastStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
-	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
+	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	void RefreshImpactReaction(float DeltaTime);
 

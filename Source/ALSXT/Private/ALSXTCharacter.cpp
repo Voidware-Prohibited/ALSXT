@@ -955,6 +955,19 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LandingHit);
 		return false;
 	}
+	const FVector LandingLocation = LandingEndLocation * (DownwardTraceHit.Normal - 100);
+
+	// Vaulting Room Trace Hit Result
+	FHitResult LandingLocationTraceHit;
+	static const FName LandingLocationTraceTag{ __FUNCTION__ TEXT(" (Landing Location Trace)") };
+
+	GetWorld()->SweepSingleByObjectType(LandingLocationTraceHit, LandingEndLocation, LandingLocation, FQuat::Identity, ObjectQueryParameters,
+		FCollisionShape::MakeCapsule(TraceCapsuleRadius, ForwardTraceCapsuleHalfHeight),
+		{ LandingLocationTraceTag, false, this });
+
+	UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
+		ForwardTraceCapsuleHalfHeight, true, ForwardTraceHit,
+		FLinearColor::Yellow, FLinearColor::Red, 5.0f);
 
 	const auto TargetRotation{(-ForwardTraceHit.ImpactNormal.GetSafeNormal2D()).ToOrientationQuat()};
 
@@ -1078,7 +1091,7 @@ void AALSXTCharacter::StartVaultingImplementation(const FALSXTVaultingParameters
 
 	// GetCharacterMovement()->SetMovementMode(MOVE_Custom);
 	GetCharacterMovement()->SetBase(Parameters.TargetPrimitive.Get());
-	// AlsCharacterMovement->SetMovementModeLocked(true);
+	AlsCharacterMovement->SetMovementModeLocked(true);
 
 	if (GetLocalRole() >= ROLE_Authority)
 	{
@@ -1592,7 +1605,6 @@ void AALSXTCharacter::OnAttackHit_Implementation(FAttackDoubleHitResult Hit)
 	GetCameraShakeInfoFromHit(Hit, CameraShakeClass, Scale);
 	if (CameraShakeClass != nullptr)
 	{
-		// UGameplayStatics::GetPlayerController(GetWorld(), 0)->ClientStartCameraShake(CameraShakeClass, Scale);
 		UGameplayStatics::GetPlayerController(this, 0)->ClientStartCameraShake(CameraShakeClass, Scale);
 	}
 }
