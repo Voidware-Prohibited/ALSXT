@@ -30,7 +30,7 @@ void UTargetLockComponent::BeginPlay()
 	Character = Cast<AALSXTCharacter>(GetOwner());
 	AlsCharacter = Cast<AAlsCharacter>(GetOwner());
 	Camera = Character->Camera;
-	
+
 }
 
 
@@ -39,28 +39,36 @@ void UTargetLockComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	TryTraceForTargets();
+}
+
+void UTargetLockComponent::TryTraceForTargets()
+{
 	TArray<FGameplayTag> TargetableOverlayModes;
 	GetTargetableOverlayModes(TargetableOverlayModes);
-
+	
 	if (Character && TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming() && IsValid(CurrentTarget.HitResult.GetActor()))
 	{
-		// if (CurrentTarget.HitResult.GetActor()->GetDistanceTo(Character) > MaxLockDistance)
-		// {
-		// 
-		// }
-		if (UnlockWhenTargetIsObstructed && !IsTartgetObstructed()) {
-			if (CurrentTarget.Valid)
+		if (Character->GetDistanceTo(CurrentTarget.HitResult.GetActor()) < MaxInitialLockDistance)
+		{
+			if (UnlockWhenTargetIsObstructed && !IsTartgetObstructed()) {
+				if (CurrentTarget.Valid)
+				{
+					RotatePlayerToTarget(CurrentTarget);
+				}
+			}
+			else
 			{
-				RotatePlayerToTarget(CurrentTarget);
+				if (CurrentTarget.Valid)
+				{
+					RotatePlayerToTarget(CurrentTarget);
+				}
 			}
 		}
 		else
 		{
-			if (CurrentTarget.Valid)
-			{
-				RotatePlayerToTarget(CurrentTarget);
-			}
-		}	
+			DisengageAllTargets();
+		}
 	}
 }
 
@@ -141,7 +149,7 @@ void UTargetLockComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Target
 	{
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.GetActor() != Character)
+			if (Hit.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.GetActor() != Character && Character->GetDistanceTo(Hit.GetActor()) < MaxLockDistance)
 			{
 				FTargetHitResultEntry HitResultEntry;
 				HitResultEntry.Valid = true;
@@ -186,6 +194,7 @@ void UTargetLockComponent::GetClosestTarget()
 							FoundHit = Hit;
 						}
 					}
+					GetWorld()->GetTimerManager().SetTimer(TraceTimerHandle, TraceTimerDelegate, 0.1f, true);
 				}
 			}
 		}
@@ -244,10 +253,10 @@ void UTargetLockComponent::ClearCurrentTarget()
 
 void UTargetLockComponent::DisengageAllTargets()
 {
-	CurrentTarget.Valid = false;
-	CurrentTarget.DistanceFromPlayer = 340282346638528859811704183484516925440.0f;
-	CurrentTarget.AngleFromCenter = 361.0f;
-	CurrentTarget.HitResult.Init();
+	ClearCurrentTarget();
+
+	// Clear Trace Timer
+	GetWorld()->GetTimerManager().ClearTimer(TraceTimerHandle);
 }
 
 void UTargetLockComponent::GetTargetLeft()

@@ -52,6 +52,13 @@ AALSXTCharacter::AALSXTCharacter()
 	AddOwnedComponent(PhysicalAnimation);
 }
 
+void AALSXTCharacter::Tick(const float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	RefreshVaulting();
+}
+
 void AALSXTCharacter::NotifyControllerChanged()
 {
 	const auto* PreviousPlayer{Cast<APlayerController>(PreviousController)};
@@ -933,7 +940,8 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		                                        {0.25f, 0.0f, 1.0f}, {0.75f, 0.0f, 1.0f}, 7.5f);
 	}
 #endif
-
+	
+	//
 	// Vaulting Room Trace
 
 	// Vaulting Room Trace Hit Result
@@ -941,7 +949,8 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	static const FName LandingTraceTag{ __FUNCTION__ TEXT(" (Landing Trace)") };
 
 	// Set Local Variables
-	const FVector LandingStartLocation{	TargetCapsuleLocation + (DepthTraceHit.Normal * 60) + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1)) };
+	//const FVector LandingStartLocation{	TargetCapsuleLocation + (DepthTraceHit.Normal * 60) + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1)) };
+	const FVector LandingStartLocation{ TargetCapsuleLocation + (DepthTraceHit.Normal * 60) };
 	const FVector LandingEndLocation{ LandingStartLocation.X, LandingStartLocation.Y, GetActorLocation().Z };
 	TArray<FHitResult> HitResults;
 	TArray<AActor*> IgnoreActors;
@@ -955,27 +964,56 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LandingHit);
 		return false;
 	}
-	const FVector LandingLocation = LandingEndLocation * (DownwardTraceHit.Normal - 100);
 
-	// Vaulting Room Trace Hit Result
+	//
+	// Landing Location Trace
+
+	const FVector LandingLocation = LandingEndLocation - (DownwardTraceHit.Normal * 10);
+	// const FVector LandingLocation = LandingEndLocation;
+	// Landing Location Trace Hit Result
 	FHitResult LandingLocationTraceHit;
+	TArray <FHitResult> LandingLocationTraceHits;
+	TArray <FHitResult> LandingPoints;
+	FHitResult LandingPoint;
+	FVector LandingPointLocation;
 	static const FName LandingLocationTraceTag{ __FUNCTION__ TEXT(" (Landing Location Trace)") };
 
-	GetWorld()->SweepSingleByObjectType(LandingLocationTraceHit, LandingEndLocation, LandingLocation, FQuat::Identity, ObjectQueryParameters,
-		FCollisionShape::MakeCapsule(TraceCapsuleRadius, ForwardTraceCapsuleHalfHeight),
-		{ LandingLocationTraceTag, false, this });
+	// Trace for Landing Location
 
-	UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
-		ForwardTraceCapsuleHalfHeight, true, ForwardTraceHit,
-		FLinearColor::Yellow, FLinearColor::Red, 5.0f);
+	UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), LandingEndLocation, LandingLocation, CapsuleRadius, CapsuleHalfHeight, ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForDuration, LandingLocationTraceHits, true, FLinearColor::Green, FLinearColor::Red, 5.0f);
+
+	for (auto LandingLocHit : LandingLocationTraceHits)
+	{
+		if (!GetCharacterMovement()->IsWalkable(LandingLocHit))
+		{
+			return false;
+		}
+		else
+		{
+			LandingPoints.Add(LandingLocHit);
+		}
+	}
+
+	for (auto LandingPt : LandingPoints)
+	{
+		if (LandingPt.ImpactPoint.Z > LandingPoint.ImpactPoint.Z)
+		{
+			LandingPoint = LandingPt;
+		}
+	}
+
+	// LandingPointLocation = LandingLocationTraceHits[0].ImpactPoint + (LandingLocationTraceHits[0].Normal * 1);
+	LandingPointLocation = LandingPoint.ImpactPoint - (LandingPoint.Normal * CapsuleHalfHeight);
+	LandingPointLocation = LandingPointLocation + (LandingPoint.Normal * 1);
+	// LandingPointLocation = LandingLocation;
 
 	const auto TargetRotation{(-ForwardTraceHit.ImpactNormal.GetSafeNormal2D()).ToOrientationQuat()};
 
 	FALSXTVaultingParameters Parameters;
 
 	Parameters.TargetPrimitive = TargetPrimitive;
-	// Parameters.VaultingHeight = UE_REAL_TO_FLOAT((TargetLocation.Z - CapsuleBottomLocation.Z) / CapsuleScale);
-	Parameters.VaultingHeight = UE_REAL_TO_FLOAT(LandingEndLocation.Z);
+	Parameters.VaultingHeight = UE_REAL_TO_FLOAT((TargetLocation.Z - CapsuleBottomLocation.Z) / CapsuleScale);
+	// Parameters.VaultingHeight = UE_REAL_TO_FLOAT(TargetLocation.Z);
 
 	// Determine the Vaulting type by checking the movement mode and Vaulting height.
 
@@ -988,6 +1026,8 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	// If the target primitive can't move, then use world coordinates to save
 	// some performance by skipping some coordinate space transformations later.
 
+	
+
 	if (MovementBaseUtility::UseRelativeLocation(TargetPrimitive))
 	{
 		// const auto TargetRelativeTransform{
@@ -997,8 +1037,12 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		// Parameters.TargetRelativeLocation = TargetRelativeTransform.GetLocation();
 		// Parameters.TargetRelativeRotation = TargetRelativeTransform.Rotator();
 
+		// const auto TargetRelativeTransform{
+		// 	TargetPrimitive->GetComponentTransform().GetRelativeTransform({TargetRotation, LandingEndLocation + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1))})
+		// };
+
 		const auto TargetRelativeTransform{
-			TargetPrimitive->GetComponentTransform().GetRelativeTransform({TargetRotation, LandingEndLocation + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1))})
+			TargetPrimitive->GetComponentTransform().GetRelativeTransform({TargetRotation, LandingPointLocation})
 		};
 
 		Parameters.TargetRelativeLocation = TargetRelativeTransform.GetLocation();
@@ -1009,7 +1053,8 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		// Parameters.TargetRelativeLocation = TargetLocation;
 		// Parameters.TargetRelativeRotation = TargetRotation.Rotator();
 		
-		Parameters.TargetRelativeLocation = LandingEndLocation + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1));
+		// Parameters.TargetRelativeLocation = LandingEndLocation + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1));
+		Parameters.TargetRelativeLocation = LandingPointLocation;
 		Parameters.TargetRelativeRotation = TargetRotation.Rotator();
 
 	}
@@ -1089,7 +1134,7 @@ void AALSXTCharacter::StartVaultingImplementation(const FALSXTVaultingParameters
 
 	// Clear the character movement mode and set the locomotion action to Vaulting.
 
-	// GetCharacterMovement()->SetMovementMode(MOVE_Custom);
+	GetCharacterMovement()->SetMovementMode(MOVE_Custom);
 	GetCharacterMovement()->SetBase(Parameters.TargetPrimitive.Get());
 	AlsCharacterMovement->SetMovementModeLocked(true);
 

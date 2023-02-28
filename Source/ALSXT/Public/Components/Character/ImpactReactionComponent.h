@@ -117,6 +117,9 @@ private:
 
 	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
+	UFUNCTION(Server, Unreliable)
+	void ServerSpawnParticleActor(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
+
 	void RefreshImpactReaction(float DeltaTime);
 
 	void RefreshImpactReactionPhysics(float DeltaTime);
