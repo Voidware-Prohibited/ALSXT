@@ -326,12 +326,13 @@ void UUnarmedCombatComponent::StartUnarmedAttack(const FGameplayTag& UnarmedAtta
 	// Clear the character movement mode and set the locomotion action to mantling.
 
 	Character->SetMovementModeLocked(true);
+	// Character->GetCharacterMovement()->SetMovementMode(MOVE_Custom);
 	// APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	// Character->DisableInput(PlayerController);
 
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
-		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
+		// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
 		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
 		MulticastStartUnarmedAttack(Montage, PlayRate, StartYawAngle, TargetYawAngle);
 	}
@@ -456,9 +457,9 @@ void UUnarmedCombatComponent::RefreshUnarmedAttackPhysics(const float DeltaTime)
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	auto TargetRotation{ PlayerController->GetControlRotation() };
 	// TargetRotation.Yaw = TargetRotation.Yaw + Offset;
-	TargetRotation.Yaw = TargetRotation.Yaw;
-	TargetRotation.Pitch = ComponentRotation.Pitch;
-	TargetRotation.Roll = ComponentRotation.Roll;
+	// TargetRotation.Yaw = TargetRotation.Yaw;
+	// TargetRotation.Pitch = ComponentRotation.Pitch;
+	// TargetRotation.Roll = ComponentRotation.Roll;
 
 	// if (Character->ALSXTSettings->UnarmedCombat.RotationInterpolationSpeed <= 0.0f)
 	// {
@@ -480,23 +481,16 @@ void UUnarmedCombatComponent::StopUnarmedAttack()
 {
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
-		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+		// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
 	}
 
+	if (Character->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Custom)
+	{
+		Character->SetMovementModeLocked(false);
+		// Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		OnUnarmedAttackEnded();
+	}
 	Character->SetMovementModeLocked(false);
-	// Character->Cast<UAlsCharacterMovementComponent>(GetCharacterMovement())->SetMovementModeLocked(false);
-	// Character->GetCharacterMovement<UAlsCharacterMovementComponent>()->SetMovementModeLocked(false);
-
-	// ULocalPlayer* LocalPlayer = Character->GetWorld()->GetFirstLocalPlayerFromController();
-	// 
-	// APlayerController* PlayerController = Character->GetWorld()->GetFirstPlayerController();
-	// 
-	// if (Character->IsPlayerControlled())
-	// {
-	// 	Character->EnableInput(PlayerController);
-	// }
-
-	OnUnarmedAttackEnded();
 }
 
 void UUnarmedCombatComponent::OnUnarmedAttackEnded_Implementation() {}
