@@ -11,7 +11,7 @@ void UALSXTAnimationInstance::NativeInitializeAnimation()
 	ALSXTCharacter = Cast<AALSXTCharacter>(GetOwningActor());
 
 #if WITH_EDITOR
-	if (!GetWorld()->IsGameWorld() && ALSXTCharacter.IsNull())
+	if (!GetWorld()->IsGameWorld() && !IsValid(ALSXTCharacter))
 	{
 		// Use default objects for editor preview.
 
