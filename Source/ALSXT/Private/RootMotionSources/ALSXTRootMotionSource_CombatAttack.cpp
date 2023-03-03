@@ -1,37 +1,37 @@
-﻿#include "RootMotionSources/ALSXTRootMotionSource_UnarmedCombat.h"
+#include "RootMotionSources/ALSXTRootMotionSource_CombatAttack.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "Curves/CurveFloat.h"
 #include "Curves/CurveVector.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Settings/ALSXTUnarmedCombatSettings.h"
+#include "Settings/ALSXTCombatSettings.h"
 #include "Utility/AlsMacros.h"
 
-FALSXTRootMotionSource_UnarmedCombat::FALSXTRootMotionSource_UnarmedCombat()
+FALSXTRootMotionSource_CombatAttack::FALSXTRootMotionSource_CombatAttack()
 {
 	Priority = 1000;
 }
 
-FRootMotionSource* FALSXTRootMotionSource_UnarmedCombat::Clone() const
+FRootMotionSource* FALSXTRootMotionSource_CombatAttack::Clone() const
 {
-	return new FALSXTRootMotionSource_UnarmedCombat{*this};
+	return new FALSXTRootMotionSource_CombatAttack{*this};
 }
 
-bool FALSXTRootMotionSource_UnarmedCombat::Matches(const FRootMotionSource* Other) const
+bool FALSXTRootMotionSource_CombatAttack::Matches(const FRootMotionSource* Other) const
 {
 	if (!Super::Matches(Other))
 	{
 		return false;
 	}
 
-	const auto* OtherCasted{static_cast<const FALSXTRootMotionSource_UnarmedCombat*>(Other)};
+	const auto* OtherCasted{static_cast<const FALSXTRootMotionSource_CombatAttack*>(Other)};
 
-	return UnarmedCombatSettings == OtherCasted->UnarmedCombatSettings &&
+	return CombatSettings == OtherCasted->CombatSettings &&
 	       TargetPrimitive == OtherCasted->TargetPrimitive;
 }
 
-void FALSXTRootMotionSource_UnarmedCombat::PrepareRootMotion(const float SimulationDeltaTime, const float DeltaTime,
+void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float SimulationDeltaTime, const float DeltaTime,
                                                       const ACharacter& Character, const UCharacterMovementComponent& Movement)
 {
 	SetTime(GetTime() + SimulationDeltaTime);
@@ -42,7 +42,7 @@ void FALSXTRootMotionSource_UnarmedCombat::PrepareRootMotion(const float Simulat
 		return;
 	}
 
-	const auto AttackTime{GetTime() * UnarmedCombatSettings->CalculatePlayRate(AttackHeight)};
+	const auto AttackTime{GetTime() * CombatSettings->CalculatePlayRate(AttackHeight)};
 
 	// Calculate target transform from the stored relative transform to follow along with moving objects.
 
@@ -56,7 +56,7 @@ void FALSXTRootMotionSource_UnarmedCombat::PrepareRootMotion(const float Simulat
 	FVector LocationOffset;
 	FRotator RotationOffset;
 
-	const auto BlendInAmount{UnarmedCombatSettings->BlendInCurve->GetFloatValue(AttackTime)};
+	const auto BlendInAmount{CombatSettings->BlendInCurve->GetFloatValue(AttackTime)};
 
 	if (!FAnimWeight::IsRelevant(BlendInAmount))
 	{
@@ -66,8 +66,8 @@ void FALSXTRootMotionSource_UnarmedCombat::PrepareRootMotion(const float Simulat
 	else
 	{
 		const FVector3f InterpolationAndCorrectionAmounts{
-			UnarmedCombatSettings->InterpolationAndCorrectionAmountsCurve->GetVectorValue(
-				AttackTime + UnarmedCombatSettings->CalculateStartTime(AttackHeight))
+			CombatSettings->InterpolationAndCorrectionAmountsCurve->GetVectorValue(
+				AttackTime + CombatSettings->CalculateStartTime(AttackHeight))
 		};
 
 		const auto InterpolationAmount{InterpolationAndCorrectionAmounts.X};
@@ -83,8 +83,8 @@ void FALSXTRootMotionSource_UnarmedCombat::PrepareRootMotion(const float Simulat
 		{
 			// Calculate the animation offset. This would be the location the actual animation starts at relative to the target transform.
 
-			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * UnarmedCombatSettings->StartRelativeLocation.X};
-			AnimationLocationOffset.Z = UnarmedCombatSettings->StartRelativeLocation.Z;
+			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * CombatSettings->StartRelativeLocation.X};
+			AnimationLocationOffset.Z = CombatSettings->StartRelativeLocation.Z;
 			AnimationLocationOffset *= Character.GetMesh()->GetComponentScale().Z;
 
 			// Blend into the animation offset and final offset at the same time.
@@ -126,7 +126,7 @@ void FALSXTRootMotionSource_UnarmedCombat::PrepareRootMotion(const float Simulat
 	bSimulatedNeedsSmoothing = true;
 }
 
-bool FALSXTRootMotionSource_UnarmedCombat::NetSerialize(FArchive& Archive, UPackageMap* Map, bool& bSuccess)
+bool FALSXTRootMotionSource_CombatAttack::NetSerialize(FArchive& Archive, UPackageMap* Map, bool& bSuccess)
 {
 	if (!Super::NetSerialize(Archive, Map, bSuccess))
 	{
@@ -137,7 +137,7 @@ bool FALSXTRootMotionSource_UnarmedCombat::NetSerialize(FArchive& Archive, UPack
 	bSuccess = true;
 	auto bSuccessLocal{true};
 
-	Archive << UnarmedCombatSettings;
+	Archive << CombatSettings;
 	Archive << TargetPrimitive;
 
 	bSuccess &= SerializePackedVector<100, 30>(TargetRelativeLocation, Archive);
@@ -157,19 +157,19 @@ bool FALSXTRootMotionSource_UnarmedCombat::NetSerialize(FArchive& Archive, UPack
 	return bSuccess;
 }
 
-UScriptStruct* FALSXTRootMotionSource_UnarmedCombat::GetScriptStruct() const
+UScriptStruct* FALSXTRootMotionSource_CombatAttack::GetScriptStruct() const
 {
 	return StaticStruct();
 }
 
-FString FALSXTRootMotionSource_UnarmedCombat::ToSimpleString() const
+FString FALSXTRootMotionSource_CombatAttack::ToSimpleString() const
 {
-	return FString::Format(TEXT("{0} ({1}, {2})"), {ALS_GET_TYPE_STRING(FALSXTRootMotionSource_UnarmedCombat), *InstanceName.ToString(), LocalID});
+	return FString::Format(TEXT("{0} ({1}, {2})"), {ALS_GET_TYPE_STRING(FALSXTRootMotionSource_CombatAttack), *InstanceName.ToString(), LocalID});
 }
 
-void FALSXTRootMotionSource_UnarmedCombat::AddReferencedObjects(FReferenceCollector& Collector)
+void FALSXTRootMotionSource_CombatAttack::AddReferencedObjects(FReferenceCollector& Collector)
 {
 	Super::AddReferencedObjects(Collector);
 
-	Collector.AddReferencedObject(UnarmedCombatSettings);
+	Collector.AddReferencedObject(CombatSettings);
 }

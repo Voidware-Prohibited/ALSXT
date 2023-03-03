@@ -9,7 +9,7 @@
 #include "Settings/ALSXTFPEyeFocusSettings.h"
 #include "Settings/ALSXTAttackReactionSettings.h"
 #include "Settings/ALSXTImpactReactionSettings.h"
-#include "Settings/ALSXTUnarmedCombatSettings.h"
+#include "Settings/ALSXTCombatSettings.h"
 #include "ALSXTCharacterSettings.generated.h"
 
 UENUM(BlueprintType)
@@ -41,13 +41,13 @@ public:
 	FALSXTFPEyeFocusSettings FirstPersonEyeFocus;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FALSXTGeneralCombatSettings Combat;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTGeneralAttackReactionSettings AttackReaction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTGeneralImpactReactionSettings ImpactReaction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FALSXTGeneralUnarmedCombatSettings UnarmedCombat;
 
 	UALSXTCharacterSettings();
 	

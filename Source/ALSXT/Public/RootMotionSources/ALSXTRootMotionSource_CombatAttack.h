@@ -1,18 +1,18 @@
 #pragma once
 
 #include "GameFramework/RootMotionSource.h"
-#include "ALSXTRootMotionSource_UnarmedCombat.generated.h"
+#include "ALSXTRootMotionSource_CombatAttack.generated.h"
 
-class UALSXTUnarmedCombatSettings;
+class UALSXTCombatAttackSettings;
 
 USTRUCT()
-struct ALSXT_API FALSXTRootMotionSource_UnarmedCombat : public FRootMotionSource
+struct ALSXT_API FALSXTRootMotionSource_CombatAttack : public FRootMotionSource
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY()
-	TObjectPtr<UALSXTUnarmedCombatSettings> UnarmedCombatSettings{nullptr};
+	TObjectPtr<UALSXTCombatSettings> CombatSettings{nullptr};
 
 	UPROPERTY()
 	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
@@ -33,7 +33,7 @@ public:
 	float AttackHeight{0.0f};
 
 public:
-	FALSXTRootMotionSource_UnarmedCombat();
+	FALSXTRootMotionSource_CombatAttack();
 
 	virtual FRootMotionSource* Clone() const override;
 
@@ -52,7 +52,7 @@ public:
 };
 
 template <>
-struct TStructOpsTypeTraits<FALSXTRootMotionSource_UnarmedCombat> : public TStructOpsTypeTraitsBase2<FALSXTRootMotionSource_UnarmedCombat>
+struct TStructOpsTypeTraits<FALSXTRootMotionSource_CombatAttack> : public TStructOpsTypeTraitsBase2<FALSXTRootMotionSource_CombatAttack>
 {
 	enum
 	{

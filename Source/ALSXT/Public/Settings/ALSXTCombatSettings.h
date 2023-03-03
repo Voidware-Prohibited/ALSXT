@@ -3,10 +3,10 @@
 #include "Utility/ALSXTStructs.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
-#include "ALSXTUnarmedCombatSettings.generated.h"
+#include "ALSXTCombatSettings.generated.h"
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTUnarmedCombatParameters
+struct ALSXT_API FALSXTCombatParameters
 {
 	GENERATED_BODY()
 
@@ -27,19 +27,19 @@ struct ALSXT_API FALSXTUnarmedCombatParameters
 };
 
 UCLASS(Blueprintable, BlueprintType)
-class ALSXT_API UALSXTUnarmedCombatSettings : public UDataAsset
+class ALSXT_API UALSXTCombatSettings : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimMontage> Montage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FUnarmedAttackType> AttackTypes;
 
-	// UnarmedAttack time to blend in amount curve.
+	// Mantling time to blend in amount curve.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UCurveFloat> BlendInCurve;
 
-	// UnarmedAttack time to interpolation, horizontal and vertical correction amounts curve.
+	// Mantling time to interpolation, horizontal and vertical correction amounts curve.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UCurveVector> InterpolationAndCorrectionAmountsCurve;
 
@@ -61,18 +61,18 @@ public:
 	float CalculatePlayRate(float UnarmedAttackHeight) const;
 };
 
-inline float UALSXTUnarmedCombatSettings::CalculateStartTime(const float UnarmedAttackHeight) const
+inline float UALSXTCombatSettings::CalculateStartTime(const float UnarmedAttackHeight) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, UnarmedAttackHeight);
 }
 
-inline float UALSXTUnarmedCombatSettings::CalculatePlayRate(const float UnarmedAttackHeight) const
+inline float UALSXTCombatSettings::CalculatePlayRate(const float UnarmedAttackHeight) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, UnarmedAttackHeight);
 }
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTAttackTraceSettings
+struct ALSXT_API FALSXTCombatAttackTraceSettings
 {
 	GENERATED_BODY()
 
@@ -106,12 +106,12 @@ struct ALSXT_API FALSXTAttackTraceSettings
 };
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTGeneralUnarmedCombatSettings
+struct ALSXT_API FALSXTGeneralCombatSettings
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAllowUnarmedCombat{ true };
+	bool bAllowCombat{ true };
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bRotateToInputOnStart{ true };
@@ -124,8 +124,5 @@ struct ALSXT_API FALSXTGeneralUnarmedCombatSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FUnarmedAttackType> UnarmedAttackTypes;
 
 };

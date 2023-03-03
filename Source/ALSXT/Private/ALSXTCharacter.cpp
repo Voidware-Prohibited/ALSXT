@@ -12,7 +12,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Settings/ALSXTCharacterSettings.h"
 #include "Settings/ALSXTVaultingSettings.h"
-#include "Settings/ALSXTUnarmedCombatSettings.h"
+#include "Settings/ALSXTCombatSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
@@ -1130,7 +1130,7 @@ void AALSXTCharacter::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Str
 	float MomemtumSum = HitMomentum + SelfMomentum;
 }
 
-void AALSXTCharacter::BeginAttackCollisionTrace(FALSXTAttackTraceSettings TraceSettings)
+void AALSXTCharacter::BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings)
 {
 	AttackTraceSettings = TraceSettings;
 	GetWorld()->GetTimerManager().SetTimer(AttackTraceTimerHandle, AttackTraceTimerDelegate, 0.1f, true);
@@ -1148,10 +1148,10 @@ void AALSXTCharacter::AttackCollisionTrace()
 		InitialIgnoredActors.Add(this);	// Add Self to Initial Trace Ignored Actors
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
-		AttackTraceObjectTypes = ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes;
+		AttackTraceObjectTypes = ALSXTSettings->Combat.AttackTraceObjectTypes;
 
 		// Initial Trace
-		bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
+		bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ALSXTSettings->Combat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
 
 		if (isHit)
 		{
@@ -1195,6 +1195,10 @@ void AALSXTCharacter::AttackCollisionTrace()
 
 					TotalImpactEnergy = (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
 					// FMath::Square(TossSpeed)
+
+					FVector HitDirection = HitResult.ImpactPoint - GetActorLocation();
+					HitDirection.Normalize();
+					CurrentHitResult.DoubleHitResult.HitResult.Direction = HitDirection;
 					CurrentHitResult.DoubleHitResult.HitResult.Impulse = HitResult.Normal * TotalImpactEnergy;
 					CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
 					GetLocationFromBoneName(CurrentHitResult.DoubleHitResult.HitResult.HitResult.BoneName, ImpactLoc);
@@ -1212,7 +1216,7 @@ void AALSXTCharacter::AttackCollisionTrace()
 					OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
 
 					// Perform Origin Trace
-					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ALSXTSettings->UnarmedCombat.AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ALSXTSettings->Combat.AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
 
 					// Perform Origin Hit Trace to get PhysMat eyc for ImpactLocation
 					if (isOriginHit)

@@ -3,7 +3,7 @@
 #include "AlsCharacter.h"
 #include "GameFramework/Character.h"
 #include "Settings/ALSXTVaultingSettings.h"
-#include "Settings/ALSXTUnarmedCombatSettings.h"
+#include "Settings/ALSXTCombatSettings.h"
 #include "Settings/ALSXTAttackReactionSettings.h"
 #include "Settings/ALSXTImpactReactionSettings.h"
 #include "State/AlsLocomotionState.h"
@@ -50,9 +50,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	class UImpactReactionComponent* ImpactReaction;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	class UUnarmedCombatComponent* Combat;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UPhysicalAnimationComponent* PhysicalAnimation;
@@ -175,7 +172,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
-	FALSXTAttackTraceSettings AttackTraceSettings;
+	FALSXTCombatAttackTraceSettings AttackTraceSettings;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
 	TArray<AActor*> AttackTraceLastHitActors;
@@ -961,7 +958,7 @@ protected:
 	// Attack Collision Trace
 public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
-	void BeginAttackCollisionTrace(FALSXTAttackTraceSettings TraceSettings);
+	void BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void AttackCollisionTrace();

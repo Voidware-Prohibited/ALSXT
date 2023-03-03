@@ -16,7 +16,7 @@ class ALSXT_API UALSXTAnimNotifyState_UCTrace : public UAnimNotifyState
 	GENERATED_BODY()
 
 protected:
-	FALSXTAttackTraceSettings TraceSettings;
+	FALSXTCombatAttackTraceSettings TraceSettings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FGameplayTag UnarmedAttackType;

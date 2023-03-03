@@ -27,7 +27,7 @@ void UALSXTAnimNotifyState_HITrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 	auto* Character{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
 	if (IsValid(Character))
 	{
-		FALSXTAttackTraceSettings TraceSettings;
+		FALSXTCombatAttackTraceSettings TraceSettings;
 		TraceSettings.Overlay = Character->GetOverlayMode();
 		TraceSettings.ImpactType = ALSXTImpactTypeTags::Hit;
 		TraceSettings.AttackType = ALSXTAttackTypeTags::Regular;
