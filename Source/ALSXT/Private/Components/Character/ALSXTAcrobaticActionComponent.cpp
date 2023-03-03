@@ -1,10 +1,10 @@
 // MIT
 
 
-#include "Components/Character/CharacterCustomizationComponent.h"
+#include "Components/Character/ALSXTAcrobaticActionComponent.h"
 
 // Sets default values for this component's properties
-UCharacterCustomizationComponent::UCharacterCustomizationComponent()
+UALSXTAcrobaticActionComponent::UALSXTAcrobaticActionComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -15,7 +15,7 @@ UCharacterCustomizationComponent::UCharacterCustomizationComponent()
 
 
 // Called when the game starts
-void UCharacterCustomizationComponent::BeginPlay()
+void UALSXTAcrobaticActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -25,7 +25,7 @@ void UCharacterCustomizationComponent::BeginPlay()
 
 
 // Called every frame
-void UCharacterCustomizationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UALSXTAcrobaticActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 

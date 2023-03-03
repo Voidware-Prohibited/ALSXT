@@ -1,10 +1,10 @@
 // MIT
 
 
-#include "Components/Character/EmoteComponent.h"
+#include "Components/Character/ALSXTEmoteComponent.h"
 
 // Sets default values for this component's properties
-UEmoteComponent::UEmoteComponent()
+UALSXTEmoteComponent::UALSXTEmoteComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -15,7 +15,7 @@ UEmoteComponent::UEmoteComponent()
 
 
 // Called when the game starts
-void UEmoteComponent::BeginPlay()
+void UALSXTEmoteComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -26,7 +26,7 @@ void UEmoteComponent::BeginPlay()
 
 
 // Called every frame
-void UEmoteComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UALSXTEmoteComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -35,7 +35,7 @@ void UEmoteComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 // Emote
 
-void UEmoteComponent::AddDesiredEmote(const FGameplayTag& Emote)
+void UALSXTEmoteComponent::AddDesiredEmote(const FGameplayTag& Emote)
 {
 	if (CanEmote())
 	{
@@ -46,12 +46,12 @@ void UEmoteComponent::AddDesiredEmote(const FGameplayTag& Emote)
 	}
 }
 
-void UEmoteComponent::ServerAddDesiredEmote_Implementation(const FGameplayTag& Emote)
+void UALSXTEmoteComponent::ServerAddDesiredEmote_Implementation(const FGameplayTag& Emote)
 {
 	AddDesiredEmote(Emote);
 }
 
-void UEmoteComponent::AddEmote(const FGameplayTag& Emote)
+void UALSXTEmoteComponent::AddEmote(const FGameplayTag& Emote)
 {
 
 	if (CanEmote())
@@ -60,4 +60,4 @@ void UEmoteComponent::AddEmote(const FGameplayTag& Emote)
 	}
 }
 
-void UEmoteComponent::OnEmote_Implementation(const FGameplayTag& Emote) {}
+void UALSXTEmoteComponent::OnEmote_Implementation(const FGameplayTag& Emote) {}

@@ -171,10 +171,13 @@ struct ALSXT_API FImpactForm
 	TArray<FActionMontageInfo> RegularMontages;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FActionMontageInfo DefaultFallbackMontage;
+	TArray<FActionMontageInfo> RecoveryMontages;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FActionMontageInfo> RecoveryMontages;
+	TArray<FActionMontageInfo> DeathMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FActionMontageInfo DefaultFallbackMontage;
 };
 
 USTRUCT(BlueprintType)

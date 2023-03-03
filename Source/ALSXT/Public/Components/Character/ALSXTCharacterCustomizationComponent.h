@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "AcrobaticActionComponent.generated.h"
+#include "ALSXTCharacterCustomizationComponent.generated.h"
 
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ALSXT_API UAcrobaticActionComponent : public UActorComponent
+class ALSXT_API UALSXTCharacterCustomizationComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UAcrobaticActionComponent();
+	UALSXTCharacterCustomizationComponent();
 
 protected:
 	// Called when the game starts
