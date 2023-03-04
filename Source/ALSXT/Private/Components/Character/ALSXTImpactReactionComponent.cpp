@@ -1,6 +1,6 @@
 // MIT
 
-#include "Components/Character/ImpactReactionComponent.h"
+#include "Components/Character/ALSXTImpactReactionComponent.h"
 #include "Utility/ALSXTStructs.h"
 #include "ALSXTCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -9,7 +9,7 @@
 #include "Utility/AlsMacros.h"
 
 // Sets default values for this component's properties
-UImpactReactionComponent::UImpactReactionComponent()
+UALSXTImpactReactionComponent::UALSXTImpactReactionComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -21,7 +21,7 @@ UImpactReactionComponent::UImpactReactionComponent()
 
 
 // Called when the game starts
-void UImpactReactionComponent::BeginPlay()
+void UALSXTImpactReactionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -32,7 +32,7 @@ void UImpactReactionComponent::BeginPlay()
 
 
 // Called every frame
-void UImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UALSXTImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -42,12 +42,12 @@ void UImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 // UnarmedAttack
 
-void UImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit)
 {
 	StartImpactReaction(Hit);
 }
 
-void UImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("1 - AttackReaction"));
 	StartAttackReaction(Hit);
@@ -67,17 +67,17 @@ void UImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 	// }
 }
 
-void UImpactReactionComponent::ImpactTimelineUpdate(float Value)
+void UALSXTImpactReactionComponent::ImpactTimelineUpdate(float Value)
 {
 	//...
 }
 
-bool UImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const
+bool UALSXTImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const
 {
 	return (Montage != nullptr);
 }
 
-void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("2 - StartAttackReaction"));
 	// if (GetOwnerRole() <= ROLE_SimulatedProxy)
@@ -128,7 +128,7 @@ void UImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 	}
 }
 
-void UImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 {
 	if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
 	{
@@ -173,17 +173,17 @@ void UImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	}
 }
 
-UALSXTImpactReactionSettings* UImpactReactionComponent::SelectImpactReactionSettings_Implementation(const FGameplayTag& Location)
+UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactionSettings_Implementation(const FGameplayTag& Location)
 {
 	return nullptr;
 }
 
-UALSXTAttackReactionSettings* UImpactReactionComponent::SelectAttackReactionSettings_Implementation(const FGameplayTag& Location)
+UALSXTAttackReactionSettings* UALSXTImpactReactionComponent::SelectAttackReactionSettings_Implementation(const FGameplayTag& Location)
 {
 	return nullptr;
 }
 
-UAnimMontage* UImpactReactionComponent::SelectAttackReactionMontage_Implementation(FAttackDoubleHitResult Hit)
+UAnimMontage* UALSXTImpactReactionComponent::SelectAttackReactionMontage_Implementation(FAttackDoubleHitResult Hit)
 {
 	UAnimMontage* SelectedMontage{ nullptr };
 	FActionMontageInfo LastAnimation{ nullptr };
@@ -262,7 +262,7 @@ UAnimMontage* UImpactReactionComponent::SelectAttackReactionMontage_Implementati
 	return SelectedMontage;
 }
 
-UAnimMontage* UImpactReactionComponent::SelectImpactReactionMontage_Implementation(FDoubleHitResult Hit)
+UAnimMontage* UALSXTImpactReactionComponent::SelectImpactReactionMontage_Implementation(FDoubleHitResult Hit)
 {
 	UAnimMontage* SelectedMontage { nullptr };
 	FActionMontageInfo LastAnimation { nullptr };
@@ -331,29 +331,29 @@ UAnimMontage* UImpactReactionComponent::SelectImpactReactionMontage_Implementati
 	return SelectedMontage;
 }
 
-void UImpactReactionComponent::ServerAttackReaction_Implementation(FAttackDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::ServerAttackReaction_Implementation(FAttackDoubleHitResult Hit)
 {
 	MulticastAttackReaction(Hit);
 	Character->ForceNetUpdate();
 }
 
-void UImpactReactionComponent::MulticastAttackReaction_Implementation(FAttackDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::MulticastAttackReaction_Implementation(FAttackDoubleHitResult Hit)
 {
 	StartAttackReaction(Hit);
 }
 
-void UImpactReactionComponent::ServerImpactReaction_Implementation(FDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::ServerImpactReaction_Implementation(FDoubleHitResult Hit)
 {
 	MulticastImpactReaction(Hit);
 	Character->ForceNetUpdate();
 }
 
-void UImpactReactionComponent::MulticastImpactReaction_Implementation(FDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::MulticastImpactReaction_Implementation(FDoubleHitResult Hit)
 {
 	StartImpactReaction(Hit);
 }
 
-void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
+void UALSXTImpactReactionComponent::ServerStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
 {
 	if (IsImpactReactionAllowedToStart(Montage))
 	{
@@ -362,12 +362,12 @@ void UImpactReactionComponent::ServerStartImpactReaction_Implementation(FDoubleH
 	}
 }
 
-void UImpactReactionComponent::MulticastStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
+void UALSXTImpactReactionComponent::MulticastStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
 {
 	StartImpactReactionImplementation(Hit, Montage, ParticleActor, Particle, Audio);
 }
 
-void UImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
+void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
 {	
 	//if (IsImpactReactionAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, 1.0f))
 	if (IsImpactReactionAllowedToStart(Montage))
@@ -426,7 +426,7 @@ void UImpactReactionComponent::StartImpactReactionImplementation(FDoubleHitResul
 	}
 }
 
-void UImpactReactionComponent::ServerSpawnParticleActor_Implementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor)
+void UALSXTImpactReactionComponent::ServerSpawnParticleActor_Implementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor)
 {
 	if (UKismetSystemLibrary::IsValidClass(ParticleActor))
 	{
@@ -457,7 +457,7 @@ void UImpactReactionComponent::ServerSpawnParticleActor_Implementation(FDoubleHi
 	}
 }
 
-void UImpactReactionComponent::RefreshImpactReaction(const float DeltaTime)
+void UALSXTImpactReactionComponent::RefreshImpactReaction(const float DeltaTime)
 {
 	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::HitReaction)
 	{
@@ -470,7 +470,7 @@ void UImpactReactionComponent::RefreshImpactReaction(const float DeltaTime)
 	}
 }
 
-void UImpactReactionComponent::RefreshImpactReactionPhysics(const float DeltaTime)
+void UALSXTImpactReactionComponent::RefreshImpactReactionPhysics(const float DeltaTime)
 {
 	float Offset = Character->ALSXTSettings->ImpactReaction.RotationOffset;
 	auto ComponentRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
@@ -496,7 +496,7 @@ void UImpactReactionComponent::RefreshImpactReactionPhysics(const float DeltaTim
 	}
 }
 
-void UImpactReactionComponent::StopImpactReaction()
+void UALSXTImpactReactionComponent::StopImpactReaction()
 {
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
@@ -519,4 +519,4 @@ void UImpactReactionComponent::StopImpactReaction()
 	OnImpactReactionEnded();
 }
 
-void UImpactReactionComponent::OnImpactReactionEnded_Implementation() {}
+void UALSXTImpactReactionComponent::OnImpactReactionEnded_Implementation() {}

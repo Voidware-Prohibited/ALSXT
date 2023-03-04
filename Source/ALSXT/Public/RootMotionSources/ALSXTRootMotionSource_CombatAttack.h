@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameFramework/RootMotionSource.h"
+#include "Settings/ALSXTCombatSettings.h"
 #include "ALSXTRootMotionSource_CombatAttack.generated.h"
 
 class UALSXTCombatAttackSettings;

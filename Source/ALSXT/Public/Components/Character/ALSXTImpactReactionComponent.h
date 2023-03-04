@@ -15,16 +15,16 @@
 #include "Settings/ALSXTImpactReactionSettings.h"
 #include "State/ALSXTImpactReactionState.h" 
 #include "Components/TimelineComponent.h"
-#include "ImpactReactionComponent.generated.h"
+#include "ALSXTImpactReactionComponent.generated.h"
 
 UCLASS(Blueprintable, ClassGroup=(Physics), meta=(BlueprintSpawnableComponent) )
-class ALSXT_API UImpactReactionComponent : public UActorComponent
+class ALSXT_API UALSXTImpactReactionComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UImpactReactionComponent();
+	UALSXTImpactReactionComponent();
 
 protected:
 	// Called when the game starts

@@ -48,8 +48,8 @@ public:
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	// class UALSXTSlidingActionComponent* SlidingAction;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	class UImpactReactionComponent* ImpactReaction;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	// class UALSXTImpactReactionComponent* ImpactReaction;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UPhysicalAnimationComponent* PhysicalAnimation;

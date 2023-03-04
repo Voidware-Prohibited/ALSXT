@@ -1,6 +1,6 @@
 // MIT
 
-#include "Components/Character/CombatComponent.h"
+#include "Components/Character/ALSXTCombatComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Utility/AlsUtility.h"
@@ -16,7 +16,7 @@
 #include "Interfaces/TargetLockInterface.h"
 
 // Sets default values for this component's properties
-UCombatComponent::UCombatComponent()
+UALSXTCombatComponent::UALSXTCombatComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -28,7 +28,7 @@ UCombatComponent::UCombatComponent()
 
 
 // Called when the game starts
-void UCombatComponent::BeginPlay()
+void UALSXTCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -39,20 +39,20 @@ void UCombatComponent::BeginPlay()
 	if (IsValid(EnhancedInput))
 	{
 		//FSetupPlayerInputComponentDelegate Del = Character->OnSetupPlayerInputComponentUpdated;
-		//Del.AddUniqueDynamic(this, &UCombatComponent::SetupInputComponent(EnhancedInput));
+		//Del.AddUniqueDynamic(this, &UALSXTCombatComponent::SetupInputComponent(EnhancedInput));
 	}
 	TargetTraceTimerDelegate.BindUFunction(this, "TryTraceForTargets");
 }
 
 
 // Called every frame
-void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UALSXTCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	RefreshAttack(DeltaTime);
 }
 
-float UCombatComponent::GetAngle(FVector Target)
+float UALSXTCombatComponent::GetAngle(FVector Target)
 {
 	float resultAngleInRadians = 0.0f;
 	FVector PlayerLocation = Character->GetActorLocation();
@@ -75,7 +75,7 @@ float UCombatComponent::GetAngle(FVector Target)
 	return resultAngleInDegrees;
 }
 
-bool UCombatComponent::IsTartgetObstructed()
+bool UALSXTCombatComponent::IsTartgetObstructed()
 {
 	FVector CharLoc = Character->GetActorLocation();
 	TArray<FHitResult> OutHits;
@@ -100,7 +100,7 @@ bool UCombatComponent::IsTartgetObstructed()
 	}
 }
 
-void UCombatComponent::TryTraceForTargets()
+void UALSXTCombatComponent::TryTraceForTargets()
 {
 	TArray<FGameplayTag> TargetableOverlayModes;
 	GetTargetableOverlayModes(TargetableOverlayModes);
@@ -137,7 +137,7 @@ void UCombatComponent::TryTraceForTargets()
 	}
 }
 
-void UCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targets)
+void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targets)
 {
 	FRotator ControlRotation = Character->GetControlRotation();
 	FVector ForwardVector = Character->GetActorForwardVector();
@@ -175,7 +175,7 @@ void UCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targets)
 	}
 }
 
-void UCombatComponent::GetClosestTarget()
+void UALSXTCombatComponent::GetClosestTarget()
 {
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
@@ -236,12 +236,12 @@ void UCombatComponent::GetClosestTarget()
 	}
 }
 
-void UCombatComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTarget)
+void UALSXTCombatComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTarget)
 {
 	CurrentTarget = NewTarget;
 }
 
-void UCombatComponent::ClearCurrentTarget()
+void UALSXTCombatComponent::ClearCurrentTarget()
 {
 	CurrentTarget.Valid = false;
 	CurrentTarget.DistanceFromPlayer = 340282346638528859811704183484516925440.0f;
@@ -264,7 +264,7 @@ void UCombatComponent::ClearCurrentTarget()
 	CurrentTarget.HitResult = FHitResult(ForceInit);
 }
 
-void UCombatComponent::DisengageAllTargets()
+void UALSXTCombatComponent::DisengageAllTargets()
 {
 	ClearCurrentTarget();
 
@@ -272,7 +272,7 @@ void UCombatComponent::DisengageAllTargets()
 	GetWorld()->GetTimerManager().ClearTimer(TargetTraceTimerHandle);
 }
 
-void UCombatComponent::GetTargetLeft()
+void UALSXTCombatComponent::GetTargetLeft()
 {
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
@@ -303,7 +303,7 @@ void UCombatComponent::GetTargetLeft()
 	}
 }
 
-void UCombatComponent::GetTargetRight()
+void UALSXTCombatComponent::GetTargetRight()
 {
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
@@ -334,7 +334,7 @@ void UCombatComponent::GetTargetRight()
 	}
 }
 
-void UCombatComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
+void UALSXTCombatComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
 {
 	if (IsValid(Character) && IsValid(Character->GetController()) && Target.Valid && IsValid(Target.HitResult.GetActor()))
 	{
@@ -355,7 +355,7 @@ void UCombatComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
 
 // Attack
 
-void UCombatComponent::Attack(const FGameplayTag& AttackType, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate)
+void UALSXTCombatComponent::Attack(const FGameplayTag& AttackType, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate)
 {
 	FGameplayTag NewStance = ALSXTActionStanceTags::Standing;
 
@@ -380,15 +380,15 @@ void UCombatComponent::Attack(const FGameplayTag& AttackType, const FGameplayTag
 		 	: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)));
 }
 
-void UCombatComponent::SetupInputComponent(UEnhancedInputComponent* PlayerInputComponent)
+void UALSXTCombatComponent::SetupInputComponent(UEnhancedInputComponent* PlayerInputComponent)
 {
 	if (PrimaryAction)
 	{
-		PlayerInputComponent->BindAction(PrimaryAction, ETriggerEvent::Triggered, this, &UCombatComponent::InputPrimaryAction);
+		PlayerInputComponent->BindAction(PrimaryAction, ETriggerEvent::Triggered, this, &UALSXTCombatComponent::InputPrimaryAction);
 	}
 }
 
-void UCombatComponent::InputPrimaryAction()
+void UALSXTCombatComponent::InputPrimaryAction()
 {
 	if ((AlsCharacter->GetOverlayMode() == AlsOverlayModeTags::Default) && ((Character->GetCombatStance() == ALSXTCombatStanceTags::Ready) || (Character->GetCombatStance() == ALSXTCombatStanceTags::Aiming)) && CanAttack())
 	{
@@ -396,7 +396,7 @@ void UCombatComponent::InputPrimaryAction()
 	}
 }
 
-bool UCombatComponent::IsAttackAllowedToStart(const UAnimMontage* Montage) const
+bool UALSXTCombatComponent::IsAttackAllowedToStart(const UAnimMontage* Montage) const
 {
 	return !Character->GetLocomotionAction().IsValid() ||
 		// ReSharper disable once CppRedundantParentheses
@@ -405,7 +405,7 @@ bool UCombatComponent::IsAttackAllowedToStart(const UAnimMontage* Montage) const
 }
 
 
-void UCombatComponent::StartAttack(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate, const float TargetYawAngle)
+void UALSXTCombatComponent::StartAttack(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate, const float TargetYawAngle)
 {
 	if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
 	{
@@ -442,12 +442,12 @@ void UCombatComponent::StartAttack(const FGameplayTag& AttackType, const FGamepl
 	}
 }
 
-UALSXTCombatSettings* UCombatComponent::SelectAttackSettings_Implementation()
+UALSXTCombatSettings* UALSXTCombatComponent::SelectAttackSettings_Implementation()
 {
 	return nullptr;
 }
 
-UAnimMontage* UCombatComponent::SelectAttackMontage_Implementation(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
+UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
 {
 	UAnimMontage* SelectedMontage{ nullptr };
 	FActionMontageInfo LastAnimation{ nullptr };
@@ -501,7 +501,7 @@ UAnimMontage* UCombatComponent::SelectAttackMontage_Implementation(const FGamepl
 	return SelectedMontage;
 }
 
-void UCombatComponent::ServerStartAttack_Implementation(UAnimMontage* Montage, const float PlayRate,
+void UALSXTCombatComponent::ServerStartAttack_Implementation(UAnimMontage* Montage, const float PlayRate,
 	const float StartYawAngle, const float TargetYawAngle)
 {
 	if (IsAttackAllowedToStart(Montage))
@@ -511,13 +511,13 @@ void UCombatComponent::ServerStartAttack_Implementation(UAnimMontage* Montage, c
 	}
 }
 
-void UCombatComponent::MulticastStartAttack_Implementation(UAnimMontage* Montage, const float PlayRate,
+void UALSXTCombatComponent::MulticastStartAttack_Implementation(UAnimMontage* Montage, const float PlayRate,
 	const float StartYawAngle, const float TargetYawAngle)
 {
 	StartAttackImplementation(Montage, PlayRate, StartYawAngle, TargetYawAngle);
 }
 
-void UCombatComponent::StartAttackImplementation(UAnimMontage* Montage, const float PlayRate,
+void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, const float PlayRate,
 	const float StartYawAngle, const float TargetYawAngle)
 {
 	
@@ -532,7 +532,7 @@ void UCombatComponent::StartAttackImplementation(UAnimMontage* Montage, const fl
 	}
 }
 
-void UCombatComponent::RefreshAttack(const float DeltaTime)
+void UALSXTCombatComponent::RefreshAttack(const float DeltaTime)
 {
 	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::PrimaryAction)
 	{
@@ -545,7 +545,7 @@ void UCombatComponent::RefreshAttack(const float DeltaTime)
 	}
 }
 
-void UCombatComponent::RefreshAttackPhysics(const float DeltaTime)
+void UALSXTCombatComponent::RefreshAttackPhysics(const float DeltaTime)
 {
 	// float Offset = Character->ALSXTSettings->Combat.RotationOffset;
 	auto ComponentRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
@@ -572,7 +572,7 @@ void UCombatComponent::RefreshAttackPhysics(const float DeltaTime)
 	// }
 }
 
-void UCombatComponent::StopAttack()
+void UALSXTCombatComponent::StopAttack()
 {
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
@@ -588,4 +588,4 @@ void UCombatComponent::StopAttack()
 	Character->SetMovementModeLocked(false);
 }
 
-void UCombatComponent::OnAttackEnded_Implementation() {}
+void UALSXTCombatComponent::OnAttackEnded_Implementation() {}

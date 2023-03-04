@@ -10,16 +10,16 @@
 #include "AlsCameraComponent.h"
 #include "Components/ActorComponent.h"
 #include "State/ALSXTCombatState.h"
-#include "CombatComponent.generated.h"
+#include "ALSXTCombatComponent.generated.h"
 
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class ALSXT_API UCombatComponent : public UActorComponent
+class ALSXT_API UALSXTCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UCombatComponent();
+	UALSXTCombatComponent();
 
 	UFUNCTION()
 		virtual void SetupInputComponent(class UEnhancedInputComponent* PlayerInputComponent);
