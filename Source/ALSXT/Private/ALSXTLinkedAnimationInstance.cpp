@@ -42,8 +42,8 @@ void UALSXTLinkedAnimationInstance::NativeBeginPlay()
 {
 	ALS_ENSURE_MESSAGE(IsValid(ALSXTParent),
 					TEXT("%s (%s) should only be used as a linked animation instance within the %s animation blueprint!"),
-					ALS_GET_TYPE_STRING(UALSXTLinkedAnimationInstance), *GetClass()->GetName(),
-					ALS_GET_TYPE_STRING(UALSXTAnimationInstance));
+					ALS_GET_TYPE_STRING(UALSXTLinkedAnimationInstance).GetData(), *GetClass()->GetName(),
+					ALS_GET_TYPE_STRING(UALSXTAnimationInstance).GetData());
 
 	Super::NativeBeginPlay();
 }
