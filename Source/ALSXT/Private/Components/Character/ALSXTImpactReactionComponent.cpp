@@ -49,24 +49,16 @@ void UALSXTImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit)
 
 void UALSXTImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("1 - AttackReaction"));
-
-	StartAttackReaction(Hit);
-
-	// MulticastAttackReaction(Hit);
-	// ServerAttackReaction(Hit);
-
-	// if (Character->GetLocalRole() >= ROLE_Authority)
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("1.5 - Authority"));
-	// 	MulticastAttackReaction(Hit);
-	// }
-	// else
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("1.5 - Not Authority"));
-	// 	// ServerAttackReaction(Hit);
-	// 	StartAttackReaction(Hit);
-	// }
+	// if (GetOwnerRole() == ROLE_AutonomousProxy)
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerAttackReaction(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartAttackReaction(Hit);
+		// MulticastAttackReaction(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::ImpactTimelineUpdate(float Value)
@@ -81,12 +73,6 @@ bool UALSXTImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMo
 
 void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("2 - StartAttackReaction"));
-	// if (GetOwnerRole() <= ROLE_SimulatedProxy)
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("3 - return false: Role: Simulated Proxy"));
-	// 	return;
-	// }
 	UAnimMontage* Montage{ nullptr };
 	UNiagaraSystem* Particle{ nullptr };
 	TSubclassOf<AActor> ParticleActor{ nullptr };
@@ -105,29 +91,9 @@ void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult H
 
 	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
 
-	// Clear the character movement mode and set the locomotion action to mantling.
-
 	Character->SetMovementModeLocked(true);
-	// APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	// Character->DisableInput(PlayerController);
 
-	if (GetOwnerRole() >= ROLE_Authority)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AutonomousProxy"));
-		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
-		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
-		// MulticastStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
-		ServerStartImpactReaction(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
-		OnImpactReactionStarted(Hit.DoubleHitResult);
-	}
-	else if (GetOwnerRole() >= ROLE_SimulatedProxy)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SimulatedProxy"));
-		Character->GetCharacterMovement()->FlushServerMoves();
-		StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
-		// ServerStartImpactReaction(Hit.DoubleHitResult, Montage, Particle, Audio);
-		OnImpactReactionStarted(Hit.DoubleHitResult);
-	}
+	StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
 }
 
 void UALSXTImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
@@ -156,8 +122,6 @@ void UALSXTImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	// Clear the character movement mode and set the locomotion action to mantling.
 
 	Character->SetMovementModeLocked(true);
-	// APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	// Character->DisableInput(PlayerController);
 
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
@@ -333,11 +297,18 @@ UAnimMontage* UALSXTImpactReactionComponent::SelectImpactReactionMontage_Impleme
 	return SelectedMontage;
 }
 
+bool UALSXTImpactReactionComponent::ServerAttackReaction_Validate(FAttackDoubleHitResult Hit)
+{
+	return true;
+}
+
 void UALSXTImpactReactionComponent::ServerAttackReaction_Implementation(FAttackDoubleHitResult Hit)
 {
-	MulticastAttackReaction(Hit);
+	// MulticastAttackReaction(Hit);
+	StartAttackReaction(Hit);
 	Character->ForceNetUpdate();
 }
+
 
 void UALSXTImpactReactionComponent::MulticastAttackReaction_Implementation(FAttackDoubleHitResult Hit)
 {
@@ -412,8 +383,9 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 		}
 		if (UKismetSystemLibrary::IsValidClass(ParticleActor))
 		{
-			ServerSpawnParticleActor(Hit, ParticleActor);
-			MulticastSpawnParticleActor(Hit, ParticleActor);
+			// ServerSpawnParticleActor(Hit, ParticleActor);
+			// MulticastSpawnParticleActor(Hit, ParticleActor);
+			SpawnParticleActorImplementation(Hit, ParticleActor);
 		}
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Hit, Hit.HitResult.HitResult.BoneName);
 		// Character->GetMesh()->AddImpulseAtLocation(Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
@@ -429,39 +401,16 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 	}
 }
 
+bool UALSXTImpactReactionComponent::ServerSpawnParticleActor_Validate(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor)
+{
+	return true;
+}
+
 void UALSXTImpactReactionComponent::ServerSpawnParticleActor_Implementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor)
 {
-	MulticastSpawnParticleActor(Hit, ParticleActor);
-	// if (UKismetSystemLibrary::IsValidClass(ParticleActor))
-	// {
-	// 	
-	// 	//Calculate Rotation from Normal Vector
-	// 	FVector UpVector = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetUpVector();
-	// 	FVector NormalVector = Hit.HitResult.HitResult.ImpactNormal;
-	// 	FVector RotationAxis = FVector::CrossProduct(UpVector, NormalVector);
-	// 	RotationAxis.Normalize();
-	// 	float DotProduct = FVector::DotProduct(UpVector, NormalVector);
-	// 	float RotationAngle = acosf(DotProduct);
-	// 	FQuat Quat = FQuat(RotationAxis, RotationAngle);
-	// 	FQuat RootQuat = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetComponentQuat();
-	// 	FQuat NewQuat = Quat * RootQuat;
-	// 	FRotator NewRotation = NewQuat.Rotator();
-	// 
-	// 	FTransform SpawnTransform = FTransform(NewRotation, Hit.HitResult.HitResult.Location, { 1.0f, 1.0f, 1.0f });
-	// 	AActor* SpawnedActor;
-	// 	FActorSpawnParameters SpawnInfo;
-	// 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	// 
-	// 	// GetWorld()->SpawnActor<AActor>(ParticleActor->StaticClass(), SpawnTransform, SpawnInfo);
-	// 	SpawnedActor = GetWorld()->SpawnActor<AActor>(ParticleActor->StaticClass(), SpawnTransform, SpawnInfo);
-	// 
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, SpawnedActor->GetActorLocation().ToString());
-	// }
-	// else
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Cannot Start"));
-	// }
+	SpawnParticleActorImplementation(Hit, ParticleActor);
 }
+
 
 void UALSXTImpactReactionComponent::MulticastSpawnParticleActor_Implementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor)
 {
@@ -496,6 +445,36 @@ void UALSXTImpactReactionComponent::MulticastSpawnParticleActor_Implementation(F
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SpawnedActor Not Valid"));
 		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("ParticleActor Invalid"));
+	}
+}
+
+void UALSXTImpactReactionComponent::SpawnParticleActorImplementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor)
+{
+	if (UKismetSystemLibrary::IsValidClass(ParticleActor))
+	{
+
+		//Calculate Rotation from Normal Vector
+		FVector UpVector = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetUpVector();
+		FVector NormalVector = Hit.HitResult.HitResult.ImpactNormal;
+		FVector RotationAxis = FVector::CrossProduct(UpVector, NormalVector);
+		RotationAxis.Normalize();
+		float DotProduct = FVector::DotProduct(UpVector, NormalVector);
+		float RotationAngle = acosf(DotProduct);
+		FQuat Quat = FQuat(RotationAxis, RotationAngle);
+		FQuat RootQuat = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetComponentQuat();
+		FQuat NewQuat = Quat * RootQuat;
+		FRotator NewRotation = NewQuat.Rotator();
+
+		FTransform SpawnTransform = FTransform(NewRotation, Hit.HitResult.HitResult.Location, { 1.0f, 1.0f, 1.0f });
+		AActor* SpawnedActor;
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		SpawnedActor = GetWorld()->SpawnActor<AActor>(ParticleActor, SpawnTransform, SpawnInfo);
 	}
 	else
 	{

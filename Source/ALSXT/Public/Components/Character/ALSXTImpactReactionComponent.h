@@ -97,7 +97,7 @@ private:
 	
 	void StartImpactReaction(FDoubleHitResult Hit);
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerAttackReaction(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -117,11 +117,13 @@ private:
 
 	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpawnParticleActor(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSpawnParticleActor(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
+
+	void SpawnParticleActorImplementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
 
 	void RefreshImpactReaction(float DeltaTime);
 
