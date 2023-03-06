@@ -88,6 +88,12 @@ protected:
 private:
 	FTimeline ImpactTimeline;
 
+	FTimerHandle TimeSinceLastRecoveryTimerHandle;
+	float TimeSinceLastRecovery;
+
+	FTimerHandle TimeSinceLastResponseTimerHandle;
+	float TimeSinceLastResponse;
+
 	UFUNCTION()
 	void ImpactTimelineUpdate(float Value);
 

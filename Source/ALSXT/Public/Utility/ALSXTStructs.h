@@ -18,16 +18,16 @@ struct ALSXT_API FExtendedHitResult
 	bool Hit {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float Mass;
+	float Mass{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float Velocity;
+	float Velocity{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FVector Direction;
+	FVector Direction{FVector(ForceInit)};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FVector Impulse;
+	FVector Impulse{FVector(ForceInit)};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag DamageType;
@@ -83,7 +83,7 @@ struct ALSXT_API FAttackDoubleHitResult
 	FGameplayTag Strength; // Explicitly set in AnimNotify or Attack code
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float BaseDamage;
+	float BaseDamage{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FDoubleHitResult DoubleHitResult;
@@ -149,10 +149,19 @@ struct ALSXT_API FSyncedActionMontageInfo
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	TArray<FActionMontageInfo> AttackerSyncedMontages;
+	FActionMontageInfo AttackerSyncedMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	TArray<FActionMontageInfo> TargetSyncedMontages;
+	FActionMontageInfo TargetAnticipationPose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo TargetSyncedMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo TargetFallenPose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo TargetGetUpMontage;
 
 };
 

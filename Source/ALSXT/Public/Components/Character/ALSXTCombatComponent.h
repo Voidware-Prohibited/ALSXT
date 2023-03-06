@@ -121,6 +121,27 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanAttack();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanGrapple();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanBeGrappled();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanThrow();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanBeThrown();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanPerformTakedown();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanBeTakenDown();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanPerformSpecialAttack();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FALSXTCombatState CombatState;
 
@@ -148,6 +169,9 @@ private:
 	FTimerDelegate TargetTraceTimerDelegate;
 
 	TArray<UMaterialInstanceDynamic*> TargetDynamicMaterials;
+
+	FTimerHandle TimeSinceLastBlockTimerHandle;
+	float TimeSinceLastBlock;
 
 	UFUNCTION(Server, Reliable)
 	void ServerStartAttack(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
