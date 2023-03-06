@@ -104,7 +104,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredCombatStance, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponFirearmStance, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponReadyPosition, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredBlocking, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredDefensiveMode, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStatus, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFocus, Parameters)
@@ -130,7 +130,17 @@ void AALSXTCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	PhysicalAnimation->SetSkeletalMeshComponent(GetMesh());
-	SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
+	// SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
+	// GetMesh()->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
+	// GetMesh()->SetAllBodiesBelowPhysicsBlendWeight("pelvis", 1.0f, false, true);
+
+	GetMesh()->SetCollisionProfileName("PhysicalAnimation");
+	GetMesh()->UpdateCollisionProfile();
+	PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("pelvis", "Hit", true, false);
+	// GetCapsuleComponent()->SetCapsuleRadius(8);
+	GetMesh()->SetAllBodiesBelowPhysicsBlendWeight("pelvis", 1, false, true);
+
+
 	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace", AttackTraceSettings);
 }
 
@@ -534,11 +544,11 @@ void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
 {
 	if (CanBlock())
 	{
-		SetDesiredBlocking(ActionValue.Get<bool>() ? ALSXTBlockingTags::Blocking : ALSXTBlockingTags::NotBlocking);
+		SetDesiredDefensiveMode(ActionValue.Get<bool>() ? ALSXTDefensiveModeTags::Blocking : ALSXTDefensiveModeTags::None);
 	}
-	else if ((DesiredBlocking == ALSXTBlockingTags::Blocking) && (ActionValue.Get<bool>()  == false))
+	else if ((DesiredDefensiveMode == ALSXTDefensiveModeTags::Blocking) && (ActionValue.Get<bool>()  == false))
 	{
-		SetDesiredBlocking(ALSXTBlockingTags::NotBlocking);
+		SetDesiredDefensiveMode(ALSXTDefensiveModeTags::None);
 	}
 }
 
@@ -935,11 +945,11 @@ void AALSXTCharacter::SetWeaponReadyPosition(const FGameplayTag& NewWeaponReadyP
 	}
 }
 
-// Blocking
+// DefensiveMode
 
-bool AALSXTCharacter::IsBlocking() const
+bool AALSXTCharacter::IsInDefensiveMode() const
 {
-	if (GetBlocking() == ALSXTBlockingTags::Blocking)
+	if (GetDefensiveMode() != ALSXTDefensiveModeTags::None)
 	{
 		return true;
 	}
@@ -949,39 +959,65 @@ bool AALSXTCharacter::IsBlocking() const
 	}
 }
 
-void AALSXTCharacter::SetDesiredBlocking(const FGameplayTag& NewBlockingTag)
+bool AALSXTCharacter::IsAvoiding() const
 {
-	if (DesiredBlocking != NewBlockingTag)
+	if (GetDefensiveMode() == ALSXTDefensiveModeTags::Avoiding)
 	{
-		DesiredBlocking = NewBlockingTag;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredBlocking, this)
+void AALSXTCharacter::SetDesiredDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
+{
+	if (DesiredDefensiveMode != NewDefensiveModeTag)
+	{
+		DesiredDefensiveMode = NewDefensiveModeTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredDefensiveMode, this)
 
 			if (GetLocalRole() == ROLE_AutonomousProxy)
 			{
-				ServerSetDesiredBlocking(NewBlockingTag);
+				ServerSetDesiredDefensiveMode(NewDefensiveModeTag);
 			}
 	}
 }
 
-void AALSXTCharacter::ServerSetDesiredBlocking_Implementation(const FGameplayTag& NewBlockingTag)
+void AALSXTCharacter::ServerSetDesiredDefensiveMode_Implementation(const FGameplayTag& NewDefensiveModeTag)
 {
-	SetDesiredBlocking(NewBlockingTag);
+	SetDesiredDefensiveMode(NewDefensiveModeTag);
 }
 
-void AALSXTCharacter::SetBlocking(const FGameplayTag& NewBlockingTag)
+void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 {
-	if (Blocking != NewBlockingTag)
+	if (DefensiveMode != NewDefensiveModeTag)
 	{
-		const auto PreviousBlocking{ Blocking };
+		const auto PreviousDefensiveMode{ DefensiveMode };
 
-		Blocking = NewBlockingTag;
+		DefensiveMode = NewDefensiveModeTag;
 
-		OnBlockingChanged(PreviousBlocking);
+		OnDefensiveModeChanged(PreviousDefensiveMode);
 	}
 }
 
-void AALSXTCharacter::OnBlockingChanged_Implementation(const FGameplayTag& PreviousBlockingTag) {}
+void AALSXTCharacter::OnDefensiveModeChanged_Implementation(const FGameplayTag& PreviousDefensiveModeTag) {}
+
+// Blocking
+
+bool AALSXTCharacter::IsBlocking() const
+{
+	if (GetDefensiveMode() == ALSXTDefensiveModeTags::Blocking)
+	{
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+}
 
 void AALSXTCharacter::SetDesiredStationaryMode(const FGameplayTag& NewStationaryModeTag)
 {

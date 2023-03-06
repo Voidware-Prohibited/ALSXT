@@ -41,7 +41,7 @@ private:
 	FGameplayTag WeaponReadyPosition{ALSXTWeaponReadyPositionTags::None};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag Blocking{ALSXTBlockingTags::NotBlocking};
+	FGameplayTag DefensiveMode{ALSXTDefensiveModeTags::None};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag StationaryMode{FGameplayTag::EmptyTag};

@@ -140,14 +140,15 @@ void UALSXTCombatComponent::TryTraceForTargets()
 void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targets)
 {
 	FRotator ControlRotation = Character->GetControlRotation();
+	FVector CharLoc = Character->GetActorLocation();
 	FVector ForwardVector = Character->GetActorForwardVector();
 	FVector CameraLocation = Character->Camera->GetFirstPersonCameraLocation();
 	FVector StartLocation = ForwardVector * 150 + CameraLocation;
 	FVector EndLocation = ForwardVector * 200 + StartLocation;
 	// FVector CenterLocation = (StartLocation - EndLocation) / 2 + StartLocation;
 	FVector CenterLocation = (StartLocation - EndLocation) / 8 + StartLocation;
-	FVector HalfSize = { 400.0f, 400.0f, 150.0f };
-	FCollisionShape CollisionShape = FCollisionShape::MakeBox(HalfSize);
+	// FVector CenterLocation = (StartLocation - EndLocation) / 8;
+	FCollisionShape CollisionShape = FCollisionShape::MakeBox(TraceAreaHalfSize);
 	TArray<FHitResult> OutHits;
 
 	// Display Debug Shape
@@ -214,17 +215,6 @@ void UALSXTCombatComponent::GetClosestTarget()
 		if (FoundHit.Valid && FoundHit.HitResult.GetActor())
 		{
 			SetCurrentTarget(FoundHit);
-			USkeletalMeshComponent* HitMesh = Cast<AALSXTCharacter>(FoundHit.HitResult.GetActor())->GetMesh();
-			TArray<UMaterialInterface*> CharMaterials = HitMesh->GetMaterials();
-			if (CharMaterials[0])
-			{
-				for (int m = 0; m < CharMaterials.Num(); m++)
-				{
-					UMaterialInstanceDynamic* CharDynMaterial = HitMesh->CreateAndSetMaterialInstanceDynamic(m);
-					CharDynMaterial->SetScalarParameterValue(HighlightMaterialParameterName, 1.0f);
-					HitMesh->SetMaterial(m, CharDynMaterial);
-				}
-			}
 			if (GEngine && DebugMode)
 			{
 				FString DebugMsg = FString::SanitizeFloat(FoundHit.AngleFromCenter);
@@ -238,30 +228,62 @@ void UALSXTCombatComponent::GetClosestTarget()
 
 void UALSXTCombatComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTarget)
 {
+	ClearCurrentTarget();
 	CurrentTarget = NewTarget;
-}
+	USkeletalMeshComponent* HitMesh;
+	AALSXTCharacter* ALSXTChar = Cast<AALSXTCharacter>(CurrentTarget.HitResult.GetActor());
 
-void UALSXTCombatComponent::ClearCurrentTarget()
-{
-	CurrentTarget.Valid = false;
-	CurrentTarget.DistanceFromPlayer = 340282346638528859811704183484516925440.0f;
-	CurrentTarget.AngleFromCenter = 361.0f;
-
-	if (Cast<AALSXTCharacter>(CurrentTarget.HitResult.GetActor()))
+	if (ALSXTChar)
 	{
-		USkeletalMeshComponent* HitMesh = Cast<AALSXTCharacter>(CurrentTarget.HitResult.GetActor())->GetMesh();
+		HitMesh = ALSXTChar->GetMesh();
 		TArray<UMaterialInterface*> CharMaterials = HitMesh->GetMaterials();
+
 		if (CharMaterials[0])
 		{
 			for (int m = 0; m < CharMaterials.Num(); m++)
 			{
 				UMaterialInstanceDynamic* CharDynMaterial = HitMesh->CreateAndSetMaterialInstanceDynamic(m);
-				CharDynMaterial->SetScalarParameterValue(HighlightMaterialParameterName, 0.0f);
+				CharDynMaterial->SetScalarParameterValue(HighlightMaterialParameterName, 1.0f);
 				HitMesh->SetMaterial(m, CharDynMaterial);
+				TargetDynamicMaterials.Add(CharDynMaterial);
 			}
 		}
+	}	
+}
+
+void UALSXTCombatComponent::ClearCurrentTarget()
+{
+	if (CurrentTarget.Valid = true && CurrentTarget.HitResult.GetActor())
+	{
+		CurrentTarget.Valid = false;
+		CurrentTarget.DistanceFromPlayer = 340282346638528859811704183484516925440.0f;
+		CurrentTarget.AngleFromCenter = 361.0f;
+
+		if (Cast<AALSXTCharacter>(CurrentTarget.HitResult.GetActor()))
+		{
+			USkeletalMeshComponent* HitMesh = Cast<AALSXTCharacter>(CurrentTarget.HitResult.GetActor())->GetMesh();
+			TArray<UMaterialInterface*> CharMaterials = HitMesh->GetMaterials();
+			if (TargetDynamicMaterials[0])
+			{
+				for (int m = 0; m < TargetDynamicMaterials.Num(); m++)
+				{
+					TargetDynamicMaterials[m]->SetScalarParameterValue(HighlightMaterialParameterName, 0.0f);
+					// HitMesh->SetMaterial(m, CharDynMaterial);
+				}
+				TargetDynamicMaterials.Empty();
+			}
+			// if (CharMaterials[0])
+			// {
+			// 	for (int m = 0; m < CharMaterials.Num(); m++)
+			// 	{
+			// 		UMaterialInstanceDynamic* CharDynMaterial = HitMesh->CreateAndSetMaterialInstanceDynamic(m);
+			// 		CharDynMaterial->SetScalarParameterValue(HighlightMaterialParameterName, 0.0f);
+			// 		HitMesh->SetMaterial(m, CharDynMaterial);
+			// 	}
+			// }
+		}
+		CurrentTarget.HitResult = FHitResult(ForceInit);
 	}
-	CurrentTarget.HitResult = FHitResult(ForceInit);
 }
 
 void UALSXTCombatComponent::DisengageAllTargets()
@@ -392,7 +414,7 @@ void UALSXTCombatComponent::InputPrimaryAction()
 {
 	if ((AlsCharacter->GetOverlayMode() == AlsOverlayModeTags::Default) && ((Character->GetCombatStance() == ALSXTCombatStanceTags::Ready) || (Character->GetCombatStance() == ALSXTCombatStanceTags::Aiming)) && CanAttack())
 	{
-		Attack(ALSXTUnarmedAttackTypeTags::RightFist, ALSXTActionStrengthTags::Medium, 0.10f, 1.3f);
+		Attack(ALSXTAttackTypeTags::RightFist, ALSXTActionStrengthTags::Medium, 0.10f, 1.3f);
 	}
 }
 
@@ -456,18 +478,18 @@ UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FG
 
 	for (int i = 0; i < Settings->AttackTypes.Num(); ++i)
 		{
-			if (Settings->AttackTypes[i].UnarmedAttackType == AttackType)
+			if (Settings->AttackTypes[i].AttackType == AttackType)
 			{
-				for (int j = 0; j < Settings->AttackTypes[i].UnarmedAttackStrengths.Num(); ++j)
+				for (int j = 0; j < Settings->AttackTypes[i].AttackStrengths.Num(); ++j)
 				{
-					if (Settings->AttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStrength == Strength)
+					if (Settings->AttackTypes[i].AttackStrengths[j].AttackStrength == Strength)
 					{
-						for (int k = 0; k < Settings->AttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances.Num(); ++k)
+						for (int k = 0; k < Settings->AttackTypes[i].AttackStrengths[j].AttackStances.Num(); ++k)
 						{
-							if (Settings->AttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].UnarmedAttackStance == Stance)
+							if (Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k].AttackStance == Stance)
 							{
 								// Declare Local Copy of Montages Array
-								TArray<FActionMontageInfo> MontageArray{ Settings->AttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].MontageInfo };
+								TArray<FActionMontageInfo> MontageArray{ Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k].MontageInfo };
 
 								if (MontageArray.Num() > 1)
 								{
@@ -486,11 +508,11 @@ UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FG
 
 									// Select Random Array Entry
 									int RandIndex = rand() % MontageArray.Max();
-									SelectedMontage = Settings->AttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].MontageInfo[RandIndex].Montage;
+									SelectedMontage = Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k].MontageInfo[RandIndex].Montage;
 								}
 								else
 								{
-									SelectedMontage = Settings->AttackTypes[i].UnarmedAttackStrengths[j].UnarmedAttackStances[k].MontageInfo[0].Montage;
+									SelectedMontage = Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k].MontageInfo[0].Montage;
 								}
 							}
 						}

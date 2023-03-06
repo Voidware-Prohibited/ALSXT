@@ -33,7 +33,7 @@ class ALSXT_API UALSXTCombatSettings : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FUnarmedAttackType> AttackTypes;
+	TArray<FAttackType> AttackTypes;
 
 	// Mantling time to blend in amount curve.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")

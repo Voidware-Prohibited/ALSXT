@@ -147,6 +147,8 @@ private:
 	FTimerHandle TargetTraceTimerHandle;
 	FTimerDelegate TargetTraceTimerDelegate;
 
+	TArray<UMaterialInstanceDynamic*> TargetDynamicMaterials;
+
 	UFUNCTION(Server, Reliable)
 	void ServerStartAttack(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);
 

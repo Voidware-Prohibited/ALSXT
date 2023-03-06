@@ -30,7 +30,7 @@ void UALSXTAnimNotifyState_HITrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 		FALSXTCombatAttackTraceSettings TraceSettings;
 		TraceSettings.Overlay = Character->GetOverlayMode();
 		TraceSettings.ImpactType = ALSXTImpactTypeTags::Hit;
-		TraceSettings.AttackType = ALSXTAttackTypeTags::Regular;
+		TraceSettings.AttackType = ALSXTAttackMethodTags::Regular;
 		TraceSettings.ImpactForm = ALSXTImpactFormTags::Blunt;
 		TraceSettings.AttackStrength = AttackStrength;
 		bool Found;

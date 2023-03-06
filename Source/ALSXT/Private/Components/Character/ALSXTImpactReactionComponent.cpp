@@ -50,7 +50,9 @@ void UALSXTImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit)
 void UALSXTImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("1 - AttackReaction"));
+
 	StartAttackReaction(Hit);
+
 	// MulticastAttackReaction(Hit);
 	// ServerAttackReaction(Hit);
 
@@ -411,6 +413,7 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 		if (UKismetSystemLibrary::IsValidClass(ParticleActor))
 		{
 			ServerSpawnParticleActor(Hit, ParticleActor);
+			MulticastSpawnParticleActor(Hit, ParticleActor);
 		}
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Hit, Hit.HitResult.HitResult.BoneName);
 		// Character->GetMesh()->AddImpulseAtLocation(Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
@@ -422,15 +425,49 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Cannot Start"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("IsImpactReactionNOTAllowedToStart"));
 	}
 }
 
 void UALSXTImpactReactionComponent::ServerSpawnParticleActor_Implementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor)
 {
+	MulticastSpawnParticleActor(Hit, ParticleActor);
+	// if (UKismetSystemLibrary::IsValidClass(ParticleActor))
+	// {
+	// 	
+	// 	//Calculate Rotation from Normal Vector
+	// 	FVector UpVector = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetUpVector();
+	// 	FVector NormalVector = Hit.HitResult.HitResult.ImpactNormal;
+	// 	FVector RotationAxis = FVector::CrossProduct(UpVector, NormalVector);
+	// 	RotationAxis.Normalize();
+	// 	float DotProduct = FVector::DotProduct(UpVector, NormalVector);
+	// 	float RotationAngle = acosf(DotProduct);
+	// 	FQuat Quat = FQuat(RotationAxis, RotationAngle);
+	// 	FQuat RootQuat = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetComponentQuat();
+	// 	FQuat NewQuat = Quat * RootQuat;
+	// 	FRotator NewRotation = NewQuat.Rotator();
+	// 
+	// 	FTransform SpawnTransform = FTransform(NewRotation, Hit.HitResult.HitResult.Location, { 1.0f, 1.0f, 1.0f });
+	// 	AActor* SpawnedActor;
+	// 	FActorSpawnParameters SpawnInfo;
+	// 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	// 
+	// 	// GetWorld()->SpawnActor<AActor>(ParticleActor->StaticClass(), SpawnTransform, SpawnInfo);
+	// 	SpawnedActor = GetWorld()->SpawnActor<AActor>(ParticleActor->StaticClass(), SpawnTransform, SpawnInfo);
+	// 
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, SpawnedActor->GetActorLocation().ToString());
+	// }
+	// else
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Cannot Start"));
+	// }
+}
+
+void UALSXTImpactReactionComponent::MulticastSpawnParticleActor_Implementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor)
+{
 	if (UKismetSystemLibrary::IsValidClass(ParticleActor))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("ServerSpawnParticleActor"));
+
 		//Calculate Rotation from Normal Vector
 		FVector UpVector = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetUpVector();
 		FVector NormalVector = Hit.HitResult.HitResult.ImpactNormal;
@@ -443,17 +480,26 @@ void UALSXTImpactReactionComponent::ServerSpawnParticleActor_Implementation(FDou
 		FQuat NewQuat = Quat * RootQuat;
 		FRotator NewRotation = NewQuat.Rotator();
 
-		FTransform SpawnTransform = FTransform(NewRotation, Hit.HitResult.HitResult.ImpactPoint, { 1.0f, 1.0f, 1.0f });
+		FTransform SpawnTransform = FTransform(NewRotation, Hit.HitResult.HitResult.Location, { 1.0f, 1.0f, 1.0f });
 		AActor* SpawnedActor;
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		GetWorld()->SpawnActor<AActor>(ParticleActor->StaticClass(), SpawnTransform, SpawnInfo);
+		// GetWorld()->SpawnActor<AActor>(ParticleActor->StaticClass(), SpawnTransform, SpawnInfo);
 		SpawnedActor = GetWorld()->SpawnActor<AActor>(ParticleActor->StaticClass(), SpawnTransform, SpawnInfo);
+
+		if (IsValid(SpawnedActor))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, SpawnedActor->GetActorLocation().ToString());
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SpawnedActor Not Valid"));
+		}
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Cannot Start"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("ParticleActor Invalid"));
 	}
 }
 

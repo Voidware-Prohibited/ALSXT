@@ -262,6 +262,19 @@ namespace ALSXTUnarmedAttackTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(Head, TEXT("Als.Unarmed Attack Type.Head"))
 }
 
+namespace ALSXTAttackTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(LeftFist, TEXT("Als.Attack Type.Left Fist"))
+	UE_DEFINE_GAMEPLAY_TAG(RightFist, TEXT("Als.Attack Type.Right Fist"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftFoot, TEXT("Als.Attack Type.Left Foot"))
+	UE_DEFINE_GAMEPLAY_TAG(RightFoot, TEXT("Als.Attack Type.Right Foot"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftElbow, TEXT("Als.Attack Type.Left Elbow"))
+	UE_DEFINE_GAMEPLAY_TAG(RightElbow, TEXT("Als.Attack Type.Right Elbow"))
+	UE_DEFINE_GAMEPLAY_TAG(LeftKnee, TEXT("Als.Attack Type.Left Knee"))
+	UE_DEFINE_GAMEPLAY_TAG(RightKnee, TEXT("Als.Attack Type.Right Knee"))
+	UE_DEFINE_GAMEPLAY_TAG(Head, TEXT("Als.Attack Type.Head"))
+}
+
 namespace ALSXTWeaponFirearmStanceTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Regular, TEXT("Als.Weapon Firearm Stance.Regular"))
@@ -310,6 +323,13 @@ namespace ALSXTFirearmSightLocationTags
 	UE_DEFINE_GAMEPLAY_TAG(BarrelTop, TEXT("Als.Firearm Sight Location.Barrel Top"))
 	UE_DEFINE_GAMEPLAY_TAG(BarrelLeft, TEXT("Als.Firearm Sight Location.Barrel Left"))
 	UE_DEFINE_GAMEPLAY_TAG(BarrelRight, TEXT("Als.Firearm Sight Location.Barrel Right"))
+}
+
+namespace ALSXTDefensiveModeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Als.Defensive Mode.None"))
+	UE_DEFINE_GAMEPLAY_TAG(Avoiding, TEXT("Als.Defensive Mode.Avoiding"))
+	UE_DEFINE_GAMEPLAY_TAG(Blocking, TEXT("Als.Defensive Mode.Blocking"))
 }
 
 namespace ALSXTBlockingTags
@@ -385,14 +405,16 @@ namespace ALSXTActionStrengthTags
 	UE_DEFINE_GAMEPLAY_TAG(Heavy, TEXT("Als.Action Strength.Heavy"))
 }
 
-namespace ALSXTAttackTypeTags
+namespace ALSXTAttackMethodTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Regular, TEXT("Als.Attack Type.Regular"))
-	UE_DEFINE_GAMEPLAY_TAG(Riposte, TEXT("Als.Attack Type.Riposte"))
-	UE_DEFINE_GAMEPLAY_TAG(Special, TEXT("Als.Attack Type.Special"))
-	UE_DEFINE_GAMEPLAY_TAG(TakeDown, TEXT("Als.Attack Type.Take Down"))
-	UE_DEFINE_GAMEPLAY_TAG(Cybernetic, TEXT("Als.Attack Type.Cybernetic"))
-	UE_DEFINE_GAMEPLAY_TAG(Device, TEXT("Als.Attack Type.Device"))
+	UE_DEFINE_GAMEPLAY_TAG(Regular, TEXT("Als.Attack Method.Regular"))
+	UE_DEFINE_GAMEPLAY_TAG(Riposte, TEXT("Als.Attack Method.Riposte"))
+	UE_DEFINE_GAMEPLAY_TAG(Special, TEXT("Als.Attack Method.Special"))
+	UE_DEFINE_GAMEPLAY_TAG(Grapple, TEXT("Als.Attack Method.Grapple"))
+	UE_DEFINE_GAMEPLAY_TAG(KnockOut, TEXT("Als.Attack Method.Knock Out"))
+	UE_DEFINE_GAMEPLAY_TAG(TakeDown, TEXT("Als.Attack Method.Take Down"))
+	UE_DEFINE_GAMEPLAY_TAG(Cybernetic, TEXT("Als.Attack Method.Cybernetic"))
+	UE_DEFINE_GAMEPLAY_TAG(Device, TEXT("Als.Attack Method.Device"))
 }
 
 namespace ALSXTDefenseTypeTags

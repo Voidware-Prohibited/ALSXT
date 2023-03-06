@@ -131,13 +131,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FALSXTSlidingState SlidingState;
 
-	// Blocking
+	// Defensive Mode
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredBlocking{ALSXTBlockingTags::NotBlocking};
+	FGameplayTag DesiredDefensiveMode{ALSXTDefensiveModeTags::None};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag Blocking{ALSXTBlockingTags::NotBlocking};
+	FGameplayTag DefensiveMode {ALSXTDefensiveModeTags::None};
 
 	// StationaryMode
 
@@ -847,35 +847,44 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnWeaponReadyPositionChanged(const FGameplayTag& PreviousWeaponReadyPositionTag);
 
-	// Desired Blocking
+	// Desired DefensiveMode
 
 public:
-	const FGameplayTag& GetDesiredBlocking() const;
+	const FGameplayTag& GetDesiredDefensiveMode() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
-	bool CanBlock() const;
+		bool CanEnterDefensiveMode() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+		bool CanBlock() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
-	bool IsBlocking() const;
+		bool IsBlocking() const;
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewBlockingTag"))
-	void SetDesiredBlocking(const FGameplayTag& NewBlockingTag);
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+		bool IsInDefensiveMode() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+		bool IsAvoiding() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeTag"))
+		void SetDesiredDefensiveMode(UPARAM(meta = (Categories = "Als.Defensive Mode"))const FGameplayTag& NewDefensiveModeTag);
 
 private:
 	UFUNCTION(Server, Reliable)
-	void ServerSetDesiredBlocking(const FGameplayTag& NewBlockingTag);
+		void ServerSetDesiredDefensiveMode(const FGameplayTag& NewDefensiveModeTag);
 
 	// Blocking
 
 public:
-	const FGameplayTag& GetBlocking() const;
+	const FGameplayTag& GetDefensiveMode() const;
 
 private:
-	void SetBlocking(const FGameplayTag& NewBlockingTag);
+	void SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	void OnBlockingChanged(const FGameplayTag& PreviousBlockingTag);
+	void OnDefensiveModeChanged(const FGameplayTag& PreviousDefensiveModeTag);
 
 	// Desired StationaryMode
 
@@ -1343,14 +1352,14 @@ inline const FGameplayTag& AALSXTCharacter::GetWeaponReadyPosition() const
 	return WeaponReadyPosition;
 }
 
-inline const FGameplayTag& AALSXTCharacter::GetDesiredBlocking() const
+inline const FGameplayTag& AALSXTCharacter::GetDesiredDefensiveMode() const
 {
-	return DesiredBlocking;
+	return DesiredDefensiveMode;
 }
 
-inline const FGameplayTag& AALSXTCharacter::GetBlocking() const
+inline const FGameplayTag& AALSXTCharacter::GetDefensiveMode() const
 {
-	return Blocking;
+	return DefensiveMode;
 }
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredStationaryMode() const
