@@ -11,6 +11,7 @@
 #include "Engine/EngineTypes.h"
 #include "Utility/ALSXTStructs.h"
 #include "State/ALSXTFootstepState.h"
+#include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTSlidingState.h"
 #include "ALSXTCharacter.generated.h"
 
@@ -138,6 +139,35 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag DefensiveMode {ALSXTDefensiveModeTags::None};
+
+	// Defensive Mode State
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_DefensiveModeState", Meta = (AllowPrivateAccess))
+	FALSXTDefensiveModeState DefensiveModeState;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTDefensiveModeState& GetDefensiveModeState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
+	void SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
+	FALSXTDefensiveModeState ProcessNewDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation);
+
+private:
+	UFUNCTION(Server, Unreliable)
+	void ServerSetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation);
+
+	UFUNCTION()
+	void OnReplicate_DefensiveModeState(const FALSXTDefensiveModeState& PreviousDefensiveModeState);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnDefensiveModeStateChanged(const FALSXTDefensiveModeState& PreviousDefensiveModeState);
 
 	// StationaryMode
 
@@ -1280,6 +1310,11 @@ protected:
 inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
 {
 	return FootprintsState;
+}
+
+inline const FALSXTDefensiveModeState& AALSXTCharacter::GetDefensiveModeState() const
+{
+	return DefensiveModeState;
 }
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredFreelooking() const

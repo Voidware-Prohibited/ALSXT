@@ -150,7 +150,13 @@ public:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void DetermineAttackMethod(FGameplayTag& AttackMethod, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	UAnimMontage* SelectAttackMontage(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void GetSyncedAttackMontageInfo(FSyncedActionMontageInfo& SyncedActionMontageInfo, const FGameplayTag& AttackType, int32 Index);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	UALSXTCombatSettings* SelectAttackSettings();
@@ -170,8 +176,17 @@ private:
 
 	TArray<UMaterialInstanceDynamic*> TargetDynamicMaterials;
 
+	FTimerHandle LastTargetsTimerHandle;
+
+	TArray<FLastTargetEntry> LastSeenTargets;
+
+	TArray<FLastTargetEntry> LastTargets;
+
 	FTimerHandle TimeSinceLastBlockTimerHandle;
 	float TimeSinceLastBlock;
+
+	FTimerHandle ConsecutiveHitsTimerHandle;
+	int ConsecutiveHits;
 
 	UFUNCTION(Server, Reliable)
 	void ServerStartAttack(UAnimMontage* Montage, float PlayRate, float StartYawAngle, float TargetYawAngle);

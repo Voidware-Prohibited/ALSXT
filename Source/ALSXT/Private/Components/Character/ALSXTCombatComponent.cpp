@@ -469,6 +469,11 @@ UALSXTCombatSettings* UALSXTCombatComponent::SelectAttackSettings_Implementation
 	return nullptr;
 }
 
+void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& AttackMethod, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target)
+{
+
+}
+
 UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
 {
 	UAnimMontage* SelectedMontage{ nullptr };
@@ -480,16 +485,19 @@ UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FG
 		{
 			if (Settings->AttackTypes[i].AttackType == AttackType)
 			{
-				for (int j = 0; j < Settings->AttackTypes[i].AttackStrengths.Num(); ++j)
+				FAttackType FoundAttackType = Settings->AttackTypes[i];
+				for (int j = 0; j < FoundAttackType.AttackStrengths.Num(); ++j)
 				{
-					if (Settings->AttackTypes[i].AttackStrengths[j].AttackStrength == Strength)
+					if (FoundAttackType.AttackStrengths[j].AttackStrength == Strength)
 					{
-						for (int k = 0; k < Settings->AttackTypes[i].AttackStrengths[j].AttackStances.Num(); ++k)
+						FAttackStrength FoundAttackStrength = Settings->AttackTypes[i].AttackStrengths[j];
+						for (int k = 0; k < FoundAttackStrength.AttackStances.Num(); ++k)
 						{
-							if (Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k].AttackStance == Stance)
+							if (FoundAttackStrength.AttackStances[k].AttackStance == Stance)
 							{
+								FAttackStance FoundAttackStance = Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k];
 								// Declare Local Copy of Montages Array
-								TArray<FActionMontageInfo> MontageArray{ Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k].MontageInfo };
+								TArray<FActionMontageInfo> MontageArray{ FoundAttackStance.MontageInfo };
 
 								if (MontageArray.Num() > 1)
 								{
@@ -508,11 +516,13 @@ UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FG
 
 									// Select Random Array Entry
 									int RandIndex = rand() % MontageArray.Max();
-									SelectedMontage = Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k].MontageInfo[RandIndex].Montage;
+									SelectedMontage = MontageArray[RandIndex].Montage;
+									return SelectedMontage;
 								}
 								else
 								{
-									SelectedMontage = Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k].MontageInfo[0].Montage;
+									SelectedMontage = MontageArray[0].Montage;
+									return SelectedMontage;
 								}
 							}
 						}
@@ -521,6 +531,11 @@ UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FG
 			}
 		}
 	return SelectedMontage;
+}
+
+void UALSXTCombatComponent::GetSyncedAttackMontageInfo_Implementation(FSyncedActionMontageInfo& SyncedActionMontageInfo, const FGameplayTag& AttackType, int32 Index)
+{
+	// UALSXTCombatSettings* Settings = SelectAttackSettings();
 }
 
 void UALSXTCombatComponent::ServerStartAttack_Implementation(UAnimMontage* Montage, const float PlayRate,

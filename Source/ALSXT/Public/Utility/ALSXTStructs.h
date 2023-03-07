@@ -110,6 +110,19 @@ struct ALSXT_API FTargetHitResultEntry
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FLastTargetEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float LastInteraction { 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	AActor* Target;
+
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FActionMontageInfo
 {
 	GENERATED_BODY()
@@ -238,6 +251,46 @@ struct ALSXT_API FImpactReactionOverlayMode
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FAttackAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", TitleProperty = "{AttackStrengths}", AllowPrivateAccess))
+	TArray<FGameplayTag> AttackStrengths;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", TitleProperty = "{AttackStances}", AllowPrivateAccess))
+	TArray<FGameplayTag> AttackStances;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FAttackAnimation& other) const
+	{
+		return (other.AttackStrengths == AttackStrengths);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FSyncedAttackAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
+	TArray<FGameplayTag> AttackStrengths;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", AllowPrivateAccess))
+	TArray<FGameplayTag> AttackStances;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FSyncedActionMontageInfo SyncedMontage;
+
+	bool operator==(const FSyncedAttackAnimation& other) const
+	{
+		return (other.AttackStrengths == AttackStrengths);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FAttackStance
 {
 	GENERATED_BODY()
@@ -287,6 +340,12 @@ struct ALSXT_API FAttackType
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Type", AllowPrivateAccess))
 	FGameplayTag AttackType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths}, {AttackStances}, {Montage}", AllowPrivateAccess))
+	TArray<FAttackAnimation> RegularMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths}, {AttackStances}", AllowPrivateAccess))
+	TArray<FSyncedAttackAnimation> SyncedMontages;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrength}", AllowPrivateAccess))
 	TArray<FAttackStrength> AttackStrengths;

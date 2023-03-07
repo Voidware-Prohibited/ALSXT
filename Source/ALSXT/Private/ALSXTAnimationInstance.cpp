@@ -38,6 +38,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	WeaponFirearmStance = ALSXTCharacter->GetDesiredWeaponFirearmStance();
 	WeaponReadyPosition = ALSXTCharacter->GetDesiredWeaponReadyPosition();
 	DefensiveMode = ALSXTCharacter->GetDesiredDefensiveMode();
+	DefensiveModeState = ALSXTCharacter->GetDefensiveModeState();
 	StationaryMode = ALSXTCharacter->GetStationaryMode();
 	HoldingBreath = ALSXTCharacter->GetHoldingBreath();
 	PhysicalAnimationMode = ALSXTCharacter->GetPhysicalAnimationMode();

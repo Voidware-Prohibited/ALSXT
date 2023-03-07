@@ -97,6 +97,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	Parameters.Condition = COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FootprintsState, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DefensiveModeState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFreelooking, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredSex, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredLocomotionVariant, Parameters)
@@ -1004,6 +1005,38 @@ void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 }
 
 void AALSXTCharacter::OnDefensiveModeChanged_Implementation(const FGameplayTag& PreviousDefensiveModeTag) {}
+
+void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation)
+{
+	const auto PreviousDefensiveModeState{ DefensiveModeState };
+
+	DefensiveModeState = NewDefensiveModeState;
+
+	OnDefensiveModeStateChanged(PreviousDefensiveModeState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetDefensiveModeState(NewDefensiveModeState, NewLocation);
+	}
+}
+
+void AALSXTCharacter::ServerSetDefensiveModeState_Implementation(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation)
+{
+	SetDefensiveModeState(NewDefensiveModeState, NewLocation);
+}
+
+
+void AALSXTCharacter::ServerProcessNewDefensiveModeState_Implementation(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation)
+{
+	ProcessNewDefensiveModeState(NewDefensiveModeState, NewLocation);
+}
+
+void AALSXTCharacter::OnReplicate_DefensiveModeState(const FALSXTDefensiveModeState& PreviousDefensiveModeState)
+{
+	OnDefensiveModeStateChanged(PreviousDefensiveModeState);
+}
+
+void AALSXTCharacter::OnDefensiveModeStateChanged_Implementation(const FALSXTDefensiveModeState& PreviousDefensiveModeState) {}
 
 // Blocking
 

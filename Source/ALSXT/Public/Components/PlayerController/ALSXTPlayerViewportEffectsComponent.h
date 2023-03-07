@@ -24,6 +24,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// UPlayerCameraManager* CameraManager;
+
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	void AddSuppressionEffect(float Amount);
 

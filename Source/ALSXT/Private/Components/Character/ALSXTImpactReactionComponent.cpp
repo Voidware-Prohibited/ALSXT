@@ -204,6 +204,7 @@ UAnimMontage* UALSXTImpactReactionComponent::SelectAttackReactionMontage_Impleme
 										// Select Random Array Entry
 										int RandIndex = rand() % MontageArray.Max();
 										SelectedMontage = MontageArray[RandIndex].Montage;
+										return SelectedMontage;
 									}
 									else
 									{
@@ -215,7 +216,7 @@ UAnimMontage* UALSXTImpactReactionComponent::SelectAttackReactionMontage_Impleme
 										{
 											SelectedMontage = SelectedEntry.DefaultFallbackMontage.Montage;
 										}
-										
+										return SelectedMontage;
 									}
 								}
 							}
