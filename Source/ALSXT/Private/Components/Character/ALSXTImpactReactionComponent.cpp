@@ -61,6 +61,20 @@ void UALSXTImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 	}
 }
 
+void UALSXTImpactReactionComponent::SyncedAttackReaction(FAttackDoubleHitResult Hit, const FGameplayTag& Overlay, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, int Index)
+{
+	// if (GetOwnerRole() == ROLE_AutonomousProxy)
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerAttackReaction(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartAttackReaction(Hit);
+		// MulticastAttackReaction(Hit);
+	}
+}
+
 void UALSXTImpactReactionComponent::ImpactTimelineUpdate(float Value)
 {
 	//...
@@ -94,6 +108,11 @@ void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult H
 	Character->SetMovementModeLocked(true);
 
 	StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
+}
+
+void UALSXTImpactReactionComponent::StartSyncedAttackReaction(FAttackDoubleHitResult Hit)
+{
+	
 }
 
 void UALSXTImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
@@ -229,6 +248,12 @@ UAnimMontage* UALSXTImpactReactionComponent::SelectAttackReactionMontage_Impleme
 	return SelectedMontage;
 }
 
+UAnimMontage* UALSXTImpactReactionComponent::SelectResponseMontage_Implementation(FAttackDoubleHitResult Hit)
+{
+	UAnimMontage* SelectedMontage{ nullptr };
+	return SelectedMontage;
+}
+
 UAnimMontage* UALSXTImpactReactionComponent::SelectImpactReactionMontage_Implementation(FDoubleHitResult Hit)
 {
 	UAnimMontage* SelectedMontage { nullptr };
@@ -296,6 +321,12 @@ UAnimMontage* UALSXTImpactReactionComponent::SelectImpactReactionMontage_Impleme
 		}
 	}
 	return SelectedMontage;
+}
+
+FSyncedAttackAnimation UALSXTImpactReactionComponent::GetSyncedMontage_Implementation(const FGameplayTag& Overlay, FAttackDoubleHitResult Hit, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, int Index)
+{
+	FSyncedAttackAnimation SyncedAttackAnimation;
+	return SyncedAttackAnimation;
 }
 
 bool UALSXTImpactReactionComponent::ServerAttackReaction_Validate(FAttackDoubleHitResult Hit)

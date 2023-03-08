@@ -174,6 +174,8 @@ private:
 	
 	void StartAttack(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage, float PlayRate, float TargetYawAngle);
 
+	void StartSyncedAttack(const FGameplayTag& Overlay, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float BaseDamage, const float PlayRate, const float TargetYawAngle, int Index);
+
 	FTimerHandle TargetTraceTimerHandle;
 	FTimerDelegate TargetTraceTimerDelegate;
 

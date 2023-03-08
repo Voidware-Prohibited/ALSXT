@@ -13,7 +13,7 @@
 #include "Math/Vector.h"
 #include "GameFramework/Character.h"
 #include "ALSXTCharacter.h"
-#include "Interfaces/TargetLockInterface.h"
+#include "Interfaces/ALSXTTargetLockInterface.h"
 #include "Interfaces/ALSXTCombatInterface.h"
 
 // Sets default values for this component's properties
@@ -164,7 +164,7 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 	{
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.GetActor()->GetClass()->ImplementsInterface(UTargetLockInterface::StaticClass()) && Hit.GetActor() != Character && Character->GetDistanceTo(Hit.GetActor()) < MaxLockDistance)
+			if (Hit.GetActor()->GetClass()->ImplementsInterface(UALSXTTargetLockInterface::StaticClass()) && Hit.GetActor() != Character && Character->GetDistanceTo(Hit.GetActor()) < MaxLockDistance)
 			{
 				FTargetHitResultEntry HitResultEntry;
 				HitResultEntry.Valid = true;
@@ -389,7 +389,7 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 	InitialIgnoredActors.Add(Character);	// Add Self to Initial Trace Ignored Actors
 	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
 	AttackTraceObjectTypes = Character->ALSXTSettings->Combat.AttackTraceObjectTypes;
-	bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), SweepStart, SweepEnd, 50, Character->ALSXTSettings->Combat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, OutHits, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
+	bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), SweepStart, SweepEnd, 50, Character->ALSXTSettings->Combat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, OutHits, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
 
 	if (isHit)
 	{
@@ -398,9 +398,8 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 		{
 			if (Hit.GetActor() != Character && UKismetSystemLibrary::DoesImplementInterface(Hit.GetActor(), UALSXTCombatInterface::StaticClass()))
 			{
-				if (GEngine)
+				if (GEngine && DebugMode)
 				{
-					// screen log information on what was hit
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.GetActor()->GetName()));
 				}
 				return Hit.GetActor();
@@ -449,9 +448,11 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& AttackType, const FGamepl
 	}
 	else if (AttackMethod == ALSXTAttackMethodTags::Special || AttackMethod == ALSXTAttackMethodTags::TakeDown)
 	{
-		// StartAttack(AttackType, NewStance, Strength, BaseDamage, PlayRate, Character->ALSXTSettings->Combat.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
-		// 	? Character->GetLocomotionState().InputYawAngle
-		// 	: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)));
+		// int SynedAnimationIndex;
+		// GetSyncedAttackMontageInfo(FSyncedActionMontageInfo & SyncedActionMontageInfo, const FGameplayTag & AttackType, int32 Index);
+		StartSyncedAttack(Character->GetOverlayMode(), AttackType, NewStance, Strength, AttackMethod, BaseDamage, PlayRate, Character->ALSXTSettings->Combat.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
+			? Character->GetLocomotionState().InputYawAngle
+			: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)), 0);
 	}
 }
 
@@ -515,6 +516,11 @@ void UALSXTCombatComponent::StartAttack(const FGameplayTag& AttackType, const FG
 		ServerStartAttack(Montage, PlayRate, StartYawAngle, TargetYawAngle);
 		OnAttackStarted(AttackType, Stance, Strength, BaseDamage);
 	}
+}
+
+void UALSXTCombatComponent::StartSyncedAttack(const FGameplayTag& Overlay, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float BaseDamage, const float PlayRate, const float TargetYawAngle, int Index)
+{
+
 }
 
 UALSXTCombatSettings* UALSXTCombatComponent::SelectAttackSettings_Implementation()

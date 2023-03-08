@@ -46,6 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanReact();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool ShouldPerformResponse();
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);
 
@@ -64,12 +67,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void AttackReaction(FAttackDoubleHitResult Hit);
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void SyncedAttackReaction(FAttackDoubleHitResult Hit, const FGameplayTag& Overlay, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, int Index);
+
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	UAnimMontage* SelectAttackReactionMontage(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	UAnimMontage* SelectImpactReactionMontage(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	FSyncedAttackAnimation GetSyncedMontage(const FGameplayTag& Overlay, FAttackDoubleHitResult Hit, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, int Index);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UAnimMontage* SelectResponseMontage(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	UALSXTImpactReactionSettings* SelectImpactReactionSettings(const FGameplayTag& Location);
@@ -81,7 +93,13 @@ protected:
 	void OnAttackReactionStarted(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnAttackReactionFinished(FAttackDoubleHitResult Hit, const FGameplayTag& AttackMode);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	void OnImpactReactionStarted(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnImpactReactionFinished(FDoubleHitResult Hit);
 
 	// Desired UnarmedAttack
 
@@ -100,6 +118,8 @@ private:
 	bool IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const;
 
 	void StartAttackReaction(FAttackDoubleHitResult Hit);
+
+	void StartSyncedAttackReaction(FAttackDoubleHitResult Hit);
 	
 	void StartImpactReaction(FDoubleHitResult Hit);
 

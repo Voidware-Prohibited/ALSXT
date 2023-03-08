@@ -17,7 +17,7 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Interfaces/CollisionInterface.h"
+#include "Interfaces/ALSXTCollisionInterface.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 //
 #include "Curves/CurveVector.h"
@@ -1250,10 +1250,10 @@ void AALSXTCharacter::AttackCollisionTrace()
 					// 
 					
 					// Call OnActorAttackCollision on CollisionInterface
-					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UCollisionInterface::StaticClass()))
+					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
 					{
-						ICollisionInterface::Execute_GetActorVelocity(HitActor, HitActorVelocity);
-						ICollisionInterface::Execute_GetActorMass(HitActor, HitActorMass);
+						IALSXTCollisionInterface::Execute_GetActorVelocity(HitActor, HitActorVelocity);
+						IALSXTCollisionInterface::Execute_GetActorMass(HitActor, HitActorMass);
 					}
 
 					// Get Attack Physics
@@ -1306,10 +1306,10 @@ void AALSXTCharacter::AttackCollisionTrace()
 						
 					}
 					// Call OnActorAttackCollision on CollisionInterface
-					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UCollisionInterface::StaticClass()))
+					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
 					{
 						// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, HitActorname);
-						ICollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
+						IALSXTCollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
 					}
 					OnAttackHit(CurrentHitResult);
 				}

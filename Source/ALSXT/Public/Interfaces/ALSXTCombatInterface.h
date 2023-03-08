@@ -13,6 +13,12 @@ class ALSXT_API IALSXTCombatInterface {
 public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
-  bool IsTrue();
+  bool CanBeGrappled();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  bool CanBeThrown();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  bool CanBeTakenDown();
 
 };
