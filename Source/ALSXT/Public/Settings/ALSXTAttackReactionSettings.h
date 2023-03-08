@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray <FImpactReactionLocation> ImpactReactionLocations;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray <FResponseAnimation> ResponseAnimations;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
 

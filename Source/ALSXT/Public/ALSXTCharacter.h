@@ -150,17 +150,17 @@ public:
 	const FALSXTDefensiveModeState& GetDefensiveModeState() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
-	void SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation);
+	void SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
-	FALSXTDefensiveModeState ProcessNewDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation);
+	FALSXTDefensiveModeState ProcessNewDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
 	UFUNCTION(Server, Unreliable)
-	void ServerProcessNewDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation);
+	void ServerProcessNewDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
 private:
 	UFUNCTION(Server, Unreliable)
-	void ServerSetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation);
+	void ServerSetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
 	UFUNCTION()
 	void OnReplicate_DefensiveModeState(const FALSXTDefensiveModeState& PreviousDefensiveModeState);

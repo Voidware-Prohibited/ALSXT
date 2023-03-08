@@ -115,7 +115,16 @@ struct ALSXT_API FLastTargetEntry
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float LastInteraction { 0.0f };
+	float LastInteraction { 99.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float LastHitTo { 99.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	int ConsecutiveHits { 0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float LastBlockedAttack { 99.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	AActor* Target;
@@ -334,6 +343,84 @@ struct ALSXT_API FAttackStrength
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FFallenAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
+	FGameplayTag ImpactStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTag ImpactSide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTag ImpactForm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	TObjectPtr<UAnimMontage> FallenPose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	TArray<FActionMontageInfo> GetUpMontages;
+
+	bool operator==(const FFallenAnimation& other) const
+	{
+		return (other.ImpactStrength == ImpactStrength);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAnticipationPose
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
+	FGameplayTag ImpactStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTag ImpactSide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTag ImpactForm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	TObjectPtr<UAnimMontage> Pose;
+
+	bool operator==(const FFallenAnimation& other) const
+	{
+		return (other.ImpactStrength == ImpactStrength);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FResponseAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
+	FGameplayTag ImpactStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTag ImpactSide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTag ImpactForm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montages;
+
+	bool operator==(const FFallenAnimation& other) const
+	{
+		return (other.ImpactStrength == ImpactStrength);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FAttackType
 {
 	GENERATED_BODY()
@@ -346,6 +433,12 @@ struct ALSXT_API FAttackType
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths}, {AttackStances}", AllowPrivateAccess))
 	TArray<FSyncedAttackAnimation> SyncedMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength}, {ImpactSide}, {ImpactForm}", AllowPrivateAccess))
+	TArray<FFallenAnimation> FallenAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength}, {ImpactSide}, {ImpactForm}, {Health}", AllowPrivateAccess))
+	TArray<FResponseAnimation> ResponseAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrength}", AllowPrivateAccess))
 	TArray<FAttackStrength> AttackStrengths;

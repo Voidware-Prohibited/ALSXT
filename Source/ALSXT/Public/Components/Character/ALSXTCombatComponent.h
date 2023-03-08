@@ -146,6 +146,9 @@ public:
 	FALSXTCombatState CombatState;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	AActor* TraceForPotentialAttackTarget(float Distance);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void Attack(const FGameplayTag& AttackType, const FGameplayTag& Strength, float BaseDamage, float PlayRate = 1.0f);
 
 protected:

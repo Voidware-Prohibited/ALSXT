@@ -346,6 +346,13 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 	//if (IsImpactReactionAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, 1.0f))
 	if (IsImpactReactionAllowedToStart(Montage))
 	{
+		//Anticipation
+		FALSXTDefensiveModeState DefensiveModeState;
+		DefensiveModeState.Mode = Character->GetDefensiveMode();
+		DefensiveModeState.Location = Hit.HitResult.HitResult.Location;
+		Character->SetDefensiveModeState(DefensiveModeState);
+		// Character->SetFacialExpression();
+
 		Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, 1.0f);
 		// ImpactReactionState.TargetYawAngle = TargetYawAngle;
 
@@ -362,11 +369,6 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 		FQuat RootQuat = Hit.HitResult.HitResult.GetActor()->GetRootComponent()->GetComponentQuat();
 		FQuat NewQuat = Quat * RootQuat;
 		FRotator NewRotation = NewQuat.Rotator();
-
-		// if (Particle)
-		// {
-		// 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Particle, Hit.HitResult.HitResult.ImpactPoint, NewRotation, FVector(1.0f, 1.0f, 1.0f), true, true, ENCPoolMethod::None, // true);
-		// }
 
 		if (Audio)
 		{

@@ -1006,7 +1006,7 @@ void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 
 void AALSXTCharacter::OnDefensiveModeChanged_Implementation(const FGameplayTag& PreviousDefensiveModeTag) {}
 
-void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation)
+void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState)
 {
 	const auto PreviousDefensiveModeState{ DefensiveModeState };
 
@@ -1016,19 +1016,19 @@ void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewD
 
 	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
 	{
-		ServerSetDefensiveModeState(NewDefensiveModeState, NewLocation);
+		ServerSetDefensiveModeState(NewDefensiveModeState);
 	}
 }
 
-void AALSXTCharacter::ServerSetDefensiveModeState_Implementation(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation)
+void AALSXTCharacter::ServerSetDefensiveModeState_Implementation(const FALSXTDefensiveModeState& NewDefensiveModeState)
 {
-	SetDefensiveModeState(NewDefensiveModeState, NewLocation);
+	SetDefensiveModeState(NewDefensiveModeState);
 }
 
 
-void AALSXTCharacter::ServerProcessNewDefensiveModeState_Implementation(const FALSXTDefensiveModeState& NewDefensiveModeState, FVector NewLocation)
+void AALSXTCharacter::ServerProcessNewDefensiveModeState_Implementation(const FALSXTDefensiveModeState& NewDefensiveModeState)
 {
-	ProcessNewDefensiveModeState(NewDefensiveModeState, NewLocation);
+	ProcessNewDefensiveModeState(NewDefensiveModeState);
 }
 
 void AALSXTCharacter::OnReplicate_DefensiveModeState(const FALSXTDefensiveModeState& PreviousDefensiveModeState)

@@ -14,6 +14,7 @@
 #include "GameFramework/Character.h"
 #include "ALSXTCharacter.h"
 #include "Interfaces/TargetLockInterface.h"
+#include "Interfaces/ALSXTCombatInterface.h"
 
 // Sets default values for this component's properties
 UALSXTCombatComponent::UALSXTCombatComponent()
@@ -377,6 +378,38 @@ void UALSXTCombatComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
 
 // Attack
 
+AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
+{
+	TArray<FHitResult> OutHits;
+	FVector SweepStart = Character->GetActorLocation();
+	FVector SweepEnd = Character->GetActorLocation() + (Character->GetActorForwardVector() * Distance);
+	FCollisionShape MyColSphere = FCollisionShape::MakeSphere(50.0f);
+	TArray<AActor*> InitialIgnoredActors;
+	TArray<AActor*> OriginTraceIgnoredActors;
+	InitialIgnoredActors.Add(Character);	// Add Self to Initial Trace Ignored Actors
+	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
+	AttackTraceObjectTypes = Character->ALSXTSettings->Combat.AttackTraceObjectTypes;
+	bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), SweepStart, SweepEnd, 50, Character->ALSXTSettings->Combat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::ForDuration, OutHits, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
+
+	if (isHit)
+	{
+		// loop through TArray
+		for (auto& Hit : OutHits)
+		{
+			if (Hit.GetActor() != Character && UKismetSystemLibrary::DoesImplementInterface(Hit.GetActor(), UALSXTCombatInterface::StaticClass()))
+			{
+				if (GEngine)
+				{
+					// screen log information on what was hit
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.GetActor()->GetName()));
+				}
+				return Hit.GetActor();
+			}
+		}
+	}
+	return nullptr;
+}
+
 void UALSXTCombatComponent::Attack(const FGameplayTag& AttackType, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate)
 {
 	FGameplayTag NewStance = ALSXTActionStanceTags::Standing;
@@ -396,10 +429,30 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& AttackType, const FGamepl
 			NewStance = ALSXTActionStanceTags::Crouched;
 		}
 	}
-	
-	StartAttack(AttackType, NewStance, Strength, BaseDamage, PlayRate, Character->ALSXTSettings->Combat.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
-		 	? Character->GetLocomotionState().InputYawAngle
-		 	: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)));
+
+	AActor* PotentialAttackTarget = TraceForPotentialAttackTarget(100.0f);
+	FGameplayTag AttackMethod;
+	if (IsValid(PotentialAttackTarget))
+	{
+		DetermineAttackMethod(AttackMethod, AttackType, NewStance, Strength, BaseDamage, PotentialAttackTarget);
+	}
+	else
+	{
+		AttackMethod = ALSXTAttackMethodTags::Regular;
+	}
+
+	if (AttackMethod == ALSXTAttackMethodTags::Regular || AttackMethod == ALSXTAttackMethodTags::Riposte)
+	{
+		StartAttack(AttackType, NewStance, Strength, BaseDamage, PlayRate, Character->ALSXTSettings->Combat.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
+			? Character->GetLocomotionState().InputYawAngle
+			: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)));
+	}
+	else if (AttackMethod == ALSXTAttackMethodTags::Special || AttackMethod == ALSXTAttackMethodTags::TakeDown)
+	{
+		// StartAttack(AttackType, NewStance, Strength, BaseDamage, PlayRate, Character->ALSXTSettings->Combat.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
+		// 	? Character->GetLocomotionState().InputYawAngle
+		// 	: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)));
+	}
 }
 
 void UALSXTCombatComponent::SetupInputComponent(UEnhancedInputComponent* PlayerInputComponent)
@@ -471,7 +524,34 @@ UALSXTCombatSettings* UALSXTCombatComponent::SelectAttackSettings_Implementation
 
 void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& AttackMethod, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target)
 {
-
+	if (LastTargets.Num() > 0)
+	{
+		for (auto& LastTarget : LastTargets)
+		{
+			if (LastTarget.Target == Target)
+			{
+				if (LastTarget.LastBlockedAttack < 2.0f)
+				{
+					AttackMethod = ALSXTAttackMethodTags::Riposte;
+					return;
+				}
+				else if (LastTarget.ConsecutiveHits > 5)
+				{
+					AttackMethod = ALSXTAttackMethodTags::Special;
+					return;
+				}
+				else
+				{
+					AttackMethod = ALSXTAttackMethodTags::Regular;
+					return;
+				}
+			}
+		}
+	}
+	else
+	{
+		AttackMethod = ALSXTAttackMethodTags::Regular;
+	}
 }
 
 UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
