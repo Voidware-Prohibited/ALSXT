@@ -131,16 +131,8 @@ void AALSXTCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	PhysicalAnimation->SetSkeletalMeshComponent(GetMesh());
-	// SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
-	// GetMesh()->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
-	// GetMesh()->SetAllBodiesBelowPhysicsBlendWeight("pelvis", 1.0f, false, true);
-
-	GetMesh()->SetCollisionProfileName("PhysicalAnimation");
-	GetMesh()->UpdateCollisionProfile();
-	PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("pelvis", "Hit", true, false);
-	// GetCapsuleComponent()->SetCapsuleRadius(8);
-	GetMesh()->SetAllBodiesBelowPhysicsBlendWeight("pelvis", 1, false, true);
-
+	SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
+	GetMesh()->SetEnablePhysicsBlending(true);
 
 	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace", AttackTraceSettings);
 }
@@ -1409,27 +1401,33 @@ void AALSXTCharacter::SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAn
 		{
 			
 			GetMesh()->SetCollisionProfileName("CharacterMesh");
-			GetMesh()->UpdateCollisionProfile();
+			// GetMesh()->UpdateCollisionProfile();
 			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("pelvis", "Default", true, false);
 			GetCapsuleComponent()->SetCapsuleRadius(30);
-			GetMesh()->SetAllBodiesPhysicsBlendWeight(0, false);
+			GetMesh()->SetAllBodiesSimulatePhysics(false);
+			GetMesh()->ResetAllBodiesSimulatePhysics();
+			GetMesh()->SetAllBodiesPhysicsBlendWeight(0.0f, false);
 			GetMesh()->SetPhysicsBlendWeight(0);
+			// GetMesh()->SetAllBodiesSimulatePhysics(false);
 		}
 		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::Bump)
 		{
 			GetMesh()->SetCollisionProfileName("PhysicalAnimation");
-			GetMesh()->UpdateCollisionProfile();
+			// GetMesh()->UpdateCollisionProfile();
 			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow(BoneName, "Bump", true, false);
 			GetCapsuleComponent()->SetCapsuleRadius(14);
-			GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 1, false, true);
+			GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 0.5f, false, true);
 		}
 		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::Hit)
 		{
 			GetMesh()->SetCollisionProfileName("PhysicalAnimation");
-			GetMesh()->UpdateCollisionProfile();
+			GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 0.5f, false, true);
+			GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow(BoneName, "Hit", true, false);
 			GetCapsuleComponent()->SetCapsuleRadius(8);
-			GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 1, false, true);
+			GetMesh()->WakeAllRigidBodies();			
+			// GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneName, true, true);			
+			
 		}
 
 		PhysicalAnimationMode = NewPhysicalAnimationModeTag;
