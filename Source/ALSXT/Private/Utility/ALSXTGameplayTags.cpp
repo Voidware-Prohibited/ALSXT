@@ -211,6 +211,14 @@ namespace ALSXTImpactSurfaceTags
 	UE_DEFINE_GAMEPLAY_TAG(Cloth, TEXT("Als.Impact Surface.Cloth"))
 }
 
+namespace ALSXTBloodSpatterDistanceTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(LessThanTwo, TEXT("Als.Blood Spatter Distance.Less than Two"))
+	UE_DEFINE_GAMEPLAY_TAG(TwoToFive, TEXT("Als.Blood Spatter Distance.Two to Five"))
+	UE_DEFINE_GAMEPLAY_TAG(FiveToMax, TEXT("Als.Blood Spatter Distance.FiveToMax"))
+	UE_DEFINE_GAMEPLAY_TAG(Max, TEXT("Als.Blood Spatter Distance.Max"))
+}
+
 namespace ALSXTDamageTypeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Impact, TEXT("Game.Damge Type.Impact"))
@@ -396,6 +404,14 @@ namespace ALSXTWeaponObstructionTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Environment, TEXT("Als.Weapon Obstruction.Environment"))
 	UE_DEFINE_GAMEPLAY_TAG(Flagging, TEXT("Als.Weapon Obstruction.Flagging"))
+}
+
+namespace ALSXTStaminaTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Optimal, TEXT("Als.Stamina.Optimal"))
+	UE_DEFINE_GAMEPLAY_TAG(Half, TEXT("Als.Stamina.Half"))
+	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Stamina.Low"))
+	UE_DEFINE_GAMEPLAY_TAG(Empty, TEXT("Als.Stamina.Empty"))
 }
 
 namespace ALSXTActionStrengthTags

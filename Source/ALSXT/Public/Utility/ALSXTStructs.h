@@ -3,6 +3,7 @@
 #include "NativeGameplayTags.h"
 #include "Animation/AnimMontage.h"
 #include "Engine/EngineTypes.h"
+#include "Components/AudioComponent.h"
 #include "ALSXTStructs.generated.h"
 
 class UAnimMontage;
@@ -446,5 +447,131 @@ struct ALSXT_API FAttackType
 	bool operator==(const FAttackType& other) const
 	{
 		return (other.AttackType == AttackType);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TObjectPtr<USoundBase> Sound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector2D PitchRange {1.0f, 1.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector2D PlayRateRange{ 1.0f, 1.0f };
+
+	bool operator==(const FALSXTCharacterSound& other) const
+	{
+		return (other.Sound == Sound) && (other.PitchRange == PitchRange) && (other.PlayRateRange == PlayRateRange);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterActionSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
+	TArray<FGameplayTag> Strength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stamina", AllowPrivateAccess))
+	TArray<FGameplayTag> Stamina;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FALSXTCharacterSound Sound;
+
+	bool operator==(const FALSXTCharacterActionSound& other) const
+	{
+		return (other.Strength == Strength) && (other.Stamina == Stamina) && (other.Sound == Sound);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterDamageSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Form", AllowPrivateAccess))
+	TArray<FGameplayTag> Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Strength", AllowPrivateAccess))
+	TArray<FGameplayTag> Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FALSXTCharacterSound Sound;
+
+	bool operator==(const FALSXTCharacterDamageSound& other) const
+	{
+		return (other.Form == Form) && (other.Damage == Damage) && (other.Sound == Sound);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTBloodSpatterType
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Form", AllowPrivateAccess))
+	TArray<FGameplayTag> Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Form", AllowPrivateAccess))
+	TArray<FGameplayTag> Volume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Blood Spatter Distance", AllowPrivateAccess))
+	TArray<FGameplayTag> Distance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UTexture2D* Albedo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UTexture2D* Normal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UTexture2D* Packed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float MaxDripSpeed;
+
+	bool operator==(const FALSXTBloodSpatterType& other) const
+	{
+		return (other.Velocity == Velocity) && (other.Volume == Volume) && (other.Distance == Distance) && (other.Albedo == Albedo) && (other.Normal == Normal) && (other.Packed == Packed) && (other.MaxDripSpeed == MaxDripSpeed);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTSurfaceInteraction
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Surfaces}", AllowPrivateAccess))
+	TArray<TEnumAsByte<EPhysicalSurface>> Surfaces;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Form", TitleProperty = "{Conditions}", AllowPrivateAccess))
+	TArray<FGameplayTag> Conditions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TObjectPtr<UAudioComponent> Sound;
+
+	bool operator==(const FALSXTSurfaceInteraction& other) const
+	{
+		return (other.Surfaces == Surfaces) && (other.Conditions == Conditions) && (other.Sound == Sound);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTSurfaceInteractionSet
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Surfaces} {Conditions} {Sound}", AllowPrivateAccess))
+	TArray<FALSXTSurfaceInteraction> SurfaceInteractions;
+
+	bool operator==(const FALSXTSurfaceInteractionSet& other) const
+	{
+		return (other.SurfaceInteractions == SurfaceInteractions);
 	}
 };
