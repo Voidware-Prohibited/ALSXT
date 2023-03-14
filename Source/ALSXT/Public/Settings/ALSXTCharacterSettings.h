@@ -35,7 +35,7 @@ public:
 	FALSXTGeneralVaultingSettings Vaulting;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FALSXTSlidingSettings Sliding;
+	FALSXTGeneralSlidingSettings Sliding;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTFPEyeFocusSettings FirstPersonEyeFocus;

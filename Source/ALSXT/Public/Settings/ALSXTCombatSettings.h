@@ -35,6 +35,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
 	TArray<FAttackType> AttackTypes;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
+	TArray<FAttackAnimation> AttackAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
+	TArray<FSyncedAttackAnimation> SyncedAttackAnimations;
+
 	// Mantling time to blend in amount curve.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UCurveFloat> BlendInCurve;

@@ -93,7 +93,7 @@ void UALSXTSlidingActionComponent::StartSliding(const float PlayRate, const floa
 		return;
 	}
 
-	auto* Montage{ SelectSlideMontage() };
+	auto* Montage{ SelectSlidingMontage() };
 
 	if (!ALS_ENSURE(IsValid(Montage)) || !IsSlidingAllowedToStart(Montage))
 	{
@@ -116,7 +116,12 @@ void UALSXTSlidingActionComponent::StartSliding(const float PlayRate, const floa
 	}
 }
 
-UAnimMontage* UALSXTSlidingActionComponent::SelectSlideMontage_Implementation()
+UALSXTSlidingSettings* UALSXTSlidingActionComponent::SelectSlidingSettings_Implementation()
+{
+	return nullptr;
+}
+
+UAnimMontage* UALSXTSlidingActionComponent::SelectSlidingMontage_Implementation()
 {
 	return Character->ALSXTSettings->Sliding.Montage;
 }

@@ -35,8 +35,62 @@ void UALSXTImpactReactionComponent::BeginPlay()
 void UALSXTImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	if (Character->GetVelocity().Length() > 0)
+	{
+		ObstacleTrace();
+	}
 	// ...
+}
+
+void UALSXTImpactReactionComponent::ObstacleTrace()
+{
+	const auto* Capsule{ Character->GetCapsuleComponent() };
+
+	const auto CapsuleScale{ Capsule->GetComponentScale().Z };
+	// const auto CapsuleRadius{ Capsule->GetScaledCapsuleRadius() };
+	const auto CapsuleRadius{ 30.0f };
+	const auto CapsuleHalfHeight{ Capsule->GetScaledCapsuleHalfHeight() };
+
+	// Set Local Variables
+	//const FVector LandingStartLocation{	TargetCapsuleLocation + (DepthTraceHit.Normal * 60) + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1)) };
+	const FVector UpVector{ Character->GetActorUpVector() };
+	// const FVector StartLocation{ Character->GetActorLocation() + (UpVector * CapsuleHalfHeight/2) + (Character->GetActorForwardVector() * 5)};
+	const FVector StartLocation{ Character->GetActorLocation() + (UpVector * CapsuleHalfHeight / 2)};
+	
+	//LocomotionState.InputYawAngle
+	TArray<FHitResult> HitResults;
+	TArray<AActor*> IgnoreActors;
+	float TraceDistance {0.0f};
+
+	if (Character->GetVelocity().Length() > 0)
+	{
+		if (Character->GetGait() == AlsGaitTags::Walking)
+		{
+			TraceDistance = ImpactReactionSettings.WalkingBumpDetectionDistance;
+		}
+		if (Character->GetGait() == AlsGaitTags::Running)
+		{
+			TraceDistance = ImpactReactionSettings.RunningBumpDetectionDistance;
+		}
+		if (Character->GetGait() == AlsGaitTags::Sprinting)
+		{
+			TraceDistance = ImpactReactionSettings.SprintingBumpDetectionDistance;
+		}
+	}
+	else
+	{
+		TraceDistance = 0.0f;
+	}
+
+	//const FVector EndLocation{ StartLocation + (Character->GetActorForwardVector() * TraceDistance) };
+	const FVector EndLocation{ StartLocation + (Character->GetControlRotation().Vector() * TraceDistance) };
+	
+	// Trace for room for Vaulting action
+	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight/2, Character->ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForOneFrame, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
+	{
+		FString BumpHit = HitResults[0].GetActor()->GetName();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, BumpHit);
+	}
 }
 
 
@@ -260,34 +314,34 @@ UAnimMontage* UALSXTImpactReactionComponent::SelectImpactReactionMontage_Impleme
 	FActionMontageInfo LastAnimation { nullptr };
 	FGameplayTag ImpactLoc = Hit.ImpactLocation;
 
-	UALSXTImpactReactionSettings* ImpactReactionSettings = SelectImpactReactionSettings(ImpactLoc);
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings(ImpactLoc);
 
-	for (int i = 0; i < ImpactReactionSettings->ImpactReactionLocations.Num(); ++i)
+	for (int i = 0; i < SelectedImpactReactionSettings->ImpactReactionLocations.Num(); ++i)
 	{
-		if (ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionLocation == Hit.ImpactLocation)
+		if (SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionLocation == Hit.ImpactLocation)
 		{
-			for (int j = 0; j < ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths.Num(); ++j)
+			for (int j = 0; j < SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths.Num(); ++j)
 			{
-				if (ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionStrength == Hit.Strength)
+				if (SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionStrength == Hit.Strength)
 				{
-					for (int k = 0; k < ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides.Num(); ++k)
+					for (int k = 0; k < SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides.Num(); ++k)
 					{
-						if (ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionSide == Hit.ImpactSide)
+						if (SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionSide == Hit.ImpactSide)
 						{
-							for (int l = 0; l < ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms.Num(); ++l)
+							for (int l = 0; l < SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms.Num(); ++l)
 							{
-								if (ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].ImpactReactionForm == Hit.ImpactForm)
+								if (SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].ImpactReactionForm == Hit.ImpactForm)
 								{
 									
 									// Determine if Blocking and Declare Local Copy of Montages Array
 									TArray<FActionMontageInfo> MontageArray;
 									if (Character->IsBlocking())
 									{
-										MontageArray = ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].BlockingMontages;
+										MontageArray = SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].BlockingMontages;
 									}
 									else
 									{
-										MontageArray = ImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].RegularMontages;
+										MontageArray = SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].RegularMontages;
 									}
 									if (MontageArray.Num() > 1)
 									{

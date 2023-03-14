@@ -167,6 +167,23 @@ struct ALSXT_API FActionMontageInfo
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FVaultAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Vault Type", AllowPrivateAccess))
+	TArray<FGameplayTag> VaultType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FVaultAnimation& other) const
+	{
+		return (other.VaultType == VaultType) && (other.Montage == Montage);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FSyncedActionMontageInfo
 {
 	GENERATED_BODY()
@@ -271,6 +288,9 @@ struct ALSXT_API FAttackAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", TitleProperty = "{AttackStances}", AllowPrivateAccess))
 	TArray<FGameplayTag> AttackStances;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", TitleProperty = "{AttackStances}", AllowPrivateAccess))
+	TArray<FGameplayTag> AttackForms;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo Montage;
 
@@ -340,6 +360,72 @@ struct ALSXT_API FAttackStrength
 	bool operator==(const FAttackStrength& other) const
 	{
 		return (other.AttackStrength == AttackStrength);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FObstacleBumpReactionAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	TArray<FGameplayTag> Gaits;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	TArray<FGameplayTag> Sides;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	TArray<FGameplayTag> Forms;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FObstacleBumpReactionAnimation& other) const
+	{
+		return (other.Gaits == Gaits);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FCrowdBumpReactionAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	TArray<FGameplayTag> Gaits;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	TArray<FGameplayTag> Sides;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FCrowdBumpReactionAnimation& other) const
+	{
+		return (other.Gaits == Gaits);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAttackReactionAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
+	TArray<FGameplayTag> Strengths;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	TArray<FGameplayTag> Sides;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	TArray<FGameplayTag> Forms;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FAttackReactionAnimation& other) const
+	{
+		return (other.Strengths == Strengths);
 	}
 };
 

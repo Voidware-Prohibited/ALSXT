@@ -3,8 +3,24 @@
 #include "Animation/AnimMontage.h"
 #include "ALSXTSlidingSettings.generated.h"
 
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UALSXTSlidingSettings : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TArray<TObjectPtr<UAnimMontage>> RegularMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TArray<TObjectPtr<UAnimMontage>> AngleMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TArray<TObjectPtr<UAnimMontage>> AngleUncontrolledMontages;
+};
+
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTSlidingSettings
+struct ALSXT_API FALSXTGeneralSlidingSettings
 {
 	GENERATED_BODY()
 

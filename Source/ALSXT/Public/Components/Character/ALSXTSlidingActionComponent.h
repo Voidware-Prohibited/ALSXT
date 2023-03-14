@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "ALSXTCharacter.h"
+#include "Settings/ALSXTSlidingSettings.h"
 #include "State/ALSXTSlidingState.h"
 #include "ALSXTSlidingActionComponent.generated.h"
 
@@ -54,8 +55,11 @@ public:
 	void TryStartSliding(float PlayRate = 1.0f);
 
 protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UALSXTSlidingSettings* SelectSlidingSettings();
+
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	UAnimMontage* SelectSlideMontage();
+	UAnimMontage* SelectSlidingMontage();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	void OnSlidingStarted();

@@ -53,6 +53,9 @@ public:
 	FTargetHitResultEntry CurrentTarget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	FALSXTGeneralCombatSettings CombatSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FLinearColor HighlightColor { 1.0f, 0.0f, 1.0f, 1.0 };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
@@ -79,8 +82,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	float DebugDuration { 4.0f };
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Target Lock")
 	void GetTargetableOverlayModes(TArray<FGameplayTag>& TargetableOverlayModes) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
+	float GetHealth();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
+	float GetStamina();
 
 	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
 	float GetAngle(FVector Target);

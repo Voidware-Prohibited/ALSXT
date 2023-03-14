@@ -99,7 +99,7 @@ namespace ALSXTPlayerGameRoleTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(OrganizationLeader, TEXT("Game.Player Game Role.Organization Leader"))
 	UE_DEFINE_GAMEPLAY_TAG(SectionLeader, TEXT("Game.Player Game Role.Section Leader"))
-	UE_DEFINE_GAMEPLAY_TAG(FireteamLeader, TEXT("Game.Player Game Role.FireteamL eader"))
+	UE_DEFINE_GAMEPLAY_TAG(FireteamLeader, TEXT("Game.Player Game Role.Fireteam Leader"))
 	UE_DEFINE_GAMEPLAY_TAG(Unit, TEXT("Game.Player Game Role.Unit"))
 }
 
@@ -163,6 +163,7 @@ namespace ALSXTImpactTypeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Bump, TEXT("Als.Impact Type.Bump"))
 	UE_DEFINE_GAMEPLAY_TAG(Hit, TEXT("Als.Impact Type.Hit"))
+	UE_DEFINE_GAMEPLAY_TAG(Fall, TEXT("Als.Impact Type.Fall"))
 }
 
 namespace ALSXTImpactFormTags

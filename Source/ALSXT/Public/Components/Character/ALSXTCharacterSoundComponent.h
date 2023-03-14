@@ -60,6 +60,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayDamageSound();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
+	float GetHealth();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
+	float GetStamina();
+
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	FGameplayTag ConvertStaminaToStaminaTag(const float Stamina);
 

@@ -45,6 +45,24 @@ public:
 	FActionMontageInfo LocationFallbackDefaultMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FAttackReactionAnimation> AttackReactionAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FAttackReactionAnimation> BlockingAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FAttackReactionAnimation> AttackResponseAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray <FFallenAnimation> FallenAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FCrowdBumpReactionAnimation> CrowdBumpReactionAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FObstacleBumpReactionAnimation> ObstacleBumpReactionAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray <FImpactReactionLocation> ImpactReactionLocations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
@@ -85,6 +103,15 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAllowImpactReaction{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float WalkingBumpDetectionDistance {10.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float RunningBumpDetectionDistance { 20.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float SprintingBumpDetectionDistance { 40.0f };
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bRotateToInputOnStart{ true };

@@ -39,9 +39,23 @@ public:
 
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	FALSXTGeneralImpactReactionSettings ImpactReactionSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	FALSXTImpactReactionParameters ImpactReactionParameters;
+
+	void ObstacleTrace();
+
 	/*Curve float reference*/
 	UPROPERTY(EditAnywhere, Category = "Impact Reaction Timeline")
 	UCurveFloat* CurveFloat;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
+	float GetHealth();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
+	float GetStamina();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanReact();

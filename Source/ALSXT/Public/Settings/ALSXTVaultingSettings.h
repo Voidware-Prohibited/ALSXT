@@ -2,6 +2,7 @@
 
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
+#include "Utility/ALSXTStructs.h"
 #include "Settings/AlsMantlingSettings.h"
 #include "ALSXTVaultingSettings.generated.h"
 
@@ -36,6 +37,9 @@ class ALSXT_API UALSXTVaultingSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TArray<FVaultAnimation> VaultAnimations;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UAnimMontage> Montage;
 
