@@ -349,9 +349,16 @@ namespace ALSXTBlockingTags
 
 namespace ALSXTStationaryModeTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Sitting01, TEXT("Als.Stationary Mode.Sitting 01"))
-	UE_DEFINE_GAMEPLAY_TAG(SittingFloor01, TEXT("Als.Stationary Mode.Sitting Floor 01"))
-	UE_DEFINE_GAMEPLAY_TAG(Petting, TEXT("Als.Stationary Mode.Petting"))
+	UE_DEFINE_GAMEPLAY_TAG(Static, TEXT("Als.Stationary Mode.Static"))
+	UE_DEFINE_GAMEPLAY_TAG(Interaction, TEXT("Als.Stationary Mode.Interaction"))
+	UE_DEFINE_GAMEPLAY_TAG(VehicleDriver, TEXT("Als.Stationary Mode.Vehicle Driver"))
+	UE_DEFINE_GAMEPLAY_TAG(VehiclePassenger, TEXT("Als.Stationary Mode.Vehicle Passenger"))
+}
+
+namespace ALSXTVehicleSeatSideTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Vehicle Seat Side.Left"))
+	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Vehicle Seat Side.Right"))
 }
 
 namespace ALSXTEmoteTags

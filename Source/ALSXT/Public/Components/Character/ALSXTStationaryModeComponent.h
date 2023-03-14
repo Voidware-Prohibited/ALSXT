@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ALSXTStatonaryModeComponent.generated.h"
+#include "ALSXTStationaryModeComponent.generated.h"
 
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ALSXT_API UALSXTStatonaryModeComponent : public UActorComponent
+class ALSXT_API UALSXTStationaryModeComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UALSXTStatonaryModeComponent();
+	UALSXTStationaryModeComponent();
 
 protected:
 	// Called when the game starts
@@ -30,5 +30,21 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanExitStationaryMode();
 
+private:
+	FTransform EnterTransform;
+
+	FTransform ExitTransform;
+
+	void TryTraceForSeat();
+
+	void GetObjectStationaryModeInfo();
+
+	void GetEnterStationaryModeAnimation();
+
+	void EnterStationaryMode();
+
+	void GetExitStationaryModeAnimation();
+
+	void ExitStationaryMode();
 		
 };
