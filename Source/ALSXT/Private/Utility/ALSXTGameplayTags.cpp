@@ -355,6 +355,19 @@ namespace ALSXTStationaryModeTags
 	UE_DEFINE_GAMEPLAY_TAG(VehiclePassenger, TEXT("Als.Stationary Mode.Vehicle Passenger"))
 }
 
+namespace ALSXTStaticStationaryModeTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Seat, TEXT("Als.Static Stationary Mode Type.Seat"))
+	UE_DEFINE_GAMEPLAY_TAG(Surface, TEXT("Als.Static Stationary Mode Type.Surface"))
+	UE_DEFINE_GAMEPLAY_TAG(Ground, TEXT("Als.Static Stationary Mode Type.Ground"))
+}
+
+namespace ALSXTVehicleStationaryModeTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Driver, TEXT("Als.Vehicle Stationary Mode Type.Driver"))
+	UE_DEFINE_GAMEPLAY_TAG(Passenger, TEXT("Als.Vehicle Stationary Mode Type.Passenger"))
+}
+
 namespace ALSXTVehicleSeatSideTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Vehicle Seat Side.Left"))

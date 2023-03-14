@@ -1254,7 +1254,7 @@ void AALSXTCharacter::AttackCollisionTrace()
 						IALSXTCharacterInterface::Execute_GetCombatAttackPhysics(HitActor, HitActorAttackMass, HitActorAttackVelocity);
 					}
 
-					TotalImpactEnergy = (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
+					TotalImpactEnergy = 50 + (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
 					// FMath::Square(TossSpeed)
 
 					FVector HitDirection = HitResult.ImpactPoint - GetActorLocation();

@@ -32,14 +32,8 @@ class ALSXT_API UALSXTStationaryModeSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
-	TArray<FAttackType> AttackTypes;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
-	TArray<FAttackAnimation> AttackAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
-	TArray<FSyncedAttackAnimation> SyncedAttackAnimations;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{StaticStationaryMode}", AllowPrivateAccess))
+	TArray<FStaticStationaryModeAnimation> StaticStationaryModeAnimations;
 
 	// Mantling time to blend in amount curve.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")

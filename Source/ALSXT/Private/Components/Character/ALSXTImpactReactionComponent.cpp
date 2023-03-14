@@ -478,7 +478,7 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Hit, Hit.HitResult.HitResult.BoneName);
 		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::HitReaction);
 		// Character->GetMesh()->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
-		Character->GetMesh()->AddImpulseToAllBodiesBelow(Hit.HitResult.Impulse, Hit.HitResult.HitResult.BoneName, false, true);
+		Character->GetMesh()->AddImpulseToAllBodiesBelow(Hit.HitResult.Impulse * 1000, Hit.HitResult.HitResult.BoneName, false, true);
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 
 		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);

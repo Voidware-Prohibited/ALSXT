@@ -167,6 +167,52 @@ struct ALSXT_API FActionMontageInfo
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FStaticStationaryModeAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", TitleProperty = "{AttackStrengths}", AllowPrivateAccess))
+	TArray<FGameplayTag> StaticStationaryMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo EnterMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimMontage> IdlePose { nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo ExitMontage;
+
+	bool operator==(const FStaticStationaryModeAnimation& other) const
+	{
+		return (other.StaticStationaryMode == StaticStationaryMode);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FVehicleStationaryModeAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", TitleProperty = "{AttackStrengths}", AllowPrivateAccess))
+	TArray<FGameplayTag> StationarySeatSide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo EnterMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimMontage> IdlePose { nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo ExitMontage;
+
+	bool operator==(const FVehicleStationaryModeAnimation& other) const
+	{
+		return (other.StationarySeatSide == StationarySeatSide);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FVaultAnimation
 {
 	GENERATED_BODY()
