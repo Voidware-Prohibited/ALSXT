@@ -83,7 +83,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 	}
 
 	//const FVector EndLocation{ StartLocation + (Character->GetActorForwardVector() * TraceDistance) };
-	const FVector EndLocation{ StartLocation + (Character->GetControlRotation().Vector() * TraceDistance) };
+	const FVector EndLocation{ StartLocation + (Character->GetControlRotation().Yaw * TraceDistance) };
 	
 	// Trace for room for Vaulting action
 	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight/2, Character->ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForOneFrame, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
