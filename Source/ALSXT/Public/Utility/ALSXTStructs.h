@@ -30,6 +30,11 @@ struct ALSXT_API FSubtitleEntry
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	bool ForceDisplayAtTop{ false };
 
+	bool operator==(const FSubtitleEntry& other) const
+	{
+		return (other.SpeakerCharacter == SpeakerCharacter) && (Text.EqualTo(other.Text)) && (other.Time == Time) && (other.MinimumDisplayDuration == MinimumDisplayDuration) && (other.ForceDisplayAtTop == ForceDisplayAtTop);
+	}
+
 };
 
 USTRUCT(BlueprintType)
@@ -58,6 +63,10 @@ struct ALSXT_API FSubtitles
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FString Comment;
 
+	bool operator==(const FSubtitles& other) const
+	{
+		return (other.Mature == Mature) && (other.ManualWordWrap == ManualWordWrap) && (other.SingleLine == SingleLine) && (other.SpokenText == SpokenText) && (other.SubtitlePriority == SubtitlePriority) && (other.Subtitles == Subtitles) && (other.Comment == Comment);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -74,6 +83,10 @@ struct ALSXT_API FSound
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FSubtitles Subtitles;
 
+	bool operator==(const FSound& other) const
+	{
+		return (other.Sound == Sound) && (other.Mature == Mature) && (other.Subtitles == Subtitles);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -654,7 +667,7 @@ struct ALSXT_API FALSXTCharacterSound
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TObjectPtr<USoundBase> Sound;
+	FSound Sound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FVector2D PitchRange {1.0f, 1.0f};

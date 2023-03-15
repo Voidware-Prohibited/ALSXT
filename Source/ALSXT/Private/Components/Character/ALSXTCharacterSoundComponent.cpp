@@ -127,7 +127,7 @@ FALSXTCharacterActionSound UALSXTCharacterSoundComponent::SelectActionSound(UALS
 	FALSXTCharacterActionSound SelectedActionSound;
 
 	// Return is there are no sounds
-	if (ActionSounds.Num() < 1 || !ActionSounds[0].Sound.Sound)
+	if (ActionSounds.Num() < 1 || !ActionSounds[0].Sound.Sound.Sound)
 	{
 		return SelectedActionSound;
 	}
@@ -147,7 +147,7 @@ FALSXTCharacterActionSound UALSXTCharacterSoundComponent::SelectActionSound(UALS
 	}
 
 	// Return if Return is there are no filtered sounds
-	if (FilteredActionSounds.Num() < 1 || !FilteredActionSounds[0].Sound.Sound)
+	if (FilteredActionSounds.Num() < 1 || !FilteredActionSounds[0].Sound.Sound.Sound)
 	{
 		return SelectedActionSound;
 	}
@@ -236,7 +236,7 @@ void UALSXTCharacterSoundComponent::PlayActionSound(const FGameplayTag& Overlay,
 	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
 	FALSXTCharacterActionSound Sound = SelectActionSound(Settings, Overlay, Strength, Stamina);
 
-	if (!IsValid(Sound.Sound.Sound))
+	if (!IsValid(Sound.Sound.Sound.Sound))
 	{
 		return;
 	}
@@ -259,18 +259,18 @@ void UALSXTCharacterSoundComponent::PlayDeathSound(const FGameplayTag& Strength,
 
 void UALSXTCharacterSoundComponent::PlaySound(FALSXTCharacterSound Sound)
 {
-	if (Sound.Sound)
+	if (Sound.Sound.Sound)
 	{
 		UAudioComponent* AudioComponent{ nullptr };
 		FVector SocketLocation = Character->GetMesh()->GetSocketLocation(VoiceSocketName);
 		FRotator PlayerRotation = Character->GetControlRotation();
 		if (GetWorld()->WorldType == EWorldType::EditorPreview)
 		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound.Sound, SocketLocation, 1.0f, 1.0f);
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound.Sound.Sound, SocketLocation, 1.0f, 1.0f);
 		}
 		else
 		{
-			AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Sound.Sound, SocketLocation, PlayerRotation, 1.0f, 1.0f);
+			AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Sound.Sound.Sound, SocketLocation, PlayerRotation, 1.0f, 1.0f);
 		}
 	}
 }
