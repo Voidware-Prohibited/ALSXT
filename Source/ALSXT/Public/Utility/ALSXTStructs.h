@@ -3,7 +3,8 @@
 #include "NativeGameplayTags.h"
 #include "Animation/AnimMontage.h"
 #include "Engine/EngineTypes.h"
-#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
+#include "NiagaraSystem.h"
 #include "ALSXTStructs.generated.h"
 
 class UAnimMontage;
@@ -87,6 +88,19 @@ struct ALSXT_API FSound
 	{
 		return (other.Sound == Sound) && (other.Mature == Mature) && (other.Subtitles == Subtitles);
 	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FBoneLocationEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Location", AllowPrivateAccess))
+	FGameplayTag Location;
+
+	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	FString Comment;
+
 };
 
 USTRUCT(BlueprintType)
@@ -207,7 +221,7 @@ struct ALSXT_API FLastTargetEntry
 	float LastBlockedAttack { 99.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	AActor* Target;
+	AActor* Target {nullptr};
 
 };
 
@@ -693,11 +707,11 @@ struct ALSXT_API FALSXTCharacterActionSound
 	TArray<FGameplayTag> Stamina;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FALSXTCharacterSound Sound;
+	FALSXTCharacterSound CharacterSound;
 
 	bool operator==(const FALSXTCharacterActionSound& other) const
 	{
-		return (other.Strength == Strength) && (other.Stamina == Stamina) && (other.Sound == Sound);
+		return (other.Strength == Strength) && (other.Stamina == Stamina) && (other.CharacterSound == CharacterSound);
 	}
 };
 
@@ -713,11 +727,11 @@ struct ALSXT_API FALSXTCharacterDamageSound
 	TArray<FGameplayTag> Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FALSXTCharacterSound Sound;
+	FALSXTCharacterSound CharacterSound;
 
 	bool operator==(const FALSXTCharacterDamageSound& other) const
 	{
-		return (other.Form == Form) && (other.Damage == Damage) && (other.Sound == Sound);
+		return (other.Form == Form) && (other.Damage == Damage) && (other.CharacterSound == CharacterSound);
 	}
 };
 
@@ -736,16 +750,16 @@ struct ALSXT_API FALSXTBloodSpatterType
 	TArray<FGameplayTag> Distance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UTexture2D* Albedo;
+	UTexture2D* Albedo {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UTexture2D* Normal;
+	UTexture2D* Normal {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UTexture2D* Packed;
+	UTexture2D* Packed {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float MaxDripSpeed;
+		float MaxDripSpeed {0.0f};
 
 	bool operator==(const FALSXTBloodSpatterType& other) const
 	{
@@ -765,7 +779,13 @@ struct ALSXT_API FALSXTSurfaceInteraction
 	TArray<FGameplayTag> Conditions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TObjectPtr<UAudioComponent> Sound;
+	USoundBase* Sound {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TSubclassOf<AActor> ParticleActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UNiagaraSystem* Particle {nullptr};
 
 	bool operator==(const FALSXTSurfaceInteraction& other) const
 	{

@@ -29,6 +29,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Als Character")
 	UALSXTCharacterSoundSettings* SelectCharacterSoundSettings();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool ShouldPlayDeathSoundModeration();
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -50,6 +53,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FVector2D DamageSoundDelay { 1.0f, 2.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	bool DebugMode { false };
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayActionSound();

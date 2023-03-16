@@ -82,14 +82,14 @@ bool UALSXTCombatComponent::IsTartgetObstructed()
 	TArray<FHitResult> OutHits;
 
 	FCollisionObjectQueryParams ObjectQueryParameters;
-	for (const auto ObjectType : ObstructionTraceObjectTypes)
+	for (const auto ObjectType : CombatSettings.ObstructionTraceObjectTypes)
 	{
 		ObjectQueryParameters.AddObjectTypesToQuery(UCollisionProfile::Get()->ConvertToCollisionChannel(false, ObjectType));
 	}
 
 	if (GetWorld()->LineTraceMultiByObjectType(OutHits, CharLoc, CurrentTarget.HitResult.GetActor()->GetActorLocation(), ObjectQueryParameters))
 	{
-		if (UnlockWhenTargetIsObstructed)
+		if (CombatSettings.UnlockWhenTargetIsObstructed)
 		{
 			ClearCurrentTarget();
 		}
@@ -108,10 +108,10 @@ void UALSXTCombatComponent::TryTraceForTargets()
 
 	if (Character && TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming() && IsValid(CurrentTarget.HitResult.GetActor()))
 	{
-		if (Character->GetDistanceTo(CurrentTarget.HitResult.GetActor()) < MaxInitialLockDistance)
+		if (Character->GetDistanceTo(CurrentTarget.HitResult.GetActor()) < CombatSettings.MaxInitialLockDistance)
 		{			
-			if (UnlockWhenTargetIsObstructed) {
-				if (UnlockWhenTargetIsObstructed && !IsTartgetObstructed()) {
+			if (CombatSettings.UnlockWhenTargetIsObstructed) {
+				if (CombatSettings.UnlockWhenTargetIsObstructed && !IsTartgetObstructed()) {
 					if (CurrentTarget.Valid)
 					{
 						RotatePlayerToTarget(CurrentTarget);
@@ -149,13 +149,13 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 	// FVector CenterLocation = (StartLocation - EndLocation) / 2 + StartLocation;
 	FVector CenterLocation = (StartLocation - EndLocation) / 8 + StartLocation;
 	// FVector CenterLocation = (StartLocation - EndLocation) / 8;
-	FCollisionShape CollisionShape = FCollisionShape::MakeBox(TraceAreaHalfSize);
+	FCollisionShape CollisionShape = FCollisionShape::MakeBox(CombatSettings.TraceAreaHalfSize);
 	TArray<FHitResult> OutHits;
 
 	// Display Debug Shape
-	if (DebugMode)
+	if (CombatSettings.DebugMode)
 	{
-		DrawDebugBox(GetWorld(), CenterLocation, TraceAreaHalfSize, ControlRotation.Quaternion(), FColor::Yellow, false, DebugDuration, 100, 2);
+		DrawDebugBox(GetWorld(), CenterLocation, CombatSettings.TraceAreaHalfSize, ControlRotation.Quaternion(), FColor::Yellow, false, CombatSettings.DebugDuration, 100, 2);
 	}
 
 	bool isHit = GetWorld()->SweepMultiByChannel(OutHits, StartLocation, EndLocation, ControlRotation.Quaternion(), ECollisionChannel::ECC_Camera, CollisionShape);
@@ -164,7 +164,7 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 	{
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.GetActor()->GetClass()->ImplementsInterface(UALSXTTargetLockInterface::StaticClass()) && Hit.GetActor() != Character && Character->GetDistanceTo(Hit.GetActor()) < MaxLockDistance)
+			if (Hit.GetActor()->GetClass()->ImplementsInterface(UALSXTTargetLockInterface::StaticClass()) && Hit.GetActor() != Character && Character->GetDistanceTo(Hit.GetActor()) < CombatSettings.MaxLockDistance)
 			{
 				FTargetHitResultEntry HitResultEntry;
 				HitResultEntry.Valid = true;
@@ -216,7 +216,7 @@ void UALSXTCombatComponent::GetClosestTarget()
 		if (FoundHit.Valid && FoundHit.HitResult.GetActor())
 		{
 			SetCurrentTarget(FoundHit);
-			if (GEngine && DebugMode)
+			if (GEngine && CombatSettings.DebugMode)
 			{
 				FString DebugMsg = FString::SanitizeFloat(FoundHit.AngleFromCenter);
 				DebugMsg.Append(" Hit Result: ");
@@ -244,7 +244,7 @@ void UALSXTCombatComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTar
 			for (int m = 0; m < CharMaterials.Num(); m++)
 			{
 				UMaterialInstanceDynamic* CharDynMaterial = HitMesh->CreateAndSetMaterialInstanceDynamic(m);
-				CharDynMaterial->SetScalarParameterValue(HighlightMaterialParameterName, 1.0f);
+				CharDynMaterial->SetScalarParameterValue(CombatSettings.HighlightMaterialParameterName, 1.0f);
 				HitMesh->SetMaterial(m, CharDynMaterial);
 				TargetDynamicMaterials.Add(CharDynMaterial);
 			}
@@ -268,7 +268,7 @@ void UALSXTCombatComponent::ClearCurrentTarget()
 			{
 				for (int m = 0; m < TargetDynamicMaterials.Num(); m++)
 				{
-					TargetDynamicMaterials[m]->SetScalarParameterValue(HighlightMaterialParameterName, 0.0f);
+					TargetDynamicMaterials[m]->SetScalarParameterValue(CombatSettings.HighlightMaterialParameterName, 0.0f);
 					// HitMesh->SetMaterial(m, CharDynMaterial);
 				}
 				TargetDynamicMaterials.Empty();
@@ -278,7 +278,7 @@ void UALSXTCombatComponent::ClearCurrentTarget()
 			// 	for (int m = 0; m < CharMaterials.Num(); m++)
 			// 	{
 			// 		UMaterialInstanceDynamic* CharDynMaterial = HitMesh->CreateAndSetMaterialInstanceDynamic(m);
-			// 		CharDynMaterial->SetScalarParameterValue(HighlightMaterialParameterName, 0.0f);
+			// 		CharDynMaterial->SetScalarParameterValue(CombatSettings.HighlightMaterialParameterName, 0.0f);
 			// 		HitMesh->SetMaterial(m, CharDynMaterial);
 			// 	}
 			// }
@@ -388,8 +388,8 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 	TArray<AActor*> OriginTraceIgnoredActors;
 	InitialIgnoredActors.Add(Character);	// Add Self to Initial Trace Ignored Actors
 	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
-	AttackTraceObjectTypes = Character->ALSXTSettings->Combat.AttackTraceObjectTypes;
-	bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), SweepStart, SweepEnd, 50, Character->ALSXTSettings->Combat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, OutHits, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
+	AttackTraceObjectTypes = CombatSettings.AttackTraceObjectTypes;
+	bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), SweepStart, SweepEnd, 50, CombatSettings.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, OutHits, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
 
 	if (isHit)
 	{
@@ -398,7 +398,7 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 		{
 			if (Hit.GetActor() != Character && UKismetSystemLibrary::DoesImplementInterface(Hit.GetActor(), UALSXTCombatInterface::StaticClass()))
 			{
-				if (GEngine && DebugMode)
+				if (GEngine && CombatSettings.DebugMode)
 				{
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.GetActor()->GetName()));
 				}
@@ -442,7 +442,7 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& AttackType, const FGamepl
 
 	if (AttackMethod == ALSXTAttackMethodTags::Regular || AttackMethod == ALSXTAttackMethodTags::Riposte)
 	{
-		StartAttack(AttackType, NewStance, Strength, BaseDamage, PlayRate, Character->ALSXTSettings->Combat.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
+		StartAttack(AttackType, NewStance, Strength, BaseDamage, PlayRate, CombatSettings.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
 			? Character->GetLocomotionState().InputYawAngle
 			: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)));
 	}
@@ -450,7 +450,7 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& AttackType, const FGamepl
 	{
 		// int SynedAnimationIndex;
 		// GetSyncedAttackMontageInfo(FSyncedActionMontageInfo & SyncedActionMontageInfo, const FGameplayTag & AttackType, int32 Index);
-		StartSyncedAttack(Character->GetOverlayMode(), AttackType, NewStance, Strength, AttackMethod, BaseDamage, PlayRate, Character->ALSXTSettings->Combat.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
+		StartSyncedAttack(Character->GetOverlayMode(), AttackType, NewStance, Strength, AttackMethod, BaseDamage, PlayRate, CombatSettings.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
 			? Character->GetLocomotionState().InputYawAngle
 			: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)), 0);
 	}
@@ -670,7 +670,7 @@ void UALSXTCombatComponent::RefreshAttack(const float DeltaTime)
 
 void UALSXTCombatComponent::RefreshAttackPhysics(const float DeltaTime)
 {
-	// float Offset = Character->ALSXTSettings->Combat.RotationOffset;
+	// float Offset = CombatSettings->Combat.RotationOffset;
 	auto ComponentRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	auto TargetRotation{ PlayerController->GetControlRotation() };
@@ -679,7 +679,7 @@ void UALSXTCombatComponent::RefreshAttackPhysics(const float DeltaTime)
 	// TargetRotation.Pitch = ComponentRotation.Pitch;
 	// TargetRotation.Roll = ComponentRotation.Roll;
 
-	// if (Character->ALSXTSettings->Combat.RotationInterpolationSpeed <= 0.0f)
+	// if (CombatSettings.RotationInterpolationSpeed <= 0.0f)
 	// {
 	// 	TargetRotation.Yaw = CombatState.TargetYawAngle;
 	// 
@@ -689,7 +689,7 @@ void UALSXTCombatComponent::RefreshAttackPhysics(const float DeltaTime)
 	// {
 	// 	TargetRotation.Yaw = UAlsMath::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
 	// 		CombatState.TargetYawAngle, DeltaTime,
-	// 		Character->ALSXTSettings->Combat.RotationInterpolationSpeed);
+	// 		CombatSettings->Combat.RotationInterpolationSpeed);
 	// 
 	// 	Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);
 	// }

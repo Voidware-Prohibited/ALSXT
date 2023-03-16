@@ -55,33 +55,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTGeneralCombatSettings CombatSettings;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	FLinearColor HighlightColor { 1.0f, 0.0f, 1.0f, 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	FName HighlightMaterialParameterName { "Highlight" };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	FVector	TraceAreaHalfSize { 400.0f, 400.0f, 150.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (Units = "cm", AllowPrivateAccess))
-	float MaxInitialLockDistance { 1000.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (Units = "cm", AllowPrivateAccess))
-	float MaxLockDistance { 1000.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	bool UnlockWhenTargetIsObstructed { true };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObstructionTraceObjectTypes;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	bool DebugMode;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	float DebugDuration { 4.0f };
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Target Lock")
 	void GetTargetableOverlayModes(TArray<FGameplayTag>& TargetableOverlayModes) const;
 

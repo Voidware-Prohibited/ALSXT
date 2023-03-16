@@ -82,11 +82,12 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 		TraceDistance = 0.0f;
 	}
 
-	//const FVector EndLocation{ StartLocation + (Character->GetActorForwardVector() * TraceDistance) };
+	// const FVector EndLocation{ StartLocation + (Character->GetActorForwardVector() * TraceDistance) };
 	const FVector EndLocation{ StartLocation + (Character->GetControlRotation().Yaw * TraceDistance) };
+	// const FVector EndLocation{ StartLocation + (Character->GetControlRotation().Yaw * TraceDistance) };
 	
 	// Trace for room for Vaulting action
-	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight/2, Character->ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForOneFrame, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
+	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight/2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForOneFrame, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
 	{
 		FString BumpHit = HitResults[0].GetActor()->GetName();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, BumpHit);
@@ -95,6 +96,11 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 
 
 // UnarmedAttack
+
+void UALSXTImpactReactionComponent::BumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
+{
+	// ...
+}
 
 void UALSXTImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit)
 {
@@ -129,6 +135,11 @@ void UALSXTImpactReactionComponent::SyncedAttackReaction(FAttackDoubleHitResult 
 	}
 }
 
+void UALSXTImpactReactionComponent::BodyFallReaction(FAttackDoubleHitResult Hit)
+{
+	// ...
+}
+
 void UALSXTImpactReactionComponent::ImpactTimelineUpdate(float Value)
 {
 	//...
@@ -137,6 +148,11 @@ void UALSXTImpactReactionComponent::ImpactTimelineUpdate(float Value)
 bool UALSXTImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const
 {
 	return (Montage != nullptr);
+}
+
+void UALSXTImpactReactionComponent::StartBumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
+{
+
 }
 
 void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
@@ -212,6 +228,21 @@ void UALSXTImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	}
 }
 
+void UALSXTImpactReactionComponent::StartFall(FDoubleHitResult Hit)
+{
+
+}
+
+void UALSXTImpactReactionComponent::StartGetUp(FDoubleHitResult Hit)
+{
+
+}
+
+void UALSXTImpactReactionComponent::StartResponse(FAttackDoubleHitResult Hit)
+{
+
+}
+
 UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactionSettings_Implementation(const FGameplayTag& Location)
 {
 	return nullptr;
@@ -220,6 +251,22 @@ UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactio
 UALSXTAttackReactionSettings* UALSXTImpactReactionComponent::SelectAttackReactionSettings_Implementation(const FGameplayTag& Location)
 {
 	return nullptr;
+}
+
+void UALSXTImpactReactionComponent::SyncedReaction() {}
+
+void UALSXTImpactReactionComponent::Fall() {}
+
+void UALSXTImpactReactionComponent::FallLand() {}
+
+void UALSXTImpactReactionComponent::GeUp() {}
+
+void UALSXTImpactReactionComponent::AttackResponse() {}
+
+UAnimMontage* UALSXTImpactReactionComponent::SelectBumpReactionMontage_Implementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
+{
+	UAnimMontage* SelectedMontage{ nullptr };
+	return SelectedMontage;
 }
 
 UAnimMontage* UALSXTImpactReactionComponent::SelectAttackReactionMontage_Implementation(FAttackDoubleHitResult Hit)
@@ -302,12 +349,6 @@ UAnimMontage* UALSXTImpactReactionComponent::SelectAttackReactionMontage_Impleme
 	return SelectedMontage;
 }
 
-UAnimMontage* UALSXTImpactReactionComponent::SelectResponseMontage_Implementation(FAttackDoubleHitResult Hit)
-{
-	UAnimMontage* SelectedMontage{ nullptr };
-	return SelectedMontage;
-}
-
 UAnimMontage* UALSXTImpactReactionComponent::SelectImpactReactionMontage_Implementation(FDoubleHitResult Hit)
 {
 	UAnimMontage* SelectedMontage { nullptr };
@@ -381,6 +422,30 @@ FSyncedAttackAnimation UALSXTImpactReactionComponent::GetSyncedMontage_Implement
 {
 	FSyncedAttackAnimation SyncedAttackAnimation;
 	return SyncedAttackAnimation;
+}
+
+UAnimMontage* UALSXTImpactReactionComponent::SelectFallMontage_Implementation(FDoubleHitResult Hit)
+{
+	UAnimMontage* SelectedMontage{ nullptr };
+	return SelectedMontage;
+}
+
+UAnimMontage* UALSXTImpactReactionComponent::SelectFallenPose_Implementation(FDoubleHitResult Hit)
+{
+	UAnimMontage* SelectedMontage{ nullptr };
+	return SelectedMontage;
+}
+
+UAnimMontage* UALSXTImpactReactionComponent::SelectGetUpMontage_Implementation(FDoubleHitResult Hit)
+{
+	UAnimMontage* SelectedMontage{ nullptr };
+	return SelectedMontage;
+}
+
+UAnimMontage* UALSXTImpactReactionComponent::SelectResponseMontage_Implementation(FAttackDoubleHitResult Hit)
+{
+	UAnimMontage* SelectedMontage{ nullptr };
+	return SelectedMontage;
 }
 
 bool UALSXTImpactReactionComponent::ServerAttackReaction_Validate(FAttackDoubleHitResult Hit)
@@ -587,7 +652,7 @@ void UALSXTImpactReactionComponent::RefreshImpactReaction(const float DeltaTime)
 
 void UALSXTImpactReactionComponent::RefreshImpactReactionPhysics(const float DeltaTime)
 {
-	float Offset = Character->ALSXTSettings->ImpactReaction.RotationOffset;
+	float Offset = ImpactReactionSettings.RotationOffset;
 	auto ComponentRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	auto TargetRotation{ PlayerController->GetControlRotation() };
@@ -595,7 +660,7 @@ void UALSXTImpactReactionComponent::RefreshImpactReactionPhysics(const float Del
 	TargetRotation.Pitch = ComponentRotation.Pitch;
 	TargetRotation.Roll = ComponentRotation.Roll;
 
-	if (Character->ALSXTSettings->ImpactReaction.RotationInterpolationSpeed <= 0.0f)
+	if (ImpactReactionSettings.RotationInterpolationSpeed <= 0.0f)
 	{
 		TargetRotation.Yaw = ImpactReactionState.TargetYawAngle;
 
@@ -605,7 +670,7 @@ void UALSXTImpactReactionComponent::RefreshImpactReactionPhysics(const float Del
 	{
 		TargetRotation.Yaw = UAlsMath::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
 			ImpactReactionState.TargetYawAngle, DeltaTime,
-			Character->ALSXTSettings->ImpactReaction.RotationInterpolationSpeed);
+			ImpactReactionSettings.RotationInterpolationSpeed);
 
 		Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);
 	}

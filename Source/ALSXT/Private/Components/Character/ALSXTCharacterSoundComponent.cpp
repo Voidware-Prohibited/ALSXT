@@ -127,7 +127,7 @@ FALSXTCharacterActionSound UALSXTCharacterSoundComponent::SelectActionSound(UALS
 	FALSXTCharacterActionSound SelectedActionSound;
 
 	// Return is there are no sounds
-	if (ActionSounds.Num() < 1 || !ActionSounds[0].Sound.Sound.Sound)
+	if (ActionSounds.Num() < 1 || !ActionSounds[0].CharacterSound.Sound.Sound)
 	{
 		return SelectedActionSound;
 	}
@@ -147,7 +147,7 @@ FALSXTCharacterActionSound UALSXTCharacterSoundComponent::SelectActionSound(UALS
 	}
 
 	// Return if Return is there are no filtered sounds
-	if (FilteredActionSounds.Num() < 1 || !FilteredActionSounds[0].Sound.Sound.Sound)
+	if (FilteredActionSounds.Num() < 1 || !FilteredActionSounds[0].CharacterSound.Sound.Sound)
 	{
 		return SelectedActionSound;
 	}
@@ -236,18 +236,18 @@ void UALSXTCharacterSoundComponent::PlayActionSound(const FGameplayTag& Overlay,
 	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
 	FALSXTCharacterActionSound Sound = SelectActionSound(Settings, Overlay, Strength, Stamina);
 
-	if (!IsValid(Sound.Sound.Sound.Sound))
+	if (!IsValid(Sound.CharacterSound.Sound.Sound))
 	{
 		return;
 	}
 
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
-		MulticastPlaySound(Sound.Sound);
+		MulticastPlaySound(Sound.CharacterSound);
 	}
 	else
 	{
-		ServerPlaySound(Sound.Sound);
+		ServerPlaySound(Sound.CharacterSound);
 	}
 }
 

@@ -19,4 +19,7 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void GetVoiceInfo(const FGameplayTag& Sex, const FGameplayTag& VoiceVariant, float& Speed, float& Pitch);
 
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
+  void BumpReaction(FGameplayTag Gait, FGameplayTag Side, FGameplayTag Form);
+
 };

@@ -34,7 +34,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
 
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
@@ -42,7 +41,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTGeneralImpactReactionSettings ImpactReactionSettings;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTImpactReactionParameters ImpactReactionParameters;
 
 	void ObstacleTrace();
@@ -57,62 +55,137 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
 	float GetStamina();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanReact();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldPerformResponse();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	TSubclassOf<AActor> GetImpactReactionParticleActor(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	USoundBase* GetImpactReactionSound(FDoubleHitResult Hit);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTImpactReactionState ImpactReactionState;
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void BumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void ImpactReaction(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void AttackReaction(FAttackDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void SyncedAttackReaction(FAttackDoubleHitResult Hit, const FGameplayTag& Overlay, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, int Index);
 
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void BodyFallReaction(FAttackDoubleHitResult Hit);
+
 protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	// Parameters
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UAnimMontage* SelectBumpReactionMontage(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectAttackReactionMontage(FAttackDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectImpactReactionMontage(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	FSyncedAttackAnimation GetSyncedMontage(const FGameplayTag& Overlay, FAttackDoubleHitResult Hit, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, int Index);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UAnimMontage* SelectFallMontage(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UAnimMontage* SelectFallenPose(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UAnimMontage* SelectGetUpMontage(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectResponseMontage(FAttackDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UALSXTImpactReactionSettings* SelectImpactReactionSettings(const FGameplayTag& Location);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UALSXTAttackReactionSettings* SelectAttackReactionSettings(const FGameplayTag& Location);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	// Settings
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldSpawnParticleActor(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldSpawnParticleActorModeration(FDoubleHitResult Hit);
+
+	// Main Sequence
+
+	void SyncedReaction();
+
+	void Fall();
+
+	void FallLand();
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void GeUp();
+
+	void AttackResponse();
+
+	// Hooks 
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSpawnParticleActor(const FDoubleHitResult& Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnAttackReactionStarted(FAttackDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void OnAttackReactionFinished(FAttackDoubleHitResult Hit, const FGameplayTag& AttackMode);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnImpactReactionStarted(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSyncedReactionStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSyncedReactionEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnFallStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnFallLand();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnGetUpStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnGetUpEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnResponseStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnResponseEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnABumpReactionFinished(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnAttackReactionFinished(FAttackDoubleHitResult Hit, const FGameplayTag& AttackMode);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnImpactReactionFinished(FDoubleHitResult Hit);
 
 	// Desired UnarmedAttack
@@ -131,11 +204,19 @@ private:
 
 	bool IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const;
 
+	void StartBumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
+
 	void StartAttackReaction(FAttackDoubleHitResult Hit);
 
 	void StartSyncedAttackReaction(FAttackDoubleHitResult Hit);
 	
 	void StartImpactReaction(FDoubleHitResult Hit);
+
+	void StartFall(FDoubleHitResult Hit);
+
+	void StartGetUp(FDoubleHitResult Hit);
+
+	void StartResponse(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerAttackReaction(FAttackDoubleHitResult Hit);
@@ -170,11 +251,11 @@ private:
 	void RefreshImpactReactionPhysics(float DeltaTime);
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
 	void StopImpactReaction();
 
 protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Hooks")
 	void OnImpactReactionEnded();
 
 };

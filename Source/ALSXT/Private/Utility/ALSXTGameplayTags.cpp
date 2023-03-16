@@ -203,8 +203,9 @@ namespace ALSXTImpactSideTags
 	UE_DEFINE_GAMEPLAY_TAG(Back, TEXT("Als.Impact Side.Back"))
 	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Impact Side.Left"))
 	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Impact Side.Right"))
-	UE_DEFINE_GAMEPLAY_TAG(Above, TEXT("Als.Impact Side.Above"))
-	UE_DEFINE_GAMEPLAY_TAG(Below, TEXT("Als.Impact Side.Below"))
+	UE_DEFINE_GAMEPLAY_TAG(High, TEXT("Als.Impact Side.High"))
+	UE_DEFINE_GAMEPLAY_TAG(Middle, TEXT("Als.Impact Side.Middle"))
+	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Impact Side.Low"))
 }
 
 namespace ALSXTImpactSurfaceTags

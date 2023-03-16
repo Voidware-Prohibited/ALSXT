@@ -81,17 +81,17 @@ public:
 	FVector2D PlayRate{1.0f, 1.0f};
 
 public:
-	float CalculateStartTime(float ImpactHeight) const;
+	float CalculateStartTime(float ImpactHeight, float RefHeight, float Start) const;
 
-	float CalculatePlayRate(float ImpactHeight) const;
+	float CalculatePlayRate(float ImpactHeight, float RefHeight, float Rate) const;
 };
 
-inline float UALSXTImpactReactionSettings::CalculateStartTime(const float ImpactHeight) const
+inline float UALSXTImpactReactionSettings::CalculateStartTime(const float ImpactHeight, float RefHeight, float Start) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, ImpactHeight);
 }
 
-inline float UALSXTImpactReactionSettings::CalculatePlayRate(const float ImpactHeight) const
+inline float UALSXTImpactReactionSettings::CalculatePlayRate(const float ImpactHeight, float RefHeight, float Rate) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, ImpactHeight);
 }
@@ -122,8 +122,17 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180))
 	float RotationOffset{ 45.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FActionMontageInfo FallbackDefaultMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TArray<TEnumAsByte<EObjectTypeQuery>> BumpTraceObjectTypes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TArray<TEnumAsByte<EObjectTypeQuery>> ImpactTraceObjectTypes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", meta=(TitleProperty="{Settings}", ForceInlineRow))
+	TMap<FName, FBoneLocationEntry> BoneLocationMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FImpactReactionLocation> ImpactReactionLocations;
