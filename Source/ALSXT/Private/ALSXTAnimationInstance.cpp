@@ -62,10 +62,10 @@ bool UALSXTAnimationInstance::IsSpineRotationAllowed()
 
 bool UALSXTAnimationInstance::IsRotateInPlaceAllowed()
 {
-	return (ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming || ALSXTCharacter->GetViewMode() == AlsViewModeTags::FirstPerson) && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
+	return (ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming || ALSXTCharacter->GetViewMode() == AlsViewModeTags::FirstPerson);
 }
 
 bool UALSXTAnimationInstance::IsTurnInPlaceAllowed()
 {
-	return (ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::LookingDirection && ALSXTCharacter->GetViewMode() != AlsViewModeTags::FirstPerson) && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
+	return (ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::LookingDirection && ALSXTCharacter->GetViewMode() != AlsViewModeTags::FirstPerson);
 }

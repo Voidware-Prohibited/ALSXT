@@ -652,13 +652,13 @@ void AALSXTCharacter::ActivateFreelooking()
 	PreviousPitch = FMath::GetMappedRangeValueClamped(FVector2D(89.900002, -89.899994), FVector2D(0.0, 1.0), GetViewState().Rotation.Pitch);
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("%f"), GetControlRotation().Yaw));
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), PreviousYaw));
-	LockRotation(GetActorRotation().Yaw);
+	// LockRotation(GetActorRotation().Yaw);
 	SetDesiredFreelooking(ALSXTFreelookingTags::True);
 }
 
 void AALSXTCharacter::DeactivateFreelooking()
 {
-	UnLockRotation();
+	// UnLockRotation();
 	SetDesiredFreelooking(ALSXTFreelookingTags::False);
 }
 
