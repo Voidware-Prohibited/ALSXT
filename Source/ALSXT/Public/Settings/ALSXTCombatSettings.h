@@ -116,8 +116,26 @@ struct ALSXT_API FALSXTGeneralCombatSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAllowCombat{ true };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableCombat{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableAttacks{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableSyncedAttacks{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableSpecials{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableGrapples{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableThrows{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableTakedowns{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FLinearColor HighlightColor { 1.0f, 0.0f, 1.0f, 1.0 };
@@ -128,25 +146,25 @@ struct ALSXT_API FALSXTGeneralCombatSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FVector	TraceAreaHalfSize { 400.0f, 400.0f, 150.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (Units = "cm", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Target Lock", Meta = (Units = "cm", AllowPrivateAccess))
 	float MaxInitialLockDistance { 1000.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (Units = "cm", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Target Lock", Meta = (Units = "cm", AllowPrivateAccess))
 	float MaxLockDistance { 1000.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Target Lock", Meta = (AllowPrivateAccess))
 	bool UnlockWhenTargetIsObstructed { true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObstructionTraceObjectTypes;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Debug", Meta = (AllowPrivateAccess))
 	bool DebugMode {false};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Debug", Meta = (AllowPrivateAccess))
 	float DebugDuration { 4.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -119,12 +119,22 @@ FGameplayTag UALSXTCharacterSoundComponent::ConvertStaminaToStaminaTag(const flo
 
 FALSXTCharacterActionSound UALSXTCharacterSoundComponent::SelectActionSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
 {
+	// TArray<FALSXTCharacterActionSound> ActionSounds = Settings->ActionSounds;
+	// TArray<FALSXTCharacterActionSound> FilteredActionSounds = Settings->ActionSounds;
+	// FGameplayTag StaminaTag = ConvertStaminaToStaminaTag(Stamina);
+	// TArray<FGameplayTag> TagsArray = {Strength, StaminaTag};
+	// FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+	// FALSXTCharacterActionSound SelectedActionSound;
+
+	FGameplayTagContainer TagsContainer;
 	TArray<FALSXTCharacterActionSound> ActionSounds = Settings->ActionSounds;
-	TArray<FALSXTCharacterActionSound> FilteredActionSounds = Settings->ActionSounds;
+	TArray<FALSXTCharacterActionSound> FilteredActionSounds;
 	FGameplayTag StaminaTag = ConvertStaminaToStaminaTag(Stamina);
-	TArray<FGameplayTag> TagsArray = {Strength, StaminaTag};
-	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+	FGameplayTagContainer StaminaTags;
+	FGameplayTagContainer StrengthTags;
 	FALSXTCharacterActionSound SelectedActionSound;
+	TagsContainer.AppendTags(StaminaTags);
+	TagsContainer.AppendTags(StrengthTags);
 
 	// Return is there are no sounds
 	if (ActionSounds.Num() < 1 || !ActionSounds[0].CharacterSound.Sound.Sound)
@@ -135,10 +145,13 @@ FALSXTCharacterActionSound UALSXTCharacterSoundComponent::SelectActionSound(UALS
 	// Filter sounds based on Tag parameters
 	for (auto ActionSound : ActionSounds)
 	{
-		TArray<FGameplayTag> CurrentTagsArray;
-		CurrentTagsArray.Append(ActionSound.Strength);
-		CurrentTagsArray.Append(ActionSound.Stamina);
-		FGameplayTagContainer CurrentTagsContainer = FGameplayTagContainer::CreateFromArray(CurrentTagsArray);
+		// TArray<FGameplayTag> CurrentTagsArray;
+		// CurrentTagsArray.Append(ActionSound.Strength);
+		// CurrentTagsArray.Append(ActionSound.Stamina);
+		// FGameplayTagContainer CurrentTagsContainer = FGameplayTagContainer::CreateFromArray(CurrentTagsArray);
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(ActionSound.Strength);
+		CurrentTagsContainer.AppendTags(ActionSound.Stamina);	
 		
 		if (CurrentTagsContainer.HasAllExact(TagsContainer))
 		{

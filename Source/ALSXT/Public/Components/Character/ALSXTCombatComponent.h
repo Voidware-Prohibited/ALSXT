@@ -27,8 +27,15 @@ public:
 
 	UEnhancedInputComponent* EnhancedInputComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputAction> PrimaryAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input", Meta = (AllowPrivateAccess))
+	TObjectPtr<UInputAction> SecondaryAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input", Meta = (AllowPrivateAccess))
+	TObjectPtr<UInputAction> BlockAction;
+
 
 	virtual void InputPrimaryAction();
 
@@ -40,16 +47,16 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
 
-	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 
-	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	UAlsCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target Lock", Meta = (AllowPrivateAccess))
 	FTargetHitResultEntry CurrentTarget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
@@ -64,89 +71,89 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
 	float GetStamina();
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	float GetAngle(FVector Target);
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void TryTraceForTargets();
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void TraceForTargets(TArray<FTargetHitResultEntry>& Targets);
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	bool IsTartgetObstructed();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintImplementableEvent, Category = "Target Lock")
 	void OnTargetObstructed();
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void GetClosestTarget();
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void SetCurrentTarget(const FTargetHitResultEntry& NewTarget);
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void ClearCurrentTarget();
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void DisengageAllTargets();
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void GetTargetLeft();
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void GetTargetRight();
 
-	UFUNCTION(BlueprintCallable, Category = "ALSXT|Target Lock")
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void RotatePlayerToTarget(FTargetHitResultEntry Target);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanAttack();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanGrapple();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanBeGrappled();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanThrow();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanBeThrown();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanPerformTakedown();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanBeTakenDown();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanPerformSpecialAttack();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTCombatState CombatState;
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "Attack")
 	AActor* TraceForPotentialAttackTarget(float Distance);
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "Attack")
 	void Attack(const FGameplayTag& AttackType, const FGameplayTag& Strength, float BaseDamage, float PlayRate = 1.0f);
 
 protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	void DetermineAttackMethod(FGameplayTag& AttackMethod, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectAttackMontage(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	void GetSyncedAttackMontageInfo(FSyncedActionMontageInfo& SyncedActionMontageInfo, const FGameplayTag& AttackType, int32 Index);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UALSXTCombatSettings* SelectAttackSettings();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnAttackStarted(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float& BaseDamage);
 
 	// Desired Attack
@@ -188,10 +195,10 @@ private:
 	void RefreshAttackPhysics(float DeltaTime);
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "Attack")
 	void StopAttack();
 
 protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Hooks")
 	void OnAttackEnded();
 };

@@ -124,6 +124,12 @@ namespace ALSXTStatusTags
 	UE_DEFINE_GAMEPLAY_TAG(Dead, TEXT("Als.Status.Dead"))
 }
 
+namespace ALSXTFacialExpressionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Als.Facial Expression.None"))
+	UE_DEFINE_GAMEPLAY_TAG(Happy, TEXT("Als.Facial Expression.Happy"))
+}
+
 namespace ALSXTFreelookingTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(False, TEXT("Als.Freelooking.False"))
@@ -213,6 +219,24 @@ namespace ALSXTImpactSurfaceTags
 	UE_DEFINE_GAMEPLAY_TAG(Cloth, TEXT("Als.Impact Surface.Cloth"))
 }
 
+namespace ALSXTBloodSpatterVelocityTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Als.Blood Spatter Velocity.None"))
+	UE_DEFINE_GAMEPLAY_TAG(Slow, TEXT("Als.Blood Spatter Velocity.Slow"))
+	UE_DEFINE_GAMEPLAY_TAG(Moderate, TEXT("Als.Blood Spatter Velocity.Moderate"))
+	UE_DEFINE_GAMEPLAY_TAG(Fast, TEXT("Als.Blood Spatter Velocity.Fast"))
+	UE_DEFINE_GAMEPLAY_TAG(TerminalVelocity, TEXT("Als.Blood Spatter Velocity.Terminal Velocity"))
+}
+
+namespace ALSXTBloodSpatterVolumeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Small, TEXT("Als.Blood Spatter Volume.Small"))
+	UE_DEFINE_GAMEPLAY_TAG(Medium, TEXT("Als.Blood Spatter Volume.Medium"))
+	UE_DEFINE_GAMEPLAY_TAG(Large, TEXT("Als.Blood Spatter Volume.Large"))
+	UE_DEFINE_GAMEPLAY_TAG(ExtraLarge, TEXT("Als.Blood Spatter Volume.Extra Large"))
+	UE_DEFINE_GAMEPLAY_TAG(Max, TEXT("Als.Blood Spatter Volume.Max"))
+}
+
 namespace ALSXTBloodSpatterDistanceTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(LessThanTwo, TEXT("Als.Blood Spatter Distance.Less than Two"))
@@ -221,15 +245,33 @@ namespace ALSXTBloodSpatterDistanceTags
 	UE_DEFINE_GAMEPLAY_TAG(Max, TEXT("Als.Blood Spatter Distance.Max"))
 }
 
+namespace ALSXTHealthTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Game.Health.None"))
+	UE_DEFINE_GAMEPLAY_TAG(Little, TEXT("Game.Health.Little"))
+	UE_DEFINE_GAMEPLAY_TAG(Moderate, TEXT("Game.Health.Moderate"))
+	UE_DEFINE_GAMEPLAY_TAG(Most, TEXT("Game.Health.Most"))
+	UE_DEFINE_GAMEPLAY_TAG(All, TEXT("Game.Health.All"))
+}
+
+namespace ALSXTDamageAmountTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Game.Damage Amount.None"))
+	UE_DEFINE_GAMEPLAY_TAG(Little, TEXT("Game.Damage Amount.Little"))
+	UE_DEFINE_GAMEPLAY_TAG(Moderate, TEXT("Game.Damage Amount.Moderate"))
+	UE_DEFINE_GAMEPLAY_TAG(Most, TEXT("Game.Damage Amount.Most"))
+	UE_DEFINE_GAMEPLAY_TAG(All, TEXT("Game.Damage Amount.All"))
+}
+
 namespace ALSXTDamageTypeTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Impact, TEXT("Game.Damge Type.Impact"))
-	UE_DEFINE_GAMEPLAY_TAG(Edge, TEXT("Game.Damge Type.Edge"))
-	UE_DEFINE_GAMEPLAY_TAG(Burn, TEXT("Game.Damge Type.Burn"))
-	UE_DEFINE_GAMEPLAY_TAG(Explosion, TEXT("Game.Damge Type.Explosion"))
-	UE_DEFINE_GAMEPLAY_TAG(Gas, TEXT("Game.Damge Type.Gas"))
-	UE_DEFINE_GAMEPLAY_TAG(Poison, TEXT("Game.Damge Type.Poison"))
-	UE_DEFINE_GAMEPLAY_TAG(Illness, TEXT("Game.Damge Type.Illness"))
+	UE_DEFINE_GAMEPLAY_TAG(Impact, TEXT("Game.Damage Type.Impact"))
+	UE_DEFINE_GAMEPLAY_TAG(Edge, TEXT("Game.Damage Type.Edge"))
+	UE_DEFINE_GAMEPLAY_TAG(Burn, TEXT("Game.Damage Type.Burn"))
+	UE_DEFINE_GAMEPLAY_TAG(Explosion, TEXT("Game.Damage Type.Explosion"))
+	UE_DEFINE_GAMEPLAY_TAG(Gas, TEXT("Game.Damage Type.Gas"))
+	UE_DEFINE_GAMEPLAY_TAG(Poison, TEXT("Game.Damage Type.Poison"))
+	UE_DEFINE_GAMEPLAY_TAG(Illness, TEXT("Game.Damage Type.Illness"))
 }
 
 namespace ALSXTLocomotionVariantTags

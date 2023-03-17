@@ -567,6 +567,26 @@ UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FG
 
 	UALSXTCombatSettings* Settings = SelectAttackSettings();
 
+	TArray<FGameplayTag> TagsArray = { AttackType, Stance, Strength };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+	// TArray<FALSXTCharacterActionSound> ActionSounds = Settings->ActionSounds;
+	// TArray<FALSXTCharacterActionSound> FilteredActionSounds;
+	//FGameplayTag StaminaTag = ConvertStaminaToStaminaTag(Stamina);
+	//TArray<FALSXTCharacterActionSound> AttackAnimations = Settings->AttackAnimations;
+	//TArray<FALSXTCharacterActionSound> FilteredAttackAnimations;
+	//FALSXTCharacterActionSound SelectedAttackAnimation;
+
+	// Return is there are no sounds
+	// if (AttackAnimations.Num() < 1 || !AttackAnimations[0].CharacterSound.Sound.Sound)
+	// {
+	// 	return SelectedAttackAnimation;
+	// }
+
+	// for (auto AttackAnimation : AttackAnimations)
+	// {
+	// 
+	// }
+
 	for (int i = 0; i < Settings->AttackTypes.Num(); ++i)
 		{
 			if (Settings->AttackTypes[i].AttackType == AttackType)
