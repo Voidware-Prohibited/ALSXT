@@ -573,6 +573,9 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	UALSXTVaultingSettings* SelectVaultingSettings(EAlsMantlingType MantlingType);
 
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	FVaultAnimation SelectVaultingMontage(const FGameplayTag& VaultingType);
+
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	void OnVaultingStarted(const FALSXTVaultingParameters& Parameters);
 

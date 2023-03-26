@@ -154,10 +154,23 @@ bool AALSXTCharacter::TryStartVaultingInAir()
 bool AALSXTCharacter::IsVaultingAllowedToStart_Implementation() const
 {
 	return !LocomotionAction.IsValid();
+
+	// return !GetLocomotionAction().IsValid() ||
+	// 	// ReSharper disable once CppRedundantParentheses
+	// 	(GetLocomotionAction() == AlsLocomotionActionTags::Sliding &&
+	// 		!GetMesh()->GetAnimInstance()->Montage_IsPlaying(VaultingAnimation.Montage.Montage));
 }
 
 bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceSettings)
 {
+	
+	FVaultAnimation VaultingAnimation{ SelectVaultingMontage(ALSXTVaultTypeTags::LowRunning) };
+
+	// if (!ALSXTSettings->Vaulting.bAllowVaulting || GetLocalRole() <= ROLE_SimulatedProxy || !IsVaultingAllowedToStart(VaultingAnimation))
+	// {
+	// 	return false;
+	// }
+
 	if (!ALSXTSettings->Vaulting.bAllowVaulting || GetLocalRole() <= ROLE_SimulatedProxy || !IsVaultingAllowedToStart())
 	{
 		return false;
@@ -631,6 +644,12 @@ void AALSXTCharacter::StartVaultingImplementation(const FALSXTVaultingParameters
 UALSXTVaultingSettings* AALSXTCharacter::SelectVaultingSettings_Implementation(EAlsMantlingType VaultingType)
 {
 	return nullptr;
+}
+
+FVaultAnimation AALSXTCharacter::SelectVaultingMontage_Implementation(const FGameplayTag& VaultingType)
+{
+	FVaultAnimation VaultAnimation;
+	return VaultAnimation;
 }
 
 void AALSXTCharacter::OnVaultingStarted_Implementation(const FALSXTVaultingParameters& Parameters) {}

@@ -140,6 +140,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	void Attack(const FGameplayTag& AttackType, const FGameplayTag& Strength, float BaseDamage, float PlayRate = 1.0f);
 
+	FALSXTCombatParameters CombatParameters;
+
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	void DetermineAttackMethod(FGameplayTag& AttackMethod, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target);

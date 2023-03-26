@@ -42,7 +42,7 @@ void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float Simulati
 		return;
 	}
 
-	const auto AttackTime{GetTime() * CombatSettings->CalculatePlayRate(AttackHeight)};
+	const auto AttackTime{GetTime() * CombatSettings->CalculatePlayRate(CombatSettings->CurrentActionMontage.ReferenceHeight, CombatSettings->CurrentActionMontage.PlayRate, AttackHeight)};
 
 	// Calculate target transform from the stored relative transform to follow along with moving objects.
 
@@ -56,7 +56,7 @@ void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float Simulati
 	FVector LocationOffset;
 	FRotator RotationOffset;
 
-	const auto BlendInAmount{CombatSettings->BlendInCurve->GetFloatValue(AttackTime)};
+	const auto BlendInAmount{CombatSettings->CurrentActionMontage.BlendInCurve->GetFloatValue(AttackTime)};
 
 	if (!FAnimWeight::IsRelevant(BlendInAmount))
 	{
@@ -66,8 +66,8 @@ void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float Simulati
 	else
 	{
 		const FVector3f InterpolationAndCorrectionAmounts{
-			CombatSettings->InterpolationAndCorrectionAmountsCurve->GetVectorValue(
-				AttackTime + CombatSettings->CalculateStartTime(AttackHeight))
+			CombatSettings->CurrentActionMontage.InterpolationAndCorrectionAmountsCurve->GetVectorValue(
+				AttackTime + CombatSettings->CalculateStartTime(CombatSettings->CurrentActionMontage.ReferenceHeight, CombatSettings->CurrentActionMontage.StartTime, AttackHeight))
 		};
 
 		const auto InterpolationAmount{InterpolationAndCorrectionAmounts.X};
@@ -83,8 +83,8 @@ void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float Simulati
 		{
 			// Calculate the animation offset. This would be the location the actual animation starts at relative to the target transform.
 
-			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * CombatSettings->StartRelativeLocation.X};
-			AnimationLocationOffset.Z = CombatSettings->StartRelativeLocation.Z;
+			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * CombatSettings->CurrentActionMontage.StartRelativeLocation.X};
+			AnimationLocationOffset.Z = CombatSettings->CurrentActionMontage.StartRelativeLocation.Z;
 			AnimationLocationOffset *= Character.GetMesh()->GetComponentScale().Z;
 
 			// Blend into the animation offset and final offset at the same time.

@@ -41,40 +41,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
 	TArray<FSyncedAttackAnimation> SyncedAttackAnimations;
 
-	// Mantling time to blend in amount curve.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UCurveFloat> BlendInCurve;
-
-	// Mantling time to interpolation, horizontal and vertical correction amounts curve.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UCurveVector> InterpolationAndCorrectionAmountsCurve;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
-	FVector2D ReferenceHeight{50.0f, 100.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
-	FVector2D StartTime{0.5f, 0.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
-	FVector2D PlayRate{1.0f, 1.0f};
+	FActionMontageInfo CurrentActionMontage;
 
 public:
-	float CalculateStartTime(float UnarmedAttackHeight) const;
+	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float AttackHeight) const;
 
-	float CalculatePlayRate(float UnarmedAttackHeight) const;
+	float CalculatePlayRate(FVector2D ReferenceHeight, FVector2D PlayRate, float AttackHeight) const;
 };
 
-inline float UALSXTCombatSettings::CalculateStartTime(const float UnarmedAttackHeight) const
+inline float UALSXTCombatSettings::CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, const float AttackHeight) const
 {
-	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, UnarmedAttackHeight);
+	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, AttackHeight);
 }
 
-inline float UALSXTCombatSettings::CalculatePlayRate(const float UnarmedAttackHeight) const
+inline float UALSXTCombatSettings::CalculatePlayRate(FVector2D ReferenceHeight, FVector2D PlayRate, const float AttackHeight) const
 {
-	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, UnarmedAttackHeight);
+	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, AttackHeight);
 }
 
 USTRUCT(BlueprintType)
@@ -154,6 +136,9 @@ struct ALSXT_API FALSXTGeneralCombatSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Target Lock", Meta = (AllowPrivateAccess))
 	bool UnlockWhenTargetIsObstructed { true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<TEnumAsByte<EObjectTypeQuery>> TargetTraceObjectTypes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObstructionTraceObjectTypes;
