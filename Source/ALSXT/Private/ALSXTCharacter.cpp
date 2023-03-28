@@ -467,6 +467,40 @@ bool AALSXTCharacter::IsAimingDownSights_Implementation() const
 	return (IsDesiredAiming() && CanAimDownSights() && (GetViewMode() == AlsViewModeTags::FirstPerson) && (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral));
 }
 
+// Vaulting State
+void AALSXTCharacter::SetVaultingState(const FALSXTVaultingState& NewVaultingState)
+{
+	const auto PreviousVaultingState{ VaultingState };
+
+	VaultingState = NewVaultingState;
+
+	OnVaultingStateChanged(PreviousVaultingState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetVaultingState(NewVaultingState);
+	}
+}
+
+void AALSXTCharacter::ServerSetVaultingState_Implementation(const FALSXTVaultingState& NewVaultingState)
+{
+	SetVaultingState(NewVaultingState);
+}
+
+
+void AALSXTCharacter::ServerProcessNewVaultingState_Implementation(const FALSXTVaultingState& NewVaultingState)
+{
+	ProcessNewVaultingState(NewVaultingState);
+}
+
+void AALSXTCharacter::OnReplicate_VaultingState(const FALSXTVaultingState& PreviousVaultingState)
+{
+	OnVaultingStateChanged(PreviousVaultingState);
+}
+
+void AALSXTCharacter::OnVaultingStateChanged_Implementation(const FALSXTVaultingState& PreviousVaultingState) {}
+
+// Footprints State
 void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
 {
 	const auto PreviousFootprintsState{ FootprintsState };

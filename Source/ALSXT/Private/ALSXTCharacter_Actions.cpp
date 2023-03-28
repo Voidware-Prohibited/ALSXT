@@ -17,6 +17,7 @@
 #include "Utility/AlsConstants.h"
 #include "Utility/AlsMacros.h"
 #include "Utility/AlsMath.h"
+#include "Utility/ALSXTGameplayTags.h"
 #include "Utility/AlsUtility.h"
 
 void AALSXTCharacter::TryStartSliding(const float PlayRate)
@@ -151,31 +152,18 @@ bool AALSXTCharacter::TryStartVaultingInAir()
 	       TryStartVaulting(ALSXTSettings->Vaulting.InAirTrace);
 }
 
-bool AALSXTCharacter::IsVaultingAllowedToStart_Implementation() const
+bool AALSXTCharacter::IsVaultingAllowedToStart_Implementation(FVaultAnimation VaultAnimation) const
 {
-	return !LocomotionAction.IsValid();
+	// return !LocomotionAction.IsValid();
 
-	// return !GetLocomotionAction().IsValid() ||
-	// 	// ReSharper disable once CppRedundantParentheses
-	// 	(GetLocomotionAction() == AlsLocomotionActionTags::Sliding &&
-	// 		!GetMesh()->GetAnimInstance()->Montage_IsPlaying(VaultingAnimation.Montage.Montage));
+	return !GetLocomotionAction().IsValid() ||
+		// ReSharper disable once CppRedundantParentheses
+		(GetLocomotionAction() == AlsLocomotionActionTags::Vaulting &&
+			!GetMesh()->GetAnimInstance()->Montage_IsPlaying(VaultAnimation.Montage.Montage));
 }
 
 bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceSettings)
 {
-	
-	FVaultAnimation VaultingAnimation{ SelectVaultingMontage(ALSXTVaultTypeTags::LowRunning) };
-
-	// if (!ALSXTSettings->Vaulting.bAllowVaulting || GetLocalRole() <= ROLE_SimulatedProxy || !IsVaultingAllowedToStart(VaultingAnimation))
-	// {
-	// 	return false;
-	// }
-
-	if (!ALSXTSettings->Vaulting.bAllowVaulting || GetLocalRole() <= ROLE_SimulatedProxy || !IsVaultingAllowedToStart())
-	{
-		return false;
-	}
-
 	const auto ActorLocation{GetActorLocation()};
 	const auto ActorYawAngle{UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(GetActorRotation().Yaw))};
 
@@ -474,12 +462,23 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	// Parameters.VaultingHeight = UE_REAL_TO_FLOAT(TargetLocation.Z);
 
 	// Determine the Vaulting type by checking the movement mode and Vaulting height.
+	// TODO Expand this
 
+	Parameters.LocomotionMode = GetLocomotionMode();
+	Parameters.Gait = GetGait();
 	Parameters.VaultingType = LocomotionMode != AlsLocomotionModeTags::Grounded
-		                          ? EAlsMantlingType::InAir
+		                          ? ALSXTVaultTypeTags::InAir
 		                          : Parameters.VaultingHeight > ALSXTSettings->Vaulting.VaultingHighHeightThreshold
-		                          ? EAlsMantlingType::High
-		                          : EAlsMantlingType::Low;
+		                          ? ALSXTVaultTypeTags::High
+		                          : ALSXTVaultTypeTags::Low;
+
+	FVaultAnimation VaultingAnimation{ SelectVaultingMontage(GetLocomotionMode(), Stance, GetDesiredGait(), Parameters.VaultingType) };
+	Parameters.VaultAnimation = VaultingAnimation;
+
+	if (!ALSXTSettings->Vaulting.bAllowVaulting || GetLocalRole() <= ROLE_SimulatedProxy || !IsVaultingAllowedToStart(VaultingAnimation))
+	{
+		return false;
+	}
 
 	// If the target primitive can't move, then use world coordinates to save
 	// some performance by skipping some coordinate space transformations later.
@@ -516,6 +515,9 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		Parameters.TargetRelativeRotation = TargetRotation.Rotator();
 
 	}
+	FALSXTVaultingState NewVaultingState;
+	NewVaultingState.VaultingParameters = Parameters;
+	SetVaultingState(NewVaultingState);
 
 	if (GetLocalRole() >= ROLE_Authority)
 	{
@@ -534,7 +536,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 
 void AALSXTCharacter::ServerStartVaulting_Implementation(const FALSXTVaultingParameters& Parameters)
 {
-	if (IsVaultingAllowedToStart())
+	if (IsVaultingAllowedToStart(Parameters.VaultAnimation))
 	{
 		MulticastStartVaulting(Parameters);
 		ForceNetUpdate();
@@ -548,28 +550,34 @@ void AALSXTCharacter::MulticastStartVaulting_Implementation(const FALSXTVaulting
 
 void AALSXTCharacter::StartVaultingImplementation(const FALSXTVaultingParameters& Parameters)
 {
-	if (!IsVaultingAllowedToStart())
+	if (!IsVaultingAllowedToStart(Parameters.VaultAnimation))
 	{
 		return;
 	}
 
 	auto* VaultingSettings{SelectVaultingSettings(Parameters.VaultingType)};
 
-	if (!ALS_ENSURE(IsValid(VaultingSettings)) ||
-	    !ALS_ENSURE(IsValid(VaultingSettings->BlendInCurve)) ||
-	    !ALS_ENSURE(IsValid(VaultingSettings->InterpolationAndCorrectionAmountsCurve)))
+	// if (!ALS_ENSURE(IsValid(VaultingSettings)) ||
+	//     !ALS_ENSURE(IsValid(VaultingSettings->BlendInCurve)) ||
+	//     !ALS_ENSURE(IsValid(VaultingSettings->InterpolationAndCorrectionAmountsCurve)))
+	// {
+	// 	return;
+	// }
+
+	if (!ALS_ENSURE(IsValid(VaultingState.VaultingParameters.VaultAnimation.Montage.BlendInCurve)) ||
+		!ALS_ENSURE(IsValid(VaultingState.VaultingParameters.VaultAnimation.Montage.InterpolationAndCorrectionAmountsCurve)))
 	{
 		return;
 	}
 
-	const auto StartTime{VaultingSettings->GetStartTimeForHeight(Parameters.VaultingHeight)};
-	const auto PlayRate{VaultingSettings->GetPlayRateForHeight(Parameters.VaultingHeight)};
+	const auto StartTime{VaultingSettings->GetStartTimeForHeight(VaultingState.VaultingParameters.VaultAnimation.Montage.ReferenceHeight, VaultingState.VaultingParameters.VaultAnimation.Montage.StartTime, Parameters.VaultingHeight)};
+	const auto PlayRate{VaultingSettings->GetPlayRateForHeight(VaultingState.VaultingParameters.VaultAnimation.Montage.ReferenceHeight, VaultingState.VaultingParameters.VaultAnimation.Montage.PlayRate, Parameters.VaultingHeight)};
 
 	// Calculate Vaulting duration.
 
 	auto MinTime{0.0f};
 	auto MaxTime{0.0f};
-	VaultingSettings->InterpolationAndCorrectionAmountsCurve->GetTimeRange(MinTime, MaxTime);
+	VaultingState.VaultingParameters.VaultAnimation.Montage.InterpolationAndCorrectionAmountsCurve->GetTimeRange(MinTime, MaxTime);
 
 	const auto Duration{MaxTime - StartTime};
 
@@ -619,18 +627,18 @@ void AALSXTCharacter::StartVaultingImplementation(const FALSXTVaultingParameters
 
 	// Play the animation montage if valid.
 
-	if (ALS_ENSURE(IsValid(VaultingSettings->Montage)))
+	if (ALS_ENSURE(IsValid(Parameters.VaultAnimation.Montage.Montage)))
 	{
 		// TODO Magic. I can't explain why, but this code fixes animation and root motion source desynchronization.
 
 		const auto MontageStartTime{
-			Parameters.VaultingType == EAlsMantlingType::InAir && IsLocallyControlled()
+			(Parameters.VaultingType == ALSXTVaultTypeTags::High || Parameters.VaultingType == ALSXTVaultTypeTags::Fence) && IsLocallyControlled()
 				? StartTime - FMath::GetMappedRangeValueClamped(
-					  FVector2f{VaultingSettings->ReferenceHeight}, {GetWorld()->GetDeltaSeconds(), 0.0f}, Parameters.VaultingHeight)
+					  FVector2f{VaultingState.VaultingParameters.VaultAnimation.Montage.ReferenceHeight}, {GetWorld()->GetDeltaSeconds(), 0.0f}, Parameters.VaultingHeight)
 				: StartTime
 		};
 
-		if (GetMesh()->GetAnimInstance()->Montage_Play(VaultingSettings->Montage, PlayRate,
+		if (GetMesh()->GetAnimInstance()->Montage_Play(Parameters.VaultAnimation.Montage.Montage, PlayRate,
 		                                               EMontagePlayReturnType::MontageLength,
 		                                               MontageStartTime, false))
 		{
@@ -641,15 +649,74 @@ void AALSXTCharacter::StartVaultingImplementation(const FALSXTVaultingParameters
 	OnVaultingStarted(Parameters);
 }
 
-UALSXTVaultingSettings* AALSXTCharacter::SelectVaultingSettings_Implementation(EAlsMantlingType VaultingType)
+UALSXTVaultingSettings* AALSXTCharacter::SelectVaultingSettings_Implementation(const FGameplayTag& VaultingType)
 {
 	return nullptr;
 }
 
-FVaultAnimation AALSXTCharacter::SelectVaultingMontage_Implementation(const FGameplayTag& VaultingType)
+FVaultAnimation AALSXTCharacter::SelectVaultingMontage_Implementation(const FGameplayTag& CurrentLocomotionMode, const FGameplayTag& CurrentStance, const FGameplayTag& CurrentGait, const FGameplayTag& VaultingType)
 {
-	FVaultAnimation VaultAnimation;
-	return VaultAnimation;
+	TArray<FVaultAnimation> VaultingAnimations = SelectVaultingSettings(VaultingType)->VaultAnimations;
+	TArray<FGameplayTag> TagsArray = { CurrentLocomotionMode, CurrentStance, CurrentGait, VaultingType };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+	TArray<FVaultAnimation> FilteredVaultingAnimations;
+	FVaultAnimation SelectedVaultingAnimation;
+
+	// Return is there are no sounds
+	if (VaultingAnimations.Num() < 1 || !VaultingAnimations[0].Montage.Montage)
+	{
+		return SelectedVaultingAnimation;
+	}
+
+	// Filter sounds based on Tag parameters
+	for (auto VaultingAnimation : VaultingAnimations)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(VaultingAnimation.LocomotionMode);
+		CurrentTagsContainer.AppendTags(VaultingAnimation.Stance);
+		CurrentTagsContainer.AppendTags(VaultingAnimation.Gait);
+		CurrentTagsContainer.AppendTags(VaultingAnimation.VaultType);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredVaultingAnimations.Add(VaultingAnimation);
+		}
+	}
+
+	// Return if Return is there are no filtered sounds
+	if (FilteredVaultingAnimations.Num() < 1 || !FilteredVaultingAnimations[0].Montage.Montage)
+	{
+		return SelectedVaultingAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredVaultingAnimations.Num() > 1)
+	{
+		// If FilteredVaultingAnimations contains LastCharacterVaultingAnimation, remove it from FilteredVaultingAnimations array to avoid duplicates
+		// if (FilteredVaultingAnimations.Contains(LastCharacterVaultingAnimation))
+		// {
+		// 	FilteredVaultingAnimations.Remove(LastCharacterVaultingAnimation);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredVaultingAnimations.Max(); m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredVaultingAnimations.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = rand() % FilteredVaultingAnimations.Max();
+		SelectedVaultingAnimation = FilteredVaultingAnimations[RandIndex];
+		return SelectedVaultingAnimation;
+	}
+	else
+	{
+		SelectedVaultingAnimation = FilteredVaultingAnimations[0];
+		return SelectedVaultingAnimation;
+	}
+
+	return SelectedVaultingAnimation;
 }
 
 void AALSXTCharacter::OnVaultingStarted_Implementation(const FALSXTVaultingParameters& Parameters) {}

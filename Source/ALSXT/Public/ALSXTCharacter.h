@@ -13,6 +13,7 @@
 #include "State/ALSXTFootstepState.h"
 #include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTSlidingState.h"
+#include "State/ALSXTVaultingState.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
@@ -59,6 +60,34 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
+	FALSXTVaultingState VaultingState;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+		const FALSXTVaultingState& GetVaultingState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewVaultingState"))
+		void SetVaultingState(const FALSXTVaultingState& NewVaultingState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewVaultingState"))
+		FALSXTVaultingState ProcessNewVaultingState(const FALSXTVaultingState& NewVaultingState);
+
+	UFUNCTION(Server, Unreliable)
+		void ServerProcessNewVaultingState(const FALSXTVaultingState& NewVaultingState);
+
+private:
+	UFUNCTION(Server, Unreliable)
+		void ServerSetVaultingState(const FALSXTVaultingState& NewVaultingState);
+
+	UFUNCTION()
+		void OnReplicate_VaultingState(const FALSXTVaultingState& PreviousVaultingState);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+		void OnVaultingStateChanged(const FALSXTVaultingState& PreviousVaultingState);
 
 private:
 
@@ -551,7 +580,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
-	bool IsVaultingAllowedToStart() const;
+	bool IsVaultingAllowedToStart(FVaultAnimation VaultAnimation) const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	bool TryStartVaultingGrounded();
@@ -571,10 +600,10 @@ private:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
-	UALSXTVaultingSettings* SelectVaultingSettings(EAlsMantlingType MantlingType);
+	UALSXTVaultingSettings* SelectVaultingSettings(const FGameplayTag& VaultingType);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	FVaultAnimation SelectVaultingMontage(const FGameplayTag& VaultingType);
+	FVaultAnimation SelectVaultingMontage(const FGameplayTag& CurrentLocomotionMode, const FGameplayTag& CurrentStance, const FGameplayTag& CurrentGait, const FGameplayTag& VaultingType);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	void OnVaultingStarted(const FALSXTVaultingParameters& Parameters);
@@ -1309,6 +1338,11 @@ protected:
 	void OnWeaponObstructionChanged(const FGameplayTag& PreviousWeaponObstructionTag);
 
 };
+
+inline const FALSXTVaultingState& AALSXTCharacter::GetVaultingState() const
+{
+	return VaultingState;
+}
 
 inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
 {

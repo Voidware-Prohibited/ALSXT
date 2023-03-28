@@ -4,6 +4,7 @@
 #include "Curves/CurveFloat.h"
 #include "Curves/CurveVector.h"
 #include "GameFramework/Character.h"
+#include "ALSXTCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Utility/AlsMacros.h"
@@ -34,6 +35,9 @@ bool FALSXTRootMotionSource_Vaulting::Matches(const FRootMotionSource* Other) co
 void FALSXTRootMotionSource_Vaulting::PrepareRootMotion(const float SimulationDeltaTime, const float DeltaTime,
                                                       const ACharacter& Character, const UCharacterMovementComponent& Movement)
 {
+	const AALSXTCharacter& ALSXTCharacter = dynamic_cast<const AALSXTCharacter&>(Character);
+	VaultingState = ALSXTCharacter.GetVaultingState();
+
 	SetTime(GetTime() + SimulationDeltaTime);
 
 	if (!ALS_ENSURE(Duration > SMALL_NUMBER) || DeltaTime <= SMALL_NUMBER)
@@ -42,7 +46,7 @@ void FALSXTRootMotionSource_Vaulting::PrepareRootMotion(const float SimulationDe
 		return;
 	}
 
-	const auto VaultingTime{GetTime() * VaultingSettings->GetPlayRateForHeight(VaultingHeight)};
+	const auto VaultingTime{GetTime() * VaultingSettings->GetPlayRateForHeight(VaultingState.VaultingParameters.VaultAnimation.Montage.ReferenceHeight, VaultingState.VaultingParameters.VaultAnimation.Montage.PlayRate, VaultingHeight)};
 
 	// Calculate target transform from the stored relative transform to follow along with moving objects.
 
@@ -56,7 +60,7 @@ void FALSXTRootMotionSource_Vaulting::PrepareRootMotion(const float SimulationDe
 	FVector LocationOffset;
 	FRotator RotationOffset;
 
-	const auto BlendInAmount{VaultingSettings->BlendInCurve->GetFloatValue(VaultingTime)};
+	const auto BlendInAmount{ VaultingState.VaultingParameters.VaultAnimation.Montage.BlendInCurve->GetFloatValue(VaultingTime)};
 
 	if (!FAnimWeight::IsRelevant(BlendInAmount))
 	{
@@ -66,8 +70,8 @@ void FALSXTRootMotionSource_Vaulting::PrepareRootMotion(const float SimulationDe
 	else
 	{
 		const FVector3f InterpolationAndCorrectionAmounts{
-			VaultingSettings->InterpolationAndCorrectionAmountsCurve->GetVectorValue(
-				VaultingTime + VaultingSettings->GetStartTimeForHeight(VaultingHeight))
+			VaultingState.VaultingParameters.VaultAnimation.Montage.InterpolationAndCorrectionAmountsCurve->GetVectorValue(
+				VaultingTime + VaultingSettings->GetStartTimeForHeight(VaultingState.VaultingParameters.VaultAnimation.Montage.ReferenceHeight, VaultingState.VaultingParameters.VaultAnimation.Montage.StartTime, VaultingHeight))
 		};
 
 		const auto InterpolationAmount{InterpolationAndCorrectionAmounts.X};
@@ -83,8 +87,8 @@ void FALSXTRootMotionSource_Vaulting::PrepareRootMotion(const float SimulationDe
 		{
 			// Calculate the animation offset. This would be the location the actual animation starts at relative to the target transform.
 
-			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * VaultingSettings->StartRelativeLocation.X};
-			AnimationLocationOffset.Z = VaultingSettings->StartRelativeLocation.Z;
+			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * VaultingState.VaultingParameters.VaultAnimation.Montage.StartRelativeLocation.X};
+			AnimationLocationOffset.Z = VaultingState.VaultingParameters.VaultAnimation.Montage.StartRelativeLocation.Z;
 			AnimationLocationOffset *= Character.GetMesh()->GetComponentScale().Z;
 
 			// Blend into the animation offset and final offset at the same time.
@@ -139,6 +143,27 @@ bool FALSXTRootMotionSource_Vaulting::NetSerialize(FArchive& Archive, UPackageMa
 
 	Archive << VaultingSettings;
 	Archive << TargetPrimitive;
+	Archive << VaultingState.VaultingParameters.VaultAnimation.Montage.Montage;
+	Archive << VaultingState.VaultingParameters.VaultAnimation.Montage.BlendInCurve;
+	Archive << VaultingState.VaultingParameters.VaultAnimation.Montage.InterpolationAndCorrectionAmountsCurve;
+
+	bSuccess &= SerializePackedVector<100, 30>(VaultingState.VaultingParameters.VaultAnimation.Montage.StartRelativeLocation, Archive);
+
+	VaultingState.VaultingParameters.VaultAnimation.Montage.StartRelativeLocation.NetSerialize(Archive, Map, bSuccessLocal);
+	VaultingState.VaultingParameters.VaultAnimation.Montage.StartRelativeLocation.Normalize();
+	bSuccess &= bSuccessLocal;
+
+	VaultingState.VaultingParameters.VaultAnimation.Montage.ReferenceHeight.NetSerialize(Archive, Map, bSuccessLocal);
+	VaultingState.VaultingParameters.VaultAnimation.Montage.ReferenceHeight.Normalize();
+	bSuccess &= bSuccessLocal;
+
+	VaultingState.VaultingParameters.VaultAnimation.Montage.StartTime.NetSerialize(Archive, Map, bSuccessLocal);
+	VaultingState.VaultingParameters.VaultAnimation.Montage.StartTime.Normalize();
+	bSuccess &= bSuccessLocal;
+
+	VaultingState.VaultingParameters.VaultAnimation.Montage.PlayRate.NetSerialize(Archive, Map, bSuccessLocal);
+	VaultingState.VaultingParameters.VaultAnimation.Montage.PlayRate.Normalize();
+	bSuccess &= bSuccessLocal;
 
 	bSuccess &= SerializePackedVector<100, 30>(TargetRelativeLocation, Archive);
 

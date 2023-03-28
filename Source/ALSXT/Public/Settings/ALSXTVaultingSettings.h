@@ -28,7 +28,16 @@ struct ALSXT_API FALSXTVaultingParameters
 	float VaultingHeight{0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	EAlsMantlingType VaultingType{EAlsMantlingType::High};
+	FGameplayTag LocomotionMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag Gait;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag VaultingType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FVaultAnimation VaultAnimation;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -39,42 +48,19 @@ class ALSXT_API UALSXTVaultingSettings : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TArray<FVaultAnimation> VaultAnimations;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimMontage> Montage;
-
-	// Mantling time to blend in amount curve.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UCurveFloat> BlendInCurve;
-
-	// Mantling time to interpolation, horizontal and vertical correction amounts curve.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UCurveVector> InterpolationAndCorrectionAmountsCurve;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
-	FVector2D ReferenceHeight{50.0f, 100.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
-	FVector2D StartTime{0.5f, 0.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
-	FVector2D PlayRate{1.0f, 1.0f};
 
 public:
-	float GetStartTimeForHeight(float MantlingHeight) const;
+	float GetStartTimeForHeight(FVector2D ReferenceHeight, FVector2D StartTime, float MantlingHeight) const;
 
-	float GetPlayRateForHeight(float MantlingHeight) const;
+	float GetPlayRateForHeight(FVector2D ReferenceHeight, FVector2D PlayRate, float MantlingHeight) const;
 };
 
-inline float UALSXTVaultingSettings::GetStartTimeForHeight(const float MantlingHeight) const
+inline float UALSXTVaultingSettings::GetStartTimeForHeight(const FVector2D ReferenceHeight, const FVector2D StartTime, const float MantlingHeight) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, MantlingHeight);
 }
 
-inline float UALSXTVaultingSettings::GetPlayRateForHeight(const float MantlingHeight) const
+inline float UALSXTVaultingSettings::GetPlayRateForHeight(const FVector2D ReferenceHeight, const FVector2D PlayRate, const float MantlingHeight) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, MantlingHeight);
 }

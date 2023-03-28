@@ -55,20 +55,11 @@ namespace ALSXTActionStanceTags
 
 namespace ALSXTVaultTypeTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(LowWalking, TEXT("Als.Vault Type.Low Walking"))
-	UE_DEFINE_GAMEPLAY_TAG(LowRunning, TEXT("Als.Vault Type.Low Running"))
-	UE_DEFINE_GAMEPLAY_TAG(LowSprinting, TEXT("Als.Vault Type.Low Sprinting"))
-	UE_DEFINE_GAMEPLAY_TAG(LowCrouched, TEXT("Als.Vault Type.Low Crouched"))
-	UE_DEFINE_GAMEPLAY_TAG(MediumWalking, TEXT("Als.Vault Type.Medium Walking"))
-	UE_DEFINE_GAMEPLAY_TAG(MediumRunning, TEXT("Als.Vault Type.Medium Running"))
-	UE_DEFINE_GAMEPLAY_TAG(MediumSprinting, TEXT("Als.Vault Type.Medium Sprinting"))
-	UE_DEFINE_GAMEPLAY_TAG(MediumCrouched, TEXT("Als.Vault Type.Medium Crouched"))
-	UE_DEFINE_GAMEPLAY_TAG(HighWalking, TEXT("Als.Vault Type.High Walking"))
-	UE_DEFINE_GAMEPLAY_TAG(HighRunning, TEXT("Als.Vault Type.High Running"))
-	UE_DEFINE_GAMEPLAY_TAG(HighSprinting, TEXT("Als.Vault Type.High Sprinting"))
-	UE_DEFINE_GAMEPLAY_TAG(FenceWalking, TEXT("Als.Vault Type.Fence Walking"))
-	UE_DEFINE_GAMEPLAY_TAG(FenceRunning, TEXT("Als.Vault Type.Fence Running"))
-	UE_DEFINE_GAMEPLAY_TAG(FenceSprinting, TEXT("Als.Vault Type.Fence Sprinting"))
+	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Vault Type.Low"))
+	UE_DEFINE_GAMEPLAY_TAG(Medium, TEXT("Als.Vault Type.Medium"))
+	UE_DEFINE_GAMEPLAY_TAG(High, TEXT("Als.Vault Type.High"))
+	UE_DEFINE_GAMEPLAY_TAG(Fence, TEXT("Als.Vault Type.Fence"))
+	UE_DEFINE_GAMEPLAY_TAG(InAir, TEXT("Als.Vault Type.In Air"))
 }
 
 namespace ALSXTPhysicalAnimationModeTags

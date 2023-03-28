@@ -15,6 +15,9 @@ public:
 	TObjectPtr<UALSXTVaultingSettings> VaultingSettings{nullptr};
 
 	UPROPERTY()
+	FALSXTVaultingState VaultingState;
+
+	UPROPERTY()
 	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
 
 	UPROPERTY()

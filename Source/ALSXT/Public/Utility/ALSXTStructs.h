@@ -327,17 +327,28 @@ struct ALSXT_API FVaultAnimation
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.LocomotionMode", AllowPrivateAccess))
+	FGameplayTagContainer LocomotionMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", AllowPrivateAccess))
+	FGameplayTagContainer Stance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait", AllowPrivateAccess))
+	FGameplayTagContainer Gait;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Vault Type", AllowPrivateAccess))
-	TArray<FGameplayTag> VaultType;
+	FGameplayTagContainer VaultType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo Montage;
 
 	bool operator==(const FVaultAnimation& other) const
 	{
-		return (other.VaultType == VaultType) && (other.Montage == Montage);
+		return (other.LocomotionMode == LocomotionMode) && (other.Stance == Stance) && (other.Gait == Gait) && (other.VaultType == VaultType) && (other.Montage == Montage);
 	}
 };
+
+
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FSyncedActionMontageInfo
