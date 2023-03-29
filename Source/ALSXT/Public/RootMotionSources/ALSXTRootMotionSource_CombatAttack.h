@@ -2,6 +2,7 @@
 
 #include "GameFramework/RootMotionSource.h"
 #include "Settings/ALSXTCombatSettings.h"
+#include "State/ALSXTCombatState.h"
 #include "ALSXTRootMotionSource_CombatAttack.generated.h"
 
 class UALSXTCombatAttackSettings;
@@ -14,6 +15,9 @@ struct ALSXT_API FALSXTRootMotionSource_CombatAttack : public FRootMotionSource
 public:
 	UPROPERTY()
 	TObjectPtr<UALSXTCombatSettings> CombatSettings{nullptr};
+
+	UPROPERTY()
+	FALSXTCombatState CombatState;
 
 	UPROPERTY()
 	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;

@@ -384,6 +384,39 @@ void UALSXTCombatComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
 	}
 }
 
+// Combat State
+void UALSXTCombatComponent::SetCombatState(const FALSXTCombatState& NewCombatState)
+{
+	const auto PreviousCombatState{ CombatState };
+
+	CombatState = NewCombatState;
+
+	OnCombatStateChanged(PreviousCombatState);
+
+	if ((Character->GetLocalRole() == ROLE_AutonomousProxy) && Character->IsLocallyControlled())
+	{
+		ServerSetCombatState(NewCombatState);
+	}
+}
+
+void UALSXTCombatComponent::ServerSetCombatState_Implementation(const FALSXTCombatState& NewCombatState)
+{
+	SetCombatState(NewCombatState);
+}
+
+
+void UALSXTCombatComponent::ServerProcessNewCombatState_Implementation(const FALSXTCombatState& NewCombatState)
+{
+	ProcessNewCombatState(NewCombatState);
+}
+
+void UALSXTCombatComponent::OnReplicate_CombatState(const FALSXTCombatState& PreviousCombatState)
+{
+	OnCombatStateChanged(PreviousCombatState);
+}
+
+void UALSXTCombatComponent::OnCombatStateChanged_Implementation(const FALSXTCombatState& PreviousCombatState) {}
+
 // Attack
 
 AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
@@ -408,7 +441,7 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 			{
 				if (GEngine && CombatSettings.DebugMode)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *Hit.GetActor()->GetName()));
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Potential Target: %s"), *Hit.GetActor()->GetName()));
 				}
 				return Hit.GetActor();
 			}
@@ -417,7 +450,7 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 	return nullptr;
 }
 
-void UALSXTCombatComponent::Attack(const FGameplayTag& AttackType, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate)
+void UALSXTCombatComponent::Attack(const FGameplayTag& ActionType, const FGameplayTag& AttackType, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate)
 {
 	FGameplayTag NewStance = ALSXTActionStanceTags::Standing;
 
@@ -438,10 +471,13 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& AttackType, const FGamepl
 	}
 
 	AActor* PotentialAttackTarget = TraceForPotentialAttackTarget(100.0f);
+	FALSXTCombatState CurrentCombatState = GetCombatState();
+	CurrentCombatState.CombatParameters.Target = PotentialAttackTarget;
+	SetCombatState(CurrentCombatState);
 	FGameplayTag AttackMethod;
 	if (IsValid(PotentialAttackTarget))
 	{
-		DetermineAttackMethod(AttackMethod, AttackType, NewStance, Strength, BaseDamage, PotentialAttackTarget);
+		DetermineAttackMethod(AttackMethod, ActionType, AttackType, NewStance, Strength, BaseDamage, PotentialAttackTarget);
 	}
 	else
 	{
@@ -456,8 +492,6 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& AttackType, const FGamepl
 	}
 	else if (AttackMethod == ALSXTAttackMethodTags::Special || AttackMethod == ALSXTAttackMethodTags::TakeDown)
 	{
-		// int SynedAnimationIndex;
-		// GetSyncedAttackMontageInfo(FSyncedActionMontageInfo & SyncedActionMontageInfo, const FGameplayTag & AttackType, int32 Index);
 		StartSyncedAttack(Character->GetOverlayMode(), AttackType, NewStance, Strength, AttackMethod, BaseDamage, PlayRate, CombatSettings.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
 			? Character->GetLocomotionState().InputYawAngle
 			: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)), 0);
@@ -476,7 +510,7 @@ void UALSXTCombatComponent::InputPrimaryAction()
 {
 	if ((AlsCharacter->GetOverlayMode() == AlsOverlayModeTags::Default) && ((Character->GetCombatStance() == ALSXTCombatStanceTags::Ready) || (Character->GetCombatStance() == ALSXTCombatStanceTags::Aiming)) && CanAttack())
 	{
-		Attack(ALSXTAttackTypeTags::RightFist, ALSXTActionStrengthTags::Medium, 0.10f, 1.3f);
+		Attack(ALSXTActionTypeTags::Primary, ALSXTAttackTypeTags::RightFist, ALSXTActionStrengthTags::Medium, 0.10f, 1.3f);
 	}
 }
 
@@ -496,9 +530,9 @@ void UALSXTCombatComponent::StartAttack(const FGameplayTag& AttackType, const FG
 		return;
 	}
 
-	auto* Montage{ SelectAttackMontage(AttackType, Stance, Strength, BaseDamage) };
+	FAttackAnimation Montage{ SelectAttackMontage(AttackType, Stance, Strength, BaseDamage) };
 
-	if (!ALS_ENSURE(IsValid(Montage)) || !IsAttackAllowedToStart(Montage))
+	if (!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsAttackAllowedToStart(Montage.Montage.Montage))
 	{
 		return;
 	}
@@ -514,21 +548,78 @@ void UALSXTCombatComponent::StartAttack(const FGameplayTag& AttackType, const FG
 	{
 		// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
 		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
-		MulticastStartAttack(Montage, PlayRate, StartYawAngle, TargetYawAngle);
+		CombatParameters.BaseDamage = BaseDamage;
+		CombatParameters.PlayRate = PlayRate;
+		CombatParameters.TargetYawAngle = TargetYawAngle;
+		CombatParameters.AttackType = AttackType;
+		CombatParameters.Stance = Stance;
+		CombatParameters.Strength = Strength;
+		CombatParameters.CombatAnimation = Montage.Montage;
+
+		FALSXTCombatState NewCombatState;
+		NewCombatState.CombatParameters = CombatParameters;
+		SetCombatState(NewCombatState);
+		MulticastStartAttack(Montage.Montage.Montage, PlayRate, StartYawAngle, TargetYawAngle);
 	}
 	else
 	{
 		Character->GetCharacterMovement()->FlushServerMoves();
 
-		StartAttackImplementation(Montage, PlayRate, StartYawAngle, TargetYawAngle);
-		ServerStartAttack(Montage, PlayRate, StartYawAngle, TargetYawAngle);
+		StartAttackImplementation(Montage.Montage.Montage, PlayRate, StartYawAngle, TargetYawAngle);
+		ServerStartAttack(Montage.Montage.Montage, PlayRate, StartYawAngle, TargetYawAngle);
 		OnAttackStarted(AttackType, Stance, Strength, BaseDamage);
 	}
 }
 
 void UALSXTCombatComponent::StartSyncedAttack(const FGameplayTag& Overlay, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float BaseDamage, const float PlayRate, const float TargetYawAngle, int Index)
 {
+	if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
+	{
+		return;
+	}
 
+	int SelectSyncedAttackMontageIndex{ -1 };
+	FSyncedAttackAnimation Montage{ SelectSyncedAttackMontage(AttackType, Stance, Strength, BaseDamage, SelectSyncedAttackMontageIndex) };
+
+	if (!ALS_ENSURE(IsValid(Montage.SyncedMontage.InstigatorSyncedMontage.Montage)) || !IsAttackAllowedToStart(Montage.SyncedMontage.InstigatorSyncedMontage.Montage))
+	{
+		return;
+	}
+
+	// GetSyncedAttackMontage();
+
+	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
+
+	// Clear the character movement mode and set the locomotion action to mantling.
+
+	Character->SetMovementModeLocked(true);
+	// Character->GetCharacterMovement()->SetMovementMode(MOVE_Custom);
+
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
+		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
+		CombatParameters.BaseDamage = BaseDamage;
+		CombatParameters.PlayRate = PlayRate;
+		CombatParameters.TargetYawAngle = TargetYawAngle;
+		CombatParameters.AttackType = AttackType;
+		CombatParameters.Stance = Stance;
+		CombatParameters.Strength = Strength;
+		CombatParameters.CombatAnimation = Montage.SyncedMontage.InstigatorSyncedMontage;
+
+		FALSXTCombatState NewCombatState;
+		NewCombatState.CombatParameters = CombatParameters;
+		SetCombatState(NewCombatState);
+		MulticastStartSyncedAttack(Montage.SyncedMontage.InstigatorSyncedMontage.Montage, SelectSyncedAttackMontageIndex, PlayRate, StartYawAngle, TargetYawAngle);
+	}
+	else
+	{
+		Character->GetCharacterMovement()->FlushServerMoves();
+
+		StartSyncedAttackImplementation(Montage.SyncedMontage.InstigatorSyncedMontage.Montage, SelectSyncedAttackMontageIndex, PlayRate, StartYawAngle, TargetYawAngle);
+		ServerStartSyncedAttack(Montage.SyncedMontage.InstigatorSyncedMontage.Montage, SelectSyncedAttackMontageIndex, PlayRate, StartYawAngle, TargetYawAngle);
+		OnSyncedAttackStarted(AttackType, Stance, Strength, BaseDamage);
+	}
 }
 
 UALSXTCombatSettings* UALSXTCombatComponent::SelectAttackSettings_Implementation()
@@ -536,8 +627,53 @@ UALSXTCombatSettings* UALSXTCombatComponent::SelectAttackSettings_Implementation
 	return nullptr;
 }
 
-void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& AttackMethod, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target)
+void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& AttackMethod, const FGameplayTag& ActionType, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target)
 {
+	if (ActionType == ALSXTActionTypeTags::Secondary)
+	{
+
+	}
+	else
+	{
+
+	}
+	
+	if (UKismetSystemLibrary::DoesImplementInterface(GetCombatState().CombatParameters.Target, UALSXTCombatInterface::StaticClass()))
+	{
+		if (!IALSXTCombatInterface::Execute_Blocking(GetCombatState().CombatParameters.Target))
+		{
+			if (IALSXTCombatInterface::Execute_CanBeTakenDown(GetCombatState().CombatParameters.Target))
+			{
+				// ...
+			}
+			if (IALSXTCombatInterface::Execute_CanBeKnockedDown(GetCombatState().CombatParameters.Target))
+			{
+				// ...
+			}
+			if (IALSXTCombatInterface::Execute_CanBeThrown(GetCombatState().CombatParameters.Target))
+			{
+				// ...
+			}
+			if (IALSXTCombatInterface::Execute_CanBeGrappled(GetCombatState().CombatParameters.Target))
+			{
+				// ...
+			}
+			if (IALSXTCombatInterface::Execute_CanBeRagdolled(GetCombatState().CombatParameters.Target))
+			{
+				// ...
+			}
+		}	
+	}
+
+	if (UKismetSystemLibrary::DoesImplementInterface(GetCombatState().CombatParameters.Target, UALSXTCollisionInterface::StaticClass()))
+	{
+		if (IALSXTCollisionInterface::Execute_CanReceiveImpulse(GetCombatState().CombatParameters.Target))
+		{
+			// ...
+		}
+	}
+	
+	
 	if (LastTargets.Num() > 0)
 	{
 		for (auto& LastTarget : LastTargets)
@@ -568,88 +704,147 @@ void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& A
 	}
 }
 
-UAnimMontage* UALSXTCombatComponent::SelectAttackMontage_Implementation(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
+FAttackAnimation UALSXTCombatComponent::SelectAttackMontage_Implementation(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
 {
-	UAnimMontage* SelectedMontage{ nullptr };
-	FActionMontageInfo LastAnimation{ nullptr };
-
+	FAttackAnimation SelectedAttackAnimation;
 	UALSXTCombatSettings* Settings = SelectAttackSettings();
-
+	TArray<FAttackAnimation> Montages = Settings->AttackAnimations;
+	TArray<FAttackAnimation> FilteredMontages;
 	TArray<FGameplayTag> TagsArray = { AttackType, Stance, Strength };
 	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
-	// TArray<FALSXTCharacterActionSound> ActionSounds = Settings->ActionSounds;
-	// TArray<FALSXTCharacterActionSound> FilteredActionSounds;
-	//FGameplayTag StaminaTag = ConvertStaminaToStaminaTag(Stamina);
-	//TArray<FALSXTCharacterActionSound> AttackAnimations = Settings->AttackAnimations;
-	//TArray<FALSXTCharacterActionSound> FilteredAttackAnimations;
-	//FALSXTCharacterActionSound SelectedAttackAnimation;
+	
+	// Return is there are no Montages
+	if (Montages.Num() < 1 || !Montages[0].Montage.Montage)
+	{
+		return SelectedAttackAnimation;
+	}
 
-	// Return is there are no sounds
-	// if (AttackAnimations.Num() < 1 || !AttackAnimations[0].CharacterSound.Sound.Sound)
-	// {
-	// 	return SelectedAttackAnimation;
-	// }
+	// Filter sounds based on Tag parameters
+	for (auto Montage : Montages)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Montage.AttackStrengths);
+		CurrentTagsContainer.AppendTags(Montage.AttackStances);
+		CurrentTagsContainer.AppendTags(Montage.AttackType);
 
-	// for (auto AttackAnimation : AttackAnimations)
-	// {
-	// 
-	// }
-
-	for (int i = 0; i < Settings->AttackTypes.Num(); ++i)
+		if (CurrentTagsContainer.HasAll(TagsContainer))
 		{
-			if (Settings->AttackTypes[i].AttackType == AttackType)
-			{
-				FAttackType FoundAttackType = Settings->AttackTypes[i];
-				for (int j = 0; j < FoundAttackType.AttackStrengths.Num(); ++j)
-				{
-					if (FoundAttackType.AttackStrengths[j].AttackStrength == Strength)
-					{
-						FAttackStrength FoundAttackStrength = Settings->AttackTypes[i].AttackStrengths[j];
-						for (int k = 0; k < FoundAttackStrength.AttackStances.Num(); ++k)
-						{
-							if (FoundAttackStrength.AttackStances[k].AttackStance == Stance)
-							{
-								FAttackStance FoundAttackStance = Settings->AttackTypes[i].AttackStrengths[j].AttackStances[k];
-								// Declare Local Copy of Montages Array
-								TArray<FActionMontageInfo> MontageArray{ FoundAttackStance.MontageInfo };
-
-								if (MontageArray.Num() > 1)
-								{
-									// If LastAnimation exists, remove it from Local Montages array to avoid duplicates
-									if (LastAnimation.Montage)
-									{
-										MontageArray.Remove(LastAnimation);
-									}
-
-									//Shuffle Array
-									for (int m = MontageArray.Max(); m >= 0; --m)
-									{
-										int n = FMath::Rand() % (m + 1);
-										if (m != n) MontageArray.Swap(m, n);
-									}
-
-									// Select Random Array Entry
-									int RandIndex = rand() % MontageArray.Max();
-									SelectedMontage = MontageArray[RandIndex].Montage;
-									return SelectedMontage;
-								}
-								else
-								{
-									SelectedMontage = MontageArray[0].Montage;
-									return SelectedMontage;
-								}
-							}
-						}
-					}
-				}	
-			}
+			FilteredMontages.Add(Montage);
 		}
-	return SelectedMontage;
+	}
+
+	// Return if there are no filtered sounds
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Montage.Montage)
+	{
+		return SelectedAttackAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastAttackAnimation, remove it from FilteredMontages array to avoid duplicates
+		if (FilteredMontages.Contains(LastAttackAnimation))
+		{
+			int IndexToRemove = FilteredMontages.Find(LastAttackAnimation);
+			FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		}
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+		
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedAttackAnimation = FilteredMontages[RandIndex];
+		LastAttackAnimation = SelectedAttackAnimation;
+		return SelectedAttackAnimation;
+	}
+	else
+	{
+		SelectedAttackAnimation = FilteredMontages[0];
+		LastAttackAnimation = SelectedAttackAnimation;
+		return SelectedAttackAnimation;
+	}
+	return SelectedAttackAnimation;
 }
 
-void UALSXTCombatComponent::GetSyncedAttackMontageInfo_Implementation(FSyncedActionMontageInfo& SyncedActionMontageInfo, const FGameplayTag& AttackType, int32 Index)
+FSyncedAttackAnimation UALSXTCombatComponent::SelectSyncedAttackMontage_Implementation(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, int& Index)
 {
-	// UALSXTCombatSettings* Settings = SelectAttackSettings();
+	FSyncedAttackAnimation SelectedSyncedAttackAnimation;
+	UALSXTCombatSettings* Settings = SelectAttackSettings();
+	TArray<FSyncedAttackAnimation> Montages = Settings->SyncedAttackAnimations;
+	TArray<FSyncedAttackAnimation> FilteredMontages;
+	TArray<FGameplayTag> TagsArray = { AttackType, Stance, Strength };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+
+	// Return is there are no Montages
+	if (Montages.Num() < 1 || !Montages[0].SyncedMontage.InstigatorSyncedMontage.Montage)
+	{
+		return SelectedSyncedAttackAnimation;
+	}
+
+	// Filter sounds based on Tag parameters
+	for (auto Montage : Montages)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Montage.AttackStrengths);
+		CurrentTagsContainer.AppendTags(Montage.AttackStances);
+		CurrentTagsContainer.AppendTags(Montage.AttackType);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredMontages.Add(Montage);
+		}
+	}
+
+	// Return if there are no filtered sounds
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].SyncedMontage.InstigatorSyncedMontage.Montage)
+	{
+		return SelectedSyncedAttackAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastAttackAnimation, remove it from FilteredMontages array to avoid duplicates
+		if (FilteredMontages.Contains(LastSyncedAttackAnimation))
+		{
+			int IndexToRemove = FilteredMontages.Find(LastSyncedAttackAnimation);
+			FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		}
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedSyncedAttackAnimation = FilteredMontages[RandIndex];
+		Index = Montages.Find(SelectedSyncedAttackAnimation);
+		LastSyncedAttackAnimation = SelectedSyncedAttackAnimation;
+		return SelectedSyncedAttackAnimation;
+	}
+	else
+	{
+		SelectedSyncedAttackAnimation = FilteredMontages[0];
+		Index = Montages.Find(SelectedSyncedAttackAnimation);
+		LastSyncedAttackAnimation = SelectedSyncedAttackAnimation;
+		return SelectedSyncedAttackAnimation;
+	}
+	return SelectedSyncedAttackAnimation;
+}
+
+FSyncedActionAnimation UALSXTCombatComponent::GetSyncedAttackMontage_Implementation(int32 Index)
+{
+	UALSXTCombatSettings* Settings = SelectAttackSettings();
+	TArray<FSyncedAttackAnimation> Montages = Settings->SyncedAttackAnimations;
+	return Montages[Index].SyncedMontage;
 }
 
 void UALSXTCombatComponent::ServerStartAttack_Implementation(UAnimMontage* Montage, const float PlayRate,
@@ -674,7 +869,7 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 	
 	if (IsAttackAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, PlayRate))
 	{
-		CombatState.TargetYawAngle = TargetYawAngle;
+		CombatState.CombatParameters.TargetYawAngle = TargetYawAngle;
 
 		Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
 
@@ -740,3 +935,96 @@ void UALSXTCombatComponent::StopAttack()
 }
 
 void UALSXTCombatComponent::OnAttackEnded_Implementation() {}
+
+void UALSXTCombatComponent::ServerStartSyncedAttack_Implementation(UAnimMontage* Montage, int32 Index, const float PlayRate,
+	const float StartYawAngle, const float TargetYawAngle)
+{
+	if (IsAttackAllowedToStart(Montage))
+	{
+		MulticastStartSyncedAttack(Montage, Index, PlayRate, StartYawAngle, TargetYawAngle);
+		Character->ForceNetUpdate();
+	}
+}
+
+void UALSXTCombatComponent::MulticastStartSyncedAttack_Implementation(UAnimMontage* Montage, int32 Index, const float PlayRate,
+	const float StartYawAngle, const float TargetYawAngle)
+{
+	StartSyncedAttackImplementation(Montage, Index, PlayRate, StartYawAngle, TargetYawAngle);
+}
+
+void UALSXTCombatComponent::StartSyncedAttackImplementation(UAnimMontage* Montage, int32 Index, const float PlayRate,
+	const float StartYawAngle, const float TargetYawAngle)
+{
+	if (IsAttackAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, PlayRate))
+	{
+		if (UKismetSystemLibrary::DoesImplementInterface(GetCombatState().CombatParameters.Target, UALSXTCombatInterface::StaticClass()))
+		{
+			if (!IALSXTCombatInterface::Execute_Blocking(GetCombatState().CombatParameters.Target))
+			{
+				IALSXTCombatInterface::Execute_AnticipateSyncedAttack(GetCombatState().CombatParameters.Target, Index);
+			}
+		}
+		CombatState.CombatParameters.TargetYawAngle = TargetYawAngle;
+		Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
+		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::PrimaryAction);
+		// Crouch(); //Hack
+	}
+}
+
+void UALSXTCombatComponent::RefreshSyncedAttack(const float DeltaTime)
+{
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::PrimaryAction)
+	{
+		StopAttack();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshSyncedAttackPhysics(DeltaTime);
+	}
+}
+
+void UALSXTCombatComponent::RefreshSyncedAttackPhysics(const float DeltaTime)
+{
+	// float Offset = CombatSettings->Combat.RotationOffset;
+	auto ComponentRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	auto TargetRotation{ PlayerController->GetControlRotation() };
+	// TargetRotation.Yaw = TargetRotation.Yaw + Offset;
+	// TargetRotation.Yaw = TargetRotation.Yaw;
+	// TargetRotation.Pitch = ComponentRotation.Pitch;
+	// TargetRotation.Roll = ComponentRotation.Roll;
+
+	// if (CombatSettings.RotationInterpolationSpeed <= 0.0f)
+	// {
+	// 	TargetRotation.Yaw = CombatState.TargetYawAngle;
+	// 
+	// 	Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false, nullptr, ETeleportType::TeleportPhysics);
+	// }
+	// else
+	// {
+	// 	TargetRotation.Yaw = UAlsMath::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
+	// 		CombatState.TargetYawAngle, DeltaTime,
+	// 		CombatSettings->Combat.RotationInterpolationSpeed);
+	// 
+	// 	Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);
+	// }
+}
+
+void UALSXTCombatComponent::StopSyncedAttack()
+{
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	if (Character->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Custom)
+	{
+		Character->SetMovementModeLocked(false);
+		// Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		OnSyncedAttackEnded();
+	}
+	Character->SetMovementModeLocked(false);
+}
+
+void UALSXTCombatComponent::OnSyncedAttackEnded_Implementation() {}

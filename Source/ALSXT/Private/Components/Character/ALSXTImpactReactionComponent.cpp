@@ -60,6 +60,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 	//LocomotionState.InputYawAngle
 	TArray<FHitResult> HitResults;
 	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(Character);
 	float TraceDistance {0.0f};
 
 	if (Character->GetVelocity().Length() > 0)
@@ -83,11 +84,12 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 	}
 
 	// const FVector EndLocation{ StartLocation + (Character->GetActorForwardVector() * TraceDistance) };
-	const FVector EndLocation{ StartLocation + (Character->GetControlRotation().Yaw * TraceDistance) };
-	// const FVector EndLocation{ StartLocation + (Character->GetControlRotation().Yaw * TraceDistance) };
+	// Character->GetLocomotionState().Velocity
+	const FVector EndLocation{ StartLocation + (Character->GetVelocity() * TraceDistance) };
+	// const FVector EndLocation{ StartLocation + (Character->GetLocomotionState().Velocity * TraceDistance) };
 	
 	// Trace for room for Vaulting action
-	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight/2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForOneFrame, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
+	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight/2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
 	{
 		FString BumpHit = HitResults[0].GetActor()->GetName();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, BumpHit);

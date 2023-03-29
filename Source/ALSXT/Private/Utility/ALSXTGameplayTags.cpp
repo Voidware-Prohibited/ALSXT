@@ -45,6 +45,12 @@ namespace AlsLocomotionActionTags
 	UE_DEFINE_GAMEPLAY_TAG(FixingMalfunction2, TEXT("Als.LocomotionAction.Firearm.Fixing Malfunction 2"))
 }
 
+namespace ALSXTActionTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Primary, TEXT("Als.Action Type.Primary"))
+	UE_DEFINE_GAMEPLAY_TAG(Secondary, TEXT("Als.Action Type.Secondary"))
+}
+
 namespace ALSXTActionStanceTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Prone, TEXT("Als.Action Stance.Prone"))

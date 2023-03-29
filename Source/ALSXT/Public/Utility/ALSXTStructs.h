@@ -272,7 +272,7 @@ struct ALSXT_API FActionMontageInfo
 
 	bool operator==(const FActionMontageInfo& other) const
 	{
-		return (other.Montage == Montage) && (other.BlendInCurve == BlendInCurve) && (other.InterpolationAndCorrectionAmountsCurve == InterpolationAndCorrectionAmountsCurve);
+		return (other.Montage == Montage) && (other.BlendInCurve == BlendInCurve) && (other.InterpolationAndCorrectionAmountsCurve == InterpolationAndCorrectionAmountsCurve) && (other.StartRelativeLocation == StartRelativeLocation) && (other.ReferenceHeight == ReferenceHeight) && (other.StartTime == StartTime) && (other.PlayRate == PlayRate);
 	}
 };
 
@@ -351,12 +351,12 @@ struct ALSXT_API FVaultAnimation
 
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FSyncedActionMontageInfo
+struct ALSXT_API FSyncedActionAnimation
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	FActionMontageInfo AttackerSyncedMontage;
+	FActionMontageInfo InstigatorSyncedMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo TargetAnticipationPose;
@@ -369,6 +369,11 @@ struct ALSXT_API FSyncedActionMontageInfo
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo TargetGetUpMontage;
+
+	bool operator==(const FSyncedActionAnimation& other) const
+	{
+		return (other.InstigatorSyncedMontage == InstigatorSyncedMontage) && (other.TargetAnticipationPose == TargetAnticipationPose) && (other.TargetSyncedMontage == TargetSyncedMontage) && (other.TargetFallenPose == TargetFallenPose) && (other.TargetGetUpMontage == TargetGetUpMontage);
+	}
 
 };
 
@@ -455,15 +460,15 @@ struct ALSXT_API FAttackAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", TitleProperty = "{AttackStances}", AllowPrivateAccess))
 	FGameplayTagContainer AttackStances;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", TitleProperty = "{AttackStances}", AllowPrivateAccess))
-	FGameplayTagContainer AttackForms;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Type", TitleProperty = "{AttackType}", AllowPrivateAccess))
+	FGameplayTagContainer AttackType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo Montage;
 
 	bool operator==(const FAttackAnimation& other) const
 	{
-		return (other.AttackStrengths == AttackStrengths);
+		return (other.AttackStrengths == AttackStrengths) && (other.AttackStances == AttackStances) && (other.AttackType == AttackType) && (other.Montage == Montage);
 	}
 };
 
@@ -478,12 +483,15 @@ struct ALSXT_API FSyncedAttackAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", AllowPrivateAccess))
 	FGameplayTagContainer AttackStances;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Type", TitleProperty = "{AttackType}", AllowPrivateAccess))
+	FGameplayTagContainer AttackType;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FSyncedActionMontageInfo SyncedMontage;
+	FSyncedActionAnimation SyncedMontage;
 
 	bool operator==(const FSyncedAttackAnimation& other) const
 	{
-		return (other.AttackStrengths == AttackStrengths);
+		return (other.AttackStrengths == AttackStrengths) && (other.AttackStances == AttackStances) && (other.AttackType == AttackType) && (other.SyncedMontage == SyncedMontage);
 	}
 };
 
@@ -505,7 +513,7 @@ struct ALSXT_API FAttackStance
 	TArray<FActionMontageInfo> RegularMontages;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FSyncedActionMontageInfo> SyncedMontages;
+	TArray<FSyncedActionAnimation> SyncedMontages;
 
 	bool operator==(const FAttackStance& other) const
 	{

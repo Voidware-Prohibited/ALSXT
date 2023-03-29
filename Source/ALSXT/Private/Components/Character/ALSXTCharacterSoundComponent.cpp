@@ -119,13 +119,6 @@ FGameplayTag UALSXTCharacterSoundComponent::ConvertStaminaToStaminaTag(const flo
 
 FALSXTCharacterActionSound UALSXTCharacterSoundComponent::SelectActionSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
 {
-	// TArray<FALSXTCharacterActionSound> ActionSounds = Settings->ActionSounds;
-	// TArray<FALSXTCharacterActionSound> FilteredActionSounds = Settings->ActionSounds;
-	// FGameplayTag StaminaTag = ConvertStaminaToStaminaTag(Stamina);
-	// TArray<FGameplayTag> TagsArray = {Strength, StaminaTag};
-	// FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
-	// FALSXTCharacterActionSound SelectedActionSound;
-
 	FGameplayTagContainer TagsContainer;
 	TArray<FALSXTCharacterActionSound> ActionSounds = Settings->ActionSounds;
 	TArray<FALSXTCharacterActionSound> FilteredActionSounds;
@@ -145,15 +138,11 @@ FALSXTCharacterActionSound UALSXTCharacterSoundComponent::SelectActionSound(UALS
 	// Filter sounds based on Tag parameters
 	for (auto ActionSound : ActionSounds)
 	{
-		// TArray<FGameplayTag> CurrentTagsArray;
-		// CurrentTagsArray.Append(ActionSound.Strength);
-		// CurrentTagsArray.Append(ActionSound.Stamina);
-		// FGameplayTagContainer CurrentTagsContainer = FGameplayTagContainer::CreateFromArray(CurrentTagsArray);
 		FGameplayTagContainer CurrentTagsContainer;
 		CurrentTagsContainer.AppendTags(ActionSound.Strength);
 		CurrentTagsContainer.AppendTags(ActionSound.Stamina);	
 		
-		if (CurrentTagsContainer.HasAllExact(TagsContainer))
+		if (CurrentTagsContainer.HasAll(TagsContainer))
 		{
 			FilteredActionSounds.Add(ActionSound);
 		}
@@ -171,24 +160,27 @@ FALSXTCharacterActionSound UALSXTCharacterSoundComponent::SelectActionSound(UALS
 		// If FilteredActionSounds contains LastCharacterActionSound, remove it from FilteredActionSounds array to avoid duplicates
 		if (FilteredActionSounds.Contains(LastCharacterActionSound))
 		{
-			FilteredActionSounds.Remove(LastCharacterActionSound);
+			int IndexToRemove = FilteredActionSounds.Find(LastCharacterActionSound);
+			FilteredActionSounds.RemoveAt(IndexToRemove, 1, true);
 		}
 
 		//Shuffle Array
-		for (int m = FilteredActionSounds.Max(); m >= 0; --m)
+		for (int m = FilteredActionSounds.Num() - 1; m >= 0; --m)
 		{
 			int n = FMath::Rand() % (m + 1);
 			if (m != n) FilteredActionSounds.Swap(m, n);
 		}
 
 		// Select Random Array Entry
-		int RandIndex = rand() % FilteredActionSounds.Max();
+		int RandIndex = FMath::RandRange(0, (FilteredActionSounds.Num() - 1));
 		SelectedActionSound = FilteredActionSounds[RandIndex];
+		LastCharacterActionSound = SelectedActionSound;
 		return SelectedActionSound;
 	}
 	else
 	{
 		SelectedActionSound = FilteredActionSounds[0];
+		LastCharacterActionSound = SelectedActionSound;
 		return SelectedActionSound;
 	}
 

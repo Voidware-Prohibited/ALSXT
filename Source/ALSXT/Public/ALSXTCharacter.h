@@ -65,29 +65,28 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
 	FALSXTVaultingState VaultingState;
 
-public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
-		const FALSXTVaultingState& GetVaultingState() const;
+	const FALSXTVaultingState& GetVaultingState() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewVaultingState"))
-		void SetVaultingState(const FALSXTVaultingState& NewVaultingState);
+	void SetVaultingState(const FALSXTVaultingState& NewVaultingState);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewVaultingState"))
-		FALSXTVaultingState ProcessNewVaultingState(const FALSXTVaultingState& NewVaultingState);
+	FALSXTVaultingState ProcessNewVaultingState(const FALSXTVaultingState& NewVaultingState);
 
 	UFUNCTION(Server, Unreliable)
-		void ServerProcessNewVaultingState(const FALSXTVaultingState& NewVaultingState);
+	void ServerProcessNewVaultingState(const FALSXTVaultingState& NewVaultingState);
 
 private:
 	UFUNCTION(Server, Unreliable)
-		void ServerSetVaultingState(const FALSXTVaultingState& NewVaultingState);
+	void ServerSetVaultingState(const FALSXTVaultingState& NewVaultingState);
 
 	UFUNCTION()
-		void OnReplicate_VaultingState(const FALSXTVaultingState& PreviousVaultingState);
+	void OnReplicate_VaultingState(const FALSXTVaultingState& PreviousVaultingState);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-		void OnVaultingStateChanged(const FALSXTVaultingState& PreviousVaultingState);
+	void OnVaultingStateChanged(const FALSXTVaultingState& PreviousVaultingState);
 
 private:
 

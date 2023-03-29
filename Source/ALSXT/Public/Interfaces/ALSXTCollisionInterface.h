@@ -21,6 +21,9 @@ public:
 	void GetActorVelocity(float& Velocity);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
+	bool CanReceiveImpulse();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void GetActorPhysicsStates(FGameplayTag& PhysicalMaterial, const TArray<FGameplayTag>& PhysicalStates);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")

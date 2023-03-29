@@ -3,10 +3,13 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Curves/CurveFloat.h"
 #include "Curves/CurveVector.h"
+#include "Kismet/KismetSystemLibrary.h" 
 #include "GameFramework/Character.h"
+#include "ALSXTCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Settings/ALSXTCombatSettings.h"
 #include "Utility/AlsMacros.h"
+#include "Interfaces/ALSXTCombatInterface.h"
 
 FALSXTRootMotionSource_CombatAttack::FALSXTRootMotionSource_CombatAttack()
 {
@@ -34,6 +37,14 @@ bool FALSXTRootMotionSource_CombatAttack::Matches(const FRootMotionSource* Other
 void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float SimulationDeltaTime, const float DeltaTime,
                                                       const ACharacter& Character, const UCharacterMovementComponent& Movement)
 {
+	const AALSXTCharacter& ALSXTCharacter = dynamic_cast<const AALSXTCharacter&>(Character);
+	AALSXTCharacter* ALSXTCharacterObject = Cast<AALSXTCharacter>(Character._getUObject());
+
+	if (UKismetSystemLibrary::DoesImplementInterface(ALSXTCharacterObject, UALSXTCombatInterface::StaticClass()))
+	{
+		CombatState = IALSXTCombatInterface::Execute_GetCombatState(ALSXTCharacterObject);
+	}
+	
 	SetTime(GetTime() + SimulationDeltaTime);
 
 	if (!ALS_ENSURE(Duration > SMALL_NUMBER) || DeltaTime <= SMALL_NUMBER)
@@ -42,7 +53,7 @@ void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float Simulati
 		return;
 	}
 
-	const auto AttackTime{GetTime() * CombatSettings->CalculatePlayRate(CombatSettings->CurrentActionMontage.ReferenceHeight, CombatSettings->CurrentActionMontage.PlayRate, AttackHeight)};
+	const auto AttackTime{GetTime() * CombatSettings->CalculatePlayRate(CombatState.CombatParameters.CombatAnimation.ReferenceHeight, CombatState.CombatParameters.CombatAnimation.PlayRate, AttackHeight)};
 
 	// Calculate target transform from the stored relative transform to follow along with moving objects.
 
@@ -56,7 +67,7 @@ void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float Simulati
 	FVector LocationOffset;
 	FRotator RotationOffset;
 
-	const auto BlendInAmount{CombatSettings->CurrentActionMontage.BlendInCurve->GetFloatValue(AttackTime)};
+	const auto BlendInAmount{CombatState.CombatParameters.CombatAnimation.BlendInCurve->GetFloatValue(AttackTime)};
 
 	if (!FAnimWeight::IsRelevant(BlendInAmount))
 	{
@@ -66,8 +77,8 @@ void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float Simulati
 	else
 	{
 		const FVector3f InterpolationAndCorrectionAmounts{
-			CombatSettings->CurrentActionMontage.InterpolationAndCorrectionAmountsCurve->GetVectorValue(
-				AttackTime + CombatSettings->CalculateStartTime(CombatSettings->CurrentActionMontage.ReferenceHeight, CombatSettings->CurrentActionMontage.StartTime, AttackHeight))
+			CombatState.CombatParameters.CombatAnimation.InterpolationAndCorrectionAmountsCurve->GetVectorValue(
+				AttackTime + CombatSettings->CalculateStartTime(CombatState.CombatParameters.CombatAnimation.ReferenceHeight, CombatState.CombatParameters.CombatAnimation.StartTime, AttackHeight))
 		};
 
 		const auto InterpolationAmount{InterpolationAndCorrectionAmounts.X};
@@ -83,8 +94,8 @@ void FALSXTRootMotionSource_CombatAttack::PrepareRootMotion(const float Simulati
 		{
 			// Calculate the animation offset. This would be the location the actual animation starts at relative to the target transform.
 
-			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * CombatSettings->CurrentActionMontage.StartRelativeLocation.X};
-			AnimationLocationOffset.Z = CombatSettings->CurrentActionMontage.StartRelativeLocation.Z;
+			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * CombatState.CombatParameters.CombatAnimation.StartRelativeLocation.X};
+			AnimationLocationOffset.Z = CombatState.CombatParameters.CombatAnimation.StartRelativeLocation.Z;
 			AnimationLocationOffset *= Character.GetMesh()->GetComponentScale().Z;
 
 			// Blend into the animation offset and final offset at the same time.

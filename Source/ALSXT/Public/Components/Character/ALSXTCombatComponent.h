@@ -129,6 +129,9 @@ public:
 	bool CanBeTakenDown();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanBeKnockedDown();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanPerformSpecialAttack();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
@@ -137,26 +140,64 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	AActor* TraceForPotentialAttackTarget(float Distance);
 
-	UFUNCTION(BlueprintCallable, Category = "Attack")
-	void Attack(const FGameplayTag& AttackType, const FGameplayTag& Strength, float BaseDamage, float PlayRate = 1.0f);
+	UFUNCTION(BlueprintCallable, Category = "Attack", Meta = (AutoCreateRefTerm = "ActionType, AttackType, Strength"))
+	void Attack(UPARAM(meta = (Categories = "Als.Action Type"))const FGameplayTag& ActionType, UPARAM(meta = (Categories = "Als.Attack Type"))const FGameplayTag& AttackType, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, float BaseDamage, float PlayRate = 1.0f);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanTarget();
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
+	int32 CombatRootMotionSourceId;
+
+public:
 	FALSXTCombatParameters CombatParameters;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTCombatState& GetCombatState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewCombatState"))
+	void SetCombatState(const FALSXTCombatState& NewCombatState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewCombatState"))
+	FALSXTCombatState ProcessNewCombatState(const FALSXTCombatState& NewCombatState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewCombatState(const FALSXTCombatState& NewCombatState);
+
+private:
+	UFUNCTION(Server, Unreliable)
+	void ServerSetCombatState(const FALSXTCombatState& NewCombatState);
+
+	UFUNCTION()
+	void OnReplicate_CombatState(const FALSXTCombatState& PreviousCombatState);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnCombatStateChanged(const FALSXTCombatState& PreviousCombatState);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
-	void DetermineAttackMethod(FGameplayTag& AttackMethod, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target);
+	void DetermineAttackMethod(FGameplayTag& AttackMethod, const FGameplayTag& ActionType, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
-	UAnimMontage* SelectAttackMontage(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage);
+	FAttackAnimation SelectAttackMontage(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
-	void GetSyncedAttackMontageInfo(FSyncedActionMontageInfo& SyncedActionMontageInfo, const FGameplayTag& AttackType, int32 Index);
+	FSyncedAttackAnimation SelectSyncedAttackMontage(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage, int& Index);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	FSyncedActionAnimation GetSyncedAttackMontage(int32 Index);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UALSXTCombatSettings* SelectAttackSettings();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnAttackStarted(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float& BaseDamage);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSyncedAttackStarted(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float& BaseDamage);
 
 	// Desired Attack
 
@@ -178,6 +219,10 @@ private:
 
 	TArray<FLastTargetEntry> LastTargets;
 
+	FAttackAnimation LastAttackAnimation;
+
+	FSyncedAttackAnimation LastSyncedAttackAnimation;
+
 	FTimerHandle TimeSinceLastBlockTimerHandle;
 	float TimeSinceLastBlock;
 
@@ -196,11 +241,34 @@ private:
 
 	void RefreshAttackPhysics(float DeltaTime);
 
+	UFUNCTION(Server, Reliable)
+	void ServerStartSyncedAttack(UAnimMontage* Montage, int32 Index, float PlayRate, float StartYawAngle, float TargetYawAngle);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartSyncedAttack(UAnimMontage* Montage, int32 Index, float PlayRate, float StartYawAngle, float TargetYawAngle);
+
+	void StartSyncedAttackImplementation(UAnimMontage* Montage, int32 Index, float PlayRate, float StartYawAngle, float TargetYawAngle);
+
+	void RefreshSyncedAttack(float DeltaTime);
+
+	void RefreshSyncedAttackPhysics(float DeltaTime);
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	void StopAttack();
 
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+	void StopSyncedAttack();
+
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Hooks")
 	void OnAttackEnded();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Hooks")
+	void OnSyncedAttackEnded();
 };
+
+inline const FALSXTCombatState& UALSXTCombatComponent::GetCombatState() const
+{
+	return CombatState;
+}

@@ -11,7 +11,28 @@ struct ALSXT_API FALSXTCombatParameters
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
+	FGameplayTag AttackType{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag Strength{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag Stance{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag Form{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FActionMontageInfo CombatAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float PlayRate{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float BaseDamage{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm"))
+	float ImpactHeight{0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FVector_NetQuantize100 TargetRelativeLocation{ForceInit};
@@ -19,11 +40,14 @@ struct ALSXT_API FALSXTCombatParameters
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FRotator TargetRelativeRotation{ForceInit};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm"))
-	float ImpactHeight{0.0f};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
+	float TargetYawAngle{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FGameplayTag Location{FGameplayTag::EmptyTag};
+	AActor* Target;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -32,16 +56,11 @@ class ALSXT_API UALSXTCombatSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
-	TArray<FAttackType> AttackTypes;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths} {AttackStances} {AttackType}", AllowPrivateAccess))
 	TArray<FAttackAnimation> AttackAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackType}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths} {AttackStances}", AllowPrivateAccess))
 	TArray<FSyncedAttackAnimation> SyncedAttackAnimations;
-
-	FActionMontageInfo CurrentActionMontage;
 
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float AttackHeight) const;
@@ -90,7 +109,6 @@ struct ALSXT_API FALSXTCombatAttackTraceSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag AttackStrength;
-
 };
 
 USTRUCT(BlueprintType)
