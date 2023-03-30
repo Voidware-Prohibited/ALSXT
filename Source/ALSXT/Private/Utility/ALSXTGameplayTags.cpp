@@ -484,10 +484,12 @@ namespace ALSXTActionStrengthTags
 
 namespace ALSXTAttackMethodTags
 {
+	UE_DEFINE_GAMEPLAY_TAG(Cancelled, TEXT("Als.Attack Method.Cancelled"))
 	UE_DEFINE_GAMEPLAY_TAG(Regular, TEXT("Als.Attack Method.Regular"))
 	UE_DEFINE_GAMEPLAY_TAG(Riposte, TEXT("Als.Attack Method.Riposte"))
-	UE_DEFINE_GAMEPLAY_TAG(Special, TEXT("Als.Attack Method.Special"))
+	UE_DEFINE_GAMEPLAY_TAG(Unique, TEXT("Als.Attack Method.Unique"))
 	UE_DEFINE_GAMEPLAY_TAG(Grapple, TEXT("Als.Attack Method.Grapple"))
+	UE_DEFINE_GAMEPLAY_TAG(Throw, TEXT("Als.Attack Method.Throw"))
 	UE_DEFINE_GAMEPLAY_TAG(KnockOut, TEXT("Als.Attack Method.Knock Out"))
 	UE_DEFINE_GAMEPLAY_TAG(TakeDown, TEXT("Als.Attack Method.Take Down"))
 	UE_DEFINE_GAMEPLAY_TAG(Cybernetic, TEXT("Als.Attack Method.Cybernetic"))

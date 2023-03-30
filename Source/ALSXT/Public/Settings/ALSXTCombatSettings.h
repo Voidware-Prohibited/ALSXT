@@ -62,6 +62,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths} {AttackStances}", AllowPrivateAccess))
 	TArray<FSyncedAttackAnimation> SyncedAttackAnimations;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
+	TArray<FAnticipationPose> BlockingPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	int32 ConsecutiveHitsForSpecialAttack{5};
+
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float AttackHeight) const;
 
@@ -126,7 +132,10 @@ struct ALSXT_API FALSXTGeneralCombatSettings
 	bool bEnableSyncedAttacks{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
-	bool bEnableSpecials{ true };
+	bool bEnableSpecialAttacks{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableUniqueAttacks{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
 	bool bEnableGrapples{ true };

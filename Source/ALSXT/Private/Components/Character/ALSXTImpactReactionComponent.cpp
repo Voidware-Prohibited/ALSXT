@@ -45,59 +45,44 @@ void UALSXTImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick Ti
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
 	const auto* Capsule{ Character->GetCapsuleComponent() };
-
 	const auto CapsuleScale{ Capsule->GetComponentScale().Z };
-	// const auto CapsuleRadius{ Capsule->GetScaledCapsuleRadius() };
-	const auto CapsuleRadius{ 30.0f };
+	const auto CapsuleRadius{ ImpactReactionSettings.BumpDetectionRadius };
 	const auto CapsuleHalfHeight{ Capsule->GetScaledCapsuleHalfHeight() };
-
-	// Set Local Variables
-	//const FVector LandingStartLocation{	TargetCapsuleLocation + (DepthTraceHit.Normal * 60) + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1)) };
 	const FVector UpVector{ Character->GetActorUpVector() };
-	// const FVector StartLocation{ Character->GetActorLocation() + (UpVector * CapsuleHalfHeight/2) + (Character->GetActorForwardVector() * 5)};
 	const FVector StartLocation{ Character->GetActorLocation() + (UpVector * CapsuleHalfHeight / 2)};
-	
-	//LocomotionState.InputYawAngle
+	TEnumAsByte<EDrawDebugTrace::Type> BumpDebugMode;
+	BumpDebugMode = (DebugMode) ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
 	TArray<FHitResult> HitResults;
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(Character);
+	float VelocityLength{ 0.0f };
 	float TraceDistance {0.0f};
+	FVector2D VelocityRange{ 0.0, 650.0 };
+	FVector2D ConversionRange{ 0.0, 1.0 };
+	FVector RangedVelocity = Character->GetVelocity();
+	VelocityLength = FMath::GetMappedRangeValueClamped(VelocityRange, ConversionRange, Character->GetVelocity().Length());
 
 	if (Character->GetVelocity().Length() > 0)
 	{
-		if (Character->GetGait() == AlsGaitTags::Walking)
-		{
-			TraceDistance = ImpactReactionSettings.WalkingBumpDetectionDistance;
-		}
-		if (Character->GetGait() == AlsGaitTags::Running)
-		{
-			TraceDistance = ImpactReactionSettings.RunningBumpDetectionDistance;
-		}
-		if (Character->GetGait() == AlsGaitTags::Sprinting)
-		{
-			TraceDistance = ImpactReactionSettings.SprintingBumpDetectionDistance;
-		}
+		TraceDistance = ImpactReactionSettings.MaxBumpDetectionDistance;
 	}
 	else
 	{
 		TraceDistance = 0.0f;
 	}
 
-	// const FVector EndLocation{ StartLocation + (Character->GetActorForwardVector() * TraceDistance) };
-	// Character->GetLocomotionState().Velocity
 	const FVector EndLocation{ StartLocation + (Character->GetVelocity() * TraceDistance) };
-	// const FVector EndLocation{ StartLocation + (Character->GetLocomotionState().Velocity * TraceDistance) };
-	
-	// Trace for room for Vaulting action
-	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight/2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
+
+	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight/2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, BumpDebugMode, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
 	{
-		FString BumpHit = HitResults[0].GetActor()->GetName();
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, BumpHit);
+		if (DebugMode)
+		{
+			FString BumpHit = "Bump: ";
+			BumpHit.Append(HitResults[0].GetActor()->GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, BumpHit);
+		}
 	}
 }
-
-
-// UnarmedAttack
 
 void UALSXTImpactReactionComponent::BumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 {
@@ -244,6 +229,19 @@ void UALSXTImpactReactionComponent::StartResponse(FAttackDoubleHitResult Hit)
 {
 
 }
+
+FAnticipationPose UALSXTImpactReactionComponent::SelectAnticipationMontage_Implementation(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
+{
+	FAnticipationPose SelectedAnticipationPose;
+	return SelectedAnticipationPose;
+}
+
+FAnticipationPose UALSXTImpactReactionComponent::SelectDefensiveMontage_Implementation(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
+{
+	FAnticipationPose SelectedAnticipationPose;
+	return SelectedAnticipationPose;
+}
+
 
 UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactionSettings_Implementation(const FGameplayTag& Location)
 {

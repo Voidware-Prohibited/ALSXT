@@ -490,7 +490,7 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& ActionType, const FGamepl
 			? Character->GetLocomotionState().InputYawAngle
 			: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)));
 	}
-	else if (AttackMethod == ALSXTAttackMethodTags::Special || AttackMethod == ALSXTAttackMethodTags::TakeDown)
+	else if (AttackMethod == ALSXTAttackMethodTags::Unique || AttackMethod == ALSXTAttackMethodTags::TakeDown)
 	{
 		StartSyncedAttack(Character->GetOverlayMode(), AttackType, NewStance, Strength, AttackMethod, BaseDamage, PlayRate, CombatSettings.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
 			? Character->GetLocomotionState().InputYawAngle
@@ -629,78 +629,98 @@ UALSXTCombatSettings* UALSXTCombatComponent::SelectAttackSettings_Implementation
 
 void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& AttackMethod, const FGameplayTag& ActionType, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target)
 {
-	if (ActionType == ALSXTActionTypeTags::Secondary)
-	{
-
-	}
-	else
-	{
-
-	}
-	
 	if (UKismetSystemLibrary::DoesImplementInterface(GetCombatState().CombatParameters.Target, UALSXTCombatInterface::StaticClass()))
 	{
-		if (!IALSXTCombatInterface::Execute_Blocking(GetCombatState().CombatParameters.Target))
+		if (ActionType == ALSXTActionTypeTags::Secondary)
 		{
-			if (IALSXTCombatInterface::Execute_CanBeTakenDown(GetCombatState().CombatParameters.Target))
+			// if (IALSXTCombatInterface::Execute_CanBeTakenDown(GetCombatState().CombatParameters.Target) && CanPerformTakedown())
+			if (CanPerformTakedown())
 			{
-				// ...
+				AttackMethod = ALSXTAttackMethodTags::TakeDown;
+				return;
 			}
-			if (IALSXTCombatInterface::Execute_CanBeKnockedDown(GetCombatState().CombatParameters.Target))
+			else if (CanGrapple())
 			{
-				// ...
-			}
-			if (IALSXTCombatInterface::Execute_CanBeThrown(GetCombatState().CombatParameters.Target))
-			{
-				// ...
-			}
-			if (IALSXTCombatInterface::Execute_CanBeGrappled(GetCombatState().CombatParameters.Target))
-			{
-				// ...
-			}
-			if (IALSXTCombatInterface::Execute_CanBeRagdolled(GetCombatState().CombatParameters.Target))
-			{
-				// ...
-			}
-		}	
-	}
-
-	if (UKismetSystemLibrary::DoesImplementInterface(GetCombatState().CombatParameters.Target, UALSXTCollisionInterface::StaticClass()))
-	{
-		if (IALSXTCollisionInterface::Execute_CanReceiveImpulse(GetCombatState().CombatParameters.Target))
-		{
-			// ...
-		}
-	}
-	
-	
-	if (LastTargets.Num() > 0)
-	{
-		for (auto& LastTarget : LastTargets)
-		{
-			if (LastTarget.Target == Target)
-			{
-				if (LastTarget.LastBlockedAttack < 2.0f)
+				if (CanThrow())
 				{
-					AttackMethod = ALSXTAttackMethodTags::Riposte;
-					return;
-				}
-				else if (LastTarget.ConsecutiveHits > 5)
-				{
-					AttackMethod = ALSXTAttackMethodTags::Special;
+					AttackMethod = ALSXTAttackMethodTags::Throw;
 					return;
 				}
 				else
 				{
-					AttackMethod = ALSXTAttackMethodTags::Regular;
+					AttackMethod = ALSXTAttackMethodTags::Grapple;
 					return;
 				}
+			}
+			else
+			{
+				AttackMethod = ALSXTAttackMethodTags::Cancelled;
+				return;
+			}
+		}
+		else
+		{
+			if (LastTargets.Num() > 0)
+			{
+				for (auto& LastTarget : LastTargets)
+				{
+					if (LastTarget.Target == Target)
+					{
+						if (LastTarget.LastBlockedAttack < 2.0f)
+						{
+							AttackMethod = ALSXTAttackMethodTags::Riposte;
+							return;
+						}
+						else if (LastTarget.ConsecutiveHits >= SelectAttackSettings()->ConsecutiveHitsForSpecialAttack)
+						{
+							if (CanPerformUniqueAttack())
+							{
+								AttackMethod = ALSXTAttackMethodTags::Unique;
+								return;
+							}
+							else if (CanPerformTakedown())
+							{
+								AttackMethod = ALSXTAttackMethodTags::TakeDown;
+								return;
+							}
+							else if (CanGrapple())
+							{
+								if (CanThrow())
+								{
+									AttackMethod = ALSXTAttackMethodTags::Throw;
+									return;
+								}
+								else
+								{
+									AttackMethod = ALSXTAttackMethodTags::Grapple;
+									return;
+								}
+							}
+							else
+							{
+								AttackMethod = ALSXTAttackMethodTags::Regular;
+								return;
+							}
+						}
+						else
+						{
+							AttackMethod = ALSXTAttackMethodTags::Regular;
+							return;
+						}
+					}
+				}
+			}
+			else
+			{
+				AttackMethod = ALSXTAttackMethodTags::Regular;
+				return;
 			}
 		}
 	}
 	else
 	{
 		AttackMethod = ALSXTAttackMethodTags::Regular;
+		return;
 	}
 }
 
@@ -838,6 +858,12 @@ FSyncedAttackAnimation UALSXTCombatComponent::SelectSyncedAttackMontage_Implemen
 		return SelectedSyncedAttackAnimation;
 	}
 	return SelectedSyncedAttackAnimation;
+}
+
+FAnticipationPose UALSXTCombatComponent::SelectBlockingkMontage_Implementation(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
+{
+	FAnticipationPose SelectedAnticipationPose;
+	return SelectedAnticipationPose;
 }
 
 FSyncedActionAnimation UALSXTCombatComponent::GetSyncedAttackMontage_Implementation(int32 Index)

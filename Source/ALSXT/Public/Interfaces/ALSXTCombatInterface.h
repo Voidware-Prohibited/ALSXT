@@ -16,6 +16,12 @@ public:
   bool Blocking();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  bool CanReceiveSpecialAttacks();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  bool CanReceiveUniqueAttacks();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   bool CanBeGrappled();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")

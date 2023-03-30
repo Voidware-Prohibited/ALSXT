@@ -97,6 +97,12 @@ protected:
 	UAnimMontage* SelectBumpReactionMontage(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	FAnticipationPose SelectAnticipationMontage(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	FAnticipationPose SelectDefensiveMontage(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health);	
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectAttackReactionMontage(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
@@ -124,6 +130,9 @@ protected:
 	UALSXTAttackReactionSettings* SelectAttackReactionSettings(const FGameplayTag& Location);
 
 	// Settings
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	bool DebugMode{ false };
+
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldSpawnParticleActor(FDoubleHitResult Hit);

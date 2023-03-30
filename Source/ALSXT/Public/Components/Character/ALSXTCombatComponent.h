@@ -132,7 +132,7 @@ public:
 	bool CanBeKnockedDown();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanPerformSpecialAttack();
+	bool CanPerformUniqueAttack();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTCombatState CombatState;
@@ -186,6 +186,9 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	FSyncedAttackAnimation SelectSyncedAttackMontage(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, float BaseDamage, int& Index);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	FAnticipationPose SelectBlockingkMontage(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health);	
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	FSyncedActionAnimation GetSyncedAttackMontage(int32 Index);

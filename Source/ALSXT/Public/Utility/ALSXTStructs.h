@@ -668,14 +668,14 @@ struct ALSXT_API FAnticipationPose
 	FGameplayTagContainer ImpactForm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Game.Health", AllowPrivateAccess))
-	FGameplayTag Health;
+	FGameplayTagContainer Health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	TObjectPtr<UAnimMontage> Pose;
 
 	bool operator==(const FAnticipationPose& other) const
 	{
-		return (other.ImpactStrength == ImpactStrength);
+		return (other.ImpactStrength == ImpactStrength) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.Health == Health);
 	}
 };
 
