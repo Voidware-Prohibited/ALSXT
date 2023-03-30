@@ -67,5 +67,5 @@ bool UALSXTAnimationInstance::IsRotateInPlaceAllowed()
 
 bool UALSXTAnimationInstance::IsTurnInPlaceAllowed()
 {
-	return (ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::LookingDirection && ALSXTCharacter->GetViewMode() != AlsViewModeTags::FirstPerson);
+	return (ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::ViewDirection && ALSXTCharacter->GetViewMode() != AlsViewModeTags::FirstPerson);
 }

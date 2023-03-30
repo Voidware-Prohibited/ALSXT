@@ -325,12 +325,12 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 				} 
 				else
 				{
-					SetDesiredRotationMode(AlsRotationModeTags::LookingDirection);
+					SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 				}
 			}
 			else 
 			{
-				SetDesiredRotationMode(AlsRotationModeTags::LookingDirection);
+				SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 			}
 			SetDesiredAiming(ActionValue.Get<bool>());
 		}
@@ -357,7 +357,7 @@ void AALSXTCharacter::InputRoll()
 void AALSXTCharacter::InputRotationMode()
 {
 	SetDesiredRotationMode(GetDesiredRotationMode() == AlsRotationModeTags::VelocityDirection
-		                       ? AlsRotationModeTags::LookingDirection
+		                       ? AlsRotationModeTags::ViewDirection
 		                       : AlsRotationModeTags::VelocityDirection);
 }
 
@@ -870,7 +870,7 @@ void AALSXTCharacter::SetDesiredCombatStance(const FGameplayTag& NewCombatStance
 				}
 				else
 				{
-					SetDesiredRotationMode(AlsRotationModeTags::LookingDirection);
+					SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 				}
 			}
 			else if (GetLocalRole() == ROLE_Authority)
