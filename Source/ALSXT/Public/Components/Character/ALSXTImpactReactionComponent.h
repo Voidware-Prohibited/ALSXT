@@ -130,10 +130,6 @@ protected:
 	UALSXTAttackReactionSettings* SelectAttackReactionSettings(const FGameplayTag& Location);
 
 	// Settings
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	bool DebugMode{ false };
-
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldSpawnParticleActor(FDoubleHitResult Hit);
 

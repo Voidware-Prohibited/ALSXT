@@ -105,13 +105,31 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAllowImpactReaction{ true };
+	bool EnableImpactReactions{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableAttackReactions{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableBumpReactions{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float CharacterBumpDetectionMinimumVelocity {175.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float ObstacleBumpDetectionMinimumVelocity {175.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float BumpDetectionRadius {30.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float MaxBumpDetectionDistance {0.125f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableSlideToCoverHook{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float MaxSlideToCoverDetectionDistance {0.25f};
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bRotateToInputOnStart{ true };
@@ -133,4 +151,7 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", meta=(TitleProperty="{Settings}", ForceInlineRow))
 	TMap<FName, FBoneLocationEntry> BoneLocationMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool DebugMode{ false };
 };

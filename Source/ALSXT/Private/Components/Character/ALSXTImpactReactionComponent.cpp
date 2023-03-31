@@ -7,6 +7,7 @@
 #include "Math/RandomStream.h"
 #include "Settings/ALSXTAttackReactionSettings.h"
 #include "Utility/AlsMacros.h"
+#include "Interfaces/ALSXTCollisionInterface.h"
 
 // Sets default values for this component's properties
 UALSXTImpactReactionComponent::UALSXTImpactReactionComponent()
@@ -35,7 +36,7 @@ void UALSXTImpactReactionComponent::BeginPlay()
 void UALSXTImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (Character->GetVelocity().Length() > 0)
+	if (Character->GetVelocity().Length() > FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
 	{
 		ObstacleTrace();
 	}
@@ -46,41 +47,101 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 {
 	const auto* Capsule{ Character->GetCapsuleComponent() };
 	const auto CapsuleScale{ Capsule->GetComponentScale().Z };
-	const auto CapsuleRadius{ ImpactReactionSettings.BumpDetectionRadius };
+	auto CapsuleRadius{ ImpactReactionSettings.BumpDetectionRadius };
 	const auto CapsuleHalfHeight{ Capsule->GetScaledCapsuleHalfHeight() };
 	const FVector UpVector{ Character->GetActorUpVector() };
 	const FVector StartLocation{ Character->GetActorLocation() + (UpVector * CapsuleHalfHeight / 2)};
 	TEnumAsByte<EDrawDebugTrace::Type> BumpDebugMode;
-	BumpDebugMode = (DebugMode) ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
+	BumpDebugMode = (ImpactReactionSettings.DebugMode) ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
 	TArray<FHitResult> HitResults;
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(Character);
 	float VelocityLength{ 0.0f };
 	float TraceDistance {0.0f};
-	FVector2D VelocityRange{ 0.0, 650.0 };
+	FVector2D VelocityRange{ 199.0, 650.0 };
 	FVector2D ConversionRange{ 0.0, 1.0 };
 	FVector RangedVelocity = Character->GetVelocity();
 	VelocityLength = FMath::GetMappedRangeValueClamped(VelocityRange, ConversionRange, Character->GetVelocity().Length());
 
-	if (Character->GetVelocity().Length() > 0)
+	if (ImpactReactionSettings.DebugMode)
 	{
-		TraceDistance = ImpactReactionSettings.MaxBumpDetectionDistance;
+		FString VelMsg = "Vel: ";
+		VelMsg.Append(FString::SanitizeFloat(Character->GetVelocity().Length()));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, VelMsg);
+	}
+
+	if (Character->GetVelocity().Length() > FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
+	{
+		if (Character->GetLocomotionAction() == AlsLocomotionActionTags::Sliding)
+		{
+			CapsuleRadius = CapsuleRadius * 2.0;
+			TraceDistance = ImpactReactionSettings.MaxSlideToCoverDetectionDistance;
+		}
+		else if (!Character->GetMesh()->IsPlayingNetworkedRootMotionMontage())
+		{
+			TraceDistance = ImpactReactionSettings.MaxBumpDetectionDistance;
+		}
+		const FVector EndLocation{ StartLocation + (Character->GetVelocity() * TraceDistance) };
+
+		if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight / 2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, BumpDebugMode, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
+		{
+			for (FHitResult HitResult : HitResults)
+			{
+				
+				if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCollisionInterface::StaticClass()))
+				{
+					FHitResult OriginHitResult;
+					TArray<AActor*> IgnoreActorsOrigin;
+					IgnoreActorsOrigin.Add(HitResult.GetActor());
+
+					if (UKismetSystemLibrary::CapsuleTraceSingleForObjects(GetWorld(), HitResult.ImpactPoint, StartLocation, CapsuleRadius, CapsuleHalfHeight / 2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActorsOrigin, EDrawDebugTrace::None, OriginHitResult, false, FLinearColor::Green, FLinearColor::Red, 5.0f))
+					{
+						FDoubleHitResult DoubleHitResult;
+						DoubleHitResult.HitResult.HitResult = HitResult;
+						IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), DoubleHitResult.HitResult.Mass);
+						IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), DoubleHitResult.HitResult.Velocity);
+						DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
+						IALSXTCollisionInterface::Execute_GetActorMass(Character, DoubleHitResult.OriginHitResult.Mass);
+						IALSXTCollisionInterface::Execute_GetActorVelocity(Character, DoubleHitResult.OriginHitResult.Velocity);
+
+						if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCharacterInterface::StaticClass()))
+						{
+							IALSXTCharacterInterface::Execute_BumpReaction(HitResult.GetActor(), DoubleHitResult, Character->GetDesiredGait(), ALSXTImpactSideTags::Right, ALSXTImpactFormTags::Blunt);
+						}
+						else if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCollisionInterface::StaticClass()))
+						{
+							IALSXTCollisionInterface::Execute_OnActorImpactCollision(HitResult.GetActor(), DoubleHitResult);
+						}
+
+					}
+
+					AALSXTCharacter* HitIsCharacter = Cast<AALSXTCharacter>(HitResult.GetActor());
+					if (HitIsCharacter) 
+					{
+						// ...
+					}
+					else
+					{
+
+					}
+					
+				}
+
+				if (ImpactReactionSettings.DebugMode)
+				{
+					FString BumpHit = "Bump: ";
+					BumpHit.Append(HitResult.GetActor()->GetName());
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, BumpHit);
+				}
+			}
+			
+			
+		}
 	}
 	else
 	{
 		TraceDistance = 0.0f;
-	}
-
-	const FVector EndLocation{ StartLocation + (Character->GetVelocity() * TraceDistance) };
-
-	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight/2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, BumpDebugMode, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
-	{
-		if (DebugMode)
-		{
-			FString BumpHit = "Bump: ";
-			BumpHit.Append(HitResults[0].GetActor()->GetName());
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, BumpHit);
-		}
+		return;
 	}
 }
 

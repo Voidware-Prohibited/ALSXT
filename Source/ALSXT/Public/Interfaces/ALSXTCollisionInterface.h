@@ -34,5 +34,4 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void OnActorImpactCollision(FDoubleHitResult Hit);
-
 };
