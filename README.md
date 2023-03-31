@@ -4,6 +4,9 @@
 
 An Unreal Engine 5 plugin that extends Advanced Locomotion System Refactored with expanded Character States, Improved Foot Print system, Sliding, Physical Animayion, Vaulting, Wallrunning and more(XT) 
 
+_ALSXT is under heavy development, some features may not be finished or production-ready_
+_Contibutors and PRs are welcome_
+
 # Introduction
 
 **Features**
@@ -34,6 +37,10 @@ An Unreal Engine 5 plugin that extends Advanced Locomotion System Refactored wit
 - Build your Solution in Visual Studio again
 - Once compilation is successful you can now begin using ALSXT in your project
 
+# Contributions
+
+If you wish to contribute, please ensure you are in sync with both ALSXT and ALS-Refactored. While I try to stay in sync with ALS-Refactored, at times it may be temporarily out of sync and features may break or need refactoring.
+
 # License
 
 Original content and code in this repository is under the MIT license. Any git submodules are covered by their respective licenses. Content listed in the Attributions are covered by their respective licenses.
@@ -53,3 +60,5 @@ Original content and code in this repository is under the MIT license. Any git s
 - [Bench 02](https://sketchfab.com/3d-models/bench-02-0fc91c47c6b04717bb4400c247de573e) by [Ricardo Sanchez](https://sketchfab.com/380660711785) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/)
 
 - [swipes and whooshes tshirt fast and short swings stereo ORTF 8040.wav](https://freesound.org/people/Soundholder/sounds/425856/) by [Soundholder](https://freesound.org/people/Soundholder/) [License: CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) Modified to be seperate sounds
+
+- [BACKPACK](https://sketchfab.com/3d-models/backpack-9ccadc2945c34826a0ce1c37de13675e) by [Idmental](https://sketchfab.com/idmental.id) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to optimize textures
