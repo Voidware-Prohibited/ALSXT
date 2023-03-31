@@ -27,8 +27,8 @@ An Unreal Engine 5 plugin that extends Advanced Locomotion System Refactored wit
 # Installation
 
 - Begin with an empty C++ Project
-- Install and setup Enhanced Plugin
-- Install and setup Metasounds Plugin
+- Install and setup Enhanced Input Plugin
+- Install and setup MetaSound Plugin
 - Install the latest version of ALS-Refactored via https://github.com/Sixze/ALS-Refactored#quick-start
 - Clone/download ALSXT into your projects Plugin folder (You should have both ALS-Refactored and ALSXT side by side)
 - Build your Solution in Visual Studio again
