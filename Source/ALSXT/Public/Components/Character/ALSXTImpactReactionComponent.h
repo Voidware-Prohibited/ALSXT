@@ -55,6 +55,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
 	float GetStamina();
 
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	FGameplayTag GetCharacterVelocity();
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanReact();
 

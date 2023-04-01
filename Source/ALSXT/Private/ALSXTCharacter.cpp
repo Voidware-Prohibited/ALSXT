@@ -207,8 +207,11 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 
 	if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
 	{
-		AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
-		MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
+		// AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
+		// MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
+		// GetLocomotionState().PreviousVelocity
+		AddMovementInput(GetLocomotionState().PreviousVelocity);
+		MovementInput = GetLocomotionState().PreviousVelocity;
 	}
 	else
 	{
@@ -622,6 +625,26 @@ void AALSXTCharacter::InputReload()
 void AALSXTCharacter::InputReloadWithRetention()
 {
 	// 
+}
+
+bool AALSXTCharacter::CanPerformPrimaryAction_Implementation() const
+{
+	return true;
+}
+
+bool AALSXTCharacter::CanPerformSecondaryAction_Implementation() const
+{
+	return true;
+}
+
+bool AALSXTCharacter::CanPerformPrimaryInteraction_Implementation() const
+{
+	return true;
+}
+
+bool AALSXTCharacter::CanPerformSecondaryInteraction_Implementation() const
+{
+	return true;
 }
 
 void AALSXTCharacter::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalLocation)

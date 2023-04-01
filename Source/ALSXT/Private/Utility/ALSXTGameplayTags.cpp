@@ -169,6 +169,15 @@ namespace ALSXTImpactTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(Fall, TEXT("Als.Impact Type.Fall"))
 }
 
+namespace ALSXTImpactVelocityTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Slow, TEXT("Als.Impact Velocity.Slow"))
+	UE_DEFINE_GAMEPLAY_TAG(Moderate, TEXT("Als.Impact Velocity.Moderate"))
+	UE_DEFINE_GAMEPLAY_TAG(Fast, TEXT("Als.Impact Velocity.Fast"))
+	UE_DEFINE_GAMEPLAY_TAG(Faster, TEXT("Als.Impact Velocity.Faster"))
+	UE_DEFINE_GAMEPLAY_TAG(TerminalVelocity, TEXT("Als.Impact Velocity.Terminal Velocity"))
+}
+
 namespace ALSXTImpactFormTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Push, TEXT("Als.Impact Form.Push"))

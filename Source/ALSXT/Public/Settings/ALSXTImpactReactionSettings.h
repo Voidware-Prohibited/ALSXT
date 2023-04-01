@@ -60,10 +60,10 @@ public:
 	TArray <FFallenAnimation> FallenAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FCrowdBumpReactionAnimation> CrowdBumpReactionAnimations;
+	TArray<FBumpReactionAnimation> CrowdBumpReactionAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FObstacleBumpReactionAnimation> ObstacleBumpReactionAnimations;
+	TArray<FBumpReactionAnimation> ObstacleBumpReactionAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray <FImpactReactionLocation> ImpactReactionLocations;

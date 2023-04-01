@@ -43,6 +43,53 @@ void UALSXTImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick Ti
 	// ...
 }
 
+FGameplayTag UALSXTImpactReactionComponent::GetCharacterVelocity()
+{
+	if (Character->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
+	{
+		if (Character->GetVelocity().Length() < 175)
+		{
+			return ALSXTImpactVelocityTags::Slow;
+		}
+		else if (Character->GetVelocity().Length() >= 175 && Character->GetVelocity().Length() < 350)
+		{
+			return ALSXTImpactVelocityTags::Moderate;
+		}
+		else if (Character->GetVelocity().Length() >= 350 && Character->GetVelocity().Length() < 650)
+		{
+			return ALSXTImpactVelocityTags::Fast;
+		}
+		else if (Character->GetVelocity().Length() >= 650 && Character->GetVelocity().Length() < 800)
+		{
+			return ALSXTImpactVelocityTags::Faster;
+		}
+		else if (Character->GetVelocity().Length() >= 800)
+		{
+			return ALSXTImpactVelocityTags::TerminalVelocity;
+		}
+		else
+		{
+			return FGameplayTag::EmptyTag;
+		}
+	}
+	else
+	{
+		FGameplayTag CharacterGait = Character->GetDesiredGait();
+		if (CharacterGait == AlsGaitTags::Walking)
+		{
+			return ALSXTImpactVelocityTags::Slow;
+		}
+		else if (CharacterGait == AlsGaitTags::Walking)
+		{
+			return ALSXTImpactVelocityTags::Moderate;
+		}
+		else
+		{
+			return ALSXTImpactVelocityTags::Fast;
+		}
+	}
+}
+
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
 	const auto* Capsule{ Character->GetCapsuleComponent() };

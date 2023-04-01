@@ -539,7 +539,30 @@ struct ALSXT_API FAttackStrength
 };
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FObstacleBumpReactionAnimation
+struct ALSXT_API FBumpReactionAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTagContainer Side;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FBumpReactionAnimation& other) const
+	{
+		return (other.Velocity == Velocity) && (other.Side == Side) && (other.Form == Form) && (other.Montage == Montage);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FCrowdBumpReactionAnimation
 {
 	GENERATED_BODY()
 
@@ -555,29 +578,9 @@ struct ALSXT_API FObstacleBumpReactionAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo Montage;
 
-	bool operator==(const FObstacleBumpReactionAnimation& other) const
-	{
-		return (other.Gait == Gait);
-	}
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FCrowdBumpReactionAnimation
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait", AllowPrivateAccess))
-	FGameplayTagContainer Gait;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
-	FGameplayTagContainer Side;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	FActionMontageInfo Montage;
-
 	bool operator==(const FCrowdBumpReactionAnimation& other) const
 	{
-		return (other.Gait == Gait);
+		return (other.Gait == Gait) && (other.Side == Side) && (other.Form == Form) && (other.Montage == Montage);
 	}
 };
 

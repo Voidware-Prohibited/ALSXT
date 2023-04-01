@@ -530,6 +530,18 @@ public:
 	void InputSecondaryInteraction();
 
 protected:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
+	bool CanPerformPrimaryAction() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
+	bool CanPerformSecondaryAction() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
+	bool CanPerformPrimaryInteraction() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
+	bool CanPerformSecondaryInteraction() const;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	void OnViewModeChanged(const FGameplayTag& PreviousViewModeTag);
 
