@@ -5,7 +5,6 @@
 #include "ALSXTCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/RandomStream.h"
-#include "Settings/ALSXTAttackReactionSettings.h"
 #include "Utility/AlsMacros.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
 
@@ -192,6 +191,21 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 	}
 }
 
+void UALSXTImpactReactionComponent::AnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::SyncedAnticipationReaction(FVector AnticipationPoint)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::DefensiveReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+{
+	// ...
+}
+
 void UALSXTImpactReactionComponent::BumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 {
 	// ...
@@ -257,7 +271,8 @@ void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult H
 	TSubclassOf<AActor> ParticleActor{ nullptr };
 	USoundBase* Audio{ nullptr };
 
-	Montage = SelectAttackReactionMontage(Hit);
+	FAttackReactionAnimation SelectedAttackReaction = SelectAttackReactionMontage(Hit);
+	Montage = SelectedAttackReaction.Montage.Montage;
 	Particle = GetImpactReactionParticle(Hit.DoubleHitResult);
 	ParticleActor = GetImpactReactionParticleActor(Hit.DoubleHitResult);
 	Audio = GetImpactReactionSound(Hit.DoubleHitResult);
@@ -291,7 +306,8 @@ void UALSXTImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	UNiagaraSystem* Particle {nullptr};
 	USoundBase* Audio {nullptr};
 
-	Montage = SelectImpactReactionMontage(Hit);
+	FImpactReactionAnimation ImpactReactionAnimation = SelectImpactReactionMontage(Hit);
+	Montage = ImpactReactionAnimation.Montage.Montage;
 	Particle = GetImpactReactionParticle(Hit);
 	Audio = GetImpactReactionSound(Hit);
 
@@ -351,190 +367,191 @@ FAnticipationPose UALSXTImpactReactionComponent::SelectDefensiveMontage_Implemen
 }
 
 
-UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactionSettings_Implementation(const FGameplayTag& Location)
-{
-	return nullptr;
-}
-
-UALSXTAttackReactionSettings* UALSXTImpactReactionComponent::SelectAttackReactionSettings_Implementation(const FGameplayTag& Location)
+UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactionSettings_Implementation()
 {
 	return nullptr;
 }
 
 void UALSXTImpactReactionComponent::SyncedReaction() {}
 
-void UALSXTImpactReactionComponent::Fall() {}
+void UALSXTImpactReactionComponent::ImpactFall() {}
+
+void UALSXTImpactReactionComponent::BumpFall() {}
+
+void UALSXTImpactReactionComponent::SyncedAttackFall() {}
 
 void UALSXTImpactReactionComponent::FallLand() {}
 
-void UALSXTImpactReactionComponent::GeUp() {}
+void UALSXTImpactReactionComponent::GetUp() {}
+
+void UALSXTImpactReactionComponent::SyncedAttackGetUp() {}
 
 void UALSXTImpactReactionComponent::AttackResponse() {}
 
-UAnimMontage* UALSXTImpactReactionComponent::SelectBumpReactionMontage_Implementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
+FBumpReactionAnimation UALSXTImpactReactionComponent::SelectBumpReactionMontage_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form)
 {
-	UAnimMontage* SelectedMontage{ nullptr };
+	FBumpReactionAnimation SelectedMontage;
 	return SelectedMontage;
 }
 
-UAnimMontage* UALSXTImpactReactionComponent::SelectAttackReactionMontage_Implementation(FAttackDoubleHitResult Hit)
+FAttackReactionAnimation UALSXTImpactReactionComponent::SelectAttackReactionMontage_Implementation(FAttackDoubleHitResult Hit)
 {
-	UAnimMontage* SelectedMontage{ nullptr };
-	FActionMontageInfo LastAnimation{ nullptr };
-	FGameplayTag ImpactLoc = Hit.DoubleHitResult.ImpactLocation;
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	TArray<FAttackReactionAnimation> Montages = SelectedImpactReactionSettings->AttackReactionAnimations;
+	TArray<FAttackReactionAnimation> FilteredMontages;
+	FAttackReactionAnimation SelectedAttackReactionAnimation;
+	// TArray<FGameplayTag> TagsArray = { Hit.Strength, Hit.DoubleHitResult.ImpactSide, Hit.DoubleHitResult.ImpactForm };
+	TArray<FGameplayTag> TagsArray = { ALSXTActionStrengthTags::Light, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
 
-	UALSXTAttackReactionSettings* AttackReactionSettings = SelectAttackReactionSettings(ImpactLoc);
-
-	for (int i = 0; i < AttackReactionSettings->ImpactReactionLocations.Num(); ++i)
+	// Return is there are no Montages
+	if (Montages.Num() < 1 || !Montages[0].Montage.Montage)
 	{
-		if (AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionLocation == Hit.DoubleHitResult.ImpactLocation)
-		{
-			for (int j = 0; j < AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths.Num(); ++j)
-			{
-				if (AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionStrength == Hit.Strength)
-				{
-					for (int k = 0; k < AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides.Num(); ++k)
-					{
-						if (AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionSide == Hit.DoubleHitResult.ImpactSide)
-						{
-							for (int l = 0; l < AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms.Num(); ++l)
-							{
-								if (AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].ImpactReactionForm == Hit.DoubleHitResult.ImpactForm)
-								{
-									FImpactForm SelectedEntry { AttackReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l] };
+		return SelectedAttackReactionAnimation;
+	}
 
-									// Determine if Blocking and Declare Local Copy of Montages Array
-									TArray<FActionMontageInfo> MontageArray;
-									if (Character->IsBlocking()) 
-									{
-										MontageArray = SelectedEntry.BlockingMontages;
-									}
-									else
-									{
-										MontageArray = SelectedEntry.RegularMontages;
-									}
-	
-									if (MontageArray.Num() > 1)
-									{
-										// If LastAnimation exists, remove it from Local Montages array to avoid duplicates
-										// if (LastAnimation.Montage)
-										// {
-										// 	MontageArray.Remove(LastAnimation);
-										// }
-	
-										//Shuffle Array
-										for (int m = MontageArray.Max(); m >= 0; --m)
-										{
-											int n = FMath::Rand() % (m + 1);
-											if (m != n) MontageArray.Swap(m, n);
-										}
-	
-										// Select Random Array Entry
-										int RandIndex = rand() % MontageArray.Max();
-										SelectedMontage = MontageArray[RandIndex].Montage;
-										return SelectedMontage;
-									}
-									else
-									{
-										if (MontageArray[0].Montage) 
-										{
-											SelectedMontage = MontageArray[0].Montage;
-										}
-										else
-										{
-											SelectedMontage = SelectedEntry.DefaultFallbackMontage.Montage;
-										}
-										return SelectedMontage;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+	// Filter Montages based on Tag parameters
+	for (auto Montage : Montages)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Montage.ImpactStrength);
+		CurrentTagsContainer.AppendTags(Montage.ImpactSide);
+		CurrentTagsContainer.AppendTags(Montage.ImpactForm);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredMontages.Add(Montage);
 		}
 	}
-	return SelectedMontage;
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Montage.Montage)
+	{
+		return SelectedAttackReactionAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastAttackReactionAnimation, remove it from FilteredMontages array to avoid duplicates
+		if (FilteredMontages.Contains(LastAttackReactionAnimation))
+		{
+			int IndexToRemove = FilteredMontages.Find(LastAttackReactionAnimation);
+			FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		}
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedAttackReactionAnimation = FilteredMontages[RandIndex];
+		LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedAttackReactionAnimation;
+	}
+	else
+	{
+		SelectedAttackReactionAnimation = FilteredMontages[0];
+		LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedAttackReactionAnimation;
+	}
+	return SelectedAttackReactionAnimation;
 }
 
-UAnimMontage* UALSXTImpactReactionComponent::SelectImpactReactionMontage_Implementation(FDoubleHitResult Hit)
+FImpactReactionAnimation UALSXTImpactReactionComponent::SelectImpactReactionMontage_Implementation(FDoubleHitResult Hit)
 {
-	UAnimMontage* SelectedMontage { nullptr };
-	FActionMontageInfo LastAnimation { nullptr };
-	FGameplayTag ImpactLoc = Hit.ImpactLocation;
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	TArray<FImpactReactionAnimation> Montages = SelectedImpactReactionSettings->ImpactReactionAnimations;
+	TArray<FImpactReactionAnimation> FilteredMontages;
+	FImpactReactionAnimation SelectedAttackReactionAnimation;
+	// TArray<FGameplayTag> TagsArray = { Hit.Strength, Hit.DoubleHitResult.ImpactSide, Hit.DoubleHitResult.ImpactForm };
+	TArray<FGameplayTag> TagsArray = { ALSXTActionStrengthTags::Light, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
 
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings(ImpactLoc);
-
-	for (int i = 0; i < SelectedImpactReactionSettings->ImpactReactionLocations.Num(); ++i)
+	// Return is there are no Montages
+	if (Montages.Num() < 1 || !Montages[0].Montage.Montage)
 	{
-		if (SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionLocation == Hit.ImpactLocation)
+		return SelectedAttackReactionAnimation;
+	}
+
+	// Filter Montages based on Tag parameters
+	for (auto Montage : Montages)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Montage.ImpactVelocity);
+		CurrentTagsContainer.AppendTags(Montage.ImpactSide);
+		CurrentTagsContainer.AppendTags(Montage.ImpactForm);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
 		{
-			for (int j = 0; j < SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths.Num(); ++j)
-			{
-				if (SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionStrength == Hit.Strength)
-				{
-					for (int k = 0; k < SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides.Num(); ++k)
-					{
-						if (SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionSide == Hit.ImpactSide)
-						{
-							for (int l = 0; l < SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms.Num(); ++l)
-							{
-								if (SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].ImpactReactionForm == Hit.ImpactForm)
-								{
-									
-									// Determine if Blocking and Declare Local Copy of Montages Array
-									TArray<FActionMontageInfo> MontageArray;
-									if (Character->IsBlocking())
-									{
-										MontageArray = SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].BlockingMontages;
-									}
-									else
-									{
-										MontageArray = SelectedImpactReactionSettings->ImpactReactionLocations[i].ImpactReactionStrengths[j].ImpactReactionSides[k].ImpactReactionForms[l].RegularMontages;
-									}
-									if (MontageArray.Num() > 1)
-									{
-										// If LastAnimation exists, remove it from Local Montages array to avoid duplicates
-										// if (LastAnimation.Montage)
-										// {
-										// 	MontageArray.Remove(LastAnimation);
-										// }
-
-										//Shuffle Array
-										for (int m = MontageArray.Max(); m >= 0; --m)
-										{
-											int n = FMath::Rand() % (m + 1);
-											if (m != n) MontageArray.Swap(m, n);
-										}
-
-										// Select Random Array Entry
-										int RandIndex = rand() % MontageArray.Max();
-										SelectedMontage = MontageArray[RandIndex].Montage;
-									}
-									else
-									{
-										SelectedMontage = MontageArray[0].Montage;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+			FilteredMontages.Add(Montage);
 		}
 	}
-	return SelectedMontage;
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Montage.Montage)
+	{
+		return SelectedAttackReactionAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastAttackReactionAnimation, remove it from FilteredMontages array to avoid duplicates
+		if (FilteredMontages.Contains(LastImpactReactionAnimation))
+		{
+			int IndexToRemove = FilteredMontages.Find(LastImpactReactionAnimation);
+			FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		}
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedAttackReactionAnimation = FilteredMontages[RandIndex];
+		LastImpactReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedAttackReactionAnimation;
+	}
+	else
+	{
+		SelectedAttackReactionAnimation = FilteredMontages[0];
+		LastImpactReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedAttackReactionAnimation;
+	}
+	return SelectedAttackReactionAnimation;
 }
 
-FSyncedAttackAnimation UALSXTImpactReactionComponent::GetSyncedMontage_Implementation(const FGameplayTag& Overlay, FAttackDoubleHitResult Hit, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, int Index)
+FSyncedAttackAnimation UALSXTImpactReactionComponent::GetSyncedMontage_Implementation(int Index)
 {
-	FSyncedAttackAnimation SyncedAttackAnimation;
-	return SyncedAttackAnimation;
+	UALSXTCombatSettings* SelectedCombatSettings = IALSXTCombatInterface::Execute_GetCombatSettings(this);
+	TArray<FSyncedAttackAnimation> Montages = SelectedCombatSettings->SyncedAttackAnimations;
+	TArray<FSyncedAttackAnimation> FilteredMontages;
+
+	if (ALS_ENSURE(IsValid(Montages[Index].SyncedMontage.TargetSyncedMontage.Montage)))
+	{
+		// FSyncedAttackAnimation SelectedSyncedAttackReactionAnimation = Montages[Index];
+		return Montages[Index];
+	}
+	else
+	{
+		FSyncedAttackAnimation EmptySyncedAttackAnimation;
+		return EmptySyncedAttackAnimation;
+	}
+
 }
 
-UAnimMontage* UALSXTImpactReactionComponent::SelectFallMontage_Implementation(FDoubleHitResult Hit)
+FActionMontageInfo UALSXTImpactReactionComponent::SelectFallMontage_Implementation(FDoubleHitResult Hit)
 {
-	UAnimMontage* SelectedMontage{ nullptr };
+	FActionMontageInfo SelectedMontage{ nullptr };
 	return SelectedMontage;
 }
 
@@ -544,15 +561,15 @@ UAnimMontage* UALSXTImpactReactionComponent::SelectFallenPose_Implementation(FDo
 	return SelectedMontage;
 }
 
-UAnimMontage* UALSXTImpactReactionComponent::SelectGetUpMontage_Implementation(FDoubleHitResult Hit)
+FActionMontageInfo UALSXTImpactReactionComponent::SelectGetUpMontage_Implementation(FDoubleHitResult Hit)
 {
-	UAnimMontage* SelectedMontage{ nullptr };
+	FActionMontageInfo SelectedMontage{ nullptr };
 	return SelectedMontage;
 }
 
-UAnimMontage* UALSXTImpactReactionComponent::SelectResponseMontage_Implementation(FAttackDoubleHitResult Hit)
+FResponseAnimation UALSXTImpactReactionComponent::SelectResponseMontage_Implementation(FAttackDoubleHitResult Hit)
 {
-	UAnimMontage* SelectedMontage{ nullptr };
+	FResponseAnimation SelectedMontage;
 	return SelectedMontage;
 }
 

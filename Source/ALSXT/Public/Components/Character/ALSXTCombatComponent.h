@@ -43,6 +43,12 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UPARAM(meta = (Categories = "Als.Impact Form")) FGameplayTag GetCurrentAttackForm();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FGameplayTag GetVelocityFromAttackStrength(UPARAM(meta = (Categories = "Als.Action Strength")) FGameplayTag AttackStrength);
+
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

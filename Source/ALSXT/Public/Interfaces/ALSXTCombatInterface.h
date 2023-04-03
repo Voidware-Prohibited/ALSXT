@@ -13,6 +13,12 @@ class ALSXT_API IALSXTCombatInterface {
 
 public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  FALSXTGeneralCombatSettings GetGeneralCombatSettings();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  UALSXTCombatSettings* GetCombatSettings();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   bool Blocking();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")

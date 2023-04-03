@@ -20,8 +20,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void GetActorVelocity(float& Velocity);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UPARAM(meta = (Categories = "Als.Impact Form")) FGameplayTag GetCurrentBumpForm();
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	bool CanReceiveImpulse();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
+    void GetAnticipationInfo(const FGameplayTag& Form, FVector& AnticipationPoint);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void GetActorPhysicsStates(FGameplayTag& PhysicalMaterial, const TArray<FGameplayTag>& PhysicalStates);

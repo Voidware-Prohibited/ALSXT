@@ -358,11 +358,17 @@ struct ALSXT_API FSyncedActionAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo InstigatorSyncedMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UCurveVector> InstigatorCameraCurve { nullptr };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo TargetAnticipationPose;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo TargetSyncedMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UCurveVector> TargetCameraCurve { nullptr };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo TargetFallenPose;
@@ -375,78 +381,6 @@ struct ALSXT_API FSyncedActionAnimation
 		return (other.InstigatorSyncedMontage == InstigatorSyncedMontage) && (other.TargetAnticipationPose == TargetAnticipationPose) && (other.TargetSyncedMontage == TargetSyncedMontage) && (other.TargetFallenPose == TargetFallenPose) && (other.TargetGetUpMontage == TargetGetUpMontage);
 	}
 
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FImpactForm
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
-	FGameplayTag ImpactReactionForm;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FActionMontageInfo> BlockingMontages;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FActionMontageInfo> RegularMontages;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FActionMontageInfo> RecoveryMontages;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FActionMontageInfo> DeathMontages;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FActionMontageInfo DefaultFallbackMontage;
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FImpactReactionSide
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
-	FGameplayTag ImpactReactionSide;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FImpactForm> ImpactReactionForms;
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FImpactReactionStrength
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
-	FGameplayTag ImpactReactionStrength;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FImpactReactionSide> ImpactReactionSides;
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FImpactReactionLocation
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Location", AllowPrivateAccess))
-	FGameplayTag ImpactReactionLocation;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FImpactReactionStrength> ImpactReactionStrengths;
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FImpactReactionOverlayMode
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode", AllowPrivateAccess))
-	FGameplayTag OverlayMode;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FImpactReactionLocation> ImpactReactionLocations;
 };
 
 USTRUCT(BlueprintType)
@@ -478,10 +412,10 @@ struct ALSXT_API FSyncedAttackAnimation
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
-	FGameplayTagContainer AttackStrengths;
+	FGameplayTagContainer AttackStrength;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", AllowPrivateAccess))
-	FGameplayTagContainer AttackStances;
+	FGameplayTagContainer AttackStance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Type", TitleProperty = "{AttackType}", AllowPrivateAccess))
 	FGameplayTagContainer AttackType;
@@ -491,50 +425,7 @@ struct ALSXT_API FSyncedAttackAnimation
 
 	bool operator==(const FSyncedAttackAnimation& other) const
 	{
-		return (other.AttackStrengths == AttackStrengths) && (other.AttackStances == AttackStances) && (other.AttackType == AttackType) && (other.SyncedMontage == SyncedMontage);
-	}
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FAttackStance
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", AllowPrivateAccess))
-	FGameplayTag AttackStance;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag AnimationType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	TArray<FActionMontageInfo> MontageInfo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	TArray<FActionMontageInfo> RegularMontages;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FSyncedActionAnimation> SyncedMontages;
-
-	bool operator==(const FAttackStance& other) const
-	{
-		return (other.AttackStance == AttackStance);
-	}
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FAttackStrength
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
-	FGameplayTag AttackStrength;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStance}", AllowPrivateAccess))
-	TArray <FAttackStance> AttackStances;
-
-	bool operator==(const FAttackStrength& other) const
-	{
-		return (other.AttackStrength == AttackStrength);
+		return (other.AttackStrength == AttackStrength) && (other.AttackStance == AttackStance) && (other.AttackType == AttackType) && (other.SyncedMontage == SyncedMontage);
 	}
 };
 
@@ -589,13 +480,13 @@ struct ALSXT_API FImpactReactionAnimation
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", TitleProperty = "{AttackStrengths}", AllowPrivateAccess))
-	FGameplayTagContainer ImpactStrength;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Velocity", TitleProperty = "{Impact Velocity}", AllowPrivateAccess))
+	FGameplayTagContainer ImpactVelocity;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", TitleProperty = "{AttackStances}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", TitleProperty = "{Impact Side}", AllowPrivateAccess))
 	FGameplayTagContainer ImpactSide;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", TitleProperty = "{AttackStances}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", TitleProperty = "{Impact Form}", AllowPrivateAccess))
 	FGameplayTagContainer ImpactForm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
@@ -603,7 +494,7 @@ struct ALSXT_API FImpactReactionAnimation
 
 	bool operator==(const FImpactReactionAnimation& other) const
 	{
-		return (other.ImpactStrength == ImpactStrength);
+		return (other.ImpactVelocity == ImpactVelocity) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.Montage == Montage);
 	}
 };
 
@@ -626,7 +517,7 @@ struct ALSXT_API FAttackReactionAnimation
 
 	bool operator==(const FAttackReactionAnimation& other) const
 	{
-		return (other.ImpactStrength == ImpactStrength);
+		return (other.ImpactStrength == ImpactStrength) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.Montage == Montage);
 	}
 };
 
@@ -652,12 +543,12 @@ struct ALSXT_API FFallenAnimation
 
 	bool operator==(const FFallenAnimation& other) const
 	{
-		return (other.ImpactStrength == ImpactStrength);
+		return (other.ImpactStrength == ImpactStrength) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.FallenPose == FallenPose) && (other.GetUpMontages == GetUpMontages);
 	}
 };
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FAnticipationPose
+struct ALSXT_API FDeathAnimation
 {
 	GENERATED_BODY()
 
@@ -670,6 +561,29 @@ struct ALSXT_API FAnticipationPose
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer ImpactForm;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FDeathAnimation& other) const
+	{
+		return (other.ImpactStrength == ImpactStrength) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.Montage == Montage);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAnticipationPose
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Velocity", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTagContainer Side;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Game.Health", AllowPrivateAccess))
 	FGameplayTagContainer Health;
 
@@ -678,7 +592,7 @@ struct ALSXT_API FAnticipationPose
 
 	bool operator==(const FAnticipationPose& other) const
 	{
-		return (other.ImpactStrength == ImpactStrength) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.Health == Health);
+		return (other.Velocity == Velocity) && (other.Side == Side) && (other.Form == Form) && (other.Health == Health) && (other.Pose == Pose);
 	}
 };
 
@@ -700,40 +614,11 @@ struct ALSXT_API FResponseAnimation
 	FGameplayTagContainer Health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	FActionMontageInfo Montages;
+	FActionMontageInfo Montage;
 
 	bool operator==(const FResponseAnimation& other) const
 	{
-		return (other.ImpactStrength == ImpactStrength);
-	}
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FAttackType
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Type", AllowPrivateAccess))
-	FGameplayTag AttackType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths}, {AttackStances}, {Montage}", AllowPrivateAccess))
-	TArray<FAttackAnimation> RegularMontages;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths}, {AttackStances}", AllowPrivateAccess))
-	TArray<FSyncedAttackAnimation> SyncedMontages;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength}, {ImpactSide}, {ImpactForm}", AllowPrivateAccess))
-	TArray<FFallenAnimation> FallenAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength}, {ImpactSide}, {ImpactForm}, {Health}", AllowPrivateAccess))
-	TArray<FResponseAnimation> ResponseAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrength}", AllowPrivateAccess))
-	TArray<FAttackStrength> AttackStrengths;
-
-	bool operator==(const FAttackType& other) const
-	{
-		return (other.AttackType == AttackType);
+		return (other.ImpactStrength == ImpactStrength) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.Health == Health) && (other.Montage == Montage);
 	}
 };
 

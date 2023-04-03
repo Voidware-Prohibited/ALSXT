@@ -4,7 +4,6 @@
 #include "GameFramework/Character.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTCombatSettings.h"
-#include "Settings/ALSXTAttackReactionSettings.h"
 #include "Settings/ALSXTImpactReactionSettings.h"
 #include "State/AlsLocomotionState.h"
 #include "Utility/ALSXTGameplayTags.h"
@@ -14,6 +13,7 @@
 #include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTSlidingState.h"
 #include "State/ALSXTVaultingState.h"
+#include "Interfaces/ALSXTCombatInterface.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
@@ -46,12 +46,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	class UALSXTCharacterSoundComponent* CharacterSound;
-	
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	// class UALSXTSlidingActionComponent* SlidingAction;
-	
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	// class UALSXTImpactReactionComponent* ImpactReaction;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UPhysicalAnimationComponent* PhysicalAnimation;

@@ -810,8 +810,8 @@ FSyncedAttackAnimation UALSXTCombatComponent::SelectSyncedAttackMontage_Implemen
 	for (auto Montage : Montages)
 	{
 		FGameplayTagContainer CurrentTagsContainer;
-		CurrentTagsContainer.AppendTags(Montage.AttackStrengths);
-		CurrentTagsContainer.AppendTags(Montage.AttackStances);
+		CurrentTagsContainer.AppendTags(Montage.AttackStrength);
+		CurrentTagsContainer.AppendTags(Montage.AttackStance);
 		CurrentTagsContainer.AppendTags(Montage.AttackType);
 
 		if (CurrentTagsContainer.HasAll(TagsContainer))

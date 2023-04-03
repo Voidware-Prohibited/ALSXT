@@ -22,4 +22,9 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void BumpReaction(FDoubleHitResult Hit, FGameplayTag Gait, FGameplayTag Side, FGameplayTag Form);
 
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
+  void AnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
+  void AttackReaction(FAttackDoubleHitResult Hit);
 };

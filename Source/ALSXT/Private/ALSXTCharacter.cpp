@@ -35,18 +35,6 @@ AALSXTCharacter::AALSXTCharacter()
 	Camera->SetupAttachment(GetMesh());
 	Camera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
 
-	// Add Character Sound Component
-	// CharacterSound = CreateDefaultSubobject<UALSXTCharacterSoundComponent>(TEXT("Character Sound"));
-	// 
-	// // Add Sliding Action Component
-	// SlidingAction = CreateDefaultSubobject<USlidingActionComponent>(TEXT("Sliding Action"));
-	// 
-	// // Add Combat Component
-	// Combat = CreateDefaultSubobject<UUnarmedCombatComponent>(TEXT("Combat"));
-	// 
-	// // Add Impact Reaction Component
-	// ImpactReaction = CreateDefaultSubobject<UImpactReactionComponent>(TEXT("Impact Reaction"));
-	// 
 	// Add Physical Animation Component
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
 	AddOwnedComponent(PhysicalAnimation);
@@ -1232,7 +1220,7 @@ void AALSXTCharacter::GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side)
 	// 1 is face to face, 0 is side,, -1 is behind
 
 	FVector CrossProduct{ FVector::CrossProduct(Hit.HitResult.Impulse, Hit.HitResult.Impulse) };
-	Side = ALSXTImpactSideTags::Front;
+	Side = ALSXTImpactSideTags::Left;
 }
 
 void AALSXTCharacter::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength)
@@ -1246,6 +1234,8 @@ void AALSXTCharacter::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Str
 	float SelfMomentum = SelfMass * SelfVelocity;
 
 	float MomemtumSum = HitMomentum + SelfMomentum;
+
+	Strength = ALSXTActionStrengthTags::Light;
 }
 
 void AALSXTCharacter::BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings)
@@ -1265,11 +1255,12 @@ void AALSXTCharacter::AttackCollisionTrace()
 		TArray<FHitResult> HitResults;
 		InitialIgnoredActors.Add(this);	// Add Self to Initial Trace Ignored Actors
 
+		FALSXTGeneralCombatSettings GeneralCombatSettings = IALSXTCombatInterface::Execute_GetGeneralCombatSettings(this);
 		TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
-		AttackTraceObjectTypes = ALSXTSettings->Combat.AttackTraceObjectTypes;
+		AttackTraceObjectTypes = GeneralCombatSettings.AttackTraceObjectTypes;
 
 		// Initial Trace
-		bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, ALSXTSettings->Combat.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
+		bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
 
 		if (isHit)
 		{
@@ -1285,6 +1276,7 @@ void AALSXTCharacter::AttackCollisionTrace()
 					// Declare Local Vars
 					FAttackDoubleHitResult CurrentHitResult;
 					FGameplayTag ImpactLoc;
+					FGameplayTag ImpactStrength;
 					FGameplayTag ImpactSide;
 					FGameplayTag ImpactForm;
 					AActor* HitActor{ nullptr };
@@ -1321,20 +1313,20 @@ void AALSXTCharacter::AttackCollisionTrace()
 					CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
 					GetLocationFromBoneName(CurrentHitResult.DoubleHitResult.HitResult.HitResult.BoneName, ImpactLoc);
 					CurrentHitResult.DoubleHitResult.ImpactLocation = ImpactLoc;
-					CurrentHitResult.Type = AttackTraceSettings.AttackType;
-					GetSideFromHit(CurrentHitResult.DoubleHitResult, ImpactSide);
+					CurrentHitResult.Type = AttackTraceSettings.AttackType;				
 					CurrentHitResult.DoubleHitResult.ImpactSide = ImpactSide;
 					CurrentHitResult.Strength = AttackTraceSettings.AttackStrength;
-					GetFormFromHit(CurrentHitResult.DoubleHitResult, ImpactForm);
+					CurrentHitResult.DoubleHitResult.Strength = AttackTraceSettings.AttackStrength;					
 					HitActor = CurrentHitResult.DoubleHitResult.HitResult.HitResult.GetActor();
 					HitActorname = HitActor->GetName();
+
 
 					// Setup Origin Trace
 					FHitResult OriginHitResult;
 					OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
 
 					// Perform Origin Trace
-					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, ALSXTSettings->Combat.AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
+					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
 
 					// Perform Origin Hit Trace to get PhysMat eyc for ImpactLocation
 					if (isOriginHit)
@@ -1352,7 +1344,16 @@ void AALSXTCharacter::AttackCollisionTrace()
 							GetUnarmedAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
 						}
 						FString OriginHitActorname = OriginHitResult.GetActor()->GetName();
-						
+
+						GetFormFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactForm);
+						GetSideFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactSide);
+						GetStrengthFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.Strength);
+						CurrentHitResult.DoubleHitResult.Strength = CurrentHitResult.Strength;
+					}
+					// Call OnActorAttackCollision on CollisionInterface
+					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
+					{
+						IALSXTCharacterInterface::Execute_AttackReaction(HitActor, CurrentHitResult);
 					}
 					// Call OnActorAttackCollision on CollisionInterface
 					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))

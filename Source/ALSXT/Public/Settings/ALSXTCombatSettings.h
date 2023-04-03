@@ -62,7 +62,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths} {AttackStances}", AllowPrivateAccess))
 	TArray<FSyncedAttackAnimation> SyncedAttackAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Velocity} {Side} {Form} {Health}", AllowPrivateAccess))
 	TArray<FAnticipationPose> BlockingPoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))

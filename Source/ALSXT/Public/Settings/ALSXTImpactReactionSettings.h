@@ -27,6 +27,12 @@ struct ALSXT_API FALSXTImpactReactionParameters
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FGameplayTag ImpactLocation{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FImpactReactionAnimation ImpactReactionAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FSyncedAttackAnimation SyncedAttackAnimation;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -35,15 +41,6 @@ class ALSXT_API UALSXTImpactReactionSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag ImpactReactionOverlayMode {FGameplayTag::EmptyTag};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag ImpactReactionLocation {FGameplayTag::EmptyTag};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FActionMontageInfo LocationFallbackDefaultMontage;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
 	TArray<FAnticipationPose> AnticipationPoses;
 
@@ -51,25 +48,22 @@ public:
 	TArray<FAnticipationPose> DefensivePoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FAttackReactionAnimation> AttackReactionAnimations;
+	TArray<FBumpReactionAnimation> BumpReactionAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FAttackReactionAnimation> AttackResponseAnimations;
+	TArray<FImpactReactionAnimation> ImpactReactionAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FAttackReactionAnimation> AttackReactionAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray <FFallenAnimation> FallenAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FBumpReactionAnimation> CrowdBumpReactionAnimations;
+	TArray<FAttackReactionAnimation> AttackResponseAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FBumpReactionAnimation> ObstacleBumpReactionAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FImpactReactionLocation> ImpactReactionLocations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FImpactReactionStrength> ImpactReactionStrengths;
+	TArray <FFallenAnimation> DeathAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
