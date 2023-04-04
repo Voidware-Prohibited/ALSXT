@@ -2,6 +2,7 @@
 
 #include "NativeGameplayTags.h"
 #include "Utility/ALSXTStructs.h"
+#include "State/ALSXTImpactReactionState.h"
 #include "ALSXTCollisionInterface.generated.h"
 
 UINTERFACE(Blueprintable)
@@ -19,6 +20,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void GetActorVelocity(float& Velocity);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
+	void GetActorThreatPoint(FVector& ThreatPoint);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UPARAM(meta = (Categories = "Als.Impact Form")) FGameplayTag GetCurrentBumpForm();
@@ -40,4 +44,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void OnActorImpactCollision(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+    FALSXTImpactReactionState GetImpactReactionState();
 };

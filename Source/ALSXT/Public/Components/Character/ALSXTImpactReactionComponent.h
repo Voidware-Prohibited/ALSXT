@@ -48,6 +48,36 @@ public:
 
 	void ObstacleTrace();
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTImpactReactionState& GetImpactReactionState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewImpactReactionState"))
+	void SetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewImpactReactionState"))
+	FALSXTImpactReactionState ProcessNewImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
+
+private:
+	UFUNCTION(Server, Unreliable)
+	void ServerSetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
+
+	UFUNCTION()
+	void OnReplicate_ImpactReactionState(const FALSXTImpactReactionState& PreviousImpactReactionState);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	bool ShouldRecieveVelocityDamage();
+
+	UFUNCTION(BlueprintCallable, Category = "Vitals")
+	float GetBaseVelocityDamage();
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnImpactReactionStateChanged(const FALSXTImpactReactionState& PreviousImpactReactionState);
+
+public:
 	/*Curve float reference*/
 	UPROPERTY(EditAnywhere, Category = "Impact Reaction Timeline")
 	UCurveFloat* CurveFloat;
@@ -114,6 +144,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void DefensiveReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void CrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void BumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
@@ -317,3 +350,8 @@ protected:
 	void OnImpactReactionEnded();
 
 };
+
+inline const FALSXTImpactReactionState& UALSXTImpactReactionComponent::GetImpactReactionState() const
+{
+	return ImpactReactionState;
+}

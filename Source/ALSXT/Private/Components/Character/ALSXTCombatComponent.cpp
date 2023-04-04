@@ -110,7 +110,7 @@ void UALSXTCombatComponent::TryTraceForTargets()
 	{
 		if (Character->GetDistanceTo(CurrentTarget.HitResult.GetActor()) < CombatSettings.MaxInitialLockDistance)
 		{			
-			if (CombatSettings.UnlockWhenTargetIsObstructed) {
+			if (CombatSettings.UnlockWhenTargetIsObstructed && !CombatSettings.ObstructionTraceObjectTypes.IsEmpty()) {
 				if (CombatSettings.UnlockWhenTargetIsObstructed && !IsTartgetObstructed()) {
 					if (CurrentTarget.Valid)
 					{
@@ -146,9 +146,7 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 	FVector CameraLocation = Character->Camera->GetFirstPersonCameraLocation();
 	FVector StartLocation = ForwardVector * 150 + CameraLocation;
 	FVector EndLocation = ForwardVector * 200 + StartLocation;
-	// FVector CenterLocation = (StartLocation - EndLocation) / 2 + StartLocation;
 	FVector CenterLocation = (StartLocation - EndLocation) / 8 + StartLocation;
-	// FVector CenterLocation = (StartLocation - EndLocation) / 8;
 	FCollisionShape CollisionShape = FCollisionShape::MakeBox(CombatSettings.TraceAreaHalfSize);
 	TArray<FHitResult> OutHits;
 
@@ -157,8 +155,6 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 	{
 		DrawDebugBox(GetWorld(), CenterLocation, CombatSettings.TraceAreaHalfSize, ControlRotation.Quaternion(), FColor::Yellow, false, CombatSettings.DebugDuration, 100, 2);
 	}
-
-	// bool isHit = GetWorld()->SweepMultiByChannel(OutHits, StartLocation, EndLocation, ControlRotation.Quaternion(), ECollisionChannel::ECC_Camera, CollisionShape);
 
 	FCollisionObjectQueryParams ObjectQueryParameters;
 	for (const auto ObjectType : CombatSettings.TargetTraceObjectTypes)
@@ -281,15 +277,6 @@ void UALSXTCombatComponent::ClearCurrentTarget()
 				}
 				TargetDynamicMaterials.Empty();
 			}
-			// if (CharMaterials[0])
-			// {
-			// 	for (int m = 0; m < CharMaterials.Num(); m++)
-			// 	{
-			// 		UMaterialInstanceDynamic* CharDynMaterial = HitMesh->CreateAndSetMaterialInstanceDynamic(m);
-			// 		CharDynMaterial->SetScalarParameterValue(CombatSettings.HighlightMaterialParameterName, 0.0f);
-			// 		HitMesh->SetMaterial(m, CharDynMaterial);
-			// 	}
-			// }
 		}
 		CurrentTarget.HitResult = FHitResult(ForceInit);
 	}
@@ -378,7 +365,6 @@ void UALSXTCombatComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
 
 		if ((NewPlayerRotation != CurrentPlayerControlRotation) && IsValid(Target.HitResult.GetActor()))
 		{
-			// Character->SetActorRotation(NewPlayerRotation, ETeleportType::TeleportPhysics);
 			Character->GetController()->SetControlRotation(NewPlayerRotation);
 		}
 	}
@@ -565,7 +551,6 @@ void UALSXTCombatComponent::StartAttack(const FGameplayTag& AttackType, const FG
 	{
 		Character->GetCharacterMovement()->FlushServerMoves();
 
-		StartAttackImplementation(Montage.Montage.Montage, PlayRate, StartYawAngle, TargetYawAngle);
 		ServerStartAttack(Montage.Montage.Montage, PlayRate, StartYawAngle, TargetYawAngle);
 		OnAttackStarted(AttackType, Stance, Strength, BaseDamage);
 	}

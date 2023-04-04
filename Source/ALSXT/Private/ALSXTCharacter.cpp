@@ -173,7 +173,9 @@ void AALSXTCharacter::InputLookMouse(const FInputActionValue& ActionValue)
 	const auto Value{ActionValue.Get<FVector2D>()};
 
 	AddControllerPitchInput(Value.Y * LookUpMouseSensitivity);
+	PreviousLookInput.Y = Value.Y;
 	AddControllerYawInput(Value.X * LookRightMouseSensitivity);
+	PreviousLookInput.X = Value.X;
 }
 
 void AALSXTCharacter::InputLook(const FInputActionValue& ActionValue)
@@ -195,11 +197,11 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 
 	if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
 	{
-		// AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
-		// MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
-		// GetLocomotionState().PreviousVelocity
-		AddMovementInput(GetLocomotionState().PreviousVelocity);
-		MovementInput = GetLocomotionState().PreviousVelocity;
+		AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
+		MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
+		GetLocomotionState().PreviousVelocity;
+		// AddMovementInput(GetLocomotionState().PreviousVelocity);
+		// MovementInput = GetLocomotionState().PreviousVelocity;
 	}
 	else
 	{
@@ -234,7 +236,6 @@ void AALSXTCharacter::InputCrouch()
 	{
 		if (CanSlide())
 		{
-			// StartSlideInternal();
 			TryStartSliding(1.3f);
 		}
 		else {

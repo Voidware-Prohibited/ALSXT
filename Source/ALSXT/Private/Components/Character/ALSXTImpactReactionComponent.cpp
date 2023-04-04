@@ -89,6 +89,18 @@ FGameplayTag UALSXTImpactReactionComponent::GetCharacterVelocity()
 	}
 }
 
+bool UALSXTImpactReactionComponent::ShouldRecieveVelocityDamage()
+{
+	return Character->GetVelocity().Length() >= 650;
+}
+
+float UALSXTImpactReactionComponent::GetBaseVelocityDamage()
+{
+	FVector2D VelocityRange{ 650.0, 2000.0 };
+	FVector2D ConversionRange{ 0.0, 100.0 };
+	return FMath::GetMappedRangeValueClamped(VelocityRange, ConversionRange, Character->GetVelocity().Length());
+}
+
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
 	const auto* Capsule{ Character->GetCapsuleComponent() };
@@ -191,6 +203,39 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 	}
 }
 
+// ImpactReaction State
+void UALSXTImpactReactionComponent::SetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState)
+{
+	const auto PreviousImpactReactionState{ ImpactReactionState };
+
+	ImpactReactionState = NewImpactReactionState;
+
+	OnImpactReactionStateChanged(PreviousImpactReactionState);
+
+	if ((Character->GetLocalRole() == ROLE_AutonomousProxy) && Character->IsLocallyControlled())
+	{
+		ServerSetImpactReactionState(NewImpactReactionState);
+	}
+}
+
+void UALSXTImpactReactionComponent::ServerSetImpactReactionState_Implementation(const FALSXTImpactReactionState& NewImpactReactionState)
+{
+	SetImpactReactionState(NewImpactReactionState);
+}
+
+
+void UALSXTImpactReactionComponent::ServerProcessNewImpactReactionState_Implementation(const FALSXTImpactReactionState& NewImpactReactionState)
+{
+	ProcessNewImpactReactionState(NewImpactReactionState);
+}
+
+void UALSXTImpactReactionComponent::OnReplicate_ImpactReactionState(const FALSXTImpactReactionState& PreviousImpactReactionState)
+{
+	OnImpactReactionStateChanged(PreviousImpactReactionState);
+}
+
+void UALSXTImpactReactionComponent::OnImpactReactionStateChanged_Implementation(const FALSXTImpactReactionState& PreviousImpactReactionState) {}
+
 void UALSXTImpactReactionComponent::AnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
 {
 	// ...
@@ -202,6 +247,11 @@ void UALSXTImpactReactionComponent::SyncedAnticipationReaction(FVector Anticipat
 }
 
 void UALSXTImpactReactionComponent::DefensiveReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::CrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 {
 	// ...
 }
@@ -266,16 +316,14 @@ void UALSXTImpactReactionComponent::StartBumpReaction(const FGameplayTag& Gait, 
 
 void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
 {
+	// if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
+	// {
+	// 	return;
+	// }
+	
 	UAnimMontage* Montage{ nullptr };
-	UNiagaraSystem* Particle{ nullptr };
-	TSubclassOf<AActor> ParticleActor{ nullptr };
-	USoundBase* Audio{ nullptr };
-
 	FAttackReactionAnimation SelectedAttackReaction = SelectAttackReactionMontage(Hit);
 	Montage = SelectedAttackReaction.Montage.Montage;
-	Particle = GetImpactReactionParticle(Hit.DoubleHitResult);
-	ParticleActor = GetImpactReactionParticleActor(Hit.DoubleHitResult);
-	Audio = GetImpactReactionSound(Hit.DoubleHitResult);
 
 	if (!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage))
 	{
@@ -283,11 +331,38 @@ void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult H
 		return;
 	}
 
+	UNiagaraSystem* Particle = GetImpactReactionParticle(Hit.DoubleHitResult);
+	TSubclassOf<AActor> ParticleActor = GetImpactReactionParticleActor(Hit.DoubleHitResult);
+	USoundBase* Audio = GetImpactReactionSound(Hit.DoubleHitResult);
 	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
 
 	Character->SetMovementModeLocked(true);
 
-	StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
+	// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
+		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
+	ImpactReactionParameters.BaseDamage = Hit.BaseDamage;
+	ImpactReactionParameters.PlayRate = SelectedAttackReaction.Montage.PlayRate;
+	// ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
+	ImpactReactionParameters.ImpactType = Hit.DoubleHitResult.ImpactType;
+	// ImpactReactionParameters.Stance = Stance;
+	ImpactReactionParameters.ImpactVelocity = Hit.Strength;
+	ImpactReactionParameters.ImpactReactionAnimation.Montage.Montage = Montage;
+	FALSXTImpactReactionState NewImpactReactionState;
+	NewImpactReactionState.ImpactReactionParameters = ImpactReactionParameters;
+	SetImpactReactionState(NewImpactReactionState);
+
+	// StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
+
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		ServerStartImpactReaction(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
+	}
+	else
+	{
+		Character->GetCharacterMovement()->FlushServerMoves();
+		MulticastStartImpactReaction(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
+		OnImpactReactionStarted(Hit.DoubleHitResult);
+	}
 }
 
 void UALSXTImpactReactionComponent::StartSyncedAttackReaction(FAttackDoubleHitResult Hit)
@@ -630,6 +705,9 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 
 		Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, 1.0f);
 		// ImpactReactionState.TargetYawAngle = TargetYawAngle;
+		FALSXTImpactReactionState CurrentImpactReactionState = GetImpactReactionState();
+		// CurrentImpactReactionState.ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
+		// CurrentImpactReactionState.ImpactReactionParameters.Target = PotentialAttackTarget;
 
 		UAudioComponent* AudioComponent{ nullptr };
 
@@ -787,14 +865,14 @@ void UALSXTImpactReactionComponent::RefreshImpactReactionPhysics(const float Del
 
 	if (ImpactReactionSettings.RotationInterpolationSpeed <= 0.0f)
 	{
-		TargetRotation.Yaw = ImpactReactionState.TargetYawAngle;
+		TargetRotation.Yaw = ImpactReactionState.ImpactReactionParameters.TargetYawAngle;
 
 		Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false, nullptr, ETeleportType::TeleportPhysics);
 	}
 	else
 	{
 		TargetRotation.Yaw = UAlsMath::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
-			ImpactReactionState.TargetYawAngle, DeltaTime,
+			ImpactReactionState.ImpactReactionParameters.TargetYawAngle, DeltaTime,
 			ImpactReactionSettings.RotationInterpolationSpeed);
 
 		Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);

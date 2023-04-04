@@ -26,10 +26,13 @@ struct ALSXT_API FALSXTCombatParameters
 	FActionMontageInfo CombatAnimation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
-	float PlayRate{ 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
 	float BaseDamage{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	AActor* Target;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm"))
 	float ImpactHeight{0.0f};
@@ -43,11 +46,8 @@ struct ALSXT_API FALSXTCombatParameters
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
 	float TargetYawAngle{ 0.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	AActor* Target;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float PlayRate{ 0.0f };
 };
 
 UCLASS(Blueprintable, BlueprintType)

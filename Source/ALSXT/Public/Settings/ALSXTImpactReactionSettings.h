@@ -11,7 +11,61 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FDoubleHitResult Hit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag ImpactType{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag ImpactVelocity{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag ImpactForm{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag ImpactLocation{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FAnticipationPose AnticipationPose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FAnticipationPose DefensivePose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FBumpReactionAnimation CrowdNavigationReactionAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FBumpReactionAnimation BumpReactionAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FImpactReactionAnimation ImpactReactionAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FAttackReactionAnimation AttackReactionAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FFallenAnimation FallenAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FResponseAnimation ResponseAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FFallenAnimation DeathAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FSyncedAttackAnimation SyncedAttackAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float BaseDamage{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	AActor* Target;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm"))
+	float ImpactHeight{0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FVector_NetQuantize100 TargetRelativeLocation{ForceInit};
@@ -19,20 +73,20 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FRotator TargetRelativeRotation{ForceInit};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm"))
-	float ImpactHeight{0.0f};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
+	float TargetYawAngle{ 0.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FDoubleHitResult Hit;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FGameplayTag ImpactLocation{FGameplayTag::EmptyTag};
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
+	FVector2D ReferenceHeight{50.0f, 100.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FImpactReactionAnimation ImpactReactionAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
+	FVector2D StartTime{0.5f, 0.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FSyncedAttackAnimation SyncedAttackAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
+	FVector2D PlayRate{1.0f, 1.0f};
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -48,6 +102,9 @@ public:
 	TArray<FAnticipationPose> DefensivePoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FBumpReactionAnimation> CrowdNavigationReactionAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FBumpReactionAnimation> BumpReactionAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
@@ -60,35 +117,23 @@ public:
 	TArray <FFallenAnimation> FallenAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray<FAttackReactionAnimation> AttackResponseAnimations;
+	TArray<FResponseAnimation> AttackResponseAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray <FFallenAnimation> DeathAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
-	FVector2D ReferenceHeight{50.0f, 100.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
-	FVector2D StartTime{0.5f, 0.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
-	FVector2D PlayRate{1.0f, 1.0f};
-
 public:
-	float CalculateStartTime(float ImpactHeight, float RefHeight, float Start) const;
+	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float ImpactHeight) const;
 
-	float CalculatePlayRate(float ImpactHeight, float RefHeight, float Rate) const;
+	float CalculatePlayRate(FVector2D ReferenceHeight, FVector2D PlayRate, float ImpactHeight) const;
 };
 
-inline float UALSXTImpactReactionSettings::CalculateStartTime(const float ImpactHeight, float RefHeight, float Start) const
+inline float UALSXTImpactReactionSettings::CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, const float ImpactHeight) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, ImpactHeight);
 }
 
-inline float UALSXTImpactReactionSettings::CalculatePlayRate(const float ImpactHeight, float RefHeight, float Rate) const
+inline float UALSXTImpactReactionSettings::CalculatePlayRate(FVector2D ReferenceHeight, FVector2D PlayRate, const float ImpactHeight) const
 {
 	return FMath::GetMappedRangeValueClamped(ReferenceHeight, PlayRate, ImpactHeight);
 }
