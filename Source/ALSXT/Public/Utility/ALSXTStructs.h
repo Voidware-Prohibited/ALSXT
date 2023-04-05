@@ -339,6 +339,9 @@ struct ALSXT_API FMantleAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Mantle Type", AllowPrivateAccess))
 	FGameplayTagContainer MantleType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Hand", AllowPrivateAccess))
+	FGameplayTagContainer Side;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo Montage;
 

@@ -440,10 +440,10 @@ namespace ALSXTGestureTags
 	UE_DEFINE_GAMEPLAY_TAG(Point, TEXT("Als.Gesture.Point"))
 }
 
-namespace ALSXTGestureHandTags
+namespace ALSXTHandTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Gesture Hand.Left"))
-	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Gesture Hand.Right"))
+	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Hand.Left"))
+	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Hand.Right"))
 }
 
 namespace ALSXTReloadingTypeTags
@@ -469,12 +469,6 @@ namespace ALSXTFirearmFingerActionTags
 	UE_DEFINE_GAMEPLAY_TAG(PullingTrigger, TEXT("Als.Firearm Finger Action.Pulling Trigger"))
 	UE_DEFINE_GAMEPLAY_TAG(TogglingAccessory1, TEXT("Als.Firearm Finger Action.Toggling Accessory1"))
 	UE_DEFINE_GAMEPLAY_TAG(TogglingAccessory2, TEXT("Als.Firearm Finger Action.Toggling Accessory2"))
-}
-
-namespace ALSXTFirearmFingerActionHandTags
-{
-	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Firearm Finger Action Hand.Left"))
-	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Firearm Finger Action Hand.Right"))
 }
 
 namespace ALSXTWeaponObstructionTags

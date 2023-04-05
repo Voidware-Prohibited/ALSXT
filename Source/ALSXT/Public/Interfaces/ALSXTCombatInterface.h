@@ -43,6 +43,12 @@ public:
   bool CanBeKnockedDown();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  bool WillDamageKnockDownPlayer(float& Damage);
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  bool WillDamageKillPlayer(float& Damage);
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   FALSXTCombatState GetCombatState();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
