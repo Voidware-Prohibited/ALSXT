@@ -235,6 +235,7 @@ void UALSXTCombatComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTar
 {
 	ClearCurrentTarget();
 	CurrentTarget = NewTarget;
+	OnNewTarget(NewTarget);
 	USkeletalMeshComponent* HitMesh;
 	AALSXTCharacter* ALSXTChar = Cast<AALSXTCharacter>(CurrentTarget.HitResult.GetActor());
 

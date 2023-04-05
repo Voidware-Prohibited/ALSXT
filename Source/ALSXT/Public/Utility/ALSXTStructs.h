@@ -323,6 +323,32 @@ struct ALSXT_API FVehicleStationaryModeAnimation
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FMantleAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.LocomotionMode", AllowPrivateAccess))
+	FGameplayTagContainer LocomotionMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", AllowPrivateAccess))
+	FGameplayTagContainer Stance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait", AllowPrivateAccess))
+	FGameplayTagContainer Gait;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Mantle Type", AllowPrivateAccess))
+	FGameplayTagContainer MantleType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FMantleAnimation& other) const
+	{
+		return (other.LocomotionMode == LocomotionMode) && (other.Stance == Stance) && (other.Gait == Gait) && (other.MantleType == MantleType) && (other.Montage == Montage);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FVaultAnimation
 {
 	GENERATED_BODY()
@@ -348,7 +374,28 @@ struct ALSXT_API FVaultAnimation
 	}
 };
 
+USTRUCT(BlueprintType)
+struct ALSXT_API FInspectItemAnimation
+{
+	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimMontage> Montage { nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimMontage> EnterMontage { nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimMontage> IdleMontage{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimMontage> ExitMontage{ nullptr };
+
+	bool operator==(const FInspectItemAnimation& other) const
+	{
+		return (other.Montage == Montage) && (other.EnterMontage == EnterMontage) && (other.IdleMontage == IdleMontage) && (other.ExitMontage == ExitMontage);
+	}
+};
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FSyncedActionAnimation

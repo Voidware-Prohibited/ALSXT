@@ -153,7 +153,7 @@ struct ALSXT_API FALSXTGeneralCombatSettings
 	FName HighlightMaterialParameterName { "Highlight" };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	FVector	TraceAreaHalfSize { 400.0f, 400.0f, 150.0f };
+	FVector	TraceAreaHalfSize { 650.0f, 600.0f, 150.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Target Lock", Meta = (Units = "cm", AllowPrivateAccess))
 	float MaxInitialLockDistance { 1000.0f };

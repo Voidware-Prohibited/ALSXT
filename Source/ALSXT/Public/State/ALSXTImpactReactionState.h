@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Settings/ALSXTImpactReactionSettings.h"
 #include "ALSXTImpactReactionState.generated.h"
 
 USTRUCT(BlueprintType)

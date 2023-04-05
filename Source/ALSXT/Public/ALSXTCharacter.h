@@ -579,6 +579,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|First Person Eye Focus")
 	bool IsFirstPersonEyeFocusActive() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Stamina")
+	float GetActionBaseStaminaCost(UPARAM(meta = (Categories = "Als.LocomotionAction"))const FGameplayTag& Action, UPARAM(meta = (Categories = "Als.Action Strength")) const FGameplayTag& ActionStrength) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Stamina")
+	float GetAttackBaseStaminaCost(UPARAM(meta = (Categories = "Als.Attack Method")) const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength")) const FGameplayTag& ActionStrength) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Stamina")
+	float GetDamageBaseStaminaCost(float Damage, UPARAM(meta = (Categories = "Als.Impact Form")) const FGameplayTag& ImpactForm) const;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanSprint() const;

@@ -4,6 +4,7 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Engine/Texture2D.h"
 #include "Engine/EngineTypes.h"
+#include "Settings/ALSXTFootstepEffectSettings.h"
 #include "ALSXTFootstepState.generated.h"
 
 UENUM(BlueprintType)

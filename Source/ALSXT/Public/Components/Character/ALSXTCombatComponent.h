@@ -98,6 +98,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void SetCurrentTarget(const FTargetHitResultEntry& NewTarget);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Target Lock")
+	void OnNewTarget(const FTargetHitResultEntry& NewTarget);
+
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void ClearCurrentTarget();
 

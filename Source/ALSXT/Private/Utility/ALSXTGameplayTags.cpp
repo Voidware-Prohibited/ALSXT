@@ -59,6 +59,13 @@ namespace ALSXTActionStanceTags
 	UE_DEFINE_GAMEPLAY_TAG(InAir, TEXT("Als.Action Stance.In Air"))
 }
 
+namespace ALSXTMantleTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(High, TEXT("Als.Mantle Type.High"))
+	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Mantle Type.Low"))
+	UE_DEFINE_GAMEPLAY_TAG(InAir, TEXT("Als.Mantle Type.In Air"))
+}
+
 namespace ALSXTVaultTypeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Vault Type.Low"))
