@@ -617,10 +617,16 @@ private:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UALSXTMantlingSettings* SelectMantlingSettingsXT();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	UALSXTSlidingSettings* SelectSlidingSettings();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	UALSXTVaultingSettings* SelectVaultingSettings(const FGameplayTag& VaultingType);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	FVaultAnimation SelectVaultingMontage(const FGameplayTag& CurrentLocomotionMode, const FGameplayTag& CurrentStance, const FGameplayTag& CurrentGait, const FGameplayTag& VaultingType);
+	FVaultAnimation SelectVaultingMontage(const FGameplayTag& CurrentGait, const FGameplayTag& VaultingType);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	void OnVaultingStarted(const FALSXTVaultingParameters& Parameters);

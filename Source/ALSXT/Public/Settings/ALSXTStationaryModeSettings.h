@@ -35,6 +35,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{StaticStationaryMode}", AllowPrivateAccess))
 	TArray<FStaticStationaryModeAnimation> StaticStationaryModeAnimations;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector2D FirstPersonYawRange {-180.0f, 180.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector2D FirstPersonPitchRange {-180.0f, 180.0f};
+
 	// Mantling time to blend in amount curve.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UCurveFloat> BlendInCurve;

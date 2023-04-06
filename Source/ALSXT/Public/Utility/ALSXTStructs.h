@@ -327,17 +327,11 @@ struct ALSXT_API FMantleAnimation
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.LocomotionMode", AllowPrivateAccess))
-	FGameplayTagContainer LocomotionMode;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", AllowPrivateAccess))
-	FGameplayTagContainer Stance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Mantle Type", AllowPrivateAccess))
+	FGameplayTagContainer MantleType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait", AllowPrivateAccess))
 	FGameplayTagContainer Gait;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Mantle Type", AllowPrivateAccess))
-	FGameplayTagContainer MantleType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Hand", AllowPrivateAccess))
 	FGameplayTagContainer Side;
@@ -347,7 +341,7 @@ struct ALSXT_API FMantleAnimation
 
 	bool operator==(const FMantleAnimation& other) const
 	{
-		return (other.LocomotionMode == LocomotionMode) && (other.Stance == Stance) && (other.Gait == Gait) && (other.MantleType == MantleType) && (other.Montage == Montage);
+		return (other.MantleType == MantleType) && (other.Gait == Gait) && (other.Side == Side) && (other.Montage == Montage);
 	}
 };
 
@@ -356,24 +350,18 @@ struct ALSXT_API FVaultAnimation
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.LocomotionMode", AllowPrivateAccess))
-	FGameplayTagContainer LocomotionMode;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", AllowPrivateAccess))
-	FGameplayTagContainer Stance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Vault Type", AllowPrivateAccess))
+	FGameplayTagContainer VaultType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait", AllowPrivateAccess))
 	FGameplayTagContainer Gait;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Vault Type", AllowPrivateAccess))
-	FGameplayTagContainer VaultType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo Montage;
 
 	bool operator==(const FVaultAnimation& other) const
 	{
-		return (other.LocomotionMode == LocomotionMode) && (other.Stance == Stance) && (other.Gait == Gait) && (other.VaultType == VaultType) && (other.Montage == Montage);
+		return (other.VaultType == VaultType) && (other.Gait == Gait) && (other.Montage == Montage);
 	}
 };
 

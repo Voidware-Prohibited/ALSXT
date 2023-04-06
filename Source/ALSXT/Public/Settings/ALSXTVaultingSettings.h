@@ -49,6 +49,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TArray<FVaultAnimation> VaultAnimations;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector2D FirstPersonYawRange {-180.0f, 180.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector2D FirstPersonPitchRange {-180.0f, 180.0f};
+
 public:
 	float GetStartTimeForHeight(FVector2D ReferenceHeight, FVector2D StartTime, float MantlingHeight) const;
 

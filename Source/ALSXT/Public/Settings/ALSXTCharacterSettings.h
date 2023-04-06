@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Settings/AlsCharacterSettings.h"
 #include "Settings/ALSXTFootstepEffectSettings.h"
+#include "Settings/ALSXTFreelookSettings.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTSlidingSettings.h"
 #include "Settings/ALSXTFPEyeFocusSettings.h"
@@ -21,6 +22,9 @@ class ALSXT_API UALSXTCharacterSettings : public UAlsCharacterSettings
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTGeneralFootstepEffectSettings FootstepEffects;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FALSXTGeneralFreelookSettings Freelook;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTGeneralVaultingSettings Vaulting;
