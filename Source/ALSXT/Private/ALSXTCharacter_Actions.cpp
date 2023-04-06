@@ -199,7 +199,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	};
 
 #if ENABLE_DRAW_DEBUG
-	 const auto bDisplayDebug{UAlsUtility::ShouldDisplayDebugForActor(this, UAlsConstants::MantlingDisplayName())};
+	 const auto bDisplayDebug{UAlsUtility::ShouldDisplayDebugForActor(this, UAlsConstants::MantlingDebugDisplayName())};
 #endif
 
 	const auto* Capsule{GetCapsuleComponent()};

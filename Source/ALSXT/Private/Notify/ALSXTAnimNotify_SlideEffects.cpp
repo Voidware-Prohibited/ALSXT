@@ -68,7 +68,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 	TEnumAsByte<EPhysicalSurface> HitSurface;
 
 #if ENABLE_DRAW_DEBUG
-	const auto bDisplayDebug{ UAlsUtility::ShouldDisplayDebugForActor(Mesh->GetOwner(), UAlsConstants::TracesDisplayName()) };
+	const auto bDisplayDebug{ UAlsUtility::ShouldDisplayDebugForActor(Mesh->GetOwner(), UAlsConstants::TracesDebugDisplayName()) };
 #endif
 
 	FCollisionQueryParams QueryParameters{ ANSI_TO_TCHAR(__FUNCTION__), true, Mesh->GetOwner() };
