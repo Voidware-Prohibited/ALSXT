@@ -280,17 +280,17 @@ void UALSXTImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 	}
 }
 
-void UALSXTImpactReactionComponent::SyncedAttackReaction(FAttackDoubleHitResult Hit, const FGameplayTag& Overlay, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const FGameplayTag& AttackMode, int Index)
+void UALSXTImpactReactionComponent::SyncedAttackReaction(int Index)
 {
 	// if (GetOwnerRole() == ROLE_AutonomousProxy)
 	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		ServerAttackReaction(Hit);
+		ServerSyncedAttackReaction(Index);
 	}
 	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
 	{
-		StartAttackReaction(Hit);
-		// MulticastAttackReaction(Hit);
+		StartSyncedAttackReaction(Index);
+		// MulticastSyncedAttackReaction(Index);
 	}
 }
 
@@ -311,7 +311,22 @@ bool UALSXTImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMo
 
 void UALSXTImpactReactionComponent::StartBumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 {
+	// ...
+}
 
+void UALSXTImpactReactionComponent::StartCrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StartAnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StartDefensiveReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+{
+	// ...
 }
 
 void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult Hit)
@@ -365,9 +380,9 @@ void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult H
 	}
 }
 
-void UALSXTImpactReactionComponent::StartSyncedAttackReaction(FAttackDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::StartSyncedAttackReaction(int32 Index)
 {
-	
+	// ...
 }
 
 void UALSXTImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
@@ -414,19 +429,44 @@ void UALSXTImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	}
 }
 
-void UALSXTImpactReactionComponent::StartFall(FDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::StartClutchImpactPoint(FDoubleHitResult Hit)
 {
-
+	// ...
 }
 
-void UALSXTImpactReactionComponent::StartGetUp(FDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::StartImpactFall(FDoubleHitResult Hit)
 {
-
+	// ...
 }
 
-void UALSXTImpactReactionComponent::StartResponse(FAttackDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::StartAttackFall(FAttackDoubleHitResult Hit)
 {
+	// ...
+}
 
+void UALSXTImpactReactionComponent::StartBraceForImpact()
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StartImpactGetUp(FDoubleHitResult Hit)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StartAttackGetUp(FAttackDoubleHitResult Hit)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StartImpactResponse(FDoubleHitResult Hit)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StartAttackResponse(FAttackDoubleHitResult Hit)
+{
+	// ...
 }
 
 FAnticipationPose UALSXTImpactReactionComponent::SelectAnticipationMontage_Implementation(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
@@ -464,6 +504,12 @@ void UALSXTImpactReactionComponent::SyncedAttackGetUp() {}
 void UALSXTImpactReactionComponent::AttackResponse() {}
 
 FBumpReactionAnimation UALSXTImpactReactionComponent::SelectBumpReactionMontage_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form)
+{
+	FBumpReactionAnimation SelectedMontage;
+	return SelectedMontage;
+}
+
+FBumpReactionAnimation UALSXTImpactReactionComponent::SelectCrowdNavigationReactionMontage_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form)
 {
 	FBumpReactionAnimation SelectedMontage;
 	return SelectedMontage;
@@ -624,28 +670,119 @@ FSyncedAttackAnimation UALSXTImpactReactionComponent::GetSyncedMontage_Implement
 
 }
 
-FActionMontageInfo UALSXTImpactReactionComponent::SelectFallMontage_Implementation(FDoubleHitResult Hit)
+FImpactReactionAnimation UALSXTImpactReactionComponent::SelectClaspImpactPointMontage_Implementation(FDoubleHitResult Hit)
+{
+	FImpactReactionAnimation SelectedMontage;
+	return SelectedMontage;
+}
+
+FAnticipationPose UALSXTImpactReactionComponent::SelectSteadyMontage_Implementation(const FGameplayTag& Side)
+{
+	FAnticipationPose SelectedMontage;
+	return SelectedMontage;
+}
+
+FActionMontageInfo UALSXTImpactReactionComponent::SelectImpactFallMontage_Implementation(FDoubleHitResult Hit)
 {
 	FActionMontageInfo SelectedMontage{ nullptr };
 	return SelectedMontage;
 }
 
-UAnimMontage* UALSXTImpactReactionComponent::SelectFallenPose_Implementation(FDoubleHitResult Hit)
+FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackFallMontage_Implementation(FDoubleHitResult Hit)
+{
+	FActionMontageInfo SelectedMontage{ nullptr };
+	return SelectedMontage;
+}
+
+UAnimMontage* UALSXTImpactReactionComponent::SelectImpactFallenPose_Implementation(FDoubleHitResult Hit)
 {
 	UAnimMontage* SelectedMontage{ nullptr };
 	return SelectedMontage;
 }
 
-FActionMontageInfo UALSXTImpactReactionComponent::SelectGetUpMontage_Implementation(FDoubleHitResult Hit)
+UAnimMontage* UALSXTImpactReactionComponent::SelectAttackFallenPose_Implementation(FDoubleHitResult Hit)
+{
+	UAnimMontage* SelectedMontage{ nullptr };
+	return SelectedMontage;
+}
+
+FActionMontageInfo UALSXTImpactReactionComponent::SelectImpactGetUpMontage_Implementation(FDoubleHitResult Hit)
 {
 	FActionMontageInfo SelectedMontage{ nullptr };
 	return SelectedMontage;
 }
 
-FResponseAnimation UALSXTImpactReactionComponent::SelectResponseMontage_Implementation(FAttackDoubleHitResult Hit)
+FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackGetUpMontage_Implementation(FDoubleHitResult Hit)
+{
+	FActionMontageInfo SelectedMontage{ nullptr };
+	return SelectedMontage;
+}
+
+FResponseAnimation UALSXTImpactReactionComponent::SelectImpactResponseMontage_Implementation(FAttackDoubleHitResult Hit)
 {
 	FResponseAnimation SelectedMontage;
 	return SelectedMontage;
+}
+
+FResponseAnimation UALSXTImpactReactionComponent::SelectAttackResponseMontage_Implementation(FAttackDoubleHitResult Hit)
+{
+	FResponseAnimation SelectedMontage;
+	return SelectedMontage;
+}
+
+void UALSXTImpactReactionComponent::MulticastBumpReaction_Implementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
+{
+	StartBumpReaction(Gait, Side, Form);
+}
+
+void UALSXTImpactReactionComponent::ServerBumpReaction_Implementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
+{
+	MulticastBumpReaction(Gait, Side, Form);
+	Character->ForceNetUpdate();
+}
+
+void UALSXTImpactReactionComponent::MulticastCrowdNavigationReaction_Implementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
+{
+	StartCrowdNavigationReaction(Gait, Side, Form);
+}
+
+void UALSXTImpactReactionComponent::ServerCrowdNavigationReaction_Implementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
+{
+	MulticastCrowdNavigationReaction(Gait, Side, Form);
+	Character->ForceNetUpdate();
+}
+
+void UALSXTImpactReactionComponent::MulticastAnticipationReaction_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+{
+	StartAnticipationReaction(Velocity, Side, Form, AnticipationPoint);
+}
+
+void UALSXTImpactReactionComponent::ServerAnticipationReaction_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+{
+	MulticastAnticipationReaction(Velocity, Side, Form, AnticipationPoint);
+	Character->ForceNetUpdate();
+}
+
+void UALSXTImpactReactionComponent::MulticastDefensiveReaction_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+{
+	StartDefensiveReaction(Velocity, Side, Form, AnticipationPoint);
+}
+
+void UALSXTImpactReactionComponent::ServerDefensiveReaction_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+{
+	MulticastDefensiveReaction(Velocity, Side, Form, AnticipationPoint);
+	Character->ForceNetUpdate();
+}
+
+void UALSXTImpactReactionComponent::MulticastAttackReaction_Implementation(FAttackDoubleHitResult Hit)
+{
+	StartAttackReaction(Hit);
+}
+
+void UALSXTImpactReactionComponent::ServerImpactReaction_Implementation(FDoubleHitResult Hit)
+{
+	MulticastImpactReaction(Hit);
+	Character->ForceNetUpdate();
 }
 
 bool UALSXTImpactReactionComponent::ServerAttackReaction_Validate(FAttackDoubleHitResult Hit)
@@ -660,21 +797,26 @@ void UALSXTImpactReactionComponent::ServerAttackReaction_Implementation(FAttackD
 	Character->ForceNetUpdate();
 }
 
-
-void UALSXTImpactReactionComponent::MulticastAttackReaction_Implementation(FAttackDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::ServerSyncedAttackReaction_Implementation(int32 Index)
 {
-	StartAttackReaction(Hit);
+	// MulticastSyncedAttackReaction(Index);
+	StartSyncedAttackReaction(Index);
+	Character->ForceNetUpdate();
 }
 
-void UALSXTImpactReactionComponent::ServerImpactReaction_Implementation(FDoubleHitResult Hit)
+bool UALSXTImpactReactionComponent::ServerSyncedAttackReaction_Validate(int32 Index)
 {
-	MulticastImpactReaction(Hit);
-	Character->ForceNetUpdate();
+	return true;
 }
 
 void UALSXTImpactReactionComponent::MulticastImpactReaction_Implementation(FDoubleHitResult Hit)
 {
 	StartImpactReaction(Hit);
+}
+
+void UALSXTImpactReactionComponent::MulticastSyncedAttackReaction_Implementation(int32 Index)
+{
+	StartSyncedAttackReaction(Index);
 }
 
 void UALSXTImpactReactionComponent::ServerStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
@@ -684,6 +826,11 @@ void UALSXTImpactReactionComponent::ServerStartImpactReaction_Implementation(FDo
 		MulticastStartImpactReaction(Hit, Montage, ParticleActor, Particle, Audio);
 		Character->ForceNetUpdate();
 	}
+}
+
+bool UALSXTImpactReactionComponent::ServerStartImpactReaction_Validate(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
+{
+	return true;
 }
 
 void UALSXTImpactReactionComponent::MulticastStartImpactReaction_Implementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)

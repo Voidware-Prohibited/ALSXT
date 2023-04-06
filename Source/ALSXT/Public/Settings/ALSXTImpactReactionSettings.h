@@ -114,13 +114,22 @@ public:
 	TArray<FAttackReactionAnimation> AttackReactionAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FFallenAnimation> FallenAnimations;
+	TArray<FImpactReactionAnimation> ClutchImpactPointAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray <FFallenAnimation> ImpactFallenAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray <FFallenAnimation> AttackFallenAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
+	TArray<FAnticipationPose> BraceForImpactPoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FResponseAnimation> AttackResponseAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TArray <FFallenAnimation> DeathAnimations;
+	TArray <FDeathAnimation> DeathAnimations;
 
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float ImpactHeight) const;
