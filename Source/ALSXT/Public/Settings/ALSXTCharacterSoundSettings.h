@@ -39,6 +39,21 @@ struct ALSXT_API FALSXTGeneralCharacterSoundSettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAllowCharacterSounds{ true };
+	bool bEnableCharacterSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableActionSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableAttackSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableDamageSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableDeathSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bDebugMode{ false };
 
 };

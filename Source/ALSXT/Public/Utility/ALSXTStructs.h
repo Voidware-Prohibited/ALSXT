@@ -721,6 +721,29 @@ struct ALSXT_API FALSXTCharacterDamageSound
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer PhysicalMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FALSXTCharacterSound ImpactSound;
+
+	bool operator==(const FALSXTImpactSound& other) const
+	{
+		return (other.PhysicalMaterial == PhysicalMaterial) && (other.Velocity == Velocity) && (other.Form == Form) && (other.ImpactSound == ImpactSound);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTBloodSpatterType
 {
 	GENERATED_BODY()

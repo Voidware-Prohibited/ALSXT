@@ -37,6 +37,9 @@ public:
 	void GetActorPhysicsStates(FGameplayTag& PhysicalMaterial, const TArray<FGameplayTag>& PhysicalStates);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
+	void PerformSurfaceInteraction(const FGameplayTag& PhysicalMaterial);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void GetActorPhysicsDamageInfo(FGameplayTag& DamageType, float& PhysicsBaseDamage, float& PhysicsDamageFrequency);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")

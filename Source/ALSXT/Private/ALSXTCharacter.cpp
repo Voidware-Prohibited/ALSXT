@@ -1044,6 +1044,38 @@ void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 
 void AALSXTCharacter::OnDefensiveModeChanged_Implementation(const FGameplayTag& PreviousDefensiveModeTag) {}
 
+void AALSXTCharacter::SetFreelookState(const FALSXTFreelookState& NewFreelookState)
+{
+	const auto PreviousFreelookState{ FreelookState };
+
+	FreelookState = NewFreelookState;
+
+	OnFreelookStateChanged(PreviousFreelookState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetFreelookState(NewFreelookState);
+	}
+}
+
+void AALSXTCharacter::ServerSetFreelookState_Implementation(const FALSXTFreelookState& NewFreelookState)
+{
+	SetFreelookState(NewFreelookState);
+}
+
+
+void AALSXTCharacter::ServerProcessNewFreelookState_Implementation(const FALSXTFreelookState& NewFreelookState)
+{
+	ProcessNewFreelookState(NewFreelookState);
+}
+
+void AALSXTCharacter::OnReplicate_FreelookState(const FALSXTFreelookState& PreviousFreelookState)
+{
+	OnFreelookStateChanged(PreviousFreelookState);
+}
+
+void AALSXTCharacter::OnFreelookStateChanged_Implementation(const FALSXTFreelookState& PreviousFreelookState) {}
+
 void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState)
 {
 	const auto PreviousDefensiveModeState{ DefensiveModeState };

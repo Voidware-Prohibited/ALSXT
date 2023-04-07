@@ -95,41 +95,50 @@ class ALSXT_API UALSXTImpactReactionSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
 	TArray<FAnticipationPose> AnticipationPoses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
 	TArray<FAnticipationPose> DefensivePoses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray<FBumpReactionAnimation> CrowdNavigationReactionAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray<FBumpReactionAnimation> BumpReactionAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray<FImpactReactionAnimation> ImpactReactionAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray<FAttackReactionAnimation> AttackReactionAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray<FImpactReactionAnimation> ClutchImpactPointAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray <FFallenAnimation> ImpactFallenAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray <FFallenAnimation> AttackFallenAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
 	TArray<FAnticipationPose> BraceForImpactPoses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray<FResponseAnimation> AttackResponseAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray <FDeathAnimation> DeathAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds", Meta = (AllowPrivateAccess))
+	TArray <FALSXTImpactSound> ImpactReactionSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds", Meta = (AllowPrivateAccess))
+	TArray <FALSXTImpactSound> AttackReactionSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds", Meta = (AllowPrivateAccess))
+	TArray <FALSXTImpactSound> BodyFallSounds;
 
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float ImpactHeight) const;

@@ -27,24 +27,20 @@ public:
 	UALSXTImpactReactionComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UPARAM(meta = (Categories = "Als.Impact Form")) FGameplayTag GetCurrentBumpForm();
 
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
-
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
+	FALSXTImpactReactionParameters ImpactReactionParameters;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTGeneralImpactReactionSettings ImpactReactionSettings;
-
-	FALSXTImpactReactionParameters ImpactReactionParameters;
 
 	void ObstacleTrace();
 
@@ -77,20 +73,18 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnImpactReactionStateChanged(const FALSXTImpactReactionState& PreviousImpactReactionState);
 
+	// Settings
+private:
+	bool IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const;
+
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldSpawnParticleActor(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldSpawnParticleActorModeration(FDoubleHitResult Hit);
+
 public:
-	/*Curve float reference*/
-	UPROPERTY(EditAnywhere, Category = "Impact Reaction Timeline")
-	UCurveFloat* CurveFloat;
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
-	float GetHealth();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
-	float GetStamina();
-
-	UFUNCTION(BlueprintCallable, Category = "Parameters")
-	FGameplayTag GetCharacterVelocity();
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanReact();
 
@@ -118,71 +112,24 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldPerformResponse();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
-	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);
+	// Parameters
+private:
+	UFUNCTION()
+	void ImpactTimelineUpdate(float Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
-	UNiagaraSystem* GetBodyFallParticle(FDoubleHitResult Hit);
+	FTimeline ImpactTimeline;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
-	TSubclassOf<AActor> GetImpactReactionParticleActor(FDoubleHitResult Hit);
+	FTimerHandle TimeSinceLastRecoveryTimerHandle;
+	float TimeSinceLastRecovery;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
-	USoundBase* GetImpactReactionSound(FDoubleHitResult Hit);
+	FTimerHandle TimeSinceLastResponseTimerHandle;
+	float TimeSinceLastResponse;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
-	USoundBase* GetBodyFallSound(FDoubleHitResult Hit);
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-	FALSXTImpactReactionState ImpactReactionState;
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void AnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void SyncedAnticipationReaction(FVector AnticipationPoint);
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void DefensiveReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void CrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void BumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void ImpactReaction(FDoubleHitResult Hit);
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void AttackReaction(FAttackDoubleHitResult Hit);
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void SyncedAttackReaction(int Index);
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void ImpactFall();
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void SyncedAttackFall();
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void BumpFall();
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void BodyFallReaction(FAttackDoubleHitResult Hit);
-
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void GetUp();
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void SyncedAttackGetUp();
-
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void AttackResponse();
+	FImpactReactionAnimation LastImpactReactionAnimation;
+	FAttackReactionAnimation LastAttackReactionAnimation;
+	FSyncedAttackAnimation LastSyncedAttackReactionAnimation;
 
 protected:
-	// Parameters
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	FBumpReactionAnimation SelectBumpReactionMontage(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
 
@@ -237,84 +184,103 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	UALSXTImpactReactionSettings* SelectImpactReactionSettings();
 
-	// Settings
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldSpawnParticleActor(FDoubleHitResult Hit);
+public:
+	UPROPERTY(EditAnywhere, Category = "Impact Reaction Timeline")
+	UCurveFloat* CurveFloat;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldSpawnParticleActorModeration(FDoubleHitResult Hit);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
+	float GetHealth();
 
-	// Main Sequence
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
+	float GetStamina();
 
-	void SyncedReaction();
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	FGameplayTag GetCharacterVelocity();
 
-	void Fall();
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);
 
-	void FallLand();
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UNiagaraSystem* GetBodyFallParticle(FDoubleHitResult Hit);
 
-	// Hooks 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	TSubclassOf<AActor> GetImpactReactionParticleActor(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnSpawnParticleActor(const FDoubleHitResult& Hit);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FALSXTCharacterSound GetImpactReactionSound(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnAttackReactionStarted(FAttackDoubleHitResult Hit);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FALSXTCharacterSound GetAttackReactionSound(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnImpactReactionStarted(FDoubleHitResult Hit);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FALSXTCharacterSound GetBodyFallSound(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnSyncedReactionStarted();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTImpactReactionState ImpactReactionState;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnSyncedReactionEnded();
+	// Entry Events
+public:
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void AnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnFallStarted();
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void SyncedAnticipationReaction(FVector AnticipationPoint);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnFallLand();
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void DefensiveReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnGetUpStarted();
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void CrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnGetUpEnded();
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void BumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnResponseStarted();
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void ImpactReaction(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnResponseEnded();
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void AttackReaction(FAttackDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnABumpReactionFinished(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void SyncedAttackReaction(int Index);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnAttackReactionFinished(FAttackDoubleHitResult Hit, const FGameplayTag& AttackMode);
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void ClutchImpactPoint(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnImpactReactionFinished(FDoubleHitResult Hit);
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void BumpFall();
+	
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void ImpactFall(FDoubleHitResult Hit);
 
-	// Desired UnarmedAttack
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void AttackFall(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void SyncedAttackFall(int32 Index);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void BraceForImpact();
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void ImpactGetUp(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void AttackGetUp(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void SyncedAttackGetUp(int32 Index);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void ImpactResponse(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void AttackResponse(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void BodyFallReaction(FAttackDoubleHitResult Hit);
 
 private:
-	FTimeline ImpactTimeline;
-
-	FTimerHandle TimeSinceLastRecoveryTimerHandle;
-	float TimeSinceLastRecovery;
-
-	FTimerHandle TimeSinceLastResponseTimerHandle;
-	float TimeSinceLastResponse;
-
-	FImpactReactionAnimation LastImpactReactionAnimation;
-	FAttackReactionAnimation LastAttackReactionAnimation;
-	FSyncedAttackAnimation LastSyncedAttackReactionAnimation;
-
-	UFUNCTION()
-	void ImpactTimelineUpdate(float Value);
-
-	bool IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const;
 
 	void StartBumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
@@ -336,15 +302,27 @@ private:
 
 	void StartAttackFall(FAttackDoubleHitResult Hit);
 
+	void StartSyncedAttackFall(int32 Index);
+
 	void StartBraceForImpact();
+
+	void StartImpactFallLand(FDoubleHitResult Hit);
+
+	void StartAttackFallLand(FAttackDoubleHitResult Hit);
+
+	void StartSyncedAttackFallLand(int32 Index);
 
 	void StartImpactGetUp(FDoubleHitResult Hit);
 
 	void StartAttackGetUp(FAttackDoubleHitResult Hit);
 
+	void StartSyncedAttackGetUp(int32 Index);
+
 	void StartImpactResponse(FDoubleHitResult Hit);
 
 	void StartAttackResponse(FAttackDoubleHitResult Hit);
+
+	// RPCs
 
 	UFUNCTION(Server, Reliable)
 	void ServerBumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
@@ -389,18 +367,254 @@ private:
 	void MulticastSyncedAttackReaction(int32 Index);
 
 	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerClutchImpactPoint(FDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastClutchImpactPoint(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerImpactFall(FDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastImpactFall(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerAttackFall(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttackFall(FAttackDoubleHitResult Hit);
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSyncedAttackFall(int32 Index);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSyncedAttackFall(int32 Index);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerBraceForImpact();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastBraceForImpact();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerImpactFallLand(FDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastImpactFallLand(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerAttackFallLand(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttackFallLand(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSyncedAttackFallLand(int32 Index);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSyncedAttackFallLand(int32 Index);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerImpactGetUp(FDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastImpactGetUp(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerAttackGetUp(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttackGetUp(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSyncedAttackGetUp(int32 Index);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSyncedAttackGetUp(int32 Index);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerImpactResponse(FDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastImpactResponse(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerAttackResponse(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttackResponse(FAttackDoubleHitResult Hit);
+
+	// Start RPCs
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartBumpReaction(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartBumpReaction(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartCrowdNavigationReaction(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartCrowdNavigationReaction(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartAnticipationReaction(FActionMontageInfo Montage, FVector AnticipationPoint);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartAnticipationReaction(FActionMontageInfo Montage, FVector AnticipationPoint);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartDefensiveReaction(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartDefensiveReaction(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
-	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartAttackReaction(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartAttackReaction(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartSyncedAttackReaction(FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartSyncedAttackReaction(FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartClutchImpactPoint(UAnimMontage* Montage, FVector ImpactPoint);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartClutchImpactPoint(UAnimMontage* Montage, FVector ImpactPoint);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartImpactFall(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartImpactFall(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartAttackFall(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartAttackFall(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartSyncedAttackFall(FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartSyncedAttackFall(FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartBraceForImpact(UAnimMontage* Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartBraceForImpact(UAnimMontage* Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartImpactFallLand(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartImpactFallLand(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartAttackFallLand(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartAttackFallLand(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartSyncedAttackFallLand(FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartSyncedAttackFallLand(FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartImpactGetUp(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartImpactGetUp(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartAttackGetUp(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartAttackGetUp(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartSyncedAttackGetUp(FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartSyncedAttackGetUp(FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartImpactResponse(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartImpactResponse(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartAttackResponse(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartAttackResponse(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	// Particle Actor RPCs
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpawnParticleActor(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSpawnParticleActor(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
+
+	// Implementations
+
+	void StartAnticipationReactionImplementation(FActionMontageInfo Montage, FVector AnticipationPoint);
+
+	void StartDefensiveReactionImplementation(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint);
+
+	void StartCrowdNavigationReactionImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	void StartBumpReactionImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	void StartAttackReactionImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+
+	void StartSyncedAttackReactionImplementation(FActionMontageInfo Montage);
+
+	void StartClutchImpactPointImplementation(UAnimMontage* Montage, FVector ImpactPoint);
+
+	void StartImpactFallImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	void StartAttackFallImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	void StartSyncedAttackFallImplementation(FActionMontageInfo Montage);
+
+	void StartBraceForImpactImplementation(UAnimMontage* Montage);
+
+	void StartImpactFallLandImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	void StartAttackFallLandImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	void StartSyncedAttackFallLandImplementation(FActionMontageInfo Montage);
+
+	void StartImpactGetUpImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	void StartAttackGetUpImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	void StartSyncedAttackGetUpImplementation(FActionMontageInfo Montage);
+
+	void StartImpactResponseImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	void StartAttackResponseImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
 
 	void SpawnParticleActorImplementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
 
@@ -413,8 +627,52 @@ public:
 	void StopImpactReaction();
 
 protected:
+	// Hooks 
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSpawnParticleActor(const FDoubleHitResult& Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnAttackReactionStarted(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnImpactReactionStarted(FDoubleHitResult Hit);
+
 	UFUNCTION(BlueprintNativeEvent, Category = "Hooks")
 	void OnImpactReactionEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSyncedReactionStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSyncedReactionEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnFallStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnFallLand();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnGetUpStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnGetUpEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnResponseStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnResponseEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnABumpReactionFinished(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnAttackReactionFinished(FAttackDoubleHitResult Hit, const FGameplayTag& AttackMode);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnImpactReactionFinished(FDoubleHitResult Hit);
 
 };
 

@@ -11,6 +11,7 @@
 #include "Utility/ALSXTStructs.h"
 #include "State/ALSXTFootstepState.h"
 #include "State/ALSXTDefensiveModeState.h"
+#include "State/ALSXTFreelookState.h"
 #include "State/ALSXTSlidingState.h"
 #include "State/ALSXTVaultingState.h"
 #include "Interfaces/ALSXTCombatInterface.h"
@@ -99,6 +100,9 @@ private:
 	FALSXTFootprintsState FootprintsState;
 
 	// Freelooking
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", ReplicatedUsing = "OnReplicate_FreelookState", Meta = (AllowPrivateAccess))
+	FALSXTFreelookState FreelookState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
 	FGameplayTag DesiredFreelooking{ALSXTFreelookingTags::False};
@@ -106,6 +110,31 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag Freelooking{ALSXTFreelookingTags::False};
 
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTFreelookState& GetFreelookState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFreelookState"))
+	void SetFreelookState(const FALSXTFreelookState& NewFreelookState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFreelookState"))
+	FALSXTFreelookState ProcessNewFreelookState(const FALSXTFreelookState& NewFreelookState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewFreelookState(const FALSXTFreelookState& NewFreelookState);
+
+private:
+	UFUNCTION(Server, Unreliable)
+	void ServerSetFreelookState(const FALSXTFreelookState& NewFreelookState);
+
+	UFUNCTION()
+	void OnReplicate_FreelookState(const FALSXTFreelookState& PreviousFreelookState);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnFreelookStateChanged(const FALSXTFreelookState& PreviousFreelookState);
+
+private:
 	// Sex
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
@@ -166,7 +195,7 @@ private:
 	FGameplayTag DefensiveMode {ALSXTDefensiveModeTags::None};
 
 	// Defensive Mode State
-
+private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_DefensiveModeState", Meta = (AllowPrivateAccess))
 	FALSXTDefensiveModeState DefensiveModeState;
 
@@ -1370,6 +1399,11 @@ inline const FALSXTVaultingState& AALSXTCharacter::GetVaultingState() const
 inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
 {
 	return FootprintsState;
+}
+
+inline const FALSXTFreelookState& AALSXTCharacter::GetFreelookState() const
+{
+	return FreelookState;
 }
 
 inline const FALSXTDefensiveModeState& AALSXTCharacter::GetDefensiveModeState() const
