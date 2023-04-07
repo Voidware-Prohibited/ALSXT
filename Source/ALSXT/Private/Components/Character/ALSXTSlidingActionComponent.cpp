@@ -39,6 +39,12 @@ void UALSXTSlidingActionComponent::BeginPlay()
 void UALSXTSlidingActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// if (Character->GetCharacterMovement().CurrentFloor.HitResult.ImpactNormal)
+	// {
+	// 
+	// }
+	// Character->GetCharacterMovement()->CurrentFloor.HitResult.ImpactNormal.ZAxisVector;
 }
 
 void UALSXTSlidingActionComponent::TryStartSliding(const float PlayRate)

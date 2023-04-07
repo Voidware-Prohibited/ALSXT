@@ -358,11 +358,78 @@ void UALSXTImpactReactionComponent::ImpactTimelineUpdate(float Value)
 	//...
 }
 
+// Error Checks
+bool UALSXTImpactReactionComponent::IsAnticipationReactionAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsDefensiveReactionAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsCrowdNavigationReactionAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsBumpReactionAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
 bool UALSXTImpactReactionComponent::IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const
 {
 	return (Montage != nullptr);
 }
 
+bool UALSXTImpactReactionComponent::IsAttackReactionAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsSyncedAttackReactionAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsClaspImpactPointAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsBumpFallAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsImpactFallAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsAttackFallAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsSyncedAttackFallAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsImpactResponseAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsAttackResponseAllowedToStart(const UAnimMontage* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+// Start Events
 void UALSXTImpactReactionComponent::StartAnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
 {
 	// ...
@@ -533,6 +600,14 @@ void UALSXTImpactReactionComponent::StartAttackResponse(FAttackDoubleHitResult H
 	// ...
 }
 
+void UALSXTImpactReactionComponent::BumpFall() {}
+
+//Parameters
+UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactionSettings_Implementation()
+{
+	return nullptr;
+}
+
 FAnticipationPose UALSXTImpactReactionComponent::SelectAnticipationMontage_Implementation(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
 {
 	FAnticipationPose SelectedAnticipationPose;
@@ -544,14 +619,6 @@ FAnticipationPose UALSXTImpactReactionComponent::SelectDefensiveMontage_Implemen
 	FAnticipationPose SelectedAnticipationPose;
 	return SelectedAnticipationPose;
 }
-
-
-UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactionSettings_Implementation()
-{
-	return nullptr;
-}
-
-void UALSXTImpactReactionComponent::BumpFall() {}
 
 FBumpReactionAnimation UALSXTImpactReactionComponent::SelectBumpReactionMontage_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form)
 {
@@ -1725,6 +1792,46 @@ void UALSXTImpactReactionComponent::SpawnParticleActorImplementation(FDoubleHitR
 
 // Refresh
 
+void UALSXTImpactReactionComponent::RefreshAnticipationReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshAnticipationReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshDefensiveReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshDefensiveReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshCrowdNavigationReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshCrowdNavigationReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshBumpReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshBumpReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
 void UALSXTImpactReactionComponent::RefreshImpactReaction(const float DeltaTime)
 {
 	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::HitReaction)
@@ -1764,6 +1871,86 @@ void UALSXTImpactReactionComponent::RefreshImpactReactionPhysics(const float Del
 	}
 }
 
+void UALSXTImpactReactionComponent::RefreshAttackReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshAttackReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshSyncedAttackReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshSyncedAttackReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshBumpFallReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshBumpFallReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshImpactFallReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshImpactFallReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshAttackFallReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshAttackFallReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshSyncedAttackFallReaction(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::RefreshSyncedAttackFallReactionPhysics(const float DeltaTime)
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StopAnticipationReaction()
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StopDefensiveReaction()
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StopCrowdNavigationReaction()
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StopBumpReaction()
+{
+	// ...
+}
+
 void UALSXTImpactReactionComponent::StopImpactReaction()
 {
 	if (Character->GetLocalRole() >= ROLE_Authority)
@@ -1785,6 +1972,36 @@ void UALSXTImpactReactionComponent::StopImpactReaction()
 	// }
 
 	OnImpactReactionEnded();
+}
+
+void UALSXTImpactReactionComponent::StopAttackReaction()
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StopSyncedAttackReaction()
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StopBumpFallReaction()
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StopImpactFallReaction()
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StopAttackFallReaction()
+{
+	// ...
+}
+
+void UALSXTImpactReactionComponent::StopSyncedAttackFallReaction()
+{
+	// ...
 }
 
 void UALSXTImpactReactionComponent::OnImpactReactionEnded_Implementation() {}

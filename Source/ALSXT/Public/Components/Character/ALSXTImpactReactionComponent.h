@@ -75,7 +75,20 @@ protected:
 
 	// Settings
 private:
+	bool IsAnticipationReactionAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsDefensiveReactionAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsCrowdNavigationReactionAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsBumpReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsSyncedAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsClaspImpactPointAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsBumpFallAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsImpactFallAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsAttackFallAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsSyncedAttackFallAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsImpactResponseAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsAttackResponseAllowedToStart(const UAnimMontage* Montage) const;
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
@@ -95,7 +108,7 @@ public:
 	bool CanPerformDefensiveReaction();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanGraspImpactPoint();
+	bool CanClaspImpactPoint();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldPerformAnticipationReaction();
@@ -107,27 +120,36 @@ public:
 	bool ShouldGraspImpactPoint();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldFall();
+	bool ShouldBumpFall();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldPerformResponse();
+	bool ShouldImpactFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldAttackFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldSyncedAttackFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldImpactPerformResponse();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldAttackPerformResponse();
 
 	// Parameters
 private:
-	UFUNCTION()
-	void ImpactTimelineUpdate(float Value);
-
 	FTimeline ImpactTimeline;
-
-	FTimerHandle TimeSinceLastRecoveryTimerHandle;
-	float TimeSinceLastRecovery;
-
-	FTimerHandle TimeSinceLastResponseTimerHandle;
-	float TimeSinceLastResponse;
-
 	FImpactReactionAnimation LastImpactReactionAnimation;
 	FAttackReactionAnimation LastAttackReactionAnimation;
 	FSyncedAttackAnimation LastSyncedAttackReactionAnimation;
+	FTimerHandle TimeSinceLastRecoveryTimerHandle;
+	float TimeSinceLastRecovery;
+	FTimerHandle TimeSinceLastResponseTimerHandle;
+	float TimeSinceLastResponse;
+
+	UFUNCTION()
+	void ImpactTimelineUpdate(float Value);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
@@ -618,13 +640,83 @@ private:
 
 	void SpawnParticleActorImplementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
 
+	void RefreshAnticipationReaction(float DeltaTime);
+
+	void RefreshAnticipationReactionPhysics(float DeltaTime);
+
+	void RefreshDefensiveReaction(float DeltaTime);
+
+	void RefreshDefensiveReactionPhysics(float DeltaTime);
+
+	void RefreshCrowdNavigationReaction(float DeltaTime);
+
+	void RefreshCrowdNavigationReactionPhysics(float DeltaTime);
+
+	void RefreshBumpReaction(float DeltaTime);
+
+	void RefreshBumpReactionPhysics(float DeltaTime);
+
 	void RefreshImpactReaction(float DeltaTime);
 
 	void RefreshImpactReactionPhysics(float DeltaTime);
 
+	void RefreshAttackReaction(float DeltaTime);
+
+	void RefreshAttackReactionPhysics(float DeltaTime);
+
+	void RefreshSyncedAttackReaction(float DeltaTime);
+
+	void RefreshSyncedAttackReactionPhysics(float DeltaTime);
+
+	void RefreshBumpFallReaction(float DeltaTime);
+
+	void RefreshBumpFallReactionPhysics(float DeltaTime);
+
+	void RefreshImpactFallReaction(float DeltaTime);
+
+	void RefreshImpactFallReactionPhysics(float DeltaTime);
+
+	void RefreshAttackFallReaction(float DeltaTime);
+
+	void RefreshAttackFallReactionPhysics(float DeltaTime);
+
+	void RefreshSyncedAttackFallReaction(float DeltaTime);
+
+	void RefreshSyncedAttackFallReactionPhysics(float DeltaTime);
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopAnticipationReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopDefensiveReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopCrowdNavigationReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopBumpReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
 	void StopImpactReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopAttackReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopSyncedAttackReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopBumpFallReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopImpactFallReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopAttackFallReaction();
+
+	UFUNCTION(BlueprintCallable, Category = "Hooks")
+	void StopSyncedAttackFallReaction();
 
 protected:
 	// Hooks 
