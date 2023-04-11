@@ -35,7 +35,9 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
+
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 	FALSXTImpactReactionParameters ImpactReactionParameters;
 
@@ -57,6 +59,8 @@ public:
 	void ServerProcessNewImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
 
 private:
+	void AnticipationTrace();
+
 	UFUNCTION(Server, Unreliable)
 	void ServerSetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
 
@@ -152,58 +156,82 @@ private:
 	void ImpactTimelineUpdate(float Value);
 
 protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FGameplayTag HealthToHealthTag(float Health);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FGameplayTag LocationToImpactSide(FVector Location);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FBumpReactionAnimation SelectBumpReactionMontage(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FBumpReactionAnimation SelectCrowdNavigationReactionMontage(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
-	FAnticipationPose SelectAnticipationMontage(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveMode(const FGameplayTag& Form);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
-	FAnticipationPose SelectDefensiveMontage(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health);	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveModeFromCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveModeFromAttackingCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	FAnticipationPose SelectImpactAnticipationMontage(UPARAM(meta = (Categories = "Als.Impact Velocity")) const FGameplayTag& Velocity, UPARAM(meta = (Categories = "Als.Stance")) const FGameplayTag& Stance, UPARAM(meta = (Categories = "Als.Impact Side")) const FGameplayTag& Side, UPARAM(meta = (Categories = "Als.Impact Form")) const FGameplayTag& Form, UPARAM(meta = (Categories = "Als.Health")) const FGameplayTag& Health);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	FAnticipationPose SelectAttackAnticipationMontage(UPARAM(meta = (Categories = "Als.Combat Stance")) const FGameplayTag& CharacterCombatStance, UPARAM(meta = (Categories = "Als.Action Strength")) const FGameplayTag& Strength, UPARAM(meta = (Categories = "Als.Stance")) const FGameplayTag& Stance, UPARAM(meta = (Categories = "Als.Impact Side")) const FGameplayTag& Side, UPARAM(meta = (Categories = "Als.Impact Form")) const FGameplayTag& Form, UPARAM(meta = (Categories = "Als.Health")) const FGameplayTag& Health);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	FAnticipationPose SelectDefensiveMontage(UPARAM(meta = (Categories = "Als.Action Strength")) const FGameplayTag& Strength, UPARAM(meta = (Categories = "Als.Stance")) const FGameplayTag& Stance, UPARAM(meta = (Categories = "Als.Impact Side")) const FGameplayTag& Side, UPARAM(meta = (Categories = "Als.Impact Form")) const FGameplayTag& Form, UPARAM(meta = (Categories = "Als.Health")) const FGameplayTag& Health);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FAttackReactionAnimation SelectAttackReactionMontage(FAttackDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FImpactReactionAnimation SelectImpactReactionMontage(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FSyncedAttackAnimation GetSyncedMontage(int Index);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FImpactReactionAnimation SelectClaspImpactPointMontage(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FAnticipationPose SelectSteadyMontage(const FGameplayTag& Side);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	FFallenAnimation SelectImpactFallAnimations(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	FFallenAnimation SelectAttackFallAnimations(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FActionMontageInfo SelectImpactFallMontage(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FActionMontageInfo SelectAttackFallMontage(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectImpactFallenPose(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectAttackFallenPose(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FActionMontageInfo SelectImpactGetUpMontage(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FActionMontageInfo SelectAttackGetUpMontage(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FResponseAnimation SelectImpactResponseMontage(FAttackDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FResponseAnimation SelectAttackResponseMontage(FAttackDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UALSXTImpactReactionSettings* SelectImpactReactionSettings();
 
 public:
@@ -725,7 +753,28 @@ protected:
 	void OnSpawnParticleActor(const FDoubleHitResult& Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnAttackReactionStarted(FAttackDoubleHitResult Hit);
+	void OnAnticipationReactionStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnAnticipationReactionEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnDefensiveReactionStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnDefensiveReactionEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnCrowdNavigationReactionStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnCrowdNavigationReactionEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnBumpReactionStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnBumpReactionEnded();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnImpactReactionStarted(FDoubleHitResult Hit);
@@ -734,16 +783,34 @@ protected:
 	void OnImpactReactionEnded();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnSyncedReactionStarted();
+	void OnAttackReactionStarted(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnSyncedReactionEnded();
+	void OnAttackReactionEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSyncedAttackReactionStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSyncedAttackReactionEnded();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnFallStarted();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnFallLand();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnBumpFallEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnImpactFallEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnAttackFallEnded();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
+	void OnSyncedAttackFallEnded();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnGetUpStarted();

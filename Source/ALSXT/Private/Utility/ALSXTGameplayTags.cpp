@@ -18,8 +18,15 @@ namespace AlsOverlayModeTags
 
 namespace AlsLocomotionActionTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(BumpReaction, TEXT("Als.LocomotionAction.Bump Reaction"))
-	UE_DEFINE_GAMEPLAY_TAG(HitReaction, TEXT("Als.LocomotionAction.Hit Reaction"))
+	UE_DEFINE_GAMEPLAY_TAG(CrowdNavigationReaction, TEXT("Als.LocomotionAction.Crowd Navigation Reaction"))
+	UE_DEFINE_GAMEPLAY_TAG(DefensiveReaction, TEXT("Als.LocomotionAction.Defensive Reaction"))
+	UE_DEFINE_GAMEPLAY_TAG(ImpactReaction, TEXT("Als.LocomotionAction.Impact Reaction"))
+	UE_DEFINE_GAMEPLAY_TAG(ClutchImpactPoint, TEXT("Als.LocomotionAction.Clutch Impact Point"))
+	UE_DEFINE_GAMEPLAY_TAG(SyncedAttackReaction, TEXT("Als.LocomotionAction.Synced Attack Reaction"))
+	UE_DEFINE_GAMEPLAY_TAG(ImpactFall, TEXT("Als.LocomotionAction.Impact Fall"))
+	UE_DEFINE_GAMEPLAY_TAG(ImpactFallLand, TEXT("Als.LocomotionAction.Impact Fall Land"))
+	UE_DEFINE_GAMEPLAY_TAG(ImpactGetUp, TEXT("Als.LocomotionAction.Impact Get Up"))
+	UE_DEFINE_GAMEPLAY_TAG(ImpactResponse, TEXT("Als.LocomotionAction.Impact Response"))
 	UE_DEFINE_GAMEPLAY_TAG(ThrowDefault, TEXT("Als.LocomotionAction.Throw.Default"))
 	UE_DEFINE_GAMEPLAY_TAG(Vaulting, TEXT("Als.LocomotionAction.Vaulting"))
 	UE_DEFINE_GAMEPLAY_TAG(Sliding, TEXT("Als.LocomotionAction.Sliding"))

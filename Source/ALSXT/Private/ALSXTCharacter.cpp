@@ -45,6 +45,13 @@ void AALSXTCharacter::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	RefreshVaulting();
+
+	FVector Difference = GetActorUpVector() - GetCharacterMovement()->CurrentFloor.HitResult.Normal;
+	float Angle = FMath::RadiansToDegrees(FMath::Atan2(Difference.X, Difference.Y)) -90;
+	if (Angle > 45.00)
+	{
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), Angle));
+	}
 }
 
 void AALSXTCharacter::NotifyControllerChanged()
@@ -561,12 +568,31 @@ void AALSXTCharacter::InputToggleCombatReady()
 
 void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
 {
-	if (CanBlock())
+	if (CanEnterBlockingDefensiveMode())
 	{
-		SetDesiredDefensiveMode(ActionValue.Get<bool>() ? ALSXTDefensiveModeTags::Blocking : ALSXTDefensiveModeTags::None);
+		if (ActionValue.Get<bool>() == true)
+		{
+			FALSXTDefensiveModeState PreviousDefensiveModeState = GetDefensiveModeState();
+			FALSXTDefensiveModeState NewDefensiveModeState = PreviousDefensiveModeState;
+			FAnticipationPose NewDefensiveMontage;
+			NewDefensiveModeState.Mode = PreviousDefensiveModeState.Mode == ALSXTDefensiveModeTags::None ? ALSXTDefensiveModeTags::Blocking : PreviousDefensiveModeState.Mode;
+			NewDefensiveModeState.Side = PreviousDefensiveModeState.Side == FGameplayTag::EmptyTag ? ALSXTImpactSideTags::Front : PreviousDefensiveModeState.Side;
+			NewDefensiveModeState.Form = PreviousDefensiveModeState.Form == FGameplayTag::EmptyTag ? ALSXTImpactFormTags::Blunt : PreviousDefensiveModeState.Form;
+			NewDefensiveModeState.Velocity = PreviousDefensiveModeState.Velocity == FGameplayTag::EmptyTag ? ALSXTImpactVelocityTags::Slow : PreviousDefensiveModeState.Velocity;
+			NewDefensiveMontage = SelectAttackAnticipationMontage(NewDefensiveModeState.Velocity, GetStance(), NewDefensiveModeState.Side, NewDefensiveModeState.Form);
+			NewDefensiveModeState.Montage = NewDefensiveMontage.Pose;
+			SetDefensiveModeState(NewDefensiveModeState);
+			SetDesiredDefensiveMode(ALSXTDefensiveModeTags::Blocking);
+		}
+		else 
+		{
+			ResetDefensiveModeState();
+			SetDesiredDefensiveMode(ALSXTDefensiveModeTags::None);
+		}
 	}
 	else if ((DesiredDefensiveMode == ALSXTDefensiveModeTags::Blocking) && (ActionValue.Get<bool>()  == false))
 	{
+		ResetDefensiveModeState();
 		SetDesiredDefensiveMode(ALSXTDefensiveModeTags::None);
 	}
 }
@@ -1038,6 +1064,14 @@ void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 
 		DefensiveMode = NewDefensiveModeTag;
 
+		if (DefensiveMode == ALSXTDefensiveModeTags::Avoiding)
+		{
+
+		}
+		if (DefensiveMode == ALSXTDefensiveModeTags::Blocking)
+		{
+
+		}
 		OnDefensiveModeChanged(PreviousDefensiveMode);
 	}
 }
@@ -1081,6 +1115,29 @@ void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewD
 	const auto PreviousDefensiveModeState{ DefensiveModeState };
 
 	DefensiveModeState = NewDefensiveModeState;
+	// ServerSetDefensiveModeState(NewDefensiveModeState);
+
+	OnDefensiveModeStateChanged(PreviousDefensiveModeState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetDefensiveModeState(NewDefensiveModeState);
+	}
+}
+
+void AALSXTCharacter::ResetDefensiveModeState()
+{
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "ResetDefensiveModeState");
+	FALSXTDefensiveModeState PreviousDefensiveModeState = GetDefensiveModeState();
+	FALSXTDefensiveModeState NewDefensiveModeState = PreviousDefensiveModeState;
+	NewDefensiveModeState.Mode = ALSXTDefensiveModeTags::None;
+	NewDefensiveModeState.Side = FGameplayTag::EmptyTag;
+	NewDefensiveModeState.Form = FGameplayTag::EmptyTag;
+	NewDefensiveModeState.Velocity = FGameplayTag::EmptyTag;
+	NewDefensiveModeState.Location = FVector::ZeroVector;
+	// NewDefensiveModeState.Montage = nullptr;
+
+	DefensiveModeState = NewDefensiveModeState;
 
 	OnDefensiveModeStateChanged(PreviousDefensiveModeState);
 
@@ -1109,18 +1166,6 @@ void AALSXTCharacter::OnReplicate_DefensiveModeState(const FALSXTDefensiveModeSt
 void AALSXTCharacter::OnDefensiveModeStateChanged_Implementation(const FALSXTDefensiveModeState& PreviousDefensiveModeState) {}
 
 // Blocking
-
-bool AALSXTCharacter::IsBlocking() const
-{
-	if (GetDefensiveMode() == ALSXTDefensiveModeTags::Blocking)
-	{
-		return true;
-	}
-	else 
-	{
-		return false;
-	}
-}
 
 void AALSXTCharacter::SetDesiredStationaryMode(const FGameplayTag& NewStationaryModeTag)
 {

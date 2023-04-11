@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "AlsCameraAnimationInstance.h"
 #include "Utility/ALSXTGameplayTags.h"
-// #include "ALSXTCharacter.h"
+#include "ALSXTCharacter.h"
 #include "ALSXTCameraAnimationInstance.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFirstPersonOverrideChanged, float, FirstPersonOverride);

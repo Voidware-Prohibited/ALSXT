@@ -206,14 +206,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
 	void SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void ResetDefensiveModeState();
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
 	FALSXTDefensiveModeState ProcessNewDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
-	UFUNCTION(Server, Unreliable)
+	UFUNCTION(Server, Reliable)
 	void ServerProcessNewDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
 private:
-	UFUNCTION(Server, Unreliable)
+	UFUNCTION(Server, Reliable)
 	void ServerSetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
 	UFUNCTION()
@@ -491,6 +494,9 @@ public:
 	UFUNCTION()
 	virtual void SetupPlayerInputComponent(UInputComponent* Input) override;
 
+public:
+	void InputBlock(const FInputActionValue& ActionValue);
+
 private:
 	void InputLookMouse(const FInputActionValue& ActionValue);
 
@@ -519,8 +525,6 @@ private:
 	void InputFreelook(const FInputActionValue& ActionValue);
 
 	void InputToggleCombatReady();
-
-	void InputBlock(const FInputActionValue& ActionValue);
 
 	void InputHoldBreath(const FInputActionValue& ActionValue);
 
@@ -621,6 +625,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanSprint() const;
 	void CanSprint_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	FAnticipationPose SelectAttackAnticipationMontage(const FGameplayTag& CharacterCombatStance, const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	// Vaulting
 
@@ -967,12 +974,18 @@ public:
 	const FGameplayTag& GetDesiredDefensiveMode() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
-		bool CanEnterDefensiveMode() const;
+	bool CanEnterDefensiveMode() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
-		bool CanBlock() const;
+	bool CanEnterBlockingDefensiveMode() const;
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool ShouldEnterBlockingDefensiveMode() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool ShouldEnterAvoidingDefensiveMode() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 		bool IsBlocking() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")

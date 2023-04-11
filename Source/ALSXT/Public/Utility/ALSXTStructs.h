@@ -574,6 +574,9 @@ struct ALSXT_API FFallenAnimation
 	FGameplayTagContainer ImpactForm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	TArray<FActionMontageInfo> FallingMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	TObjectPtr<UAnimMontage> FallenPose;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
@@ -581,7 +584,7 @@ struct ALSXT_API FFallenAnimation
 
 	bool operator==(const FFallenAnimation& other) const
 	{
-		return (other.ImpactStrength == ImpactStrength) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.FallenPose == FallenPose) && (other.GetUpMontages == GetUpMontages);
+		return (other.ImpactStrength == ImpactStrength) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.FallingMontages == FallingMontages) && (other.FallenPose == FallenPose) && (other.GetUpMontages == GetUpMontages);
 	}
 };
 
@@ -615,6 +618,9 @@ struct ALSXT_API FAnticipationPose
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Velocity", AllowPrivateAccess))
 	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", AllowPrivateAccess))
+	FGameplayTagContainer Stance;
 		
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTagContainer Side;
@@ -626,11 +632,11 @@ struct ALSXT_API FAnticipationPose
 	FGameplayTagContainer Health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	TObjectPtr<UAnimMontage> Pose;
+	TObjectPtr<UAnimSequenceBase> Pose;
 
 	bool operator==(const FAnticipationPose& other) const
 	{
-		return (other.Velocity == Velocity) && (other.Side == Side) && (other.Form == Form) && (other.Health == Health) && (other.Pose == Pose);
+		return (other.Velocity == Velocity) && (other.Stance == Stance) && (other.Side == Side) && (other.Form == Form) && (other.Health == Health) && (other.Pose == Pose);
 	}
 };
 

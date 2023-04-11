@@ -15,7 +15,7 @@ class ALSXT_API UALSXTAnimationInstance : public UAlsAnimationInstance
 {
 	GENERATED_BODY()
 
-private:
+protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	TObjectPtr<AALSXTCharacter> ALSXTCharacter;

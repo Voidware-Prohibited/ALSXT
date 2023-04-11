@@ -31,7 +31,7 @@ public:
 	bool CanReceiveImpulse();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
-    void GetAnticipationInfo(const FGameplayTag& Form, FVector& AnticipationPoint);
+	void GetAnticipationInfo(FGameplayTag& Velocity, FGameplayTag& Form, FVector& AnticipationPoint);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void GetActorPhysicsStates(FGameplayTag& PhysicalMaterial, const TArray<FGameplayTag>& PhysicalStates);

@@ -6,6 +6,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Math/RandomStream.h"
 #include "Utility/AlsMacros.h"
+#include "InputActionValue.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTCombatInterface.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
 
 // Sets default values for this component's properties
@@ -39,7 +42,7 @@ void UALSXTImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick Ti
 	{
 		ObstacleTrace();
 	}
-	// ...
+	AnticipationTrace();
 }
 
 FGameplayTag UALSXTImpactReactionComponent::GetCharacterVelocity()
@@ -202,6 +205,116 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 		return;
 	}
 }
+
+void UALSXTImpactReactionComponent::AnticipationTrace()
+{
+	const auto* Capsule{ Character->GetCapsuleComponent() };
+	const auto CapsuleScale{ Capsule->GetComponentScale().Z };
+	auto CapsuleRadius{ ImpactReactionSettings.BumpDetectionRadius };
+	const auto CapsuleHalfHeight{ Capsule->GetScaledCapsuleHalfHeight() };
+	const FVector UpVector{ Character->GetActorUpVector() };
+	float TraceDistance{ 100.0f };
+	const FVector StartLocation{ Character->GetActorLocation() + (UpVector * CapsuleHalfHeight / 2) };
+	const FVector EndLocation{ StartLocation + (Character->GetActorForwardVector() * TraceDistance) };
+	TEnumAsByte<EDrawDebugTrace::Type> BumpDebugMode;
+	BumpDebugMode = (ImpactReactionSettings.DebugMode) ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
+	// BumpDebugMode = EDrawDebugTrace::ForOneFrame;
+	TArray<FHitResult> HitResults;
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(Character);
+
+	bool isHit = UKismetSystemLibrary::BoxTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, ImpactReactionSettings.AnticipationAreaHalfSize, Character->GetControlRotation(), ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f);
+	if (isHit)
+	{
+		for (FHitResult HitResult : HitResults)
+		{
+			if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCharacterInterface::StaticClass()))
+			{
+				float ActorVelocity{ 0.0f };
+				float ActorMass{ 0.0f };
+				FGameplayTag Velocity{ FGameplayTag::EmptyTag };
+				FGameplayTag Form{ FGameplayTag::EmptyTag };
+				FVector AnticipationPoint{ FVector::ZeroVector };
+				FALSXTDefensiveModeState DefensiveModeState;
+				FAnticipationPose Montage;
+				FGameplayTag CharacterCombatStance = IALSXTCharacterInterface::Execute_GetCombatStance(HitResult.GetActor());
+				IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), ActorMass);
+				IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), ActorVelocity);
+				IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationPoint);
+				FGameplayTag DefensiveMode = IALSXTCombatInterface::Execute_Attacking(HitResult.GetActor()) ? DetermineDefensiveModeFromAttackingCharacter(Form, CharacterCombatStance) : DetermineDefensiveModeFromCharacter(Form, CharacterCombatStance);
+				FGameplayTag Stance = Character->GetDesiredStance();
+				FGameplayTag Side = LocationToImpactSide(AnticipationPoint);
+				FGameplayTag Health = HealthToHealthTag(GetHealth());
+
+				if (DefensiveMode == ALSXTDefensiveModeTags::Avoiding)
+				{
+					Montage = SelectAttackAnticipationMontage(CharacterCombatStance, Velocity, Stance, Side, Form, Health);
+				}
+				else
+				{
+					if (DefensiveMode == ALSXTDefensiveModeTags::Blocking)
+					{
+						Montage = SelectDefensiveMontage(Velocity, Stance, Side, Form, Health);
+					}
+				}
+
+				DefensiveModeState.Mode = DefensiveMode;
+				DefensiveModeState.Montage = Montage.Pose;
+				DefensiveModeState.Location = AnticipationPoint;
+				Character->SetDefensiveModeState(DefensiveModeState);
+				Character->SetDesiredDefensiveMode(DefensiveMode);
+				return;
+			}
+			else
+			{
+				if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCollisionInterface::StaticClass()))
+				{
+					float ActorVelocity{ 0.0f };
+					float ActorMass{ 0.0f };
+					FGameplayTag Velocity{ FGameplayTag::EmptyTag };
+					FGameplayTag Form{ FGameplayTag::EmptyTag };
+					FVector AnticipationPoint{ FVector::ZeroVector };
+					FALSXTDefensiveModeState DefensiveModeState;
+					FAnticipationPose Montage;
+					IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), ActorMass);
+					IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), ActorVelocity);
+					IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationPoint);
+					FGameplayTag DefensiveMode = DetermineDefensiveMode(Form);
+					FGameplayTag Stance = Character->GetDesiredStance();
+					FGameplayTag Side = LocationToImpactSide(AnticipationPoint);
+					FGameplayTag Health = HealthToHealthTag(GetHealth());
+
+					if (DefensiveMode == ALSXTDefensiveModeTags::Avoiding)
+					{
+						Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
+					}
+					if (DefensiveMode == ALSXTDefensiveModeTags::Blocking)
+					{
+						Montage = SelectDefensiveMontage(Velocity, Stance, Side, Form, Health);
+					}
+
+					DefensiveModeState.Mode = DefensiveMode;
+					DefensiveModeState.Montage = Montage.Pose;
+					DefensiveModeState.Location = AnticipationPoint;
+					Character->SetDefensiveModeState(DefensiveModeState);
+					Character->SetDesiredDefensiveMode(DefensiveMode);
+					return;
+				}
+			}
+		}
+	}
+	else
+	{
+		if (!Character->IsBlocking())
+		{
+			Character->ResetDefensiveModeState();
+			Character->SetDesiredDefensiveMode(ALSXTDefensiveModeTags::None);
+		}
+		
+	}
+}
+
+
 
 // ImpactReaction State
 void UALSXTImpactReactionComponent::SetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState)
@@ -608,28 +721,342 @@ UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactio
 	return nullptr;
 }
 
-FAnticipationPose UALSXTImpactReactionComponent::SelectAnticipationMontage_Implementation(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
+FAnticipationPose UALSXTImpactReactionComponent::SelectImpactAnticipationMontage_Implementation(const FGameplayTag& Velocity , const FGameplayTag& Stance, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
 {
-	FAnticipationPose SelectedAnticipationPose;
-	return SelectedAnticipationPose;
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	TArray<FAnticipationPose> Montages = SelectedImpactReactionSettings->ImpactAnticipationPoses;
+	TArray<FAnticipationPose> FilteredMontages;
+	FAnticipationPose SelectedImpactAnticipationPose;
+	TArray<FGameplayTag> TagsArray = { ALSXTImpactVelocityTags::Slow, AlsStanceTags::Standing, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt, ALSXTHealthTags::All };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+
+	// Return is there are no Montages
+	if (Montages.Num() < 1 || !Montages[0].Pose)
+	{
+		return SelectedImpactAnticipationPose;
+	}
+
+	// Filter Montages based on Tag parameters
+	for (auto Montage : Montages)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Montage.Velocity);
+		CurrentTagsContainer.AppendTags(Montage.Side);
+		CurrentTagsContainer.AppendTags(Montage.Form);
+		CurrentTagsContainer.AppendTags(Montage.Health);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredMontages.Add(Montage);
+		}
+	}
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Pose)
+	{
+		return SelectedImpactAnticipationPose;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastAttackReactionAnimation, remove it from FilteredMontages array to avoid duplicates
+		// if (FilteredMontages.Contains(LastAttackReactionAnimation))
+		// {
+		// 	int IndexToRemove = FilteredMontages.Find(LastAttackReactionAnimation);
+		// 	FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedImpactAnticipationPose = FilteredMontages[RandIndex];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedImpactAnticipationPose;
+	}
+	else
+	{
+		SelectedImpactAnticipationPose = FilteredMontages[0];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedImpactAnticipationPose;
+	}
+	return SelectedImpactAnticipationPose;
 }
 
-FAnticipationPose UALSXTImpactReactionComponent::SelectDefensiveMontage_Implementation(const FGameplayTag& Strength, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
+FAnticipationPose UALSXTImpactReactionComponent::SelectAttackAnticipationMontage_Implementation(const FGameplayTag& CharacterCombatStance, const FGameplayTag& Strength, const FGameplayTag& Stance, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
 {
-	FAnticipationPose SelectedAnticipationPose;
-	return SelectedAnticipationPose;
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	TArray<FAnticipationPose> Montages = SelectedImpactReactionSettings->AttackAnticipationPoses;
+	TArray<FAnticipationPose> FilteredMontages;
+	FAnticipationPose SelectedAttackAnticipationPose;
+	TArray<FGameplayTag> TagsArray = { ALSXTActionStrengthTags::Light, AlsStanceTags::Standing, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt, ALSXTHealthTags::All };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+
+	// Return is there are no Montages
+	if (Montages.Num() < 1 || !Montages[0].Pose)
+	{
+		return SelectedAttackAnticipationPose;
+	}
+
+	// Filter Montages based on Tag parameters
+	for (auto Montage : Montages)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Montage.Velocity);
+		CurrentTagsContainer.AppendTags(Montage.Side);
+		CurrentTagsContainer.AppendTags(Montage.Form);
+		CurrentTagsContainer.AppendTags(Montage.Health);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredMontages.Add(Montage);
+		}
+	}
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Pose)
+	{
+		return SelectedAttackAnticipationPose;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastAttackReactionAnimation, remove it from FilteredMontages array to avoid duplicates
+		// if (FilteredMontages.Contains(LastAttackReactionAnimation))
+		// {
+		// 	int IndexToRemove = FilteredMontages.Find(LastAttackReactionAnimation);
+		// 	FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedAttackAnticipationPose = FilteredMontages[RandIndex];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedAttackAnticipationPose;
+	}
+	else
+	{
+		SelectedAttackAnticipationPose = FilteredMontages[0];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedAttackAnticipationPose;
+	}
+	return SelectedAttackAnticipationPose;
+}
+
+FAnticipationPose UALSXTImpactReactionComponent::SelectDefensiveMontage_Implementation(const FGameplayTag& Strength, const FGameplayTag& Stance, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
+{
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	TArray<FAnticipationPose> Montages = SelectedImpactReactionSettings->DefensivePoses;
+	TArray<FAnticipationPose> FilteredMontages;
+	FAnticipationPose SelectedDefensivePose;
+	TArray<FGameplayTag> TagsArray = { ALSXTActionStrengthTags::Light, AlsStanceTags::Standing, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt, ALSXTHealthTags::All };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+
+	// Return is there are no Montages
+	if (Montages.Num() < 1 || !Montages[0].Pose)
+	{
+		return SelectedDefensivePose;
+	}
+
+	// Filter Montages based on Tag parameters
+	for (auto Montage : Montages)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Montage.Velocity);
+		CurrentTagsContainer.AppendTags(Montage.Side);
+		CurrentTagsContainer.AppendTags(Montage.Form);
+		CurrentTagsContainer.AppendTags(Montage.Health);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredMontages.Add(Montage);
+		}
+	}
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Pose)
+	{
+		return SelectedDefensivePose;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastAttackReactionAnimation, remove it from FilteredMontages array to avoid duplicates
+		// if (FilteredMontages.Contains(LastAttackReactionAnimation))
+		// {
+		// 	int IndexToRemove = FilteredMontages.Find(LastAttackReactionAnimation);
+		// 	FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedDefensivePose = FilteredMontages[RandIndex];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedDefensivePose;
+	}
+	else
+	{
+		SelectedDefensivePose = FilteredMontages[0];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedDefensivePose;
+	}
+	return SelectedDefensivePose;
 }
 
 FBumpReactionAnimation UALSXTImpactReactionComponent::SelectBumpReactionMontage_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form)
 {
-	FBumpReactionAnimation SelectedMontage;
-	return SelectedMontage;
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	TArray<FBumpReactionAnimation> Montages = SelectedImpactReactionSettings->BumpReactionAnimations;
+	TArray<FBumpReactionAnimation> FilteredMontages;
+	FBumpReactionAnimation SelectedBumpReactionAnimation;
+	TArray<FGameplayTag> TagsArray = { ALSXTImpactVelocityTags::Slow, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt};
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+
+	// Return is there are no Montages
+	if (Montages.Num() < 1 || !Montages[0].Montage.Montage)
+	{
+		return SelectedBumpReactionAnimation;
+	}
+
+	// Filter Montages based on Tag parameters
+	for (auto Montage : Montages)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Montage.Velocity);
+		CurrentTagsContainer.AppendTags(Montage.Side);
+		CurrentTagsContainer.AppendTags(Montage.Form);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredMontages.Add(Montage);
+		}
+	}
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Montage.Montage)
+	{
+		return SelectedBumpReactionAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastAttackReactionAnimation, remove it from FilteredMontages array to avoid duplicates
+		// if (FilteredMontages.Contains(LastAttackReactionAnimation))
+		// {
+		// 	int IndexToRemove = FilteredMontages.Find(LastAttackReactionAnimation);
+		// 	FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedBumpReactionAnimation = FilteredMontages[RandIndex];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedBumpReactionAnimation;
+	}
+	else
+	{
+		SelectedBumpReactionAnimation = FilteredMontages[0];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedBumpReactionAnimation;
+	}
+	return SelectedBumpReactionAnimation;
 }
 
 FBumpReactionAnimation UALSXTImpactReactionComponent::SelectCrowdNavigationReactionMontage_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form)
 {
-	FBumpReactionAnimation SelectedMontage;
-	return SelectedMontage;
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	TArray<FBumpReactionAnimation> Montages = SelectedImpactReactionSettings->CrowdNavigationReactionAnimations;
+	TArray<FBumpReactionAnimation> FilteredMontages;
+	FBumpReactionAnimation SelectedCrowdNavigationReactionAnimation;
+	TArray<FGameplayTag> TagsArray = { ALSXTImpactVelocityTags::Slow, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+
+	// Return is there are no Montages
+	if (Montages.Num() < 1 || !Montages[0].Montage.Montage)
+	{
+		return SelectedCrowdNavigationReactionAnimation;
+	}
+
+	// Filter Montages based on Tag parameters
+	for (auto Montage : Montages)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Montage.Velocity);
+		CurrentTagsContainer.AppendTags(Montage.Side);
+		CurrentTagsContainer.AppendTags(Montage.Form);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredMontages.Add(Montage);
+		}
+	}
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Montage.Montage)
+	{
+		return SelectedCrowdNavigationReactionAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastAttackReactionAnimation, remove it from FilteredMontages array to avoid duplicates
+		// if (FilteredMontages.Contains(LastAttackReactionAnimation))
+		// {
+		// 	int IndexToRemove = FilteredMontages.Find(LastAttackReactionAnimation);
+		// 	FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedCrowdNavigationReactionAnimation = FilteredMontages[RandIndex];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedCrowdNavigationReactionAnimation;
+	}
+	else
+	{
+		SelectedCrowdNavigationReactionAnimation = FilteredMontages[0];
+		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
+		return SelectedCrowdNavigationReactionAnimation;
+	}
+	return SelectedCrowdNavigationReactionAnimation;
 }
 
 FAttackReactionAnimation UALSXTImpactReactionComponent::SelectAttackReactionMontage_Implementation(FAttackDoubleHitResult Hit)
@@ -638,7 +1065,6 @@ FAttackReactionAnimation UALSXTImpactReactionComponent::SelectAttackReactionMont
 	TArray<FAttackReactionAnimation> Montages = SelectedImpactReactionSettings->AttackReactionAnimations;
 	TArray<FAttackReactionAnimation> FilteredMontages;
 	FAttackReactionAnimation SelectedAttackReactionAnimation;
-	// TArray<FGameplayTag> TagsArray = { Hit.Strength, Hit.DoubleHitResult.ImpactSide, Hit.DoubleHitResult.ImpactForm };
 	TArray<FGameplayTag> TagsArray = { ALSXTActionStrengthTags::Light, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt };
 	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
 
@@ -799,40 +1225,200 @@ FAnticipationPose UALSXTImpactReactionComponent::SelectSteadyMontage_Implementat
 	return SelectedMontage;
 }
 
+FFallenAnimation UALSXTImpactReactionComponent::SelectImpactFallAnimations_Implementation(FDoubleHitResult Hit)
+{
+	FFallenAnimation SelectedMontage;
+	return SelectedMontage;
+}
+
+FFallenAnimation UALSXTImpactReactionComponent::SelectAttackFallAnimations_Implementation(FDoubleHitResult Hit)
+{
+	FFallenAnimation SelectedMontage;
+	return SelectedMontage;
+}
+
 FActionMontageInfo UALSXTImpactReactionComponent::SelectImpactFallMontage_Implementation(FDoubleHitResult Hit)
 {
-	FActionMontageInfo SelectedMontage{ nullptr };
-	return SelectedMontage;
+	TArray<FActionMontageInfo> FilteredMontages = GetImpactReactionState().ImpactReactionParameters.ImpactFallenAnimations.FallingMontages;
+	FActionMontageInfo SelectedImpactFallAnimation;
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Montage)
+	{
+		return SelectedImpactFallAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastmpactFallAnimation, remove it from FilteredMontages array to avoid duplicates
+		// if (FilteredMontages.Contains(LastImpactReactionAnimation))
+		// {
+		// 	int IndexToRemove = FilteredMontages.Find(LastImpactReactionAnimation);
+		// 	FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedImpactFallAnimation = FilteredMontages[RandIndex];
+		// LastImpactReactionAnimation = SelectedImpactFallAnimation;
+		return SelectedImpactFallAnimation;
+	}
+	else
+	{
+		SelectedImpactFallAnimation = FilteredMontages[0];
+		// LastImpactReactionAnimation = SelectedImpactFallAnimation;
+		return SelectedImpactFallAnimation;
+	}
+	return SelectedImpactFallAnimation;
 }
 
 FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackFallMontage_Implementation(FDoubleHitResult Hit)
 {
-	FActionMontageInfo SelectedMontage{ nullptr };
-	return SelectedMontage;
+	TArray<FActionMontageInfo> FilteredMontages = GetImpactReactionState().ImpactReactionParameters.ImpactFallenAnimations.FallingMontages;
+	FActionMontageInfo SelectedAttackFallAnimation;
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Montage)
+	{
+		return SelectedAttackFallAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastmpactFallAnimation, remove it from FilteredMontages array to avoid duplicates
+		// if (FilteredMontages.Contains(LastImpactReactionAnimation))
+		// {
+		// 	int IndexToRemove = FilteredMontages.Find(LastImpactReactionAnimation);
+		// 	FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedAttackFallAnimation = FilteredMontages[RandIndex];
+		// LastImpactReactionAnimation = SelectedAttackFallAnimation;
+		return SelectedAttackFallAnimation;
+	}
+	else
+	{
+		SelectedAttackFallAnimation = FilteredMontages[0];
+		// LastImpactReactionAnimation = SelectedAttackFallAnimation;
+		return SelectedAttackFallAnimation;
+	}
+	return SelectedAttackFallAnimation;
 }
 
 UAnimMontage* UALSXTImpactReactionComponent::SelectImpactFallenPose_Implementation(FDoubleHitResult Hit)
 {
-	UAnimMontage* SelectedMontage{ nullptr };
+	UAnimMontage* SelectedMontage = GetImpactReactionState().ImpactReactionParameters.ImpactFallenAnimations.FallenPose;
 	return SelectedMontage;
 }
 
 UAnimMontage* UALSXTImpactReactionComponent::SelectAttackFallenPose_Implementation(FDoubleHitResult Hit)
 {
-	UAnimMontage* SelectedMontage{ nullptr };
+	UAnimMontage* SelectedMontage = GetImpactReactionState().ImpactReactionParameters.AttackFallenAnimations.FallenPose;
 	return SelectedMontage;
 }
 
 FActionMontageInfo UALSXTImpactReactionComponent::SelectImpactGetUpMontage_Implementation(FDoubleHitResult Hit)
 {
-	FActionMontageInfo SelectedMontage{ nullptr };
-	return SelectedMontage;
+	TArray<FActionMontageInfo> FilteredMontages = GetImpactReactionState().ImpactReactionParameters.ImpactFallenAnimations.GetUpMontages;
+	FActionMontageInfo SelectedAttackGetUpAnimation;
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Montage)
+	{
+		return SelectedAttackGetUpAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastmpactGetUpAnimation, remove it from FilteredMontages array to avoid duplicates
+		// if (FilteredMontages.Contains(LastImpactReactionAnimation))
+		// {
+		// 	int IndexToRemove = FilteredMontages.Find(LastImpactReactionAnimation);
+		// 	FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedAttackGetUpAnimation = FilteredMontages[RandIndex];
+		// LastImpactReactionAnimation = SelectedAttackGetUpAnimation;
+		return SelectedAttackGetUpAnimation;
+	}
+	else
+	{
+		SelectedAttackGetUpAnimation = FilteredMontages[0];
+		// LastImpactReactionAnimation = SelectedAttackGetUpAnimation;
+		return SelectedAttackGetUpAnimation;
+	}
+	return SelectedAttackGetUpAnimation;
 }
 
 FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackGetUpMontage_Implementation(FDoubleHitResult Hit)
 {
-	FActionMontageInfo SelectedMontage{ nullptr };
-	return SelectedMontage;
+	TArray<FActionMontageInfo> FilteredMontages = GetImpactReactionState().ImpactReactionParameters.AttackFallenAnimations.GetUpMontages;
+	FActionMontageInfo SelectedAttackGetUpAnimation;
+
+	// Return if there are no filtered Montages
+	if (FilteredMontages.Num() < 1 || !FilteredMontages[0].Montage)
+	{
+		return SelectedAttackGetUpAnimation;
+	}
+
+	// If more than one result, avoid duplicates
+	if (FilteredMontages.Num() > 1)
+	{
+		// If FilteredMontages contains LastmpactGetUpAnimation, remove it from FilteredMontages array to avoid duplicates
+		// if (FilteredMontages.Contains(LastImpactReactionAnimation))
+		// {
+		// 	int IndexToRemove = FilteredMontages.Find(LastImpactReactionAnimation);
+		// 	FilteredMontages.RemoveAt(IndexToRemove, 1, true);
+		// }
+
+		//Shuffle Array
+		for (int m = FilteredMontages.Num() - 1; m >= 0; --m)
+		{
+			int n = FMath::Rand() % (m + 1);
+			if (m != n) FilteredMontages.Swap(m, n);
+		}
+
+		// Select Random Array Entry
+		int RandIndex = FMath::RandRange(0, (FilteredMontages.Num() - 1));
+		SelectedAttackGetUpAnimation = FilteredMontages[RandIndex];
+		// LastImpactReactionAnimation = SelectedSelectedAttackGetUpAnimation;
+		return SelectedAttackGetUpAnimation;
+	}
+	else
+	{
+		SelectedAttackGetUpAnimation = FilteredMontages[0];
+		// LastImpactReactionAnimation = SelectedSelectedAttackGetUpAnimation;
+		return SelectedAttackGetUpAnimation;
+	}
+	return SelectedAttackGetUpAnimation;
 }
 
 FResponseAnimation UALSXTImpactReactionComponent::SelectImpactResponseMontage_Implementation(FAttackDoubleHitResult Hit)
@@ -1618,7 +2204,7 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 			SpawnParticleActorImplementation(Hit, ParticleActor);
 		}
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Hit, Hit.HitResult.HitResult.BoneName);
-		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::HitReaction);
+		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::ImpactReaction);
 		// Character->GetMesh()->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
 		Character->GetMesh()->AddImpulseToAllBodiesBelow(Hit.HitResult.Impulse * 1000, Hit.HitResult.HitResult.BoneName, false, true);
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
@@ -1794,7 +2380,15 @@ void UALSXTImpactReactionComponent::SpawnParticleActorImplementation(FDoubleHitR
 
 void UALSXTImpactReactionComponent::RefreshAnticipationReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::DefensiveReaction)
+	{
+		StopAnticipationReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshAnticipationReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshAnticipationReactionPhysics(const float DeltaTime)
@@ -1804,7 +2398,15 @@ void UALSXTImpactReactionComponent::RefreshAnticipationReactionPhysics(const flo
 
 void UALSXTImpactReactionComponent::RefreshDefensiveReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::DefensiveReaction)
+	{
+		StopDefensiveReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshDefensiveReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshDefensiveReactionPhysics(const float DeltaTime)
@@ -1814,7 +2416,15 @@ void UALSXTImpactReactionComponent::RefreshDefensiveReactionPhysics(const float 
 
 void UALSXTImpactReactionComponent::RefreshCrowdNavigationReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::CrowdNavigationReaction)
+	{
+		StopCrowdNavigationReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshCrowdNavigationReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshCrowdNavigationReactionPhysics(const float DeltaTime)
@@ -1824,7 +2434,15 @@ void UALSXTImpactReactionComponent::RefreshCrowdNavigationReactionPhysics(const 
 
 void UALSXTImpactReactionComponent::RefreshBumpReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::ImpactReaction)
+	{
+		StopBumpReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshBumpReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshBumpReactionPhysics(const float DeltaTime)
@@ -1834,7 +2452,7 @@ void UALSXTImpactReactionComponent::RefreshBumpReactionPhysics(const float Delta
 
 void UALSXTImpactReactionComponent::RefreshImpactReaction(const float DeltaTime)
 {
-	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::HitReaction)
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::ImpactReaction)
 	{
 		StopImpactReaction();
 		Character->ForceNetUpdate();
@@ -1873,7 +2491,15 @@ void UALSXTImpactReactionComponent::RefreshImpactReactionPhysics(const float Del
 
 void UALSXTImpactReactionComponent::RefreshAttackReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::ImpactReaction)
+	{
+		StopAttackReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshAttackReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshAttackReactionPhysics(const float DeltaTime)
@@ -1883,7 +2509,15 @@ void UALSXTImpactReactionComponent::RefreshAttackReactionPhysics(const float Del
 
 void UALSXTImpactReactionComponent::RefreshSyncedAttackReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::SyncedAttackReaction)
+	{
+		StopSyncedAttackReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshSyncedAttackReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshSyncedAttackReactionPhysics(const float DeltaTime)
@@ -1893,7 +2527,15 @@ void UALSXTImpactReactionComponent::RefreshSyncedAttackReactionPhysics(const flo
 
 void UALSXTImpactReactionComponent::RefreshBumpFallReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::ImpactFall)
+	{
+		StopBumpFallReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshBumpFallReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshBumpFallReactionPhysics(const float DeltaTime)
@@ -1903,7 +2545,15 @@ void UALSXTImpactReactionComponent::RefreshBumpFallReactionPhysics(const float D
 
 void UALSXTImpactReactionComponent::RefreshImpactFallReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::ImpactFall)
+	{
+		StopImpactFallReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshImpactFallReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshImpactFallReactionPhysics(const float DeltaTime)
@@ -1913,7 +2563,15 @@ void UALSXTImpactReactionComponent::RefreshImpactFallReactionPhysics(const float
 
 void UALSXTImpactReactionComponent::RefreshAttackFallReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::ImpactFall)
+	{
+		StopAttackFallReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshAttackFallReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshAttackFallReactionPhysics(const float DeltaTime)
@@ -1923,7 +2581,15 @@ void UALSXTImpactReactionComponent::RefreshAttackFallReactionPhysics(const float
 
 void UALSXTImpactReactionComponent::RefreshSyncedAttackFallReaction(const float DeltaTime)
 {
-	// ...
+	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::ImpactFall)
+	{
+		StopSyncedAttackFallReaction();
+		Character->ForceNetUpdate();
+	}
+	else
+	{
+		RefreshSyncedAttackFallReactionPhysics(DeltaTime);
+	}
 }
 
 void UALSXTImpactReactionComponent::RefreshSyncedAttackFallReactionPhysics(const float DeltaTime)
@@ -1933,22 +2599,46 @@ void UALSXTImpactReactionComponent::RefreshSyncedAttackFallReactionPhysics(const
 
 void UALSXTImpactReactionComponent::StopAnticipationReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnAnticipationReactionEnded();
 }
 
 void UALSXTImpactReactionComponent::StopDefensiveReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnDefensiveReactionEnded();
 }
 
 void UALSXTImpactReactionComponent::StopCrowdNavigationReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnCrowdNavigationReactionEnded();
 }
 
 void UALSXTImpactReactionComponent::StopBumpReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnBumpReactionEnded();
 }
 
 void UALSXTImpactReactionComponent::StopImpactReaction()
@@ -1958,50 +2648,74 @@ void UALSXTImpactReactionComponent::StopImpactReaction()
 		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
 	}
 
-	Character->SetMovementModeLocked(false);
-	// Character->Cast<UAlsCharacterMovementComponent>(GetCharacterMovement())->SetMovementModeLocked(false);
-	// Character->GetCharacterMovement<UAlsCharacterMovementComponent>()->SetMovementModeLocked(false);
-
-	// ULocalPlayer* LocalPlayer = Character->GetWorld()->GetFirstLocalPlayerFromController();
-	// 
-	// APlayerController* PlayerController = Character->GetWorld()->GetFirstPlayerController();
-	// 
-	// if (Character->IsPlayerControlled())
-	// {
-	// 	Character->EnableInput(PlayerController);
-	// }
-
+	// Character->SetMovementModeLocked(false);
 	OnImpactReactionEnded();
 }
 
 void UALSXTImpactReactionComponent::StopAttackReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnAttackReactionEnded();
 }
 
 void UALSXTImpactReactionComponent::StopSyncedAttackReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnSyncedAttackReactionEnded();
 }
 
 void UALSXTImpactReactionComponent::StopBumpFallReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnBumpFallEnded();
 }
 
 void UALSXTImpactReactionComponent::StopImpactFallReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnImpactFallEnded();
 }
 
 void UALSXTImpactReactionComponent::StopAttackFallReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnAttackFallEnded();
 }
 
 void UALSXTImpactReactionComponent::StopSyncedAttackFallReaction()
 {
-	// ...
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
+	}
+
+	// Character->SetMovementModeLocked(false);
+	OnSyncedAttackFallEnded();
 }
 
 void UALSXTImpactReactionComponent::OnImpactReactionEnded_Implementation() {}

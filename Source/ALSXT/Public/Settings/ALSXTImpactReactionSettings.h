@@ -44,7 +44,10 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	FAttackReactionAnimation AttackReactionAnimation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FFallenAnimation FallenAnimation;
+	FFallenAnimation ImpactFallenAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FFallenAnimation AttackFallenAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FResponseAnimation ResponseAnimation;
@@ -96,10 +99,13 @@ class ALSXT_API UALSXTImpactReactionSettings : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
-	TArray<FAnticipationPose> AnticipationPoses;
+	TArray<FAnticipationPose> DefensivePoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
-	TArray<FAnticipationPose> DefensivePoses;
+	TArray<FAnticipationPose> ImpactAnticipationPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health}", AllowPrivateAccess))
+	TArray<FAnticipationPose> AttackAnticipationPoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (AllowPrivateAccess))
 	TArray<FBumpReactionAnimation> CrowdNavigationReactionAnimations;
@@ -181,6 +187,9 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float MaxBumpDetectionDistance {0.125f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	FVector	AnticipationAreaHalfSize { 20.0f, 40.0f, 50.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableSlideToCoverHook{ true };
