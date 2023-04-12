@@ -314,8 +314,6 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 	}
 }
 
-
-
 // ImpactReaction State
 void UALSXTImpactReactionComponent::SetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState)
 {
@@ -348,16 +346,7 @@ void UALSXTImpactReactionComponent::OnReplicate_ImpactReactionState(const FALSXT
 
 void UALSXTImpactReactionComponent::OnImpactReactionStateChanged_Implementation(const FALSXTImpactReactionState& PreviousImpactReactionState) {}
 
-// Anticipation Reaction
-void UALSXTImpactReactionComponent::AnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
-{
-	// ...
-}
-
-void UALSXTImpactReactionComponent::SyncedAnticipationReaction(FVector AnticipationPoint)
-{
-	// ...
-}
+// ENTRY FUNCTIONS
 
 // Defensive Reaction
 void UALSXTImpactReactionComponent::DefensiveReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
@@ -365,27 +354,61 @@ void UALSXTImpactReactionComponent::DefensiveReaction(const FGameplayTag& Veloci
 	// ...
 }
 
-// Crown Navigation Reaction
+void UALSXTImpactReactionComponent::SyncedAnticipationReaction(FVector AnticipationPoint)
+{
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerSyncedAnticipationReaction(AnticipationPoint);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartSyncedAnticipationReaction(AnticipationPoint);
+	}
+}
+
+// Crowd Navigation Reaction
 void UALSXTImpactReactionComponent::CrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerCrowdNavigationReaction(Gait, Side, Form);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartCrowdNavigationReaction(Gait, Side, Form);
+	}
 }
 
 // Bump Reaction
 void UALSXTImpactReactionComponent::BumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerBumpReaction(Gait, Side, Form);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartBumpReaction(Gait, Side, Form);
+	}
 }
 
 // Impact Reaction
 void UALSXTImpactReactionComponent::ImpactReaction(FDoubleHitResult Hit)
 {
 	StartImpactReaction(Hit);
+
+	// if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	// {
+	// 	ServerImpactReaction(Hit);
+	// }
+	// else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	// {
+	// 	StartImpactReaction(Hit);
+	// }
 }
 
 void UALSXTImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 {
-	// if (GetOwnerRole() == ROLE_AutonomousProxy)
 	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		ServerAttackReaction(Hit);
@@ -393,13 +416,11 @@ void UALSXTImpactReactionComponent::AttackReaction(FAttackDoubleHitResult Hit)
 	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
 	{
 		StartAttackReaction(Hit);
-		// MulticastAttackReaction(Hit);
 	}
 }
 
 void UALSXTImpactReactionComponent::SyncedAttackReaction(int Index)
 {
-	// if (GetOwnerRole() == ROLE_AutonomousProxy)
 	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		ServerSyncedAttackReaction(Index);
@@ -407,63 +428,139 @@ void UALSXTImpactReactionComponent::SyncedAttackReaction(int Index)
 	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
 	{
 		StartSyncedAttackReaction(Index);
-		// MulticastSyncedAttackReaction(Index);
 	}
 }
 
 void UALSXTImpactReactionComponent::ClutchImpactPoint(FDoubleHitResult Hit)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerClutchImpactPoint(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartClutchImpactPoint(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::ImpactFall(FDoubleHitResult Hit)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerImpactFall(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartImpactFall(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::AttackFall(FAttackDoubleHitResult Hit)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerAttackFall(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartAttackFall(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::SyncedAttackFall(int32 Index)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerSyncedAttackFall(Index);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartSyncedAttackFall(Index);
+	}
 }
 
 void UALSXTImpactReactionComponent::BraceForImpact()
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerBraceForImpact();
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartBraceForImpact();
+	}
 }
 
 void UALSXTImpactReactionComponent::ImpactGetUp(FDoubleHitResult Hit)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerImpactGetUp(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartImpactGetUp(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::AttackGetUp(FAttackDoubleHitResult Hit)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerAttackGetUp(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartAttackGetUp(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::SyncedAttackGetUp(int32 Index)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerSyncedAttackGetUp(Index);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartSyncedAttackGetUp(Index);
+	}
 }
 
 void UALSXTImpactReactionComponent::ImpactResponse(FDoubleHitResult Hit)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerImpactResponse(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartImpactResponse(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::AttackResponse(FAttackDoubleHitResult Hit)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerAttackResponse(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartAttackResponse(Hit);
+	}
 }
 
-void UALSXTImpactReactionComponent::BodyFallReaction(FAttackDoubleHitResult Hit)
+void UALSXTImpactReactionComponent::BodyFallReaction(FDoubleHitResult Hit)
 {
-	// ...
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerImpactReaction(Hit);
+	}
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	{
+		StartImpactReaction(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::ImpactTimelineUpdate(float Value)
@@ -472,7 +569,7 @@ void UALSXTImpactReactionComponent::ImpactTimelineUpdate(float Value)
 }
 
 // Error Checks
-bool UALSXTImpactReactionComponent::IsAnticipationReactionAllowedToStart(const UAnimMontage* Montage) const
+bool UALSXTImpactReactionComponent::IsSyncedAnticipationReactionAllowedToStart(const UAnimMontage* Montage) const
 {
 	return (Montage != nullptr);
 }
@@ -507,7 +604,7 @@ bool UALSXTImpactReactionComponent::IsSyncedAttackReactionAllowedToStart(const U
 	return (Montage != nullptr);
 }
 
-bool UALSXTImpactReactionComponent::IsClaspImpactPointAllowedToStart(const UAnimMontage* Montage) const
+bool UALSXTImpactReactionComponent::IsClutchImpactPointAllowedToStart(const UAnimSequenceBase* Montage) const
 {
 	return (Montage != nullptr);
 }
@@ -543,7 +640,7 @@ bool UALSXTImpactReactionComponent::IsAttackResponseAllowedToStart(const UAnimMo
 }
 
 // Start Events
-void UALSXTImpactReactionComponent::StartAnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+void UALSXTImpactReactionComponent::StartSyncedAnticipationReaction(FVector AnticipationPoint)
 {
 	// ...
 }
@@ -665,7 +762,35 @@ void UALSXTImpactReactionComponent::StartSyncedAttackReaction(int32 Index)
 
 void UALSXTImpactReactionComponent::StartClutchImpactPoint(FDoubleHitResult Hit)
 {
-	// ...
+	// if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
+	// {
+	// 	return;
+	// }
+
+	UAnimSequenceBase* Montage;
+	FClutchImpactLocationAnimation SelectedClutchImpactPointReaction = SelectClutchImpactPointMontage(Hit);
+	Montage = SelectedClutchImpactPointReaction.Pose;
+
+	if (!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		return;
+	}
+
+	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
+
+	// StartClutchImpactPointImplementation(Montage, Hit.HitResult.HitResult.ImpactPoint);
+
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		ServerStartClutchImpactPoint(Montage, Hit.HitResult.HitResult.ImpactPoint);
+	}
+	else
+	{
+		Character->GetCharacterMovement()->FlushServerMoves();
+		MulticastStartClutchImpactPoint(Montage, Hit.HitResult.HitResult.ImpactPoint);
+		OnImpactReactionStarted(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::StartImpactFall(FDoubleHitResult Hit)
@@ -675,7 +800,50 @@ void UALSXTImpactReactionComponent::StartImpactFall(FDoubleHitResult Hit)
 
 void UALSXTImpactReactionComponent::StartAttackFall(FAttackDoubleHitResult Hit)
 {
-	// ...
+	// if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
+	// {
+	// 	return;
+	// }
+
+	FActionMontageInfo Montage{ nullptr };
+	FActionMontageInfo SelectedAttackFall = SelectAttackFallMontage(Hit);
+	Montage = SelectedAttackFall;
+
+	if (!ALS_ENSURE(IsValid(Montage.Montage)) || !IsAttackFallAllowedToStart(Montage.Montage))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		return;
+	}
+
+	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
+
+	Character->SetMovementModeLocked(true);
+
+	// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
+		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
+	// ImpactReactionParameters.BaseDamage = Hit.BaseDamage;
+	// ImpactReactionParameters.PlayRate = SelectedAttackFall.Montage.PlayRate;
+	// ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
+	// ImpactReactionParameters.ImpactType = Hit.DoubleHitResult.ImpactType;
+	// ImpactReactionParameters.Stance = Stance;
+	// ImpactReactionParameters.ImpactVelocity = Hit.Strength;
+	// ImpactReactionParameters.ImpactReactionAnimation.Montage.Montage = Montage;
+	// FALSXTImpactReactionState NewImpactReactionState;
+	// NewImpactReactionState.ImpactReactionParameters = ImpactReactionParameters;
+	// SetImpactReactionState(NewImpactReactionState);
+
+	// StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
+
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		ServerStartAttackFall(Hit, Montage);
+	}
+	else
+	{
+		Character->GetCharacterMovement()->FlushServerMoves();
+		MulticastStartAttackFall(Hit, Montage);
+		// OnImpactReactionStarted(Hit.DoubleHitResult);
+	}
 }
 
 void UALSXTImpactReactionComponent::StartSyncedAttackFall(int32 Index)
@@ -695,7 +863,49 @@ void UALSXTImpactReactionComponent::StartImpactGetUp(FDoubleHitResult Hit)
 
 void UALSXTImpactReactionComponent::StartAttackGetUp(FAttackDoubleHitResult Hit)
 {
-	// ...
+	// if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
+	// {
+	// 	return;
+	// }
+
+	FActionMontageInfo Montage{ nullptr };
+	FActionMontageInfo SelectedAttackGetUp = SelectAttackFallMontage(Hit);
+	Montage = SelectedAttackGetUp;
+
+	if (!ALS_ENSURE(IsValid(Montage.Montage)))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		return;
+	}
+	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
+
+	Character->SetMovementModeLocked(true);
+
+	// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
+		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
+	// ImpactReactionParameters.BaseDamage = Hit.BaseDamage;
+	// ImpactReactionParameters.PlayRate = SelectedAttackFall.Montage.PlayRate;
+	// ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
+	// ImpactReactionParameters.ImpactType = Hit.DoubleHitResult.ImpactType;
+	// ImpactReactionParameters.Stance = Stance;
+	// ImpactReactionParameters.ImpactVelocity = Hit.Strength;
+	// ImpactReactionParameters.ImpactReactionAnimation.Montage.Montage = Montage;
+	// FALSXTImpactReactionState NewImpactReactionState;
+	// NewImpactReactionState.ImpactReactionParameters = ImpactReactionParameters;
+	// SetImpactReactionState(NewImpactReactionState);
+
+	// StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
+
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		ServerStartAttackGetUp(Hit, Montage);
+	}
+	else
+	{
+		Character->GetCharacterMovement()->FlushServerMoves();
+		MulticastStartAttackGetUp(Hit, Montage);
+		// OnImpactReactionStarted(Hit.DoubleHitResult);
+	}
 }
 
 void UALSXTImpactReactionComponent::StartSyncedAttackGetUp(int32 Index)
@@ -705,12 +915,96 @@ void UALSXTImpactReactionComponent::StartSyncedAttackGetUp(int32 Index)
 
 void UALSXTImpactReactionComponent::StartImpactResponse(FDoubleHitResult Hit)
 {
-	// ...
+	// if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
+	// {
+	// 	return;
+	// }
+
+	FResponseAnimation Montage;
+	FResponseAnimation SelectedAttackResponse = SelectImpactResponseMontage(Hit);
+	Montage = SelectedAttackResponse;
+
+	if (!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsImpactResponseAllowedToStart(Montage.Montage.Montage))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		return;
+	}
+	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
+
+	Character->SetMovementModeLocked(true);
+
+	// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
+		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
+	// ImpactReactionParameters.BaseDamage = Hit.BaseDamage;
+	// ImpactReactionParameters.PlayRate = SelectedAttackFall.Montage.PlayRate;
+	// ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
+	// ImpactReactionParameters.ImpactType = Hit.DoubleHitResult.ImpactType;
+	// ImpactReactionParameters.Stance = Stance;
+	// ImpactReactionParameters.ImpactVelocity = Hit.Strength;
+	// ImpactReactionParameters.ImpactReactionAnimation.Montage.Montage = Montage;
+	// FALSXTImpactReactionState NewImpactReactionState;
+	// NewImpactReactionState.ImpactReactionParameters = ImpactReactionParameters;
+	// SetImpactReactionState(NewImpactReactionState);
+
+	// StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
+
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		ServerStartImpactResponse(Hit, Montage.Montage);
+	}
+	else
+	{
+		Character->GetCharacterMovement()->FlushServerMoves();
+		MulticastStartImpactResponse(Hit, Montage.Montage);
+	}
+
 }
 
 void UALSXTImpactReactionComponent::StartAttackResponse(FAttackDoubleHitResult Hit)
 {
-	// ...
+	// if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
+	// {
+	// 	return;
+	// }
+
+	FResponseAnimation Montage;
+	FResponseAnimation SelectedAttackResponse = SelectAttackResponseMontage(Hit);
+	Montage = SelectedAttackResponse;
+
+	if (!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsAttackResponseAllowedToStart(Montage.Montage.Montage))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		return;
+	}
+	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
+
+	Character->SetMovementModeLocked(true);
+
+	// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
+		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
+	// ImpactReactionParameters.BaseDamage = Hit.BaseDamage;
+	// ImpactReactionParameters.PlayRate = SelectedAttackFall.Montage.PlayRate;
+	// ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
+	// ImpactReactionParameters.ImpactType = Hit.DoubleHitResult.ImpactType;
+	// ImpactReactionParameters.Stance = Stance;
+	// ImpactReactionParameters.ImpactVelocity = Hit.Strength;
+	// ImpactReactionParameters.ImpactReactionAnimation.Montage.Montage = Montage;
+	// FALSXTImpactReactionState NewImpactReactionState;
+	// NewImpactReactionState.ImpactReactionParameters = ImpactReactionParameters;
+	// SetImpactReactionState(NewImpactReactionState);
+
+	// StartImpactReactionImplementation(Hit.DoubleHitResult, Montage, ParticleActor, Particle, Audio);
+
+	if (Character->GetLocalRole() >= ROLE_Authority)
+	{
+		ServerStartAttackResponse(Hit, Montage.Montage);
+	}
+	else
+	{
+		Character->GetCharacterMovement()->FlushServerMoves();
+		MulticastStartAttackResponse(Hit, Montage.Montage);
+		// OnImpactReactionStarted(Hit.DoubleHitResult);
+	}
 }
 
 void UALSXTImpactReactionComponent::BumpFall() {}
@@ -1213,9 +1507,9 @@ FSyncedAttackAnimation UALSXTImpactReactionComponent::GetSyncedMontage_Implement
 
 }
 
-FImpactReactionAnimation UALSXTImpactReactionComponent::SelectClaspImpactPointMontage_Implementation(FDoubleHitResult Hit)
+FClutchImpactLocationAnimation UALSXTImpactReactionComponent::SelectClutchImpactPointMontage_Implementation(FDoubleHitResult Hit)
 {
-	FImpactReactionAnimation SelectedMontage;
+	FClutchImpactLocationAnimation SelectedMontage;
 	return SelectedMontage;
 }
 
@@ -1231,7 +1525,7 @@ FFallenAnimation UALSXTImpactReactionComponent::SelectImpactFallAnimations_Imple
 	return SelectedMontage;
 }
 
-FFallenAnimation UALSXTImpactReactionComponent::SelectAttackFallAnimations_Implementation(FDoubleHitResult Hit)
+FFallenAnimation UALSXTImpactReactionComponent::SelectAttackFallAnimations_Implementation(FAttackDoubleHitResult Hit)
 {
 	FFallenAnimation SelectedMontage;
 	return SelectedMontage;
@@ -1280,7 +1574,7 @@ FActionMontageInfo UALSXTImpactReactionComponent::SelectImpactFallMontage_Implem
 	return SelectedImpactFallAnimation;
 }
 
-FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackFallMontage_Implementation(FDoubleHitResult Hit)
+FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackFallMontage_Implementation(FAttackDoubleHitResult Hit)
 {
 	TArray<FActionMontageInfo> FilteredMontages = GetImpactReactionState().ImpactReactionParameters.ImpactFallenAnimations.FallingMontages;
 	FActionMontageInfo SelectedAttackFallAnimation;
@@ -1378,7 +1672,7 @@ FActionMontageInfo UALSXTImpactReactionComponent::SelectImpactGetUpMontage_Imple
 	return SelectedAttackGetUpAnimation;
 }
 
-FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackGetUpMontage_Implementation(FDoubleHitResult Hit)
+FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackGetUpMontage_Implementation(FAttackDoubleHitResult Hit)
 {
 	TArray<FActionMontageInfo> FilteredMontages = GetImpactReactionState().ImpactReactionParameters.AttackFallenAnimations.GetUpMontages;
 	FActionMontageInfo SelectedAttackGetUpAnimation;
@@ -1421,7 +1715,7 @@ FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackGetUpMontage_Imple
 	return SelectedAttackGetUpAnimation;
 }
 
-FResponseAnimation UALSXTImpactReactionComponent::SelectImpactResponseMontage_Implementation(FAttackDoubleHitResult Hit)
+FResponseAnimation UALSXTImpactReactionComponent::SelectImpactResponseMontage_Implementation(FDoubleHitResult Hit)
 {
 	FResponseAnimation SelectedMontage;
 	return SelectedMontage;
@@ -1457,15 +1751,15 @@ void UALSXTImpactReactionComponent::MulticastCrowdNavigationReaction_Implementat
 	StartCrowdNavigationReaction(Gait, Side, Form);
 }
 
-void UALSXTImpactReactionComponent::ServerAnticipationReaction_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+void UALSXTImpactReactionComponent::ServerSyncedAnticipationReaction_Implementation(FVector AnticipationPoint)
 {
-	MulticastAnticipationReaction(Velocity, Side, Form, AnticipationPoint);
+	MulticastSyncedAnticipationReaction(AnticipationPoint);
 	Character->ForceNetUpdate();
 }
 
-void UALSXTImpactReactionComponent::MulticastAnticipationReaction_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
+void UALSXTImpactReactionComponent::MulticastSyncedAnticipationReaction_Implementation(FVector AnticipationPoint)
 {
-	StartAnticipationReaction(Velocity, Side, Form, AnticipationPoint);
+	StartSyncedAnticipationReaction(AnticipationPoint);
 }
 
 void UALSXTImpactReactionComponent::ServerDefensiveReaction_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint)
@@ -1749,23 +2043,23 @@ void UALSXTImpactReactionComponent::MulticastAttackResponse_Implementation(FAtta
 
 // Start RPCs
 
-void UALSXTImpactReactionComponent::ServerStartAnticipationReaction_Implementation(FActionMontageInfo Montage, FVector AnticipationPoint)
+void UALSXTImpactReactionComponent::ServerStartSyncedAnticipationReaction_Implementation(FVector AnticipationPoint)
 {
-	if (IsImpactReactionAllowedToStart(Montage.Montage))
-	{
-		MulticastStartAnticipationReaction(Montage, AnticipationPoint);
-		Character->ForceNetUpdate();
-	}
+	// if (IsImpactReactionAllowedToStart(Montage.Montage))
+	// {
+	// 	MulticastStartSyncedAnticipationReaction(Montage, AnticipationPoint);
+	// 	Character->ForceNetUpdate();
+	// }
 }
 
-bool UALSXTImpactReactionComponent::ServerStartAnticipationReaction_Validate(FActionMontageInfo Montage, FVector AnticipationPoint)
+bool UALSXTImpactReactionComponent::ServerStartSyncedAnticipationReaction_Validate(FVector AnticipationPoint)
 {
 	return true;
 }
 
-void UALSXTImpactReactionComponent::MulticastStartAnticipationReaction_Implementation(FActionMontageInfo Montage, FVector AnticipationPoint)
+void UALSXTImpactReactionComponent::MulticastStartSyncedAnticipationReaction_Implementation(FVector AnticipationPoint)
 {
-	StartAnticipationReactionImplementation(Montage, AnticipationPoint);
+	// StartSyncedAnticipationReactionImplementation(Montage, AnticipationPoint);
 }
 
 void UALSXTImpactReactionComponent::ServerStartDefensiveReaction_Implementation(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint)
@@ -1882,23 +2176,23 @@ void UALSXTImpactReactionComponent::MulticastStartSyncedAttackReaction_Implement
 	StartSyncedAttackReactionImplementation(Montage);
 }
 
-void UALSXTImpactReactionComponent::ServerStartClutchImpactPoint_Implementation(UAnimMontage* Montage, FVector ImpactPoint)
+void UALSXTImpactReactionComponent::ServerStartClutchImpactPoint_Implementation(UAnimSequenceBase* Pose, FVector ImpactPoint)
 {
-	if (IsImpactReactionAllowedToStart(Montage))
+	if (IsClutchImpactPointAllowedToStart(Pose))
 	{
-		MulticastStartClutchImpactPoint(Montage, ImpactPoint);
+		MulticastStartClutchImpactPoint(Pose, ImpactPoint);
 		Character->ForceNetUpdate();
 	}
 }
 
-bool UALSXTImpactReactionComponent::ServerStartClutchImpactPoint_Validate(UAnimMontage* Montage, FVector ImpactPoint)
+bool UALSXTImpactReactionComponent::ServerStartClutchImpactPoint_Validate(UAnimSequenceBase* Pose, FVector ImpactPoint)
 {
 	return true;
 }
 
-void UALSXTImpactReactionComponent::MulticastStartClutchImpactPoint_Implementation(UAnimMontage* Montage, FVector ImpactPoint)
+void UALSXTImpactReactionComponent::MulticastStartClutchImpactPoint_Implementation(UAnimSequenceBase* Pose, FVector ImpactPoint)
 {
-	StartClutchImpactPointImplementation(Montage, ImpactPoint);
+	StartClutchImpactPointImplementation(Pose, ImpactPoint);
 }
 
 void UALSXTImpactReactionComponent::ServerStartImpactFall_Implementation(FDoubleHitResult Hit, FActionMontageInfo Montage)
@@ -2131,7 +2425,7 @@ void UALSXTImpactReactionComponent::MulticastStartAttackResponse_Implementation(
 
 // Start Implementations
 
-void UALSXTImpactReactionComponent::StartAnticipationReactionImplementation(FActionMontageInfo Montage, FVector AnticipationPoint)
+void UALSXTImpactReactionComponent::StartSyncedAnticipationReactionImplementation(FActionMontageInfo Montage, FVector AnticipationPoint)
 {
 	// ...
 }
@@ -2209,6 +2503,18 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 		Character->GetMesh()->AddImpulseToAllBodiesBelow(Hit.HitResult.Impulse * 1000, Hit.HitResult.HitResult.BoneName, false, true);
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 
+		if (ShouldImpactFall())
+		{
+			ImpactFall(Hit);
+		}
+		else
+		{
+			if (ShouldClutchImpactPoint())
+			{
+				ClutchImpactPoint(Hit);
+			}
+		}
+
 		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
 
 		// Crouch(); //Hack
@@ -2221,7 +2527,81 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 
 void UALSXTImpactReactionComponent::StartAttackReactionImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
 {
-	// ...
+	if (IsAttackReactionAllowedToStart(Montage.Montage))
+	{
+		//Anticipation
+		FALSXTDefensiveModeState DefensiveModeState;
+		DefensiveModeState.Mode = Character->GetDefensiveMode();
+		DefensiveModeState.Location = Hit.DoubleHitResult.HitResult.HitResult.Location;
+		Character->SetDefensiveModeState(DefensiveModeState);
+		// Character->SetFacialExpression();
+
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage.Montage, 1.0f);
+		// ImpactReactionState.TargetYawAngle = TargetYawAngle;
+		FALSXTImpactReactionState CurrentImpactReactionState = GetImpactReactionState();
+		// CurrentImpactReactionState.ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
+		// CurrentImpactReactionState.ImpactReactionParameters.Target = PotentialAttackTarget;
+
+		UAudioComponent* AudioComponent{ nullptr };
+
+		//Calculate Rotation from Normal Vector
+		FVector UpVector = Hit.DoubleHitResult.HitResult.HitResult.GetActor()->GetRootComponent()->GetUpVector();
+		FVector NormalVector = Hit.DoubleHitResult.HitResult.HitResult.ImpactNormal;
+		FVector RotationAxis = FVector::CrossProduct(UpVector, NormalVector);
+		RotationAxis.Normalize();
+		float DotProduct = FVector::DotProduct(UpVector, NormalVector);
+		float RotationAngle = acosf(DotProduct);
+		FQuat Quat = FQuat(RotationAxis, RotationAngle);
+		FQuat RootQuat = Hit.DoubleHitResult.HitResult.HitResult.GetActor()->GetRootComponent()->GetComponentQuat();
+		FQuat NewQuat = Quat * RootQuat;
+		FRotator NewRotation = NewQuat.Rotator();
+
+		if (Audio)
+		{
+			if (GetWorld()->WorldType == EWorldType::EditorPreview)
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Audio, Hit.DoubleHitResult.HitResult.HitResult.ImpactPoint,
+					1.0f, 1.0f);
+			}
+			else
+			{
+				AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Audio, Hit.DoubleHitResult.HitResult.HitResult.ImpactPoint,
+					NewRotation,
+					1.0f, 1.0f);
+			}
+		}
+		if (UKismetSystemLibrary::IsValidClass(ParticleActor))
+		{
+			// ServerSpawnParticleActor(Hit, ParticleActor);
+			// MulticastSpawnParticleActor(Hit, ParticleActor);
+			SpawnParticleActorImplementation(Hit.DoubleHitResult, ParticleActor);
+		}
+		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Hit, Hit.DoubleHitResult.HitResult.HitResult.BoneName);
+		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::ImpactReaction);
+		// Character->GetMesh()->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
+		Character->GetMesh()->AddImpulseToAllBodiesBelow(Hit.DoubleHitResult.HitResult.Impulse * 1000, Hit.DoubleHitResult.HitResult.HitResult.BoneName, false, true);
+		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
+
+		if (ShouldAttackFall())
+		{
+			AttackFall(Hit);
+		}
+		else
+		{
+			if (ShouldClutchImpactPoint())
+			{
+				ClutchImpactPoint(Hit.DoubleHitResult);
+			}
+		}
+
+		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
+
+		// Crouch(); //Hack
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("IsImpactReactionNOTAllowedToStart"));
+	}
 }
 
 void UALSXTImpactReactionComponent::StartSyncedAttackReactionImplementation(FActionMontageInfo Montage)
@@ -2229,9 +2609,31 @@ void UALSXTImpactReactionComponent::StartSyncedAttackReactionImplementation(FAct
 	// ...
 }
 
-void UALSXTImpactReactionComponent::StartClutchImpactPointImplementation(UAnimMontage* Montage, FVector ImpactPoint)
+void UALSXTImpactReactionComponent::StartClutchImpactPointImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint)
 {
-	// ...
+	if (IsClutchImpactPointAllowedToStart(Montage))
+	{
+		// Character->SetFacialExpression();
+
+		FALSXTDefensiveModeState CurrentDefensiveModeState = Character->GetDefensiveModeState();
+		CurrentDefensiveModeState.Montage = Montage;
+		CurrentDefensiveModeState.Location = ImpactPoint;
+		Character->SetDefensiveModeState(CurrentDefensiveModeState);
+
+		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::ImpactReaction);
+
+		if (ShouldPerformImpactResponse())
+		{
+			ImpactResponse(GetImpactReactionState().ImpactReactionParameters.Hit);
+		}
+		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
+
+		// Crouch(); //Hack
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("IsImpactReactionNOTAllowedToStart"));
+	}
 }
 
 void UALSXTImpactReactionComponent::StartImpactFallImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage)
@@ -2291,7 +2693,21 @@ void UALSXTImpactReactionComponent::StartImpactResponseImplementation(FDoubleHit
 
 void UALSXTImpactReactionComponent::StartAttackResponseImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage)
 {
-	// ...
+	if (IsAttackResponseAllowedToStart(Montage.Montage))
+	{
+		// Character->SetFacialExpression();
+
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage.Montage, 1.0f);
+		// ImpactReactionState.TargetYawAngle = TargetYawAngle;
+		FALSXTImpactReactionState CurrentImpactReactionState = GetImpactReactionState();
+		// CurrentImpactReactionState.ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
+		// CurrentImpactReactionState.ImpactReactionParameters.Target = PotentialAttackTarget;
+
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("IsImpactReactionNOTAllowedToStart"));
+	}
 }
 
 // Spawn Particle Actor
@@ -2378,20 +2794,20 @@ void UALSXTImpactReactionComponent::SpawnParticleActorImplementation(FDoubleHitR
 
 // Refresh
 
-void UALSXTImpactReactionComponent::RefreshAnticipationReaction(const float DeltaTime)
+void UALSXTImpactReactionComponent::RefreshSyncedAnticipationReaction(const float DeltaTime)
 {
 	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::DefensiveReaction)
 	{
-		StopAnticipationReaction();
+		StopSyncedAnticipationReaction();
 		Character->ForceNetUpdate();
 	}
 	else
 	{
-		RefreshAnticipationReactionPhysics(DeltaTime);
+		RefreshSyncedAnticipationReactionPhysics(DeltaTime);
 	}
 }
 
-void UALSXTImpactReactionComponent::RefreshAnticipationReactionPhysics(const float DeltaTime)
+void UALSXTImpactReactionComponent::RefreshSyncedAnticipationReactionPhysics(const float DeltaTime)
 {
 	// ...
 }
@@ -2597,7 +3013,7 @@ void UALSXTImpactReactionComponent::RefreshSyncedAttackFallReactionPhysics(const
 	// ...
 }
 
-void UALSXTImpactReactionComponent::StopAnticipationReaction()
+void UALSXTImpactReactionComponent::StopSyncedAnticipationReaction()
 {
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
@@ -2605,7 +3021,7 @@ void UALSXTImpactReactionComponent::StopAnticipationReaction()
 	}
 
 	// Character->SetMovementModeLocked(false);
-	OnAnticipationReactionEnded();
+	OnSyncedAnticipationReactionEnded();
 }
 
 void UALSXTImpactReactionComponent::StopDefensiveReaction()

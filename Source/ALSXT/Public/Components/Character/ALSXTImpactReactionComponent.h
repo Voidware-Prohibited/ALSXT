@@ -79,14 +79,14 @@ protected:
 
 	// Settings
 private:
-	bool IsAnticipationReactionAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsSyncedAnticipationReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsDefensiveReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsCrowdNavigationReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsBumpReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsImpactReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsSyncedAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
-	bool IsClaspImpactPointAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsClutchImpactPointAllowedToStart(const UAnimSequenceBase* Montage) const;
 	bool IsBumpFallAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsImpactFallAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsAttackFallAllowedToStart(const UAnimMontage* Montage) const;
@@ -106,22 +106,22 @@ public:
 	bool CanReact();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanPerformAnticipationReaction();
+	bool CanPerformSyncedAnticipationReaction();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanPerformDefensiveReaction();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanClaspImpactPoint();
+	bool CanClutchImpactPoint();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldPerformAnticipationReaction();
+	bool ShouldPerformSyncedAnticipationReaction();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldPerformDefensiveReaction();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldGraspImpactPoint();
+	bool ShouldClutchImpactPoint();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldBumpFall();
@@ -136,10 +136,10 @@ public:
 	bool ShouldSyncedAttackFall();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldImpactPerformResponse();
+	bool ShouldPerformImpactResponse();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldAttackPerformResponse();
+	bool ShouldPerformAttackResponse();
 
 	// Parameters
 private:
@@ -196,7 +196,7 @@ protected:
 	FSyncedAttackAnimation GetSyncedMontage(int Index);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	FImpactReactionAnimation SelectClaspImpactPointMontage(FDoubleHitResult Hit);
+	FClutchImpactLocationAnimation SelectClutchImpactPointMontage(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FAnticipationPose SelectSteadyMontage(const FGameplayTag& Side);
@@ -205,13 +205,13 @@ protected:
 	FFallenAnimation SelectImpactFallAnimations(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	FFallenAnimation SelectAttackFallAnimations(FDoubleHitResult Hit);
+	FFallenAnimation SelectAttackFallAnimations(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FActionMontageInfo SelectImpactFallMontage(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	FActionMontageInfo SelectAttackFallMontage(FDoubleHitResult Hit);
+	FActionMontageInfo SelectAttackFallMontage(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectImpactFallenPose(FDoubleHitResult Hit);
@@ -223,10 +223,10 @@ protected:
 	FActionMontageInfo SelectImpactGetUpMontage(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	FActionMontageInfo SelectAttackGetUpMontage(FDoubleHitResult Hit);
+	FActionMontageInfo SelectAttackGetUpMontage(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	FResponseAnimation SelectImpactResponseMontage(FAttackDoubleHitResult Hit);
+	FResponseAnimation SelectImpactResponseMontage(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FResponseAnimation SelectAttackResponseMontage(FAttackDoubleHitResult Hit);
@@ -270,9 +270,6 @@ public:
 
 	// Entry Events
 public:
-	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void AnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
-
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void SyncedAnticipationReaction(FVector AnticipationPoint);
 
@@ -328,7 +325,7 @@ public:
 	void AttackResponse(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void BodyFallReaction(FAttackDoubleHitResult Hit);
+	void BodyFallReaction(FDoubleHitResult Hit);
 
 private:
 
@@ -336,7 +333,7 @@ private:
 
 	void StartCrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
-	void StartAnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
+	void StartSyncedAnticipationReaction(FVector AnticipationPoint);
 
 	void StartDefensiveReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
 
@@ -387,10 +384,10 @@ private:
 	void MulticastCrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(Server, Reliable)
-	void ServerAnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
+	void ServerSyncedAnticipationReaction(FVector AnticipationPoint);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastAnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
+	void MulticastSyncedAnticipationReaction(FVector AnticipationPoint);
 
 	UFUNCTION(Server, Reliable)
 	void ServerDefensiveReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
@@ -509,10 +506,10 @@ private:
 	void MulticastStartCrowdNavigationReaction(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartAnticipationReaction(FActionMontageInfo Montage, FVector AnticipationPoint);
+	void ServerStartSyncedAnticipationReaction(FVector AnticipationPoint);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartAnticipationReaction(FActionMontageInfo Montage, FVector AnticipationPoint);
+	void MulticastStartSyncedAnticipationReaction(FVector AnticipationPoint);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartDefensiveReaction(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint);
@@ -539,10 +536,10 @@ private:
 	void MulticastStartSyncedAttackReaction(FActionMontageInfo Montage);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartClutchImpactPoint(UAnimMontage* Montage, FVector ImpactPoint);
+	void ServerStartClutchImpactPoint(UAnimSequenceBase* Pose, FVector ImpactPoint);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartClutchImpactPoint(UAnimMontage* Montage, FVector ImpactPoint);
+	void MulticastStartClutchImpactPoint(UAnimSequenceBase* Pose, FVector ImpactPoint);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartImpactFall(FDoubleHitResult Hit, FActionMontageInfo Montage);
@@ -626,7 +623,7 @@ private:
 
 	// Implementations
 
-	void StartAnticipationReactionImplementation(FActionMontageInfo Montage, FVector AnticipationPoint);
+	void StartSyncedAnticipationReactionImplementation(FActionMontageInfo Montage, FVector AnticipationPoint);
 
 	void StartDefensiveReactionImplementation(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint);
 
@@ -640,7 +637,7 @@ private:
 
 	void StartSyncedAttackReactionImplementation(FActionMontageInfo Montage);
 
-	void StartClutchImpactPointImplementation(UAnimMontage* Montage, FVector ImpactPoint);
+	void StartClutchImpactPointImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint);
 
 	void StartImpactFallImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage);
 
@@ -668,9 +665,9 @@ private:
 
 	void SpawnParticleActorImplementation(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
 
-	void RefreshAnticipationReaction(float DeltaTime);
+	void RefreshSyncedAnticipationReaction(float DeltaTime);
 
-	void RefreshAnticipationReactionPhysics(float DeltaTime);
+	void RefreshSyncedAnticipationReactionPhysics(float DeltaTime);
 
 	void RefreshDefensiveReaction(float DeltaTime);
 
@@ -714,7 +711,7 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Hooks")
-	void StopAnticipationReaction();
+	void StopSyncedAnticipationReaction();
 
 	UFUNCTION(BlueprintCallable, Category = "Hooks")
 	void StopDefensiveReaction();
@@ -753,10 +750,10 @@ protected:
 	void OnSpawnParticleActor(const FDoubleHitResult& Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnAnticipationReactionStarted();
+	void OnSyncedAnticipationReactionStarted();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnAnticipationReactionEnded();
+	void OnSyncedAnticipationReactionEnded();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnDefensiveReactionStarted();

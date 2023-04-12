@@ -409,14 +409,17 @@ struct ALSXT_API FSyncedActionAnimation
 	TObjectPtr<UCurveVector> TargetCameraCurve { nullptr };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	FActionMontageInfo TargetFallenPose;
+	TArray<FActionMontageInfo> TargetFallingMontages;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
-	FActionMontageInfo TargetGetUpMontage;
+	TObjectPtr<UAnimMontage> TargetFallenPose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	TArray<FActionMontageInfo> TargetGetUpMontages;
 
 	bool operator==(const FSyncedActionAnimation& other) const
 	{
-		return (other.InstigatorSyncedMontage == InstigatorSyncedMontage) && (other.TargetAnticipationPose == TargetAnticipationPose) && (other.TargetSyncedMontage == TargetSyncedMontage) && (other.TargetFallenPose == TargetFallenPose) && (other.TargetGetUpMontage == TargetGetUpMontage);
+		return (other.InstigatorSyncedMontage == InstigatorSyncedMontage) && (other.TargetAnticipationPose == TargetAnticipationPose) && (other.TargetSyncedMontage == TargetSyncedMontage) && (other.TargetFallingMontages == TargetFallingMontages) && (other.TargetFallenPose == TargetFallenPose) && (other.TargetGetUpMontages == TargetGetUpMontages);
 	}
 
 };
@@ -641,6 +644,32 @@ struct ALSXT_API FAnticipationPose
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FClutchImpactLocationAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
+	FGameplayTagContainer ImpactStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTagContainer ImpactSide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer ImpactForm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Game.Health", AllowPrivateAccess))
+	FGameplayTagContainer Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	TObjectPtr<UAnimSequenceBase> Pose;
+
+	bool operator==(const FClutchImpactLocationAnimation& other) const
+	{
+		return (other.ImpactStrength == ImpactStrength) && (other.ImpactSide == ImpactSide) && (other.ImpactForm == ImpactForm) && (other.Health == Health) && (other.Pose == Pose);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FResponseAnimation
 {
 	GENERATED_BODY()
@@ -732,7 +761,7 @@ struct ALSXT_API FALSXTImpactSound
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
-	FGameplayTagContainer PhysicalMaterial;
+	TArray<TEnumAsByte<EPhysicalSurface>> PhysicalMaterials;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Velocity;
@@ -745,8 +774,87 @@ struct ALSXT_API FALSXTImpactSound
 
 	bool operator==(const FALSXTImpactSound& other) const
 	{
-		return (other.PhysicalMaterial == PhysicalMaterial) && (other.Velocity == Velocity) && (other.Form == Form) && (other.ImpactSound == ImpactSound);
+		return (other.PhysicalMaterials == PhysicalMaterials) && (other.Velocity == Velocity) && (other.Form == Form) && (other.ImpactSound == ImpactSound);
 	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactParticle
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	TArray<TEnumAsByte<EPhysicalSurface>> PhysicalMaterials;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FALSXTCharacterSound ImpactParticle;
+
+	bool operator==(const FALSXTImpactParticle& other) const
+	{
+		return (other.PhysicalMaterials == PhysicalMaterials) && (other.Velocity == Velocity) && (other.Form == Form) && (other.ImpactParticle == ImpactParticle);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactSounds
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FALSXTImpactSound> Sounds;
+
+	bool operator==(const FALSXTImpactSounds& other) const
+	{
+		return (other.Sounds == Sounds);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactParticles
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FALSXTImpactParticle> Particles;
+
+	bool operator==(const FALSXTImpactParticles& other) const
+	{
+		return (other.Particles == Particles);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactSoundMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTImpactSounds> Sounds;
+
+	// bool operator==(const FALSXTImpactSoundMap& other) const
+	// {
+	// 	return (other.Sounds == Sounds);
+	// }
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactParticleMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTImpactParticle> Particles;
+
+	// bool operator==(const FALSXTImpactParticleMap& other) const
+	// {
+	// 	return (other.Particles == Particles);
+	// }
 };
 
 USTRUCT(BlueprintType)
