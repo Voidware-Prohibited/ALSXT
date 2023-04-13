@@ -22,6 +22,9 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void BumpReaction(FDoubleHitResult Hit, FGameplayTag Gait, FGameplayTag Side, FGameplayTag Form);
 
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
+  void CrowdNavigationReaction(FGameplayTag Gait, FGameplayTag Side, FGameplayTag Form);
+
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
   UPARAM(meta = (Categories = "Als.Combat Stance")) FGameplayTag GetCombatStance();
 

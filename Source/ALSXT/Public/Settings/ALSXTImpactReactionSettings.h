@@ -14,6 +14,18 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	FDoubleHitResult Hit;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FDoubleHitResult CrowdNavigationHit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FDoubleHitResult BumpHit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FDoubleHitResult ImpactHit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FAttackDoubleHitResult AttackHit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FGameplayTag ImpactType{FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")

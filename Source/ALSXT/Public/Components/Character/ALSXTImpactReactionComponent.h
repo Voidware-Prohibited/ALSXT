@@ -494,16 +494,16 @@ private:
 	// Start RPCs
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartBumpReaction(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void ServerStartBumpReaction(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartBumpReaction(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void MulticastStartBumpReaction(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartCrowdNavigationReaction(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void ServerStartCrowdNavigationReaction(FActionMontageInfo Montage, USoundBase* Audio);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartCrowdNavigationReaction(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void MulticastStartCrowdNavigationReaction(FActionMontageInfo Montage, USoundBase* Audio);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartSyncedAnticipationReaction(FVector AnticipationPoint);
@@ -627,9 +627,9 @@ private:
 
 	void StartDefensiveReactionImplementation(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint);
 
-	void StartCrowdNavigationReactionImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void StartCrowdNavigationReactionImplementation(FActionMontageInfo Montage, USoundBase* Audio);
 
-	void StartBumpReactionImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void StartBumpReactionImplementation(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
