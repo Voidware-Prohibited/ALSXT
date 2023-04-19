@@ -247,27 +247,27 @@ struct ALSXT_API FActionMontageInfo
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	TObjectPtr<UAnimMontage> Montage { nullptr };
 
 	// UnarmedAttack time to blend in amount curve.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	TObjectPtr<UCurveFloat> BlendInCurve { nullptr };
 
 	// UnarmedAttack time to interpolation, horizontal and vertical correction amounts curve.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	TObjectPtr<UCurveVector> InterpolationAndCorrectionAmountsCurve { nullptr };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	FVector StartRelativeLocation{-65.0f, 0.0f, -100.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (ClampMin = 0))
 	FVector2D ReferenceHeight{50.0f, 100.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (ClampMin = 0))
 	FVector2D StartTime{0.5f, 0.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (ClampMin = 0))
 	FVector2D PlayRate{1.0f, 1.0f};
 
 	bool operator==(const FActionMontageInfo& other) const

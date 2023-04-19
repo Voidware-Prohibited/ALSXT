@@ -7,6 +7,7 @@
 #include "Utility/ALSXTStructs.h"
 #include "ALSXTCharacter.h"
 #include "AlsCharacter.h"
+#include "Animation/AnimInstance.h"
 #include "Chaos/ChaosEngineInterface.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "NiagaraSystem.h"
@@ -37,6 +38,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
+	UAnimInstance* AnimInstance{ nullptr };
 
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 	FALSXTImpactReactionParameters ImpactReactionParameters;
@@ -72,6 +76,80 @@ private:
 
 	UFUNCTION(BlueprintCallable, Category = "Vitals")
 	float GetBaseVelocityDamage();
+
+	// BlendOut Delegates
+
+	FOnMontageBlendingOutStarted OnCrowdNavigationReactionBlendOutDelegate;
+	FOnMontageEnded OnCrowdNavigationReactionEndedDelegate;
+
+	FOnMontageBlendingOutStarted OnBumpReactionBlendOutDelegate;
+	FOnMontageEnded OnBumpReactionEndedDelegate;
+	FOnMontageBlendingOutStarted OnImpactReactionBlendOutDelegate;
+	FOnMontageEnded OnImpactReactionEndedDelegate;
+	FOnMontageBlendingOutStarted OnAttackReactionBlendOutDelegate;
+	FOnMontageEnded OnAttackReactionEndedDelegate;
+	FOnMontageBlendingOutStarted OnSyncedAttackReactionBlendOutDelegate;
+	FOnMontageEnded OnSyncedAttackReactionEndedDelegate;
+	FOnMontageBlendingOutStarted OnClutchImpactPointBlendOutDelegate;
+	FOnMontageEnded OnClutchImpactPointEndedDelegate;
+	FOnMontageBlendingOutStarted OnBumpFallBlendOutDelegate;
+	FOnMontageEnded OnBumpFallEndedDelegate;
+	FOnMontageBlendingOutStarted OnImpactFallBlendOutDelegate;
+	FOnMontageEnded OnImpactFallEndedDelegate;
+	FOnMontageBlendingOutStarted OnAttackFallBlendOutDelegate;
+	FOnMontageEnded OnAttackFallEndedDelegate;
+	FOnMontageBlendingOutStarted OnSyncedAttackFallBlendOutDelegate;
+	FOnMontageEnded OnSyncedAttackFallEndedDelegate;
+	FOnMontageBlendingOutStarted OnBraceForImpactBlendOutDelegate;
+	FOnMontageEnded OnBraceForImpactEndedDelegate;
+	FOnMontageBlendingOutStarted OnBumpFallGetupBlendOutDelegate;
+	FOnMontageEnded OnBumpFallGetupEndedDelegate;
+	FOnMontageBlendingOutStarted OnImpactFallGetupBlendOutDelegate;
+	FOnMontageEnded OnImpactFallGetupEndedDelegate;
+	FOnMontageBlendingOutStarted OnAttackFallGetupBlendOutDelegate;
+	FOnMontageEnded OnAttackFallGetupEndedDelegate;
+	FOnMontageBlendingOutStarted OnSyncedAttackFallGetUpBlendOutDelegate;
+	FOnMontageEnded OnSyncedAttackFallGetUpEndedDelegate;
+	FOnMontageBlendingOutStarted OnImpactResponseBlendOutDelegate;
+	FOnMontageEnded OnImpactResponseEndedDelegate;
+	FOnMontageBlendingOutStarted OnAttackResponseBlendOutDelegate;
+	FOnMontageEnded OnAttackResponseEndedDelegate;
+
+	void OnCrowdNavigationReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnBumpReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnImpactReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnAttackReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnSyncedAttackReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnClutchImpactPointBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnBumpFallBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnImpactFallBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnAttackFallBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnSyncedAttackFallBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnBraceForImpactBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnBumpFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnImpactFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnAttackFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnSyncedAttackFallGetUpBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnImpactResponseBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnAttackResponseBlendOut(UAnimMontage* Montage, bool bInterrupted);
+
+	void OnCrowdNavigationReactionEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnBumpReactionEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnImpactReactionEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnAttackReactionEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnSyncedAttackReactionEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnClutchImpactPointEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnBumpFallEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnImpactFallEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnAttackFallEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnSyncedAttackFallEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnBraceForImpactEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnBumpFallGetupEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnImpactFallGetupEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnAttackFallGetupEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnSyncedAttackFallGetUpEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnImpactResponseEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnAttackResponseEnded(UAnimMontage* Montage, bool bInterrupted);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
