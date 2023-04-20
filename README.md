@@ -62,3 +62,9 @@ Original content and code in this repository is under the MIT license. Any git s
 - [swipes and whooshes tshirt fast and short swings stereo ORTF 8040.wav](https://freesound.org/people/Soundholder/sounds/425856/) by [Soundholder](https://freesound.org/people/Soundholder/) [License: CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) Modified to be seperate sounds
 
 - [BACKPACK](https://sketchfab.com/3d-models/backpack-9ccadc2945c34826a0ce1c37de13675e) by [Idmental](https://sketchfab.com/idmental.id) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to optimize textures
+
+# Special Thanks
+
+[Freesound](https://freesound.org/)
+
+[Sixze](https://github.com/Sixze)

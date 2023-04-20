@@ -379,10 +379,19 @@ public:
 	void ImpactFall(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void ImpactFallIdle(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void AttackFall(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void AttackFallIdle(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void SyncedAttackFall(int32 Index);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void SyncedAttackFallIdle(int32 Index);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void BraceForImpact();
@@ -425,9 +434,15 @@ private:
 
 	void StartImpactFall(FDoubleHitResult Hit);
 
+	void StartImpactFallIdle(FDoubleHitResult Hit);
+
 	void StartAttackFall(FAttackDoubleHitResult Hit);
 
+	void StartAttackFallIdle(FAttackDoubleHitResult Hit);
+
 	void StartSyncedAttackFall(int32 Index);
+
+	void StartSyncedAttackFallIdle(int32 Index);
 
 	void StartBraceForImpact();
 
@@ -504,16 +519,34 @@ private:
 	void MulticastImpactFall(FDoubleHitResult Hit);
 
 	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerImpactFallIdle(FDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastImpactFallIdle(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerAttackFall(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAttackFall(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerAttackFallIdle(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttackFallIdle(FAttackDoubleHitResult Hit);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSyncedAttackFall(int32 Index);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSyncedAttackFall(int32 Index);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSyncedAttackFallIdle(int32 Index);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSyncedAttackFallIdle(int32 Index);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerBraceForImpact();
@@ -626,16 +659,34 @@ private:
 	void MulticastStartImpactFall(FDoubleHitResult Hit, FActionMontageInfo Montage);
 
 	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartImpactFallIdle(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartImpactFallIdle(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartAttackFall(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartAttackFall(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartAttackFallIdle(UAnimMontage* Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartAttackFallIdle(UAnimMontage* Montage);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartSyncedAttackFall(FActionMontageInfo Montage);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartSyncedAttackFall(FActionMontageInfo Montage);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartSyncedAttackFallIdle(FActionMontageInfo Montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartSyncedAttackFallIdle(FActionMontageInfo Montage);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartBraceForImpact(UAnimMontage* Montage);
@@ -719,9 +770,15 @@ private:
 
 	void StartImpactFallImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage);
 
+	void StartImpactFallIdleImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage);
+
 	void StartAttackFallImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
 
+	void StartAttackFallIdleImplementation(UAnimMontage* Montage);
+
 	void StartSyncedAttackFallImplementation(FActionMontageInfo Montage);
+
+	void StartSyncedAttackFallIdleImplementation(FActionMontageInfo Montage);
 
 	void StartBraceForImpactImplementation(UAnimMontage* Montage);
 
