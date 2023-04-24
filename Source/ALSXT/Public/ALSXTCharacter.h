@@ -2,6 +2,7 @@
 
 #include "AlsCharacter.h"
 #include "GameFramework/Character.h"
+#include "ALSXTCharacterMovementComponent.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTCombatSettings.h"
 #include "Settings/ALSXTImpactReactionSettings.h"
@@ -18,6 +19,7 @@
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
+class UALSXTCharacterMovementComponent;
 class UALSXTCharacterSettings;
 class UAlsCameraComponent;
 class UInputMappingContext;
@@ -32,6 +34,7 @@ class ALSXT_API AALSXTCharacter : public AAlsCharacter
 	GENERATED_BODY()
 
 public:
+	// explicit AALSXTCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Als Character", Meta = (AllowPrivateAccess))
 	TObjectPtr<UALSXTCharacterSettings> ALSXTSettings;
@@ -52,9 +55,18 @@ public:
 	class UPhysicalAnimationComponent* PhysicalAnimation;
 
 protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
+	TObjectPtr<UALSXTCharacterMovementComponent> ALSXTCharacterMovement;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void DisableInputMovement(const bool Disable);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void DisableLookAt(const bool Disable);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
@@ -983,7 +995,7 @@ public:
 	bool ShouldEnterBlockingDefensiveMode() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
-	bool ShouldEnterAvoidingDefensiveMode() const;
+	bool ShouldEnterAnticipationDefensiveMode() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 		bool IsBlocking() const;
@@ -992,7 +1004,7 @@ public:
 		bool IsInDefensiveMode() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
-		bool IsAvoiding() const;
+		bool IsInAnticipationMode() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeTag"))
 		void SetDesiredDefensiveMode(UPARAM(meta = (Categories = "Als.Defensive Mode"))const FGameplayTag& NewDefensiveModeTag);

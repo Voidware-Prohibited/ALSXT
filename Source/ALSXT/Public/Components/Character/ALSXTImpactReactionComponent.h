@@ -33,6 +33,31 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UPARAM(meta = (Categories = "Als.Impact Form")) FGameplayTag GetCurrentBumpForm();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	float GetDynamicImpactFallenMinimumTime();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	float GetDynamicAttackFallenMinimumTime();
+
+	float GetImpactFallenMinimumTime();
+
+	float GetAttackFallenMinimumTime();
+
+	void StartClutchImpactPointTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void ClutchImpactPointTimer();
+
+	void StartImpactFallenTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void ImpactFallenTimer();
+
+	void StartAttackFallenTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void AttackFallenTimer();
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -58,6 +83,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewImpactReactionState"))
 	FALSXTImpactReactionState ProcessNewImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ServerSetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
 	UFUNCTION(Server, Unreliable)
 	void ServerProcessNewImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
@@ -229,6 +257,12 @@ private:
 	float TimeSinceLastRecovery;
 	FTimerHandle TimeSinceLastResponseTimerHandle;
 	float TimeSinceLastResponse;
+	FTimerHandle ClutchImpactPointTimerHandle;
+	FTimerDelegate ClutchImpactPointTimerDelegate;
+	FTimerHandle ImpactFallenTimerHandle;
+	FTimerDelegate ImpactFallenTimerDelegate;
+	FTimerHandle AttackFallenTimerHandle;
+	FTimerDelegate AttackFallenTimerDelegate;
 
 	UFUNCTION()
 	void ImpactTimelineUpdate(float Value);
@@ -463,6 +497,12 @@ private:
 	void StartAttackResponse(FAttackDoubleHitResult Hit);
 
 	// RPCs
+
+	UFUNCTION(Server, Reliable)
+	void ServerCrouch();
+
+	UFUNCTION(Server, Reliable)
+	void ServerGetUp();
 
 	UFUNCTION(Server, Reliable)
 	void ServerBumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);

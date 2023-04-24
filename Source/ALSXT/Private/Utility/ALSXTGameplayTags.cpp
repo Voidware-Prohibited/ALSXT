@@ -401,7 +401,10 @@ namespace ALSXTDefensiveModeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Als.Defensive Mode.None"))
 	UE_DEFINE_GAMEPLAY_TAG(Avoiding, TEXT("Als.Defensive Mode.Avoiding"))
+	UE_DEFINE_GAMEPLAY_TAG(Anticipation, TEXT("Als.Defensive Mode.Anticipation"))
 	UE_DEFINE_GAMEPLAY_TAG(Blocking, TEXT("Als.Defensive Mode.Blocking"))
+	UE_DEFINE_GAMEPLAY_TAG(ClutchImpactPoint, TEXT("Als.Defensive Mode.Clutch Impact Point"))
+	UE_DEFINE_GAMEPLAY_TAG(BraceForImpact, TEXT("Als.Defensive Mode.Brace For Impact"))
 }
 
 namespace ALSXTBlockingTags

@@ -35,6 +35,8 @@ AALSXTCharacter::AALSXTCharacter()
 	Camera->SetupAttachment(GetMesh());
 	Camera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
 
+	ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());
+
 	// Add Physical Animation Component
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
 	AddOwnedComponent(PhysicalAnimation);
@@ -173,6 +175,16 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(HoldBreathAction, ETriggerEvent::Triggered, this, &ThisClass::InputHoldBreath);
 		OnSetupPlayerInputComponentUpdated.Broadcast();
 	}
+}
+
+void AALSXTCharacter::DisableInputMovement(const bool Disable)
+{
+
+}
+
+void AALSXTCharacter::DisableLookAt(const bool Disable)
+{
+
 }
 
 void AALSXTCharacter::InputLookMouse(const FInputActionValue& ActionValue)
@@ -1024,9 +1036,9 @@ bool AALSXTCharacter::IsInDefensiveMode() const
 	}
 }
 
-bool AALSXTCharacter::IsAvoiding() const
+bool AALSXTCharacter::IsInAnticipationMode() const
 {
-	if (GetDefensiveMode() == ALSXTDefensiveModeTags::Avoiding)
+	if (GetDefensiveMode() == ALSXTDefensiveModeTags::Anticipation)
 	{
 		return true;
 	}
@@ -1064,7 +1076,7 @@ void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 
 		DefensiveMode = NewDefensiveModeTag;
 
-		if (DefensiveMode == ALSXTDefensiveModeTags::Avoiding)
+		if (DefensiveMode == ALSXTDefensiveModeTags::Anticipation)
 		{
 
 		}
@@ -1127,7 +1139,6 @@ void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewD
 
 void AALSXTCharacter::ResetDefensiveModeState()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "ResetDefensiveModeState");
 	FALSXTDefensiveModeState PreviousDefensiveModeState = GetDefensiveModeState();
 	FALSXTDefensiveModeState NewDefensiveModeState = PreviousDefensiveModeState;
 	NewDefensiveModeState.Mode = ALSXTDefensiveModeTags::None;
@@ -1216,6 +1227,10 @@ void AALSXTCharacter::SetDesiredStatus(const FGameplayTag& NewStatusTag)
 			{
 				ServerSetDesiredStatus(NewStatusTag);
 			}
+			else if (GetLocalRole() == ROLE_SimulatedProxy && GetRemoteRole() == ROLE_Authority)
+			{
+				ServerSetDesiredStatus(NewStatusTag);
+			}
 	}
 }
 
@@ -1232,6 +1247,8 @@ void AALSXTCharacter::SetStatus(const FGameplayTag& NewStatusTag)
 		const auto PreviousStatus{ Status };
 
 		Status = NewStatusTag;
+
+		SetDesiredStance(NewStatusTag != ALSXTStatusTags::Normal ? AlsStanceTags::Crouching : AlsStanceTags::Standing);
 
 		OnStatusChanged(PreviousStatus);
 	}

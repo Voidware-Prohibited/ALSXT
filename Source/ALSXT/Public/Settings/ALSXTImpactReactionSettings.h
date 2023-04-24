@@ -62,6 +62,12 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	FFallenAnimation AttackFallenAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	float FallenMinimumTime{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurrentFallenTime{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FAnticipationPose BraceForImpactPose;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
@@ -143,6 +149,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
 	TArray <FFallenAnimation> AttackFallenAnimations;
 
+	UPROPERTY(EditAnywhere, Category = "Animations|Falling", BlueprintReadWrite, Meta = (TitleProperty = "{FallenMinimumTime}", AllowPrivateAccess))
+	float ImpactFallenMinimumTime { 0.0f };
+
+	UPROPERTY(EditAnywhere, Category = "Animations|Falling", BlueprintReadWrite, Meta = (TitleProperty = "{AttackFallenMinimumTime}", AllowPrivateAccess))
+	float AttackFallenMinimumTime { 0.0f };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
 	TArray<FAnticipationPose> BraceForImpactPoses;
 
@@ -190,6 +202,9 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableBumpReactions{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableAutoGetUp{ false };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float CharacterBumpDetectionMinimumVelocity {175.0f};
