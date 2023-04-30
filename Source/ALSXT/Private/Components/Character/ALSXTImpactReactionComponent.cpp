@@ -1985,7 +1985,8 @@ void UALSXTImpactReactionComponent::StartImpactResponse(FDoubleHitResult Hit)
 	else
 	{
 		Character->GetCharacterMovement()->FlushServerMoves();
-		MulticastStartImpactResponse(Hit, Montage.Montage);
+		// MulticastStartImpactResponse(Hit, Montage.Montage);
+		StartImpactResponseImplementation(Hit, Montage.Montage);
 	}
 
 }

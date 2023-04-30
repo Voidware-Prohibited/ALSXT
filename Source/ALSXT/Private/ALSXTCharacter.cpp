@@ -118,6 +118,8 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmSightLocation, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredVaultType, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponObstruction, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PreviousLookInput, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FreelookState, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
 }

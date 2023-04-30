@@ -56,7 +56,7 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	FGameplayTag FallType{FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FVector FallLandLocation;
+	FVector FallLandLocation {FVector::ZeroVector};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FFallenAnimation ImpactFallenAnimations;
@@ -86,7 +86,7 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	float BaseDamage{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	AActor* Target;
+	AActor* Target {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;

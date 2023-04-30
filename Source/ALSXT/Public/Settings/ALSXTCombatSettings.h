@@ -29,7 +29,7 @@ struct ALSXT_API FALSXTCombatParameters
 	float BaseDamage{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	AActor* Target;
+	AActor* Target {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
