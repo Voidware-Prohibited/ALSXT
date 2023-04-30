@@ -10,6 +10,7 @@
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTCombatInterface.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values for this component's properties
 UALSXTImpactReactionComponent::UALSXTImpactReactionComponent()
@@ -1951,8 +1952,8 @@ void UALSXTImpactReactionComponent::StartImpactResponse(FDoubleHitResult Hit)
 	// }
 
 	FResponseAnimation Montage;
-	FResponseAnimation SelectedAttackResponse = SelectImpactResponseMontage(Hit);
-	Montage = SelectedAttackResponse;
+	FResponseAnimation SelectedImpactResponse = SelectImpactResponseMontage(Hit);
+	Montage = SelectedImpactResponse;
 
 	if (!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsImpactResponseAllowedToStart(Montage.Montage.Montage))
 	{
@@ -2007,18 +2008,17 @@ void UALSXTImpactReactionComponent::StartAttackResponse(FAttackDoubleHitResult H
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
 		return;
 	}
-	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
-
+	
+	FVector OtherActorLocation = GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult.HitResult.HitResult.GetActor()->GetActorLocation();
+	FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(Character->GetActorLocation(), OtherActorLocation);
+	const float StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(PlayerRot.Yaw)) };
+	FRotator CurrentRotation = Character->GetActorRotation();
+	CurrentRotation.Yaw = PlayerRot.Yaw;
+	Character->SetActorRotation(CurrentRotation);
 	Character->SetMovementModeLocked(true);
 
 	// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Disabled;
-		// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
-	// ImpactReactionParameters.BaseDamage = Hit.BaseDamage;
-	// ImpactReactionParameters.PlayRate = SelectedAttackFall.Montage.PlayRate;
-	// ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
-	// ImpactReactionParameters.ImpactType = Hit.DoubleHitResult.ImpactType;
-	// ImpactReactionParameters.Stance = Stance;
-	// ImpactReactionParameters.ImpactVelocity = Hit.Strength;
+	// Character->GetMesh()->SetRelativeLocationAndRotation(BaseTranslationOffset, BaseRotationOffset);
 	// ImpactReactionParameters.ImpactReactionAnimation.Montage.Montage = Montage;
 	// FALSXTImpactReactionState NewImpactReactionState;
 	// NewImpactReactionState.ImpactReactionParameters = ImpactReactionParameters;
