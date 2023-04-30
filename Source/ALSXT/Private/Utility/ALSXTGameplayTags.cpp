@@ -242,6 +242,19 @@ namespace ALSXTImpactSideTags
 	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Impact Side.Low"))
 }
 
+namespace ALSXTReboundTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(False, TEXT("Als.Rebound.False"))
+	UE_DEFINE_GAMEPLAY_TAG(True, TEXT("Als.Rebound.True"))
+}
+
+namespace ALSXTElementalConditionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Dry, TEXT("Als.Elemental Condition.Dry"))
+	UE_DEFINE_GAMEPLAY_TAG(Wet, TEXT("Als.Elemental Condition.Wet"))
+	UE_DEFINE_GAMEPLAY_TAG(Doused, TEXT("Als.Elemental Condition.Doused"))
+}
+
 namespace ALSXTImpactSurfaceTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Cloth, TEXT("Als.Impact Surface.Cloth"))

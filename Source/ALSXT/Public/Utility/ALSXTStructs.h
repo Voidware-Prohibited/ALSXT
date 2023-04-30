@@ -890,41 +890,125 @@ struct ALSXT_API FALSXTBloodSpatterType
 };
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTSurfaceInteraction
+struct ALSXT_API FALSXTElementalDecal
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Blood Spatter Volume", TitleProperty = "{Size}", AllowPrivateAccess))
+	FGameplayTagContainer Size;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UMaterialInterface* Decal {nullptr};
+
+	bool operator==(const FALSXTElementalDecal& other) const
+	{
+		return (other.Size == Size) && (other.Decal == Decal);
+	}
+
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTElementalParticle
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Blood Spatter Volume", TitleProperty = "{Volume}", AllowPrivateAccess))
+	FGameplayTagContainer Volume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Velocity", TitleProperty = "{Velocity}", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UNiagaraSystem* Particle {nullptr};
+
+	bool operator==(const FALSXTElementalParticle& other) const
+	{
+		return (other.Volume == Volume) && (other.Velocity == Velocity) && (other.Particle == Particle);
+	}
+
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTElementalSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Velocity", TitleProperty = "{Velocity}", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Rebound", TitleProperty = "{Rebound}", AllowPrivateAccess))
+	FGameplayTagContainer Rebound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	USoundBase* Sound{nullptr};
+
+	bool operator==(const FALSXTElementalSound& other) const
+	{
+		return (other.Velocity == Velocity) && (other.Rebound == Rebound) && (other.Sound == Sound);
+	}
+
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTElementalParticleActor
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Blood Spatter Volume", TitleProperty = "{Conditions}", AllowPrivateAccess))
+	FGameplayTagContainer Volume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Blood Spatter Velocity", TitleProperty = "{Conditions}", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TSubclassOf<AActor> Particle {nullptr};
+
+	bool operator==(const FALSXTElementalParticleActor& other) const
+	{
+		return (other.Volume == Volume) && (other.Velocity == Velocity) && (other.Particle == Particle);
+	}
+
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTElementalInteraction
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Surfaces}", AllowPrivateAccess))
 	TArray<TEnumAsByte<EPhysicalSurface>> Surfaces;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Form", TitleProperty = "{Conditions}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Elemental Condition", TitleProperty = "{Conditions}", AllowPrivateAccess))
 	FGameplayTagContainer Conditions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	USoundBase* Sound {nullptr};
+	TArray<FALSXTElementalSound> Sounds;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TSubclassOf<AActor> ParticleActor;
+	TArray<FALSXTElementalParticle> Particles;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UNiagaraSystem* Particle {nullptr};
+	TArray<FALSXTElementalDecal> Decals;
 
-	bool operator==(const FALSXTSurfaceInteraction& other) const
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FALSXTElementalParticleActor> ParticleActors;
+
+	bool operator==(const FALSXTElementalInteraction& other) const
 	{
-		return (other.Surfaces == Surfaces) && (other.Conditions == Conditions) && (other.Sound == Sound);
+		return (other.Surfaces == Surfaces) && (other.Conditions == Conditions) && (other.Sounds == Sounds) && (other.Particles == Particles) && (other.Decals == Decals) && (other.ParticleActors == ParticleActors);
 	}
 };
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTSurfaceInteractionSet
+struct ALSXT_API FALSXTElementalInteractionSet
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Surfaces} {Conditions} {Sound}", AllowPrivateAccess))
-	TArray<FALSXTSurfaceInteraction> SurfaceInteractions;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Surfaces} {Conditions} {Sounds}", AllowPrivateAccess))
+	TArray<FALSXTElementalInteraction> ElementalInteractions;
 
-	bool operator==(const FALSXTSurfaceInteractionSet& other) const
+	bool operator==(const FALSXTElementalInteractionSet& other) const
 	{
-		return (other.SurfaceInteractions == SurfaceInteractions);
+		return (other.ElementalInteractions == ElementalInteractions);
 	}
 };
