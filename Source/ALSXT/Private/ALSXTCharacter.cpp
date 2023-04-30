@@ -209,25 +209,28 @@ void AALSXTCharacter::InputLook(const FInputActionValue& ActionValue)
 
 void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 {
-	const auto Value{UAlsMath::ClampMagnitude012D(ActionValue.Get<FVector2D>())};
-	FRotator CapsuleRotation = GetActorRotation();
-	const auto ForwardDirection{UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw))};
-	const auto RightDirection{UAlsMath::PerpendicularCounterClockwiseXY(ForwardDirection)};
-	const auto CharForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(CapsuleRotation.Yaw)) };
-	const auto CharRightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(CharForwardDirection) };
+	if (GetDesiredStatus() == ALSXTStatusTags::Normal)
+	{
+		const auto Value{ UAlsMath::ClampMagnitude012D(ActionValue.Get<FVector2D>()) };
+		FRotator CapsuleRotation = GetActorRotation();
+		const auto ForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw)) };
+		const auto RightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(ForwardDirection) };
+		const auto CharForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(CapsuleRotation.Yaw)) };
+		const auto CharRightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(CharForwardDirection) };
 
-	if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
-	{
-		AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
-		MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
-		GetLocomotionState().PreviousVelocity;
-		// AddMovementInput(GetLocomotionState().PreviousVelocity);
-		// MovementInput = GetLocomotionState().PreviousVelocity;
-	}
-	else
-	{
-		AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
-		MovementInput = ForwardDirection * Value.Y + RightDirection * Value.X;
+		if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
+		{
+			AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
+			MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
+			GetLocomotionState().PreviousVelocity;
+			// AddMovementInput(GetLocomotionState().PreviousVelocity);
+			// MovementInput = GetLocomotionState().PreviousVelocity;
+		}
+		else
+		{
+			AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
+			MovementInput = ForwardDirection * Value.Y + RightDirection * Value.X;
+		}
 	}
 }
 
@@ -268,10 +271,7 @@ void AALSXTCharacter::InputCrouch()
 		SetDesiredStance(AlsStanceTags::Standing);
 		if (GetDesiredStatus() != ALSXTStatusTags::Normal)
 		{
-			AlsCharacterMovement.Get()->SetMovementMode(EMovementMode::MOVE_Walking, 0);
-			GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
 			SetDesiredStatus(ALSXTStatusTags::Normal);
-			IALSXTCharacterInterface::Execute_TryGetUp(this);
 		}
 	}
 }
@@ -288,11 +288,7 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 			}
 			if (GetDesiredStatus() != ALSXTStatusTags::Normal)
 			{
-				AlsCharacterMovement.Get()->SetMovementMode(EMovementMode::MOVE_Walking, 0);
-				GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
 				SetDesiredStatus(ALSXTStatusTags::Normal);
-				IALSXTCharacterInterface::Execute_TryGetUp(this);
-				SetDesiredStance(AlsStanceTags::Standing);
 				return;
 			}
 			if (TryStartVaultingGrounded())
@@ -1248,7 +1244,8 @@ void AALSXTCharacter::SetDesiredStatus(const FGameplayTag& NewStatusTag)
 			else if (GetLocalRole() == ROLE_SimulatedProxy && GetRemoteRole() == ROLE_Authority)
 			{
 				// MulticastSetDesiredStatus(NewStatusTag);
-				ServerSetDesiredStatus(NewStatusTag);
+				// ServerSetDesiredStatus(NewStatusTag);
+				SetStatus(NewStatusTag);
 			}
 	}
 }
@@ -1273,20 +1270,19 @@ void AALSXTCharacter::SetStatus(const FGameplayTag& NewStatusTag)
 
 		Status = NewStatusTag;
 
-		SetDesiredStance(NewStatusTag != ALSXTStatusTags::Normal ? AlsStanceTags::Crouching : AlsStanceTags::Standing);
-
 		if (NewStatusTag != ALSXTStatusTags::Normal)
 		{
 			SetDesiredCombatStance(ALSXTCombatStanceTags::Neutral);
+			SetDesiredStance(AlsStanceTags::Crouching);
 			Crouch();
-			AlsCharacterMovement.Get()->SetMovementMode(EMovementMode::MOVE_None, 0);
 			GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 		}
 		else
 		{
-			AlsCharacterMovement.Get()->SetMovementMode(EMovementMode::MOVE_Walking, 0);
 			GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+			SetDesiredStance(AlsStanceTags::Standing);
 			UnCrouch();
+			IALSXTCharacterInterface::Execute_TryGetUp(this);
 		}
 
 		OnStatusChanged(PreviousStatus);
@@ -1413,7 +1409,7 @@ void AALSXTCharacter::AttackCollisionTrace()
 					FGameplayTag ImpactStrength;
 					FGameplayTag ImpactSide;
 					FGameplayTag ImpactForm;
-					AActor* HitActor{ nullptr };
+					AActor* HitActor = HitResult.GetActor();
 					FString HitActorname;
 					FVector HitActorVelocity { FVector::ZeroVector };
 					float HitActorMass { 0.0f };
@@ -1479,6 +1475,7 @@ void AALSXTCharacter::AttackCollisionTrace()
 							GetUnarmedAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
 						}
 						FString OriginHitActorname = OriginHitResult.GetActor()->GetName();
+						CurrentHitResult.DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
 
 						GetFormFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactForm);
 						GetSideFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactSide);

@@ -222,7 +222,9 @@ void UALSXTImpactReactionComponent::ClutchImpactPointTimer()
 	{
 		if (ShouldPerformAttackResponse())
 		{
-			AttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
+			// AttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
+			// AttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
+			StartAttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
 		}
 	}
 	else
@@ -482,10 +484,11 @@ void UALSXTImpactReactionComponent::AttackFallenTimer()
 		SetImpactReactionState(Params);
 		GetWorld()->GetTimerManager().ClearTimer(AttackFallenTimerHandle);
 
-		if (ImpactReactionSettings.bEnableAutoGetUp)
+		if (ImpactReactionSettings.bEnableAutoGetUp && CanGetUp() && ShouldGetUp())
 		{
-			AttackGetUp(Params.ImpactReactionParameters.AttackHit);
-			ServerGetUp();
+			Character->SetDesiredStatus(ALSXTStatusTags::Normal);
+			// AttackGetUp(Params.ImpactReactionParameters.AttackHit);
+			// ServerGetUp();
 		}
 	}
 }
@@ -493,7 +496,7 @@ void UALSXTImpactReactionComponent::AttackFallenTimer()
 void UALSXTImpactReactionComponent::OnCrowdNavigationReactionBlendOut(UAnimMontage* Montage, bool bInterrupted){}
 void UALSXTImpactReactionComponent::OnBumpReactionBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (ShouldBumpFall())
+	if (ShouldCrowdNavigationFall())
 	{
 
 	}
@@ -526,6 +529,13 @@ void UALSXTImpactReactionComponent::OnAttackReactionBlendOut(UAnimMontage* Monta
 			{
 				ClutchImpactPoint(GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult);
 			}
+			else
+			{
+				if (IsValid(GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult.OriginHitResult.HitResult.GetActor()) && ShouldPerformAttackResponse())
+				{
+					StartAttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
+				}
+			}			
 		}
 	}
 }
@@ -558,10 +568,11 @@ void UALSXTImpactReactionComponent::OnClutchImpactPointBlendOut(UAnimMontage* Mo
 		}
 	}
 }
-void UALSXTImpactReactionComponent::OnBumpFallBlendOut(UAnimMontage* Montage, bool bInterrupted){}
+void UALSXTImpactReactionComponent::OnCrowdNavigationFallBlendOut(UAnimMontage* Montage, bool bInterrupted){}
 void UALSXTImpactReactionComponent::OnImpactFallBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
 	ImpactFallIdle(GetImpactReactionState().ImpactReactionParameters.ImpactHit);
+	StartAttackFallenTimer();
 }
 
 void UALSXTImpactReactionComponent::OnAttackFallBlendOut(UAnimMontage* Montage, bool bInterrupted)
@@ -571,9 +582,32 @@ void UALSXTImpactReactionComponent::OnAttackFallBlendOut(UAnimMontage* Montage, 
 
 void UALSXTImpactReactionComponent::OnSyncedAttackFallBlendOut(UAnimMontage* Montage, bool bInterrupted){}
 void UALSXTImpactReactionComponent::OnBraceForImpactBlendOut(UAnimMontage* Montage, bool bInterrupted){}
-void UALSXTImpactReactionComponent::OnBumpFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted){}
-void UALSXTImpactReactionComponent::OnImpactFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted){}
-void UALSXTImpactReactionComponent::OnAttackFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted){}
+
+void UALSXTImpactReactionComponent::OnCrowdNavigationFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (ShouldPerformCrowdNavigationResponse())
+	{
+		CrowdNavigationResponse();
+	}
+}
+
+void UALSXTImpactReactionComponent::OnImpactFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (ShouldPerformImpactResponse())
+	{
+		ImpactResponse(GetImpactReactionState().ImpactReactionParameters.ImpactHit);
+	}
+}
+
+void UALSXTImpactReactionComponent::OnAttackFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (ShouldPerformAttackResponse())
+	{
+		// AttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
+		StartAttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
+	}
+}
+
 void UALSXTImpactReactionComponent::OnSyncedAttackFallGetUpBlendOut(UAnimMontage* Montage, bool bInterrupted){}
 void UALSXTImpactReactionComponent::OnImpactResponseBlendOut(UAnimMontage* Montage, bool bInterrupted){}
 void UALSXTImpactReactionComponent::OnAttackResponseBlendOut(UAnimMontage* Montage, bool bInterrupted){}
@@ -620,11 +654,11 @@ void UALSXTImpactReactionComponent::OnClutchImpactPointEnded(UAnimMontage* Monta
 		OnClutchImpactPointBlendOutDelegate.Unbind();
 	}
 }
-void UALSXTImpactReactionComponent::OnBumpFallEnded(UAnimMontage* Montage, bool bInterrupted)
+void UALSXTImpactReactionComponent::OnCrowdNavigationFallEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (AnimInstance)
 	{
-		OnBumpFallBlendOutDelegate.Unbind();
+		OnCrowdNavigationFallBlendOutDelegate.Unbind();
 	}
 }
 void UALSXTImpactReactionComponent::OnImpactFallEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -655,11 +689,11 @@ void UALSXTImpactReactionComponent::OnBraceForImpactEnded(UAnimMontage* Montage,
 		OnBraceForImpactBlendOutDelegate.Unbind();
 	}
 }
-void UALSXTImpactReactionComponent::OnBumpFallGetupEnded(UAnimMontage* Montage, bool bInterrupted)
+void UALSXTImpactReactionComponent::OnCrowdNavigationFallGetupEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (AnimInstance)
 	{
-		OnBumpFallGetupBlendOutDelegate.Unbind();
+		OnCrowdNavigationFallGetupBlendOutDelegate.Unbind();
 	}
 }
 void UALSXTImpactReactionComponent::OnImpactFallGetupEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -1252,6 +1286,18 @@ void UALSXTImpactReactionComponent::SyncedAttackGetUp(int32 Index)
 	}
 }
 
+void UALSXTImpactReactionComponent::CrowdNavigationResponse()
+{
+	// if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+	// {
+	// 	ServerCrowdNavigation();
+	// }
+	// else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
+	// {
+	// 	StartCrowdNavigation();
+	// }
+}
+
 void UALSXTImpactReactionComponent::ImpactResponse(FDoubleHitResult Hit)
 {
 	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
@@ -1273,6 +1319,8 @@ void UALSXTImpactReactionComponent::AttackResponse(FAttackDoubleHitResult Hit)
 	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
 	{
 		StartAttackResponse(Hit);
+		// MulticastAttackResponse(Hit);
+		// ServerAttackResponse(Hit);
 	}
 }
 
@@ -1334,7 +1382,7 @@ bool UALSXTImpactReactionComponent::IsClutchImpactPointAllowedToStart(const UAni
 	return (Montage != nullptr);
 }
 
-bool UALSXTImpactReactionComponent::IsBumpFallAllowedToStart(const UAnimMontage* Montage) const
+bool UALSXTImpactReactionComponent::IsCrowdNavigationFallAllowedToStart(const UAnimMontage* Montage) const
 {
 	return (Montage != nullptr);
 }
@@ -1999,9 +2047,8 @@ void UALSXTImpactReactionComponent::StartAttackResponse(FAttackDoubleHitResult H
 	// 	return;
 	// }
 
-	FResponseAnimation Montage;
 	FResponseAnimation SelectedAttackResponse = SelectAttackResponseMontage(Hit);
-	Montage = SelectedAttackResponse;
+	FResponseAnimation Montage = SelectedAttackResponse;
 
 	if (!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsAttackResponseAllowedToStart(Montage.Montage.Montage))
 	{
@@ -2009,7 +2056,13 @@ void UALSXTImpactReactionComponent::StartAttackResponse(FAttackDoubleHitResult H
 		return;
 	}
 	
-	FVector OtherActorLocation = GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult.HitResult.HitResult.GetActor()->GetActorLocation();
+	if (!Hit.DoubleHitResult.OriginHitResult.HitResult.GetActor())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor Invalid"));
+		return;
+	}
+	
+	FVector OtherActorLocation = Hit.DoubleHitResult.OriginHitResult.HitResult.GetActor()->GetActorLocation();
 	FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(Character->GetActorLocation(), OtherActorLocation);
 	const float StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(PlayerRot.Yaw)) };
 	FRotator CurrentRotation = Character->GetActorRotation();
@@ -2034,14 +2087,20 @@ void UALSXTImpactReactionComponent::StartAttackResponse(FAttackDoubleHitResult H
 	{
 		Character->GetCharacterMovement()->FlushServerMoves();
 		MulticastStartAttackResponse(Hit, Montage.Montage);
+		// StartAttackResponseImplementation(Hit, Montage.Montage);
 		// OnImpactReactionStarted(Hit.DoubleHitResult);
 	}
 }
 
-void UALSXTImpactReactionComponent::BumpFall() {}
+void UALSXTImpactReactionComponent::CrowdNavigationFall() {}
 
 //Parameters
 UALSXTImpactReactionSettings* UALSXTImpactReactionComponent::SelectImpactReactionSettings_Implementation()
+{
+	return nullptr;
+}
+
+UALSXTElementalInteractionSettings* UALSXTImpactReactionComponent::GetElementalInteractionSettings_Implementation()
 {
 	return nullptr;
 }
@@ -3270,8 +3329,8 @@ void UALSXTImpactReactionComponent::MulticastSyncedAttackGetUp_Implementation(in
 
 void UALSXTImpactReactionComponent::ServerImpactResponse_Implementation(FDoubleHitResult Hit)
 {
-	// MulticastImpactResponse(Hit);
-	StartImpactResponse(Hit);
+	MulticastImpactResponse(Hit);
+	// StartImpactResponse(Hit);
 	Character->ForceNetUpdate();
 }
 
@@ -3813,9 +3872,9 @@ void UALSXTImpactReactionComponent::StartCrowdNavigationReactionImplementation(F
 		Character->GetMesh()->AddImpulseToAllBodiesBelow(CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.BoneName, false, true);
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 
-		if (ShouldBumpFall())
+		if (ShouldCrowdNavigationFall())
 		{
-			BumpFall();
+			CrowdNavigationFall();
 		}
 		else
 		{
@@ -4236,6 +4295,13 @@ void UALSXTImpactReactionComponent::StartAttackGetUpImplementation(FAttackDouble
 		// Character->SetFacialExpression();
 
 		Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage.Montage, 1.0f);
+
+		if (AnimInstance && ShouldPerformAttackResponse())
+		{
+			OnAttackFallGetupBlendOutDelegate.BindUObject(this, &UALSXTImpactReactionComponent::OnAttackFallGetupBlendOut);
+			AnimInstance->Montage_SetBlendingOutDelegate(OnAttackFallGetupBlendOutDelegate);
+		}
+
 		// ImpactReactionState.TargetYawAngle = TargetYawAngle;
 		// FALSXTImpactReactionState CurrentImpactReactionState = GetImpactReactionState();
 		// CurrentImpactReactionState.ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
@@ -4522,20 +4588,20 @@ void UALSXTImpactReactionComponent::RefreshSyncedAttackReactionPhysics(const flo
 	// ...
 }
 
-void UALSXTImpactReactionComponent::RefreshBumpFallReaction(const float DeltaTime)
+void UALSXTImpactReactionComponent::RefreshCrowdNavigationFallReaction(const float DeltaTime)
 {
 	if (Character->GetLocomotionAction() != AlsLocomotionActionTags::ImpactFall)
 	{
-		StopBumpFallReaction();
+		StopCrowdNavigationFallReaction();
 		Character->ForceNetUpdate();
 	}
 	else
 	{
-		RefreshBumpFallReactionPhysics(DeltaTime);
+		RefreshCrowdNavigationFallReactionPhysics(DeltaTime);
 	}
 }
 
-void UALSXTImpactReactionComponent::RefreshBumpFallReactionPhysics(const float DeltaTime)
+void UALSXTImpactReactionComponent::RefreshCrowdNavigationFallReactionPhysics(const float DeltaTime)
 {
 	// ...
 }
@@ -4671,7 +4737,7 @@ void UALSXTImpactReactionComponent::StopSyncedAttackReaction()
 	OnSyncedAttackReactionEnded();
 }
 
-void UALSXTImpactReactionComponent::StopBumpFallReaction()
+void UALSXTImpactReactionComponent::StopCrowdNavigationFallReaction()
 {
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
@@ -4679,7 +4745,7 @@ void UALSXTImpactReactionComponent::StopBumpFallReaction()
 	}
 
 	// Character->SetMovementModeLocked(false);
-	OnBumpFallEnded();
+	OnCrowdNavigationFallEnded();
 }
 
 void UALSXTImpactReactionComponent::StopImpactFallReaction()

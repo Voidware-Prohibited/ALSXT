@@ -155,15 +155,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
 	TArray <FFallenAnimation> AttackFallenAnimations;
 
-	UPROPERTY(EditAnywhere, Category = "Animations|Falling", BlueprintReadWrite, Meta = (TitleProperty = "{FallenMinimumTime}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Animations|Falling|Settings", BlueprintReadWrite, Meta = (TitleProperty = "{FallenMinimumTime}", AllowPrivateAccess))
 	float ImpactFallenMinimumTime { 0.0f };
 
-	UPROPERTY(EditAnywhere, Category = "Animations|Falling", BlueprintReadWrite, Meta = (TitleProperty = "{AttackFallenMinimumTime}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Animations|Falling|Settings", BlueprintReadWrite, Meta = (TitleProperty = "{AttackFallenMinimumTime}", AllowPrivateAccess))
 	float AttackFallenMinimumTime { 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
 	TArray<FAnticipationPose> BraceForImpactPoses;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
+	TArray<FResponseAnimation> CrowdNavigationResponseAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
+	TArray<FResponseAnimation> ImpactResponseAnimations;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
 	TArray<FResponseAnimation> AttackResponseAnimations;
 
@@ -208,6 +214,36 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableBumpReactions{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableFacialExpressions{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableCharacterSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableImpactSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableParticleActors{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableParticles{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableClutchImpactPoint{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableBraceForImpact{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableCrowdNavigationResponses{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableImpactResponses{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableAttackResponses{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableAutoGetUp{ false };

@@ -14,6 +14,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Components/AudioComponent.h" 
 #include "Settings/ALSXTImpactReactionSettings.h"
+#include "Settings/ALSXTElementalInteractionSettings.h"
 #include "State/ALSXTImpactReactionState.h" 
 #include "Components/TimelineComponent.h"
 #include "ALSXTImpactReactionComponent.generated.h"
@@ -141,8 +142,8 @@ private:
 	FOnMontageEnded OnSyncedAttackReactionEndedDelegate;
 	FOnMontageBlendingOutStarted OnClutchImpactPointBlendOutDelegate;
 	FOnMontageEnded OnClutchImpactPointEndedDelegate;
-	FOnMontageBlendingOutStarted OnBumpFallBlendOutDelegate;
-	FOnMontageEnded OnBumpFallEndedDelegate;
+	FOnMontageBlendingOutStarted OnCrowdNavigationFallBlendOutDelegate;
+	FOnMontageEnded OnCrowdNavigationFallEndedDelegate;
 	FOnMontageBlendingOutStarted OnImpactFallBlendOutDelegate;
 	FOnMontageEnded OnImpactFallEndedDelegate;
 	FOnMontageBlendingOutStarted OnAttackFallBlendOutDelegate;
@@ -151,8 +152,8 @@ private:
 	FOnMontageEnded OnSyncedAttackFallEndedDelegate;
 	FOnMontageBlendingOutStarted OnBraceForImpactBlendOutDelegate;
 	FOnMontageEnded OnBraceForImpactEndedDelegate;
-	FOnMontageBlendingOutStarted OnBumpFallGetupBlendOutDelegate;
-	FOnMontageEnded OnBumpFallGetupEndedDelegate;
+	FOnMontageBlendingOutStarted OnCrowdNavigationFallGetupBlendOutDelegate;
+	FOnMontageEnded OnCrowdNavigationFallGetupEndedDelegate;
 	FOnMontageBlendingOutStarted OnImpactFallGetupBlendOutDelegate;
 	FOnMontageEnded OnImpactFallGetupEndedDelegate;
 	FOnMontageBlendingOutStarted OnAttackFallGetupBlendOutDelegate;
@@ -170,12 +171,12 @@ private:
 	void OnAttackReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnSyncedAttackReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnClutchImpactPointBlendOut(UAnimMontage* Montage, bool bInterrupted);
-	void OnBumpFallBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnCrowdNavigationFallBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnImpactFallBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnAttackFallBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnSyncedAttackFallBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnBraceForImpactBlendOut(UAnimMontage* Montage, bool bInterrupted);
-	void OnBumpFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnCrowdNavigationFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnImpactFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnAttackFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnSyncedAttackFallGetUpBlendOut(UAnimMontage* Montage, bool bInterrupted);
@@ -188,12 +189,12 @@ private:
 	void OnAttackReactionEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnSyncedAttackReactionEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnClutchImpactPointEnded(UAnimMontage* Montage, bool bInterrupted);
-	void OnBumpFallEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnCrowdNavigationFallEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnImpactFallEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnAttackFallEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnSyncedAttackFallEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnBraceForImpactEnded(UAnimMontage* Montage, bool bInterrupted);
-	void OnBumpFallGetupEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnCrowdNavigationFallGetupEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnImpactFallGetupEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnAttackFallGetupEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnSyncedAttackFallGetUpEnded(UAnimMontage* Montage, bool bInterrupted);
@@ -214,7 +215,7 @@ private:
 	bool IsAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsSyncedAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsClutchImpactPointAllowedToStart(const UAnimSequenceBase* Montage) const;
-	bool IsBumpFallAllowedToStart(const UAnimMontage* Montage) const;
+	bool IsCrowdNavigationFallAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsImpactFallAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsAttackFallAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsSyncedAttackFallAllowedToStart(const UAnimMontage* Montage) const;
@@ -251,7 +252,7 @@ public:
 	bool ShouldClutchImpactPoint();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldBumpFall();
+	bool ShouldCrowdNavigationFall();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldImpactFall();
@@ -261,6 +262,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldSyncedAttackFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanGetUp();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldGetUp();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldPerformCrowdNavigationResponse();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldPerformImpactResponse();
@@ -376,6 +386,9 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UALSXTImpactReactionSettings* SelectImpactReactionSettings();
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	UALSXTElementalInteractionSettings* GetElementalInteractionSettings();
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Impact Reaction Timeline")
 	UCurveFloat* CurveFloat;
@@ -437,7 +450,7 @@ public:
 	void ClutchImpactPoint(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
-	void BumpFall();
+	void CrowdNavigationFall();
 	
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void ImpactFall(FDoubleHitResult Hit);
@@ -474,6 +487,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void SyncedAttackGetUp(int32 Index);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void CrowdNavigationResponse();
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void ImpactResponse(FDoubleHitResult Hit);
@@ -904,9 +920,9 @@ private:
 
 	void RefreshSyncedAttackReactionPhysics(float DeltaTime);
 
-	void RefreshBumpFallReaction(float DeltaTime);
+	void RefreshCrowdNavigationFallReaction(float DeltaTime);
 
-	void RefreshBumpFallReactionPhysics(float DeltaTime);
+	void RefreshCrowdNavigationFallReactionPhysics(float DeltaTime);
 
 	void RefreshImpactFallReaction(float DeltaTime);
 
@@ -943,7 +959,7 @@ public:
 	void StopSyncedAttackReaction();
 
 	UFUNCTION(BlueprintCallable, Category = "Hooks")
-	void StopBumpFallReaction();
+	void StopCrowdNavigationFallReaction();
 
 	UFUNCTION(BlueprintCallable, Category = "Hooks")
 	void StopImpactFallReaction();
@@ -1009,7 +1025,7 @@ protected:
 	void OnFallLand();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnBumpFallEnded();
+	void OnCrowdNavigationFallEnded();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnImpactFallEnded();
