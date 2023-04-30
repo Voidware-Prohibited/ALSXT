@@ -96,6 +96,14 @@ namespace ALSXTReactionAnimationTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(Synced, TEXT("Game.Reaction Animation Type.Synced"))
 }
 
+namespace ALSXTFallTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Bump, TEXT("Game.Fall Type.Bump"))
+	UE_DEFINE_GAMEPLAY_TAG(Impact, TEXT("Game.Fall Type.Impact"))
+	UE_DEFINE_GAMEPLAY_TAG(Attack, TEXT("Game.Fall Type.Attack"))
+	UE_DEFINE_GAMEPLAY_TAG(SyncedAttack, TEXT("Game.Fall Type.Synced Attack"))
+}
+
 namespace ALSXTPlayerServerStateTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Loading, TEXT("Game.Player Server State.Loading"))

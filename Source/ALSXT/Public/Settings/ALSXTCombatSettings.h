@@ -68,6 +68,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	int32 ConsecutiveHitsForSpecialAttack{5};
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target Lock", Meta = (AllowPrivateAccess))
+	bool bEnableMoveToTarget{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target Lock", Meta = (Units = "cm", AllowPrivateAccess))
+	float MoveToTargetMaxDistance { 900.0f };
+
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float AttackHeight) const;
 
@@ -145,6 +151,12 @@ struct ALSXT_API FALSXTGeneralCombatSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
 	bool bEnableTakedowns{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableMoveToTarget{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Target Lock", Meta = (Units = "cm", AllowPrivateAccess))
+	float GlobalMoveToTargetMaxDistance { 900.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FLinearColor HighlightColor { 1.0f, 0.0f, 1.0f, 1.0 };

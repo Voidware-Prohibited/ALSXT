@@ -132,7 +132,7 @@ struct ALSXT_API FExtendedHitResult
 	float Mass{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	float Velocity{ 0.0f };
+	FVector Velocity{FVector(ForceInit)};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FVector Direction{FVector(ForceInit)};

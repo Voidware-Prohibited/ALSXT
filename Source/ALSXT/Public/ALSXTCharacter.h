@@ -1065,7 +1065,10 @@ public:
 
 private:
 	UFUNCTION(Server, Reliable)
-		void ServerSetDesiredStatus(const FGameplayTag& NewStatusTag);
+	void ServerSetDesiredStatus(const FGameplayTag& NewStatusTag);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSetDesiredStatus(const FGameplayTag& NewStatusTag);
 
 	// Status
 

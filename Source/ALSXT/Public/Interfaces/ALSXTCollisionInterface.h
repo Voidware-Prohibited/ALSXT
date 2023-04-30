@@ -19,7 +19,7 @@ public:
 	void GetActorMass(float& Mass);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
-	void GetActorVelocity(float& Velocity);
+	void GetActorVelocity(FVector& Velocity);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface")
 	void GetActorThreatPoint(FVector& ThreatPoint);

@@ -264,6 +264,13 @@ void AALSXTCharacter::InputCrouch()
 	else if (GetDesiredStance() == AlsStanceTags::Crouching)
 	{
 		SetDesiredStance(AlsStanceTags::Standing);
+		if (GetDesiredStatus() != ALSXTStatusTags::Normal)
+		{
+			AlsCharacterMovement.Get()->SetMovementMode(EMovementMode::MOVE_Walking, 0);
+			GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+			SetDesiredStatus(ALSXTStatusTags::Normal);
+			IALSXTCharacterInterface::Execute_TryGetUp(this);
+		}
 	}
 }
 
@@ -275,6 +282,15 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 		{
 			if (TryStopRagdolling())
 			{
+				return;
+			}
+			if (GetDesiredStatus() != ALSXTStatusTags::Normal)
+			{
+				AlsCharacterMovement.Get()->SetMovementMode(EMovementMode::MOVE_Walking, 0);
+				GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+				SetDesiredStatus(ALSXTStatusTags::Normal);
+				IALSXTCharacterInterface::Execute_TryGetUp(this);
+				SetDesiredStance(AlsStanceTags::Standing);
 				return;
 			}
 			if (TryStartVaultingGrounded())
@@ -1229,6 +1245,7 @@ void AALSXTCharacter::SetDesiredStatus(const FGameplayTag& NewStatusTag)
 			}
 			else if (GetLocalRole() == ROLE_SimulatedProxy && GetRemoteRole() == ROLE_Authority)
 			{
+				// MulticastSetDesiredStatus(NewStatusTag);
 				ServerSetDesiredStatus(NewStatusTag);
 			}
 	}
@@ -1236,7 +1253,13 @@ void AALSXTCharacter::SetDesiredStatus(const FGameplayTag& NewStatusTag)
 
 void AALSXTCharacter::ServerSetDesiredStatus_Implementation(const FGameplayTag& NewStatusTag)
 {
-	SetDesiredStatus(NewStatusTag);
+	// SetDesiredStatus(NewStatusTag);
+	MulticastSetDesiredStatus(NewStatusTag);
+}
+
+void AALSXTCharacter::MulticastSetDesiredStatus_Implementation(const FGameplayTag& NewStatusTag)
+{
+	SetStatus(NewStatusTag);
 }
 
 void AALSXTCharacter::SetStatus(const FGameplayTag& NewStatusTag)
@@ -1249,6 +1272,20 @@ void AALSXTCharacter::SetStatus(const FGameplayTag& NewStatusTag)
 		Status = NewStatusTag;
 
 		SetDesiredStance(NewStatusTag != ALSXTStatusTags::Normal ? AlsStanceTags::Crouching : AlsStanceTags::Standing);
+
+		if (NewStatusTag != ALSXTStatusTags::Normal)
+		{
+			SetDesiredCombatStance(ALSXTCombatStanceTags::Neutral);
+			Crouch();
+			AlsCharacterMovement.Get()->SetMovementMode(EMovementMode::MOVE_None, 0);
+			GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		}
+		else
+		{
+			AlsCharacterMovement.Get()->SetMovementMode(EMovementMode::MOVE_Walking, 0);
+			GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+			UnCrouch();
+		}
 
 		OnStatusChanged(PreviousStatus);
 	}
@@ -1321,14 +1358,14 @@ void AALSXTCharacter::GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side)
 void AALSXTCharacter::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength)
 {
 	float HitMass = Hit.HitResult.Mass;
-	float HitVelocity = Hit.HitResult.Velocity;
-	float HitMomentum = HitMass * HitVelocity;
+	FVector HitVelocity = Hit.HitResult.Velocity;
+	FVector HitMomentum = HitMass * HitVelocity;
 
 	float SelfMass = Hit.OriginHitResult.Mass;
-	float SelfVelocity = Hit.OriginHitResult.Velocity;
-	float SelfMomentum = SelfMass * SelfVelocity;
+	FVector SelfVelocity = Hit.OriginHitResult.Velocity;
+	FVector SelfMomentum = SelfMass * SelfVelocity;
 
-	float MomemtumSum = HitMomentum + SelfMomentum;
+	FVector MomemtumSum = HitMomentum + SelfMomentum;
 
 	Strength = ALSXTActionStrengthTags::Light;
 }
@@ -1376,11 +1413,11 @@ void AALSXTCharacter::AttackCollisionTrace()
 					FGameplayTag ImpactForm;
 					AActor* HitActor{ nullptr };
 					FString HitActorname;
-					float HitActorVelocity { 0.0f };
+					FVector HitActorVelocity { FVector::ZeroVector };
 					float HitActorMass { 0.0f };
 					float HitActorAttackVelocity { 0.0f };
 					float HitActorAttackMass { 0.0f };
-					float TotalImpactEnergy { 0.0f };
+					FVector TotalImpactEnergy { FVector::ZeroVector };
 
 					// Populate Hit
 					// 
@@ -1398,7 +1435,8 @@ void AALSXTCharacter::AttackCollisionTrace()
 						IALSXTCharacterInterface::Execute_GetCombatAttackPhysics(HitActor, HitActorAttackMass, HitActorAttackVelocity);
 					}
 
-					TotalImpactEnergy = 50 + (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
+					// TotalImpactEnergy = 50.0f + (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
+					TotalImpactEnergy = (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
 					// FMath::Square(TossSpeed)
 
 					FVector HitDirection = HitResult.ImpactPoint - GetActorLocation();

@@ -11,7 +11,7 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FDoubleHitResult Hit;
+	FGameplayTag ImpactType{FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FDoubleHitResult CrowdNavigationHit;
@@ -24,9 +24,6 @@ struct ALSXT_API FALSXTImpactReactionParameters
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FAttackDoubleHitResult AttackHit;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FGameplayTag ImpactType{FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FGameplayTag ImpactVelocity{FGameplayTag::EmptyTag};
@@ -54,6 +51,12 @@ struct ALSXT_API FALSXTImpactReactionParameters
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FAttackReactionAnimation AttackReactionAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag FallType{FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FVector FallLandLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FFallenAnimation ImpactFallenAnimations;

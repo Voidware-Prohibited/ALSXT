@@ -33,6 +33,12 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UPARAM(meta = (Categories = "Als.Impact Form")) FGameplayTag GetCurrentBumpForm();
 
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	bool GetImpactFallLocation(FVector& Location, FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	bool GetAttackFallLocation(FVector& Location, FAttackDoubleHitResult Hit);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	float GetDynamicImpactFallenMinimumTime();
 
@@ -47,6 +53,21 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void ClutchImpactPointTimer();
+
+	void StartImpactFallingTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void ImpactFallingTimer();
+
+	void StartAttackFallingTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void AttackFallingTimer();
+
+	void StartBraceForImpactTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void BraceForImpactTimer();
 
 	void StartImpactFallenTimer();
 
@@ -259,6 +280,12 @@ private:
 	float TimeSinceLastResponse;
 	FTimerHandle ClutchImpactPointTimerHandle;
 	FTimerDelegate ClutchImpactPointTimerDelegate;
+	FTimerHandle ImpactFallingTimerHandle;
+	FTimerDelegate ImpactFallingTimerDelegate;
+	FTimerHandle AttackFallingTimerHandle;
+	FTimerDelegate AttackFallingTimerDelegate;
+	FTimerHandle BraceForImpactTimerHandle;
+	FTimerDelegate BraceForImpactTimerDelegate;
 	FTimerHandle ImpactFallenTimerHandle;
 	FTimerDelegate ImpactFallenTimerDelegate;
 	FTimerHandle AttackFallenTimerHandle;
@@ -324,6 +351,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FActionMontageInfo SelectAttackFallMontage(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	UAnimSequenceBase* SelectBraceForImpactPose(const FGameplayTag& Side);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectImpactFallenPose(FDoubleHitResult Hit);
@@ -413,10 +443,16 @@ public:
 	void ImpactFall(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void ImpactFallLand(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void ImpactFallIdle(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void AttackFall(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void AttackFallLand(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void AttackFallIdle(FAttackDoubleHitResult Hit);
@@ -559,6 +595,12 @@ private:
 	void MulticastImpactFall(FDoubleHitResult Hit);
 
 	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerImpactFallLand(FDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastImpactFallLand(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerImpactFallIdle(FDoubleHitResult Hit);
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -569,6 +611,12 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAttackFall(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerAttackFallLand(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttackFallLand(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerAttackFallIdle(FAttackDoubleHitResult Hit);
@@ -583,6 +631,12 @@ private:
 	void MulticastSyncedAttackFall(int32 Index);
 
 	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSyncedAttackFallLand(int32 Index);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSyncedAttackFallLand(int32 Index);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSyncedAttackFallIdle(int32 Index);
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -593,24 +647,6 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastBraceForImpact();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerImpactFallLand(FDoubleHitResult Hit);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastImpactFallLand(FDoubleHitResult Hit);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerAttackFallLand(FAttackDoubleHitResult Hit);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastAttackFallLand(FAttackDoubleHitResult Hit);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSyncedAttackFallLand(int32 Index);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSyncedAttackFallLand(int32 Index);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerImpactGetUp(FDoubleHitResult Hit);

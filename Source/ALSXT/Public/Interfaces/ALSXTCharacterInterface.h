@@ -33,4 +33,10 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void AttackReaction(FAttackDoubleHitResult Hit);
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
+  void GetImpactFallLocation(FVector& Location, FDoubleHitResult Hit);
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
+  void TryGetUp();
 };
