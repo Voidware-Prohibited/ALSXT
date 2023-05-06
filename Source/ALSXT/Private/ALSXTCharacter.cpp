@@ -1443,11 +1443,11 @@ void AALSXTCharacter::AttackCollisionTrace()
 					CurrentHitResult.DoubleHitResult.HitResult.Impulse = HitResult.Normal * TotalImpactEnergy;
 					CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
 					GetLocationFromBoneName(CurrentHitResult.DoubleHitResult.HitResult.HitResult.BoneName, ImpactLoc);
-					CurrentHitResult.DoubleHitResult.ImpactLocation = ImpactLoc;
+					CurrentHitResult.DoubleHitResult.HitResult.ImpactLocation = ImpactLoc;
 					CurrentHitResult.Type = AttackTraceSettings.AttackType;				
-					CurrentHitResult.DoubleHitResult.ImpactSide = ImpactSide;
+					CurrentHitResult.DoubleHitResult.HitResult.ImpactSide = ImpactSide;
 					CurrentHitResult.Strength = AttackTraceSettings.AttackStrength;
-					CurrentHitResult.DoubleHitResult.Strength = AttackTraceSettings.AttackStrength;					
+					CurrentHitResult.DoubleHitResult.HitResult.ImpactStrength = AttackTraceSettings.AttackStrength;					
 					HitActor = CurrentHitResult.DoubleHitResult.HitResult.HitResult.GetActor();
 					HitActorname = HitActor->GetName();
 
@@ -1459,7 +1459,7 @@ void AALSXTCharacter::AttackCollisionTrace()
 					// Perform Origin Trace
 					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
 
-					// Perform Origin Hit Trace to get PhysMat eyc for ImpactLocation
+					// Perform Origin Hit Trace to get PhysMat etc for ImpactLocation
 					if (isOriginHit)
 					{
 						// Populate Origin Hit
@@ -1468,11 +1468,11 @@ void AALSXTCharacter::AttackCollisionTrace()
 						// Populate Values based if Holding Item
 						if (IsHoldingItem())
 						{
-							GetHeldItemAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
+							GetHeldItemAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.HitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
 						}
 						else
 						{
-							GetUnarmedAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
+							GetUnarmedAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.HitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
 						}
 						FString OriginHitActorname = OriginHitResult.GetActor()->GetName();
 						CurrentHitResult.DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
@@ -1480,7 +1480,7 @@ void AALSXTCharacter::AttackCollisionTrace()
 						GetFormFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactForm);
 						GetSideFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactSide);
 						GetStrengthFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.Strength);
-						CurrentHitResult.DoubleHitResult.Strength = CurrentHitResult.Strength;
+						CurrentHitResult.DoubleHitResult.HitResult.ImpactStrength = CurrentHitResult.Strength;
 					}
 					// Call OnActorAttackCollision on CollisionInterface
 					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))

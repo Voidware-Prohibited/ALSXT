@@ -126,7 +126,7 @@ struct ALSXT_API FExtendedHitResult
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	bool Hit {false};
+	bool bHit {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float Mass{ 0.0f };
@@ -139,6 +139,21 @@ struct ALSXT_API FExtendedHitResult
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FVector Impulse{FVector(ForceInit)};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactForm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactLocation; // Calculated from Get Location from Bone Name
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactSide; // Calculated from Get Side from Hit
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactStrength; // Calculated by Mass and Volume
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactGait; // Used for Bump and Crowd Navigation Reactions
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag DamageType;
@@ -1010,5 +1025,22 @@ struct ALSXT_API FALSXTElementalInteractionSet
 	bool operator==(const FALSXTElementalInteractionSet& other) const
 	{
 		return (other.ElementalInteractions == ElementalInteractions);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FIdleAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Health", TitleProperty = "{Health}", AllowPrivateAccess))
+	FGameplayTagContainer Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimMontage> Montage { nullptr };
+
+	bool operator==(const FIdleAnimation& other) const
+	{
+		return (other.Health == Health) && (other.Montage == Montage);
 	}
 };

@@ -134,6 +134,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Defensive Modes", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
 	TArray<FAnticipationPose> AttackAnticipationPoses;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Defensive Modes", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
+	TArray<FAnticipationPose> StablizationPoses;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Crowd Navigation", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
 	TArray<FBumpReactionAnimation> CrowdNavigationReactionAnimations;
 
@@ -155,14 +158,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
 	TArray <FFallenAnimation> AttackFallenAnimations;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
+	TArray<FAnticipationPose> BraceForImpactPoses;
+
 	UPROPERTY(EditAnywhere, Category = "Animations|Falling|Settings", BlueprintReadWrite, Meta = (TitleProperty = "{FallenMinimumTime}", AllowPrivateAccess))
 	float ImpactFallenMinimumTime { 0.0f };
 
 	UPROPERTY(EditAnywhere, Category = "Animations|Falling|Settings", BlueprintReadWrite, Meta = (TitleProperty = "{AttackFallenMinimumTime}", AllowPrivateAccess))
 	float AttackFallenMinimumTime { 0.0f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
-	TArray<FAnticipationPose> BraceForImpactPoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
 	TArray<FResponseAnimation> CrowdNavigationResponseAnimations;

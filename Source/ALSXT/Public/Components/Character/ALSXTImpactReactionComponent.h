@@ -65,6 +65,11 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void AttackFallingTimer();
 
+	void StartStabilizeTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void StabilizeTimer();
+
 	void StartBraceForImpactTimer();
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
@@ -140,6 +145,10 @@ private:
 	FOnMontageEnded OnAttackReactionEndedDelegate;
 	FOnMontageBlendingOutStarted OnSyncedAttackReactionBlendOutDelegate;
 	FOnMontageEnded OnSyncedAttackReactionEndedDelegate;
+
+	FOnMontageBlendingOutStarted OnStabilizeBlendOutDelegate;
+	FOnMontageEnded OnStabilizeEndedDelegate;
+
 	FOnMontageBlendingOutStarted OnClutchImpactPointBlendOutDelegate;
 	FOnMontageEnded OnClutchImpactPointEndedDelegate;
 	FOnMontageBlendingOutStarted OnCrowdNavigationFallBlendOutDelegate;
@@ -249,6 +258,9 @@ public:
 	bool ShouldPerformDefensiveReaction();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldStabilize();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldClutchImpactPoint();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
@@ -288,6 +300,10 @@ private:
 	float TimeSinceLastRecovery;
 	FTimerHandle TimeSinceLastResponseTimerHandle;
 	float TimeSinceLastResponse;
+
+	FTimerHandle StabilizeTimerHandle;
+	FTimerDelegate StabilizeTimerDelegate;
+
 	FTimerHandle ClutchImpactPointTimerHandle;
 	FTimerDelegate ClutchImpactPointTimerDelegate;
 	FTimerHandle ImpactFallingTimerHandle;
@@ -310,6 +326,21 @@ protected:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	FGameplayTag LocationToImpactSide(FVector Location);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FGameplayTag LocationToActorImpactSide(AActor* Actor, FVector Location);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, meta = (DisplayName = "Convert Physical Surface to GameplayTag", Keywords = "physical, surface, material, gameplay, tag"), Category = "Physical Surface")
+	FGameplayTag ConvertPhysicalSurfaceToFormTag(EPhysicalSurface PhysicalSurface);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FGameplayTag ConvertVelocityToTag(UPARAM(meta = (Categories = "Als.Impact Velocity")) FVector Velocity);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FGameplayTag ConvertVelocityToStrength(UPARAM(meta = (Categories = "Als.Action Strength")) FVector Velocity);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	FGameplayTag ConvertVelocityTagToStrength(UPARAM(meta = (Categories = "Als.Action Strength")) FGameplayTag Velocity);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FBumpReactionAnimation SelectBumpReactionMontage(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
@@ -343,6 +374,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FSyncedAttackAnimation GetSyncedMontage(int Index);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	FAnticipationPose SelectStablizationPose(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FClutchImpactLocationAnimation SelectClutchImpactPointMontage(FDoubleHitResult Hit);
@@ -447,6 +481,9 @@ public:
 	void SyncedAttackReaction(int Index);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void Stabilize(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void ClutchImpactPoint(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
@@ -515,6 +552,8 @@ private:
 	void StartAttackReaction(FAttackDoubleHitResult Hit);
 
 	void StartSyncedAttackReaction(int32 Index);
+
+	void StartStabilize(FDoubleHitResult Hit);
 
 	void StartClutchImpactPoint(FDoubleHitResult Hit);
 
@@ -597,6 +636,12 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSyncedAttackReaction(int32 Index);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStabilize(FDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStabilize(FDoubleHitResult Hit);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerClutchImpactPoint(FDoubleHitResult Hit);
@@ -739,6 +784,12 @@ private:
 	void MulticastStartSyncedAttackReaction(FActionMontageInfo Montage);
 
 	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartStabilize(UAnimSequenceBase* Pose, FVector ImpactPoint);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartStabilize(UAnimSequenceBase* Pose, FVector ImpactPoint);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartClutchImpactPoint(UAnimSequenceBase* Pose, FVector ImpactPoint);
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -857,6 +908,8 @@ private:
 	void StartAttackReactionImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	void StartSyncedAttackReactionImplementation(FActionMontageInfo Montage);
+
+	void StartStabilizeImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint);
 
 	void StartClutchImpactPointImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint);
 
