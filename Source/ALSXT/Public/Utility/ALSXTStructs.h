@@ -486,6 +486,23 @@ struct ALSXT_API FSyncedAttackAnimation
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FMoveToTargetAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Stance", TitleProperty = "{AttackStances}", AllowPrivateAccess))
+	FGameplayTagContainer Stances;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FMoveToTargetAnimation& other) const
+	{
+		return (other.Stances == Stances) && (other.Montage == Montage);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FBumpReactionAnimation
 {
 	GENERATED_BODY()
