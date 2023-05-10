@@ -3,6 +3,7 @@
 
 #include "ALSXTAnimationInstance.h"
 #include "ALSXTCharacter.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 
 void UALSXTAnimationInstance::NativeInitializeAnimation()
 {
@@ -37,6 +38,8 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	CombatStance = ALSXTCharacter->GetDesiredCombatStance();
 	WeaponFirearmStance = ALSXTCharacter->GetDesiredWeaponFirearmStance();
 	WeaponReadyPosition = ALSXTCharacter->GetDesiredWeaponReadyPosition();
+	CrowdNavigationPoseState = IALSXTCharacterInterface::Execute_GetCrowdNavigationPoseState(ALSXTCharacter);
+	BumpPoseState = IALSXTCharacterInterface::Execute_GetBumpPoseState(ALSXTCharacter);
 	DefensiveMode = ALSXTCharacter->GetDesiredDefensiveMode();
 	DefensiveModeState = ALSXTCharacter->GetDefensiveModeState();
 	StationaryMode = ALSXTCharacter->GetStationaryMode();

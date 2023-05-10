@@ -211,7 +211,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_DefensiveModeState", Meta = (AllowPrivateAccess))
 	FALSXTDefensiveModeState DefensiveModeState;
 
-public:
+public:	
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FALSXTDefensiveModeState& GetDefensiveModeState() const;
 

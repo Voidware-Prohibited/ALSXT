@@ -6,6 +6,7 @@
 #include "AlsAnimationInstance.h"
 #include "State/AlsFeetState.h"
 #include "State/ALSXTDefensiveModeState.h"
+#include "State/ALSXTBumpPoseState.h"
 #include "ALSXTCharacter.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "ALSXTAnimationInstance.generated.h"
@@ -40,6 +41,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag WeaponReadyPosition{ALSXTWeaponReadyPositionTags::None};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTBumpPoseState CrowdNavigationPoseState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTBumpPoseState BumpPoseState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTDefensiveModeState DefensiveModeState;

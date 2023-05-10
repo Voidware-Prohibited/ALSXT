@@ -549,6 +549,29 @@ struct ALSXT_API FCrowdBumpReactionAnimation
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FBumpPose
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait", AllowPrivateAccess))
+	FGameplayTagContainer Gait;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTagContainer Side;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	TObjectPtr<UAnimSequenceBase> Pose;
+
+	bool operator==(const FBumpPose& other) const
+	{
+		return (other.Gait == Gait) && (other.Side == Side) && (other.Form == Form) && (other.Pose == Pose);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FImpactReactionAnimation
 {
 	GENERATED_BODY()

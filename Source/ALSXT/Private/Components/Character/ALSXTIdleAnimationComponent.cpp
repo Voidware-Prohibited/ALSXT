@@ -19,8 +19,11 @@ void UALSXTIdleAnimationComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	Character = Cast<AALSXTCharacter>(GetOwner());
+	if (Character)
+	{
+		Camera = Character->Camera;
+	}
 }
 
 
@@ -32,3 +35,56 @@ void UALSXTIdleAnimationComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	// ...
 }
 
+UALSXTIdleAnimationSettings* UALSXTIdleAnimationComponent::SelectIdleSettings_Implementation()
+{
+	return nullptr;
+}
+
+void UALSXTIdleAnimationComponent::StartIdleCounterTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(IdleCounterTimerHandle, IdleCounterTimerDelegate, 0.01f, true);
+}
+
+void UALSXTIdleAnimationComponent::IdleCounterTimer()
+{
+	IdleCounterCurrent = IdleCounterCurrent + 0.01;
+	if (IdleCounterCurrent >= IdleCounterTarget)
+	{
+		StartIdle();
+		ResetIdleCounterTimer();
+	}
+	// ...
+}
+
+void UALSXTIdleAnimationComponent::ResetIdleCounterTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(IdleCounterTimerHandle);
+	IdleCounterCurrent = 0.0f;
+	IdleCounterTarget = 0.0f;
+}
+
+void UALSXTIdleAnimationComponent::StartCameraRotationTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(CameraRotationTimerHandle, CameraRotationTimerDelegate, 0.01f, true);
+}
+
+void UALSXTIdleAnimationComponent::CameraRotationTimer()
+{
+	// ...
+}
+
+void UALSXTIdleAnimationComponent::ResetCameraRotationTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(CameraRotationTimerHandle);
+	CameraOffset = FVector::ZeroVector;
+}
+
+void UALSXTIdleAnimationComponent::StartIdle()
+{
+	// ..
+}
+
+void UALSXTIdleAnimationComponent::StopIdle()
+{
+	// ..
+}

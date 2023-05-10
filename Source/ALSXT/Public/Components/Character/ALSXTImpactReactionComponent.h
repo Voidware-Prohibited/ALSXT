@@ -15,6 +15,7 @@
 #include "Components/AudioComponent.h" 
 #include "Settings/ALSXTImpactReactionSettings.h"
 #include "Settings/ALSXTElementalInteractionSettings.h"
+#include "State/ALSXTBumpPoseState.h"
 #include "State/ALSXTImpactReactionState.h" 
 #include "Components/TimelineComponent.h"
 #include "ALSXTImpactReactionComponent.generated.h"
@@ -27,6 +28,8 @@ class ALSXT_API UALSXTImpactReactionComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UALSXTImpactReactionComponent();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -49,6 +52,12 @@ protected:
 	float GetImpactFallenMinimumTime();
 
 	float GetAttackFallenMinimumTime();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void CrowdNavigationVelocityTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void BumpVelocityTimer();
 
 	void StartClutchImpactPointTimer();
 
@@ -117,11 +126,64 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void ServerProcessNewImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
 
+	//
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTBumpPoseState& GetCrowdNavigationPoseState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewCrowdNavigationPoseState"))
+	void SetCrowdNavigationPoseState(const FALSXTBumpPoseState& NewCrowdNavigationPoseState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewCrowdNavigationPoseState"))
+	FALSXTBumpPoseState ProcessNewCrowdNavigationPoseState(const FALSXTBumpPoseState& NewCrowdNavigationPoseState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewCrowdNavigationPoseState(const FALSXTBumpPoseState& NewCrowdNavigationPoseState);
+
+	//
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTBumpPoseState& GetBumpPoseState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewBumpPoseState"))
+	void SetBumpPoseState(const FALSXTBumpPoseState& NewBumpPoseState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewBumpPoseState"))
+	FALSXTBumpPoseState ProcessNewBumpPoseState(const FALSXTBumpPoseState& NewBumpPoseState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewBumpPoseState(const FALSXTBumpPoseState& NewBumpPoseState);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnCrowdNavigationPoseStateChanged(const FALSXTBumpPoseState& PreviousCrowdNavigationPoseState);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnBumpPoseStateChanged(const FALSXTBumpPoseState& PreviousBumpPoseState);
+
 private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_CrowdNavigationPoseState", Meta = (AllowPrivateAccess))
+	FALSXTBumpPoseState CrowdNavigationPoseState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_BumpPoseState", Meta = (AllowPrivateAccess))
+	FALSXTBumpPoseState BumpPoseState;
+
 	void AnticipationTrace();
+
+	UFUNCTION()
+	void OnReplicate_CrowdNavigationPoseState(const FALSXTBumpPoseState& PreviousCrowdNavigationPoseState);
+
+	UFUNCTION()
+	void OnReplicate_BumpPoseState(const FALSXTBumpPoseState& PreviousBumpPoseStateState);
 
 	UFUNCTION(Server, Unreliable)
 	void ServerSetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerSetCrowdNavigationPoseState(const FALSXTBumpPoseState& NewCrowdNavigationPoseState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerSetBumpPoseState(const FALSXTBumpPoseState& NewBumpPoseState);
 
 	UFUNCTION()
 	void OnReplicate_ImpactReactionState(const FALSXTImpactReactionState& PreviousImpactReactionState);
@@ -129,7 +191,7 @@ private:
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	bool ShouldRecieveVelocityDamage();
 
-	UFUNCTION(BlueprintCallable, Category = "Vitals")
+	UFUNCTION(BlueprintCallable, Category = "Vitals") 
 	float GetBaseVelocityDamage();
 
 	// BlendOut Delegates
@@ -304,9 +366,13 @@ private:
 	FTimerHandle TimeSinceLastResponseTimerHandle;
 	float TimeSinceLastResponse;
 
+	FTimerHandle CrowdNavigationVelocityTimerHandle;
+	FTimerDelegate CrowdNavigationVelocityTimerDelegate;
+	FTimerHandle BumpVelocityTimerHandle;
+	FTimerDelegate BumpVelocityTimerDelegate;
+
 	FTimerHandle StabilizeTimerHandle;
 	FTimerDelegate StabilizeTimerDelegate;
-
 	FTimerHandle ClutchImpactPointTimerHandle;
 	FTimerDelegate ClutchImpactPointTimerDelegate;
 	FTimerHandle ImpactFallingTimerHandle;
@@ -349,7 +415,13 @@ protected:
 	FBumpReactionAnimation SelectBumpReactionMontage(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	UAnimSequenceBase* SelectBumpPose(const FGameplayTag& Side, const FGameplayTag& Form);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FBumpReactionAnimation SelectCrowdNavigationReactionMontage(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	UAnimSequenceBase* SelectCrowdNavigationPose(const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveMode(const FGameplayTag& Form);
@@ -1105,7 +1177,7 @@ protected:
 	void OnResponseEnded();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnABumpReactionFinished(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
+	void OnBumpReactionFinished(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnAttackReactionFinished(FAttackDoubleHitResult Hit, const FGameplayTag& AttackMode);
@@ -1114,6 +1186,16 @@ protected:
 	void OnImpactReactionFinished(FDoubleHitResult Hit);
 
 };
+
+inline const FALSXTBumpPoseState& UALSXTImpactReactionComponent::GetCrowdNavigationPoseState() const
+{
+	return CrowdNavigationPoseState;
+}
+
+inline const FALSXTBumpPoseState& UALSXTImpactReactionComponent::GetBumpPoseState() const
+{
+	return BumpPoseState;
+}
 
 inline const FALSXTImpactReactionState& UALSXTImpactReactionComponent::GetImpactReactionState() const
 {

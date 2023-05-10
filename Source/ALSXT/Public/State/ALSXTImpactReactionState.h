@@ -10,4 +10,3 @@ struct ALSXT_API FALSXTImpactReactionState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")
 	FALSXTImpactReactionParameters ImpactReactionParameters;
 };
-
