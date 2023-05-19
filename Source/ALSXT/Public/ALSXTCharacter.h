@@ -262,6 +262,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag Focus{ALSXTFocusedTags::False};
 
+	FTimerHandle FreelookTimerHandle;	// Timer Handle for Attack Trace
+	FTimerDelegate FreelookTimerDelegate; // Delegate to bind function with parameters
+
 	// Attack Trace Settings
 
 	FTimerHandle AttackTraceTimerHandle;	// Timer Handle for Attack Trace
@@ -1106,8 +1109,19 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 		void OnFocusChanged(const FGameplayTag& PreviousFocusTag);
 
-	// Attack Collision Trace
+	
 public:
+	// Freelook
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void BeginFreelookTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void FreelookTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void EndFreelookTimer();
+
+	// Attack Collision Trace
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings);
 

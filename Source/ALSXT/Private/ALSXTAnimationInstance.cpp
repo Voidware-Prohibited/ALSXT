@@ -3,6 +3,7 @@
 
 #include "ALSXTAnimationInstance.h"
 #include "ALSXTCharacter.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 
 void UALSXTAnimationInstance::NativeInitializeAnimation()
@@ -33,15 +34,12 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 
 	Freelooking = ALSXTCharacter->GetDesiredFreelooking();
 	Sex = ALSXTCharacter->GetDesiredSex();
+	DefensiveMode = ALSXTCharacter->GetDesiredDefensiveMode();
 	LocomotionVariant = ALSXTCharacter->GetDesiredLocomotionVariant();
 	Injury = ALSXTCharacter->GetDesiredInjury();
 	CombatStance = ALSXTCharacter->GetDesiredCombatStance();
 	WeaponFirearmStance = ALSXTCharacter->GetDesiredWeaponFirearmStance();
 	WeaponReadyPosition = ALSXTCharacter->GetDesiredWeaponReadyPosition();
-	CrowdNavigationPoseState = IALSXTCharacterInterface::Execute_GetCrowdNavigationPoseState(ALSXTCharacter);
-	BumpPoseState = IALSXTCharacterInterface::Execute_GetBumpPoseState(ALSXTCharacter);
-	DefensiveMode = ALSXTCharacter->GetDesiredDefensiveMode();
-	DefensiveModeState = ALSXTCharacter->GetDefensiveModeState();
 	StationaryMode = ALSXTCharacter->GetStationaryMode();
 	HoldingBreath = ALSXTCharacter->GetHoldingBreath();
 	PhysicalAnimationMode = ALSXTCharacter->GetPhysicalAnimationMode();
@@ -53,6 +51,15 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	WeaponCarryPosition = ALSXTCharacter->GetWeaponCarryPosition();
 	FirearmSightLocation = ALSXTCharacter->GetFirearmSightLocation();
 	VaultType = ALSXTCharacter->GetVaultType();
+	FreelookState = ALSXTCharacter->GetFreelookState();
+
+	if (UKismetSystemLibrary::DoesImplementInterface(ALSXTCharacter, UALSXTCharacterInterface::StaticClass()))
+	{
+		CrowdNavigationPoseState = IALSXTCharacterInterface::Execute_GetCrowdNavigationPoseState(ALSXTCharacter);
+		BumpPoseState = IALSXTCharacterInterface::Execute_GetBumpPoseState(ALSXTCharacter);
+	}
+
+	DefensiveModeState = ALSXTCharacter->GetDefensiveModeState();
 	WeaponObstruction = ALSXTCharacter->GetWeaponObstruction();
 
 }

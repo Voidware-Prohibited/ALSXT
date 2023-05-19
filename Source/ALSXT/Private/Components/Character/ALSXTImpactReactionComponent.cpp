@@ -57,6 +57,8 @@ void UALSXTImpactReactionComponent::BeginPlay()
 	ImpactFallenTimerDelegate.BindUFunction(this, "ImpactFallenTimer");
 	AttackFallenTimerDelegate.BindUFunction(this, "AttackFallenTimer");
 	ClutchImpactPointTimerDelegate.BindUFunction(this, "ClutchImpactPointTimer");
+
+	Character->GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &UALSXTImpactReactionComponent::OnCapsuleHit);
 }
 
 
@@ -69,6 +71,24 @@ void UALSXTImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick Ti
 		ObstacleTrace();
 	}
 	AnticipationTrace();
+}
+
+void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
+	{
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I Hit: %s"), *OtherActor->GetName()));
+
+		if (UKismetSystemLibrary::DoesImplementInterface(OtherActor, UALSXTCharacterInterface::StaticClass()))
+		{
+
+		}
+
+		if (UKismetSystemLibrary::DoesImplementInterface(OtherActor, UALSXTCollisionInterface::StaticClass()))
+		{
+		
+		}
+	}
 }
 
 bool UALSXTImpactReactionComponent::GetImpactFallLocation(FVector& Location, FDoubleHitResult Hit)
@@ -240,11 +260,17 @@ void UALSXTImpactReactionComponent::CrowdNavigationVelocityTimer()
 	{
 		if (IsValid(AnimInstance))
 		{
-			AnimInstance->Montage_Pause(AnimInstance->GetCurrentActiveMontage());
+			FALSXTBumpPoseState NewCrowdNavigationPoseState = GetCrowdNavigationPoseState();
+			NewCrowdNavigationPoseState.Alpha = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, 5.0f), FVector2D(1.0f, 0.0f), HitResult.Distance);
+			SetCrowdNavigationPoseState(NewCrowdNavigationPoseState);
 		}
 	}
 	else
 	{
+		FALSXTBumpPoseState NewCrowdNavigationPoseState = GetCrowdNavigationPoseState();
+		NewCrowdNavigationPoseState.Alpha = 0.0f;
+		SetCrowdNavigationPoseState(NewCrowdNavigationPoseState);
+		GetWorld()->GetTimerManager().ClearTimer(CrowdNavigationVelocityTimerHandle);
 		if (!AnimInstance->IsAnyMontagePlaying())
 		{
 			AnimInstance->Montage_Resume(AnimInstance->GetCurrentActiveMontage());
@@ -268,12 +294,18 @@ void UALSXTImpactReactionComponent::BumpVelocityTimer()
 	{
 		if (IsValid(AnimInstance))
 		{
-			// AnimInstance->Montage_Pause(AnimInstance->GetCurrentActiveMontage());
-			// AnimInstance->GetActiveMontageInstance()->Stop();
+			
+			FALSXTBumpPoseState NewBumpPoseState = GetBumpPoseState();
+			NewBumpPoseState.Alpha = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, 5.0f), FVector2D(1.0f, 0.0f), HitResult.Distance);
+			SetBumpPoseState(NewBumpPoseState);
 		}
 	}
 	else
 	{
+		FALSXTBumpPoseState NewBumpPoseState = GetBumpPoseState();
+		NewBumpPoseState.Alpha = 0.0f;
+		SetBumpPoseState(NewBumpPoseState);
+		GetWorld()->GetTimerManager().ClearTimer(BumpVelocityTimerHandle);
 		if (!AnimInstance->IsAnyMontagePlaying())
 		{
 			// AnimInstance->Montage_Resume(AnimInstance->GetActiveMontageInstance());
@@ -588,6 +620,7 @@ void UALSXTImpactReactionComponent::OnCrowdNavigationReactionBlendOut(UAnimMonta
 void UALSXTImpactReactionComponent::OnBumpReactionBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
 	// GetWorld()->GetTimerManager().ClearTimer(BumpVelocityTimerHandle);
+	GetWorld()->GetTimerManager().SetTimer(BumpVelocityTimerHandle, BumpVelocityTimerDelegate, 0.1f, true);
 	if (ShouldCrowdNavigationFall())
 	{
 		CrowdNavigationFall();

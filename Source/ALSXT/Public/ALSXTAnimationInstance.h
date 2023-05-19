@@ -9,6 +9,7 @@
 #include "State/ALSXTBumpPoseState.h"
 #include "ALSXTCharacter.h"
 #include "Utility/ALSXTGameplayTags.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 #include "ALSXTAnimationInstance.generated.h"
 
 UCLASS()
@@ -42,6 +43,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag WeaponReadyPosition{ALSXTWeaponReadyPositionTags::None};
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTFreelookState FreelookState;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTBumpPoseState CrowdNavigationPoseState;
 

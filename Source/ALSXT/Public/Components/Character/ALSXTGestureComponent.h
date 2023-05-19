@@ -31,5 +31,8 @@ public:
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
 
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanGesture();
 		
 };

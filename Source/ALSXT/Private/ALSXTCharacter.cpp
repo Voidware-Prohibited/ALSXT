@@ -28,6 +28,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AALSXTCharacter::AALSXTCharacter()
 {
@@ -133,6 +134,7 @@ void AALSXTCharacter::BeginPlay()
 	SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 	GetMesh()->SetEnablePhysicsBlending(true);
 
+	FreelookTimerDelegate.BindUFunction(this, "AttackCollisionTrace");
 	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace", AttackTraceSettings);
 }
 
@@ -789,6 +791,16 @@ void AALSXTCharacter::SetFreelooking(const FGameplayTag& NewFreelookingTag)
 
 		Freelooking = NewFreelookingTag;
 
+		if (NewFreelookingTag == ALSXTFreelookingTags::True)
+		{
+			// FreelookTimerHandle.IsValid()
+			BeginFreelookTimer();
+		}
+		if (NewFreelookingTag == ALSXTFreelookingTags::False)
+		{
+			EndFreelookTimer();
+		}
+
 		OnFreelookingChanged(PreviousFreelooking);
 	}
 }
@@ -1366,6 +1378,59 @@ void AALSXTCharacter::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Str
 	FVector MomemtumSum = HitMomentum + SelfMomentum;
 
 	Strength = ALSXTActionStrengthTags::Light;
+}
+
+void AALSXTCharacter::BeginFreelookTimer()
+{
+	if (ALSXTSettings->Freelook.bEnableFreelook)
+	{
+		GetWorld()->GetTimerManager().SetTimer(FreelookTimerHandle, FreelookTimerDelegate, 0.1f, true);
+	}
+}
+
+void AALSXTCharacter::FreelookTimer()
+{
+	FGameplayTag CurrentViewMode = GetViewMode();
+	FALSXTFreelookState NewState;
+
+	if (CurrentViewMode == AlsViewModeTags::FirstPerson && ALSXTSettings->Freelook.bEnableFirstPersonFreelook)
+	{
+		FVector2D FirstPersonYawRange = ALSXTSettings->Freelook.FirstPersonYawRange;
+		FVector2D FirstPersonPitchRange = ALSXTSettings->Freelook.FirstPersonPitchRange;
+		FMinimalViewInfo ViewInfo;
+		Camera->GetViewInfo(ViewInfo);
+		FVector CurrentViewTarget = ViewInfo.Location + (Camera->GetForwardVector() * 1000.0);
+		FRotator LookAtRotation = UKismetMathLibrary::FindRelativeLookAtRotation(GetMesh()->GetSocketTransform("head", ERelativeTransformSpace::RTS_Component), CurrentViewTarget);
+		LookAtRotation.Yaw = FMath::Clamp(LookAtRotation.Yaw, FirstPersonYawRange.X, FirstPersonYawRange.Y);
+		LookAtRotation.Pitch = FMath::Clamp(LookAtRotation.Pitch, FirstPersonPitchRange.X, FirstPersonPitchRange.Y);
+		NewState.LockedPitchAngle = LookAtRotation.Pitch;
+		NewState.LockedYawAngle = LookAtRotation.Yaw;
+		NewState.LockedControlRotation = LookAtRotation;
+		SetFreelookState(NewState);
+	}
+	if (CurrentViewMode == AlsViewModeTags::ThirdPerson && ALSXTSettings->Freelook.bEnableThirdPersonFreelook)
+	{
+		FVector2D ThirdPersonYawRange = ALSXTSettings->Freelook.ThirdPersonYawRange;
+		FVector2D ThirdPersonPitchRange = ALSXTSettings->Freelook.ThirdPersonPitchRange;
+		FMinimalViewInfo ViewInfo;
+		Camera->GetViewInfo(ViewInfo);
+		FVector CurrentViewTarget = ViewInfo.Location + (Camera->GetForwardVector() * 1000.0);
+		FRotator LookAtRotation = UKismetMathLibrary::FindRelativeLookAtRotation(GetMesh()->GetSocketTransform("head", ERelativeTransformSpace::RTS_Component), CurrentViewTarget);
+		LookAtRotation.Yaw = FMath::Clamp(LookAtRotation.Yaw, ThirdPersonYawRange.X, ThirdPersonYawRange.Y);
+		LookAtRotation.Pitch = FMath::Clamp(LookAtRotation.Pitch, ThirdPersonPitchRange.X, ThirdPersonPitchRange.Y);
+		NewState.LockedPitchAngle = LookAtRotation.Pitch;
+		NewState.LockedYawAngle = LookAtRotation.Yaw;
+		NewState.LockedControlRotation = LookAtRotation;
+		SetFreelookState(NewState);
+	}
+}
+
+void AALSXTCharacter::EndFreelookTimer()
+{
+	// Clear Attack Trace Timer
+	FALSXTFreelookState EmptyState;
+	SetFreelookState(EmptyState);
+	GetWorld()->GetTimerManager().ClearTimer(FreelookTimerHandle);
 }
 
 void AALSXTCharacter::BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings)
