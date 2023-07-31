@@ -10,14 +10,22 @@
 #include "ALSXTCharacter.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Settings/ALSXTAnimationInstanceSettings.h"
 #include "ALSXTAnimationInstance.generated.h"
+
+class UALSXTLinkedAnimationInstance;
+class AALSXTCharacter;
 
 UCLASS()
 class ALSXT_API UALSXTAnimationInstance : public UAlsAnimationInstance
 {
 	GENERATED_BODY()
 
+	friend UALSXTLinkedAnimationInstance;
+
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UALSXTAnimationInstanceSettings> ALSXTSettings;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	TObjectPtr<AALSXTCharacter> ALSXTCharacter;
@@ -111,9 +119,24 @@ protected:
 
 public:
 
+	UALSXTAnimationInstance();
+
 	virtual void NativeInitializeAnimation() override;
 
+	virtual void NativeBeginPlay() override;
+
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
+
+	virtual void NativeThreadSafeUpdateAnimation(float DeltaTime) override;
+
+	virtual void NativePostEvaluateAnimation() override;
+
+	// Core
+
+protected:
+	UFUNCTION(BlueprintPure, Category = "ALS|Als Animation Instance",
+		Meta = (BlueprintProtected, BlueprintThreadSafe, ReturnDisplayName = "Setting"))
+	UALSXTAnimationInstanceSettings* GetALSXTSettingsUnsafe() const;
 
 protected:
 	// Spine Rotation
@@ -126,3 +149,8 @@ protected:
 
 	virtual bool IsTurnInPlaceAllowed() override;
 };
+
+inline UALSXTAnimationInstanceSettings* UALSXTAnimationInstance::GetALSXTSettingsUnsafe() const
+{
+	return ALSXTSettings;
+}

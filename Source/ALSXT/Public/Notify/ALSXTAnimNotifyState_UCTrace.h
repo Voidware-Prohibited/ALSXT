@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
+#include "../Settings/ALSXTCombatSettings.h"
 #include "ALSXTAnimNotifyState_UCTrace.generated.h"
 
 /**

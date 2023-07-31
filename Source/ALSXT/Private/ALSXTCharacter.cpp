@@ -36,6 +36,15 @@ AALSXTCharacter::AALSXTCharacter()
 	Camera->SetupAttachment(GetMesh());
 	Camera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
 
+	AimAnimationHelperBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Aim Animation Helper Box"));
+	AimAnimationHelperBox->AttachToComponent(this->RootComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true));
+	AimAnimationHelperBox->SetBoxExtent(FVector(0.1f, 32.0f, 360.0f), true);
+	AimAnimationHelperBox->SetCollisionObjectType(ECC_Visibility);
+	AimAnimationHelperBox->SetGenerateOverlapEvents(true);
+	AimAnimationHelperBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	AimAnimationHelperBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Overlap);
+	AimAnimationHelperBox->bEditableWhenInherited = false;
+
 	ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());
 
 	// Add Physical Animation Component
@@ -177,6 +186,10 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
 		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::InputBlock);
 		EnhancedInput->BindAction(HoldBreathAction, ETriggerEvent::Triggered, this, &ThisClass::InputHoldBreath);
+		EnhancedInput->BindAction(SwitchForegripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchForegripPosition);
+		EnhancedInput->BindAction(SelectEmoteAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectEmote);
+		EnhancedInput->BindAction(SelectGestureAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectGesture);
+		
 		OnSetupPlayerInputComponentUpdated.Broadcast();
 	}
 }
@@ -426,6 +439,30 @@ void AALSXTCharacter::InputHoldBreath(const FInputActionValue& ActionValue)
 	if (CanHoldBreath())
 	{
 		SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
+	}
+}
+
+void AALSXTCharacter::InputSwitchForegripPosition()
+{
+	if (CanSwitchForegripPosition())
+	{
+		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
+	}
+}
+
+void AALSXTCharacter::InputSelectEmote(const FInputActionValue& ActionValue)
+{
+	if (CanSelectEmote())
+	{
+		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
+	}
+}
+
+void AALSXTCharacter::InputSelectGesture(const FInputActionValue& ActionValue)
+{
+	if (CanSelectGesture())
+	{
+		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
 	}
 }
 
@@ -1116,6 +1153,38 @@ void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 
 void AALSXTCharacter::OnDefensiveModeChanged_Implementation(const FGameplayTag& PreviousDefensiveModeTag) {}
 
+void AALSXTCharacter::SetAimState(const FALSXTAimState& NewAimState)
+{
+	const auto PreviousAimState{ AimState };
+
+	AimState = NewAimState;
+
+	OnAimStateChanged(PreviousAimState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetAimState(NewAimState);
+	}
+}
+
+void AALSXTCharacter::ServerSetAimState_Implementation(const FALSXTAimState& NewAimState)
+{
+	SetAimState(NewAimState);
+}
+
+
+void AALSXTCharacter::ServerProcessNewAimState_Implementation(const FALSXTAimState& NewAimState)
+{
+	ProcessNewAimState(NewAimState);
+}
+
+void AALSXTCharacter::OnReplicate_AimState(const FALSXTAimState& PreviousAimState)
+{
+	OnAimStateChanged(PreviousAimState);
+}
+
+void AALSXTCharacter::OnAimStateChanged_Implementation(const FALSXTAimState& PreviousAimState) {}
+
 void AALSXTCharacter::SetFreelookState(const FALSXTFreelookState& NewFreelookState)
 {
 	const auto PreviousFreelookState{ FreelookState };
@@ -1766,6 +1835,43 @@ void AALSXTCharacter::SetGestureHand(const FGameplayTag& NewGestureHandTag)
 }
 
 void AALSXTCharacter::OnGestureHandChanged_Implementation(const FGameplayTag& PreviousGestureHandTag) {}
+
+// ForegripPosition
+
+void AALSXTCharacter::SetDesiredForegripPosition(const FGameplayTag& NewForegripPositionTag)
+{
+	if (DesiredForegripPosition != NewForegripPositionTag)
+	{
+		DesiredForegripPosition = NewForegripPositionTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredForegripPosition, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredForegripPosition(NewForegripPositionTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredForegripPosition_Implementation(const FGameplayTag& NewForegripPositionTag)
+{
+	SetDesiredForegripPosition(NewForegripPositionTag);
+}
+
+void AALSXTCharacter::SetForegripPosition(const FGameplayTag& NewForegripPositionTag)
+{
+
+	if (ForegripPosition != NewForegripPositionTag)
+	{
+		const auto PreviousForegripPosition{ ForegripPosition };
+
+		ForegripPosition = NewForegripPositionTag;
+
+		OnForegripPositionChanged(PreviousForegripPosition);
+	}
+}
+
+void AALSXTCharacter::OnForegripPositionChanged_Implementation(const FGameplayTag& PreviousForegripPositionTag) {}
 
 // ReloadingType
 

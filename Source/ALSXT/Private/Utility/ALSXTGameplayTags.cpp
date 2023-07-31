@@ -560,3 +560,12 @@ namespace ALSXTClothingStateTags
 	UE_DEFINE_GAMEPLAY_TAG(LeftSleeveUp, TEXT("Als.Clothing State.Left Sleeve Up"))
 	UE_DEFINE_GAMEPLAY_TAG(RightSleeveUp, TEXT("Als.Clothing State.Right Sleeve Up"))
 }
+
+namespace ALSXTForegripPositionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Default, FName{ TEXTVIEW("Als.Foregrip Position.Default") })
+	UE_DEFINE_GAMEPLAY_TAG(MagazineWell, FName{ TEXTVIEW("Als.Foregrip Position.Magazine Well") })
+	UE_DEFINE_GAMEPLAY_TAG(VerticalGrip, FName{ TEXTVIEW("Als.Foregrip Position.Vertical Grip") })
+	UE_DEFINE_GAMEPLAY_TAG(AngledForeGrip, FName{ TEXTVIEW("Als.Foregrip Position.Angled Fore Grip") })
+	UE_DEFINE_GAMEPLAY_TAG(TopHorizontalGrip, FName{ TEXTVIEW("Als.Foregrip Position.Top Horizontal Grip") })
+}

@@ -5,6 +5,15 @@
 #include "ALSXTCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "ALS/Public/Utility/AlsMacros.h"
+#include "Stats/Stats.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ALSXTAnimationInstance)
+
+UALSXTAnimationInstance::UALSXTAnimationInstance()
+{
+	RootMotionMode = ERootMotionMode::RootMotionFromMontagesOnly;
+}
 
 void UALSXTAnimationInstance::NativeInitializeAnimation()
 {
@@ -20,6 +29,14 @@ void UALSXTAnimationInstance::NativeInitializeAnimation()
 		ALSXTCharacter = GetMutableDefault<AALSXTCharacter>();
 	}
 #endif
+}
+
+void UALSXTAnimationInstance::NativeBeginPlay()
+{
+	Super::NativeBeginPlay();
+
+	ALS_ENSURE(IsValid(ALSXTSettings));
+	ALS_ENSURE(IsValid(ALSXTCharacter));
 }
 
 void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
@@ -63,6 +80,32 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	WeaponObstruction = ALSXTCharacter->GetWeaponObstruction();
 
 }
+
+void UALSXTAnimationInstance::NativeThreadSafeUpdateAnimation(const float DeltaTime)
+{
+
+	Super::NativeThreadSafeUpdateAnimation(DeltaTime);
+
+	if (!IsValid(ALSXTSettings) || !IsValid(ALSXTCharacter))
+	{
+		return;
+	}
+}
+
+void UALSXTAnimationInstance::NativePostEvaluateAnimation()
+{
+
+	Super::NativePostEvaluateAnimation();
+
+	if (!IsValid(ALSXTSettings) || !IsValid(ALSXTCharacter))
+	{
+		return;
+	}
+
+	bPendingUpdate = false;
+}
+
+
 
 bool UALSXTAnimationInstance::IsSpineRotationAllowed()
 {

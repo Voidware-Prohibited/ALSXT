@@ -3,6 +3,7 @@
 #include "AlsCharacter.h"
 #include "GameFramework/Character.h"
 #include "ALSXTCharacterMovementComponent.h"
+#include "Components/BoxComponent.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTCombatSettings.h"
 #include "Settings/ALSXTImpactReactionSettings.h"
@@ -11,6 +12,7 @@
 #include "Engine/EngineTypes.h"
 #include "Utility/ALSXTStructs.h"
 #include "State/ALSXTFootstepState.h"
+#include "State/ALSXTAimState.h"
 #include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTFreelookState.h"
 #include "State/ALSXTSlidingState.h"
@@ -47,6 +49,9 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
+	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UBoxComponent> AimAnimationHelperBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	class UALSXTCharacterSoundComponent* CharacterSound;
@@ -110,6 +115,46 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootprintsState", Meta = (AllowPrivateAccess))
 	FALSXTFootprintsState FootprintsState;
+
+	// Aim State
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootprintsState", Meta = (AllowPrivateAccess))
+	FALSXTAimState AimState;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
+	// 	FALSXTVaultingState VaultingState;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTAimState& GetAimState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewAimState"))
+	void SetAimState(const FALSXTAimState& NewAimState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewAimState"))
+	FALSXTAimState ProcessNewAimState(const FALSXTAimState& NewAimState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewAimState(const FALSXTAimState& NewAimState);
+
+private:
+	UFUNCTION(Server, Unreliable)
+	void ServerSetAimState(const FALSXTAimState& NewAimState);
+
+	UFUNCTION()
+	void OnReplicate_AimState(const FALSXTAimState& PreviousAimState);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnAimStateChanged(const FALSXTAimState& PreviousAimState);
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool DoesOverlayObjectUseLeftHandIK();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	const FGameplayTagContainer GetAvailableForegripPositionsForOvelayObject() const;
 
 	// Freelooking
 private:
@@ -321,6 +366,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag ReloadingType{FGameplayTag::EmptyTag};
 
+// ForegripPosition
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredForegripPosition {ALSXTForegripPositionTags::Default};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag ForegripPosition {ALSXTForegripPositionTags::Default};
+
 // FirearmFingerAction
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
@@ -460,6 +513,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputAction> ToggleWeaponFirearmStanceAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	TObjectPtr<UInputAction> SwitchForegripPositionAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	TObjectPtr<UInputAction> SelectEmoteAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	TObjectPtr<UInputAction> SelectGestureAction;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example",
 		Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
 	float LookUpMouseSensitivity{3.0f};
@@ -560,6 +622,12 @@ private:
 	void InputReload();
 
 	void InputReloadWithRetention();
+
+	void InputSwitchForegripPosition();
+
+	void InputSelectEmote(const FInputActionValue& ActionValue);
+
+	void InputSelectGesture(const FInputActionValue& ActionValue);
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
@@ -836,6 +904,7 @@ protected:
 	// Desired Sex
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredSex() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewSexTag"))
@@ -860,6 +929,7 @@ protected:
 	// Desired LocomotionVariant
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredLocomotionVariant() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewLocomotionVariantTag"))
@@ -884,6 +954,7 @@ protected:
 	// Desired Injury
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredInjury() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewInjuryTag"))
@@ -908,6 +979,7 @@ protected:
 	// Desired CombatStance
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredCombatStance() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewCombatStanceTag"))
@@ -938,6 +1010,7 @@ protected:
 	// Desired WeaponFirearmStance
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredWeaponFirearmStance() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewWeaponFirearmStanceTag"))
@@ -962,6 +1035,7 @@ protected:
 	// Desired WeaponReadyPosition
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredWeaponReadyPosition() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewWeaponReadyPositionTag"))
@@ -986,6 +1060,7 @@ protected:
 	// Desired DefensiveMode
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredDefensiveMode() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
@@ -1031,6 +1106,7 @@ protected:
 	// Desired StationaryMode
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredStationaryMode() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
@@ -1061,6 +1137,7 @@ protected:
 	// Desired Status
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredStatus() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewStatusTag"))
@@ -1088,6 +1165,7 @@ protected:
 	// Desired Focus
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredFocus() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFocusTag"))
@@ -1168,6 +1246,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool CanHoldBreath() const;
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredHoldingBreath() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHoldingBreathTag"))
@@ -1192,6 +1271,7 @@ protected:
 	// Desired PhysicalAnimationMode
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredPhysicalAnimationMode() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewPhysicalAnimationModeTag"))
@@ -1213,11 +1293,19 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnPhysicalAnimationModeChanged(const FGameplayTag& PreviousPhysicalAnimationModeTag);
 
+	// Emote
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanEmote() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanSelectEmote() const;
 
 	// Desired Gesture
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredGesture() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewGestureTag"))
@@ -1242,6 +1330,7 @@ protected:
 // Desired GestureHand
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredGestureHand() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewGestureHandTag"))
@@ -1254,6 +1343,14 @@ private:
 // GestureHand
 
 public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanGesture() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanSelectGesture() const;
+
+	const FGameplayTagContainer GetAvailableGestureHands() const;
+
 	const FGameplayTag& GetGestureHand() const;
 
 private:
@@ -1263,9 +1360,38 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnGestureHandChanged(const FGameplayTag& PreviousGestureHandTag);
 
+// Desired ForegripPosition
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	const FGameplayTag& GetDesiredForegripPosition() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewForegripPositionTag"))
+	void SetDesiredForegripPosition(const FGameplayTag& NewForegripPositionTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredForegripPosition(const FGameplayTag& NewForegripPositionTag);
+
+// ForegripPosition
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanSwitchForegripPosition() const;
+
+	const FGameplayTag& GetForegripPosition() const;
+
+private:
+	void SetForegripPosition(const FGameplayTag& NewForegripPositionTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnForegripPositionChanged(const FGameplayTag& PreviousForegripPositionTag);
+
 	// Desired ReloadingType
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredReloadingType() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewReloadingTypeTag"))
@@ -1290,6 +1416,7 @@ protected:
 // Desired FirearmFingerAction
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredFirearmFingerAction() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFirearmFingerActionTag"))
@@ -1314,6 +1441,7 @@ protected:
 // Desired FirearmFingerActionHand
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredFirearmFingerActionHand() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFirearmFingerActionHandTag"))
@@ -1338,6 +1466,7 @@ protected:
 // Desired WeaponCarryPosition
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredWeaponCarryPosition() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewWeaponCarryPositionTag"))
@@ -1362,6 +1491,7 @@ protected:
 // Desired FirearmSightLocation
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredFirearmSightLocation() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFirearmSightLocationTag"))
@@ -1386,6 +1516,7 @@ protected:
 // Desired VaultType
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredVaultType() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewVaultTypeTag"))
@@ -1410,6 +1541,7 @@ protected:
 // Desired WeaponObstruction
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredWeaponObstruction() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewWeaponObstructionTag"))
@@ -1446,6 +1578,11 @@ inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
 inline const FALSXTFreelookState& AALSXTCharacter::GetFreelookState() const
 {
 	return FreelookState;
+}
+
+inline const FALSXTAimState& AALSXTCharacter::GetAimState() const
+{
+	return AimState;
 }
 
 inline const FALSXTDefensiveModeState& AALSXTCharacter::GetDefensiveModeState() const
@@ -1603,6 +1740,13 @@ inline const FGameplayTag& AALSXTCharacter::GetGestureHand() const
 	return GestureHand;
 }
 
+inline const FGameplayTagContainer AALSXTCharacter::GetAvailableGestureHands() const
+{
+	FGameplayTagContainer AvailableHands;
+	
+	return AvailableHands;
+}
+
 inline const FGameplayTag& AALSXTCharacter::GetDesiredReloadingType() const
 {
 	return DesiredReloadingType;
@@ -1611,6 +1755,16 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredReloadingType() const
 inline const FGameplayTag& AALSXTCharacter::GetReloadingType() const
 {
 	return ReloadingType;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredForegripPosition() const
+{
+	return DesiredForegripPosition;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetForegripPosition() const
+{
+	return ForegripPosition;
 }
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredFirearmFingerAction() const
