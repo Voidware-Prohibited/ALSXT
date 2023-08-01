@@ -1084,3 +1084,46 @@ struct ALSXT_API FIdleAnimation
 		return (other.Health == Health) && (other.Montage == Montage);
 	}
 };
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FForegripPositionEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Foregrip Position", TitleProperty = "{Position}", AllowPrivateAccess))
+	FGameplayTag Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = ( AllowPrivateAccess))
+	FName SocketName;
+
+	bool operator==(const FForegripPositionEntry& other) const
+	{
+		return (other.Position == Position) && (other.SocketName == SocketName);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FForegripPositions
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Foregrip Position", TitleProperty = "{Position}", AllowPrivateAccess))
+	FForegripPositionEntry Default;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Foregrip Position", TitleProperty = "{Position}", AllowPrivateAccess))
+	FForegripPositionEntry MagazineWell;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Foregrip Position", TitleProperty = "{Position}", AllowPrivateAccess))
+	FForegripPositionEntry Vertical;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Foregrip Position", TitleProperty = "{Position}", AllowPrivateAccess))
+	FForegripPositionEntry Angled;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Foregrip Position", TitleProperty = "{Position}", AllowPrivateAccess))
+	FForegripPositionEntry Top;
+
+	bool operator==(const FForegripPositions& other) const
+	{
+		return (other.Default == Default) && (other.MagazineWell == MagazineWell) && (other.Vertical == Vertical) && (other.Angled == Angled) && (other.Top == Top);
+	}
+};

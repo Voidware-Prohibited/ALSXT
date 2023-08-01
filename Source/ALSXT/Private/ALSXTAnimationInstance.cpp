@@ -63,11 +63,14 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	Gesture = ALSXTCharacter->GetGesture();
 	GestureHand = ALSXTCharacter->GetGestureHand();
 	ReloadingType = ALSXTCharacter->GetReloadingType();
+	ForegripPosition = ALSXTCharacter->GetForegripPosition();
 	FirearmFingerAction = ALSXTCharacter->GetFirearmFingerAction();
 	FirearmFingerActionHand = ALSXTCharacter->GetFirearmFingerActionHand();
 	WeaponCarryPosition = ALSXTCharacter->GetWeaponCarryPosition();
 	FirearmSightLocation = ALSXTCharacter->GetFirearmSightLocation();
+	ForegripTransform = ALSXTCharacter->GetCurrentForegripTransform();
 	VaultType = ALSXTCharacter->GetVaultType();
+	AimState = ALSXTCharacter->GetAimState();
 	FreelookState = ALSXTCharacter->GetFreelookState();
 
 	if (UKismetSystemLibrary::DoesImplementInterface(ALSXTCharacter, UALSXTCharacterInterface::StaticClass()))

@@ -122,6 +122,8 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGesture, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGestureHand, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGripPosition, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredForegripPosition, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerAction, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerActionHand, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponCarryPosition, Parameters)
@@ -130,6 +132,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponObstruction, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PreviousLookInput, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FreelookState, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, AimState, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
 }
@@ -186,6 +189,7 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
 		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::InputBlock);
 		EnhancedInput->BindAction(HoldBreathAction, ETriggerEvent::Triggered, this, &ThisClass::InputHoldBreath);
+		EnhancedInput->BindAction(SwitchGripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchGripPosition);
 		EnhancedInput->BindAction(SwitchForegripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchForegripPosition);
 		EnhancedInput->BindAction(SelectEmoteAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectEmote);
 		EnhancedInput->BindAction(SelectGestureAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectGesture);
@@ -439,6 +443,14 @@ void AALSXTCharacter::InputHoldBreath(const FInputActionValue& ActionValue)
 	if (CanHoldBreath())
 	{
 		SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
+	}
+}
+
+void AALSXTCharacter::InputSwitchGripPosition()
+{
+	if (CanSwitchGripPosition())
+	{
+		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
 	}
 }
 
@@ -1836,7 +1848,74 @@ void AALSXTCharacter::SetGestureHand(const FGameplayTag& NewGestureHandTag)
 
 void AALSXTCharacter::OnGestureHandChanged_Implementation(const FGameplayTag& PreviousGestureHandTag) {}
 
+// GripPosition
+
+void AALSXTCharacter::SetDesiredGripPosition(const FGameplayTag& NewGripPositionTag)
+{
+	if (DesiredGripPosition != NewGripPositionTag)
+	{
+		DesiredGripPosition = NewGripPositionTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredGripPosition, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredGripPosition(NewGripPositionTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredGripPosition_Implementation(const FGameplayTag& NewGripPositionTag)
+{
+	SetDesiredGripPosition(NewGripPositionTag);
+}
+
+void AALSXTCharacter::SetGripPosition(const FGameplayTag& NewGripPositionTag)
+{
+
+	if (GripPosition != NewGripPositionTag)
+	{
+		const auto PreviousGripPosition{ GripPosition };
+
+		GripPosition = NewGripPositionTag;
+
+		OnGripPositionChanged(PreviousGripPosition);
+	}
+}
+
+void AALSXTCharacter::OnGripPositionChanged_Implementation(const FGameplayTag& PreviousGripPositionTag) {}
+
 // ForegripPosition
+
+FName AALSXTCharacter::GetSocketNameForForegripPosition(const FGameplayTag& ForegripPositionTag)
+{
+	FForegripPositions ForegripPositions = ALSXTSettings->ForegripPosition.ForegripPositions;
+
+	if (ForegripPositionTag == ALSXTForegripPositionTags::Default)
+	{
+		return ForegripPositions.Default.SocketName;
+	}
+	if (ForegripPositionTag == ALSXTForegripPositionTags::MagazineWell)
+	{
+		return ForegripPositions.MagazineWell.SocketName;
+	}
+	if (ForegripPositionTag == ALSXTForegripPositionTags::VerticalGrip)
+	{
+		return ForegripPositions.Vertical.SocketName;
+	}
+	if (ForegripPositionTag == ALSXTForegripPositionTags::AngledForeGrip)
+	{
+		return ForegripPositions.Angled.SocketName;
+	}
+	if (ForegripPositionTag == ALSXTForegripPositionTags::TopHorizontalGrip)
+	{
+		return ForegripPositions.Top.SocketName;
+	}
+	else
+	{
+		return ForegripPositions.Default.SocketName;
+	}
+}
 
 void AALSXTCharacter::SetDesiredForegripPosition(const FGameplayTag& NewForegripPositionTag)
 {

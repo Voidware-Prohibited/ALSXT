@@ -559,6 +559,12 @@ namespace ALSXTClothingStateTags
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(RightSleeveUp)
 }
 
+namespace ALSXTGripPositionTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Default)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Underbarrel)
+}
+
 namespace ALSXTForegripPositionTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Default)

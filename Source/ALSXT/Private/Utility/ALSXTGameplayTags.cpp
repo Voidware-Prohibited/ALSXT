@@ -561,6 +561,12 @@ namespace ALSXTClothingStateTags
 	UE_DEFINE_GAMEPLAY_TAG(RightSleeveUp, TEXT("Als.Clothing State.Right Sleeve Up"))
 }
 
+namespace ALSXTGripPositionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Default, FName{ TEXTVIEW("Als.Grip Position.Default") })
+	UE_DEFINE_GAMEPLAY_TAG(UnderBarrel, FName{ TEXTVIEW("Als.Grip Position.Under Barrel") })
+}
+
 namespace ALSXTForegripPositionTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Default, FName{ TEXTVIEW("Als.Foregrip Position.Default") })

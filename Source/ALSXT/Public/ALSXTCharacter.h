@@ -119,12 +119,8 @@ private:
 	// Aim State
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootprintsState", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_AimState", Meta = (AllowPrivateAccess))
 	FALSXTAimState AimState;
-
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
-	// 	FALSXTVaultingState VaultingState;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FALSXTAimState& GetAimState() const;
@@ -153,8 +149,14 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool DoesOverlayObjectUseLeftHandIK();
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "ForegripPosition"))
+	FName GetSocketNameForForegripPosition(UPARAM(meta = (Categories = "Als.Foregrip Position"))const FGameplayTag& ForegripPosition);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	const FGameplayTagContainer GetAvailableForegripPositionsForOvelayObject() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	FTransform GetCurrentForegripTransform();
 
 	// Freelooking
 private:
@@ -366,6 +368,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag ReloadingType{FGameplayTag::EmptyTag};
 
+// GripPosition
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredGripPosition {ALSXTGripPositionTags::Default};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag GripPosition {ALSXTGripPositionTags::Default};
+
 // ForegripPosition
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
@@ -514,6 +524,9 @@ public:
 	TObjectPtr<UInputAction> ToggleWeaponFirearmStanceAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	TObjectPtr<UInputAction> SwitchGripPositionAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputAction> SwitchForegripPositionAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
@@ -622,6 +635,8 @@ private:
 	void InputReload();
 
 	void InputReloadWithRetention();
+
+	void InputSwitchGripPosition();
 
 	void InputSwitchForegripPosition();
 
@@ -1360,6 +1375,34 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnGestureHandChanged(const FGameplayTag& PreviousGestureHandTag);
 
+// Desired GripPosition
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	const FGameplayTag& GetDesiredGripPosition() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewGripPositionTag"))
+	void SetDesiredGripPosition(const FGameplayTag& NewGripPositionTag);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredGripPosition(const FGameplayTag& NewGripPositionTag);
+
+// GripPosition
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanSwitchGripPosition() const;
+
+	const FGameplayTag& GetGripPosition() const;
+
+private:
+	void SetGripPosition(const FGameplayTag& NewGripPositionTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnGripPositionChanged(const FGameplayTag& PreviousGripPositionTag);
+
 // Desired ForegripPosition
 
 public:
@@ -1755,6 +1798,16 @@ inline const FGameplayTag& AALSXTCharacter::GetDesiredReloadingType() const
 inline const FGameplayTag& AALSXTCharacter::GetReloadingType() const
 {
 	return ReloadingType;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredGripPosition() const
+{
+	return DesiredGripPosition;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetGripPosition() const
+{
+	return GripPosition;
 }
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredForegripPosition() const

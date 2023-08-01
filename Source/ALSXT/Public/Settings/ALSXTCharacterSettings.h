@@ -6,6 +6,8 @@
 #include "Settings/AlsCharacterSettings.h"
 #include "Settings/ALSXTFootstepEffectSettings.h"
 #include "Settings/ALSXTFreelookSettings.h"
+#include "Settings/ALSXTProceduralAimSettings.h"
+#include "Settings/ALSXTForegripPositionSettings.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTSlidingSettings.h"
 #include "Settings/ALSXTFPEyeFocusSettings.h"
@@ -25,6 +27,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTGeneralFreelookSettings Freelook;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FALSXTProceduralAimSettings ProceduralAim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FALSXTForegripPositionSettings ForegripPosition;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTGeneralVaultingSettings Vaulting;
