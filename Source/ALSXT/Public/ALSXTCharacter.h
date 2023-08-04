@@ -146,14 +146,14 @@ protected:
 	void OnAimStateChanged(const FALSXTAimState& PreviousAimState);
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	bool DoesOverlayObjectUseLeftHandIK();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character")
+	bool DoesOverlayObjectUseLeftHandIK() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "ForegripPosition"))
 	FName GetSocketNameForForegripPosition(UPARAM(meta = (Categories = "Als.Foregrip Position"))const FGameplayTag& ForegripPosition);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	const FGameplayTagContainer GetAvailableForegripPositionsForOvelayObject() const;
+	FGameplayTagContainer GetAvailableForegripPositionsForOvelayObject();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	FTransform GetCurrentForegripTransform();
@@ -379,10 +379,10 @@ private:
 // ForegripPosition
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredForegripPosition {ALSXTForegripPositionTags::Default};
+	FGameplayTag DesiredForegripPosition {ALSXTForegripPositionTags::None};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag ForegripPosition {ALSXTForegripPositionTags::Default};
+	FGameplayTag ForegripPosition {ALSXTForegripPositionTags::None};
 
 // FirearmFingerAction
 

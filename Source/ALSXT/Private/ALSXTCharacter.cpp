@@ -301,10 +301,10 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 	{
 		if (ActionValue.Get<bool>())
 		{
-			if (TryStopRagdolling())
-			{
-				return;
-			}
+			// if (TryStopRagdolling())
+			// {
+			// 	return;
+			// }
 			if (GetDesiredStatus() != ALSXTStatusTags::Normal)
 			{
 				SetDesiredStatus(ALSXTStatusTags::Normal);
@@ -324,7 +324,7 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 				return;
 			}
 
-			Jump();
+			Super::Jump();
 		}
 		else
 		{
@@ -458,7 +458,22 @@ void AALSXTCharacter::InputSwitchForegripPosition()
 {
 	if (CanSwitchForegripPosition())
 	{
-		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
+		FGameplayTagContainer AvailableForegripPositionsForOvelayObject = GetAvailableForegripPositionsForOvelayObject();
+		TArray<FGameplayTag> AvailableForegripPositionsForOvelayObjectArray;
+		AvailableForegripPositionsForOvelayObject.GetGameplayTagArray(AvailableForegripPositionsForOvelayObjectArray);
+		int LastIndex = AvailableForegripPositionsForOvelayObjectArray.Num() - 1;
+		int CurrentIndex = AvailableForegripPositionsForOvelayObjectArray.IndexOfByKey(GetDesiredForegripPosition());
+		int NextIndex;
+		if ((CurrentIndex + 1) > LastIndex)
+		{
+			NextIndex = 0;
+		}
+		else
+		{
+			NextIndex = CurrentIndex + 1;
+		}
+		
+		SetDesiredForegripPosition(AvailableForegripPositionsForOvelayObjectArray[NextIndex]);
 	}
 }
 
@@ -1209,6 +1224,11 @@ void AALSXTCharacter::SetFreelookState(const FALSXTFreelookState& NewFreelookSta
 	{
 		ServerSetFreelookState(NewFreelookState);
 	}
+}
+
+bool AALSXTCharacter::DoesOverlayObjectUseLeftHandIK_Implementation() const
+{
+	return false;
 }
 
 void AALSXTCharacter::ServerSetFreelookState_Implementation(const FALSXTFreelookState& NewFreelookState)

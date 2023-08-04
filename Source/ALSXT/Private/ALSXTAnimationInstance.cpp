@@ -72,6 +72,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	VaultType = ALSXTCharacter->GetVaultType();
 	AimState = ALSXTCharacter->GetAimState();
 	FreelookState = ALSXTCharacter->GetFreelookState();
+	DoesOverlayObjectUseLeftHandIK = ALSXTCharacter->DoesOverlayObjectUseLeftHandIK();
 
 	if (UKismetSystemLibrary::DoesImplementInterface(ALSXTCharacter, UALSXTCharacterInterface::StaticClass()))
 	{

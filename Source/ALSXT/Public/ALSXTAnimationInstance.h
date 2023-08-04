@@ -100,7 +100,7 @@ protected:
 	FGameplayTag ReloadingType{FGameplayTag::EmptyTag};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag ForegripPosition{ALSXTForegripPositionTags::Default};
+	FGameplayTag ForegripPosition{ALSXTForegripPositionTags::None};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FTransform ForegripTransform;
@@ -125,6 +125,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag WeaponObstruction {FGameplayTag::EmptyTag};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	bool DoesOverlayObjectUseLeftHandIK{ false };
 
 public:
 
