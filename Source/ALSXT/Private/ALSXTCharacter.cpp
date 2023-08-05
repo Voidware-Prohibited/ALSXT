@@ -301,10 +301,10 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 	{
 		if (ActionValue.Get<bool>())
 		{
-			// if (TryStopRagdolling())
-			// {
-			// 	return;
-			// }
+			if (TryStopRagdolling())
+			{
+				return;
+			}
 			if (GetDesiredStatus() != ALSXTStatusTags::Normal)
 			{
 				SetDesiredStatus(ALSXTStatusTags::Normal);

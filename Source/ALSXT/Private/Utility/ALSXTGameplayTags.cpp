@@ -569,7 +569,6 @@ namespace ALSXTGripPositionTags
 
 namespace ALSXTForegripPositionTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(None, FName{ TEXTVIEW("Als.Foregrip Position.None") })
 	UE_DEFINE_GAMEPLAY_TAG(Default, FName{ TEXTVIEW("Als.Foregrip Position.Default") })
 	UE_DEFINE_GAMEPLAY_TAG(MagazineWell, FName{ TEXTVIEW("Als.Foregrip Position.Magazine Well") })
 	UE_DEFINE_GAMEPLAY_TAG(VerticalGrip, FName{ TEXTVIEW("Als.Foregrip Position.Vertical Grip") })

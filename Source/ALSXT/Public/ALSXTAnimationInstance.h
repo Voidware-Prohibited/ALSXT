@@ -100,7 +100,7 @@ protected:
 	FGameplayTag ReloadingType{FGameplayTag::EmptyTag};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag ForegripPosition{ALSXTForegripPositionTags::None};
+	FGameplayTag ForegripPosition{ALSXTForegripPositionTags::Default};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FTransform ForegripTransform;

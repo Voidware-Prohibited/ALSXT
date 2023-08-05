@@ -379,10 +379,10 @@ private:
 // ForegripPosition
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredForegripPosition {ALSXTForegripPositionTags::None};
+	FGameplayTag DesiredForegripPosition {ALSXTForegripPositionTags::Default};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag ForegripPosition {ALSXTForegripPositionTags::None};
+	FGameplayTag ForegripPosition {ALSXTForegripPositionTags::Default};
 
 // FirearmFingerAction
 

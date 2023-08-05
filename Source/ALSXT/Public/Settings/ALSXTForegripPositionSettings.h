@@ -9,4 +9,7 @@ struct ALSXT_API FALSXTForegripPositionSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FForegripPositions ForegripPositions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Debug;
 };
