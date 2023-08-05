@@ -2,7 +2,7 @@
 
 ![ALSXT](ALSXT.png)
 
-An Unreal Engine 5 plugin that extends Advanced Locomotion System Refactored with expanded Character States, Improved Foot Print system, Sliding, Physical Animayion, Vaulting, Wallrunning and more(XT) 
+An Unreal Engine 5 plugin that extends Advanced Locomotion System Refactored with expanded Character States, Improved Foot Print system, Sliding, Physical Animation, Vaulting, Wallrunning and more planned.
 
 _ALSXT is under heavy development, some features may not be finished or production-ready_
 _Contibutors and PRs are welcome_
@@ -62,6 +62,14 @@ Original content and code in this repository is under the MIT license. Any git s
 - [swipes and whooshes tshirt fast and short swings stereo ORTF 8040.wav](https://freesound.org/people/Soundholder/sounds/425856/) by [Soundholder](https://freesound.org/people/Soundholder/) [License: CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) Modified to be seperate sounds
 
 - [BACKPACK](https://sketchfab.com/3d-models/backpack-9ccadc2945c34826a0ce1c37de13675e) by [Idmental](https://sketchfab.com/idmental.id) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to optimize textures
+
+- Vertical Foregrip from [Low-Poly Mk18 Mod0](https://sketchfab.com/3d-models/backpack-9ccadc2945c34826a0ce1c37de13675e) by [notcplkerry](https://sketchfab.com/notcplkerry) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate and retexture model
+
+- [Textured Suppressor - Free Download](https://sketchfab.com/3d-models/textured-suppressor-free-download-d176b5b1b03f4a78983698c6f7675023) by [RMT](https://sketchfab.com/rmt) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to optimize textures
+
+- Angled Foregrip from [M4 - Stealth and Grenadier Configurations](https://sketchfab.com/3d-models/m4-stealth-and-grenadier-configurations-e530c3225f094a04ba33273c6ebb3d1c) by [LunarEclipse](https://sketchfab.com/e.hackett.03) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate and retexture model
+
+- Bushnell 1x22x33 from [low-poly Sight set](https://sketchfab.com/3d-models/low-poly-sight-set-2cdf0f52f1254ad3bc387bbd7e8d6223) by [D.U.](https://sketchfab.com/D.U.) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate and retexture model
 
 # Special Thanks
 
