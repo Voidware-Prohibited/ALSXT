@@ -11,21 +11,27 @@ _Contibutors and PRs are welcome_
 
 **Features**
 
-- Sliding Locomotion Action (Replicated).
-- Advanced Footprints System (Replicated).
-- Expanded Character States (Combat Stance, Sex, Variant, Weapon Ready Position) (Replicated).
-- Camera FX Component.
-- Character Sound Component (Replicated).
-- Vaulting _Coming Soon_.
-- Impact Reactions (Blending reaction animations with Physical Animation) _Coming Soon_.
-- Stationary Modes ( Sitting etc) _Coming Soon_.
-- Wallrunning _Coming Soon_.
+- Combat Component _In Progress_.
+- Impact Reactions (Blending reaction animations with Physical Animation) _In Progress_.
+- Sliding Locomotion Action.
+- Advanced Footprints System.
+- Character Sound Component.
+- Expanded Character States (Combat Stance, Sex, Variant, Weapon Ready Position).
+- Vaulting _In Progress_.
+- Camera FX Component _In Progress_.
 - Gestures _Coming Soon_.
 - Emotes _Coming Soon_.
+- Stationary Modes (Sitting etc) _Coming Soon_.
+- Actobatic Actions (Wallrunning etc)  _Coming Soon_.
+
 
 **Dependecies**
 
 - [Advanced Locomotion System Refactored](https://github.com/Sixze/ALS-Refactored/)
+
+**Important Note**
+
+ALSXT is not automatically synced with the main ALS-Refactored repository, but is instead maintained through [this fork](https://github.com/Voidware-Prohibited/ALS-Refactored). If you find changes in ALS-Refactored have broken ALSXT you may use this fork to maintain more stability in your projects.
 
 # Installation
 
