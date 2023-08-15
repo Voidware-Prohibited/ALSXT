@@ -29,6 +29,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Als Character")
 	UALSXTCharacterSoundSettings* SelectCharacterSoundSettings();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Als Character")
+	UALSXTWeaponSoundSettings* SelectWeaponSoundSettings();
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool ShouldPlayDeathSoundModeration();
 
@@ -58,6 +61,15 @@ public:
 	bool DebugMode { false };
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayCharacterMovementSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayWeaponMovementSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayWeaponActionSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayActionSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
@@ -65,6 +77,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayDamageSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayDeathSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
 	float GetHealth();
@@ -76,42 +91,71 @@ public:
 	FGameplayTag ConvertStaminaToStaminaTag(const float Stamina);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
-	FALSXTCharacterActionSound SelectActionSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina);
+	FALSXTCharacterMovementSound SelectCharacterMovementSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Type, const FGameplayTag& Weight);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
-	FALSXTCharacterActionSound SelectAttackSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina);
+	FALSXTCharacterMovementSound SelectCharacterMovementAccentSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Type, const FGameplayTag& Weight);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
-	FALSXTCharacterDamageSound SelectDamageSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Overlay, const FGameplayTag& Form, const float Damage);
+	FALSXTWeaponMovementSound SelectWeaponMovementSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Type);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
-	FALSXTCharacterDamageSound SelectDeathSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Overlay, const FGameplayTag& Form, const float Damage);
+	FALSXTWeaponActionSound SelectWeaponActionSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Type);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
-	void PlayActionSound(const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina);
+	FALSXTCharacterActionSound SelectActionSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
-	void PlayAttackSound(const FGameplayTag& Overlay, const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float Stamina);
+	FALSXTCharacterActionSound SelectAttackSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
-	void PlayDamageSound(const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
+	FALSXTCharacterDamageSound SelectDamageSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Strength);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
-	void PlayDeathSound(const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
+	FALSXTCharacterDamageSound SelectDeathSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Strength);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Weight"))
+	void PlayCharacterMovementSound(UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type"))
+	void PlayWeaponMovementSound(UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type"))
+	void PlayWeaponActionSound(UPARAM(meta = (Categories = "Als.Weapon Action"))const FGameplayTag& Type);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, Strength"))
+	void PlayActionSound(UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const float Stamina);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, Strength, AttackMode"))
+	void PlayAttackSound(UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float Stamina);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, Strength, AttackForm"))
+	void PlayDamageSound(UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Attack Method"))const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, Strength, AttackForm"))
+	void PlayDeathSound(UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Attack Method"))const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
 
 private:
+	FTimerHandle TimeSinceLastCharacterMovementSoundTimer;
+	float TimeSinceLastCharacterMovementSound;
 	FTimerHandle TimeSinceLastActionSoundTimer;
 	float TimeSinceLastActionSound;
 	FTimerHandle TimeSinceLastAttackSoundTimer;
 	float TimeSinceLastAttackSound;
 	FTimerHandle TimeSinceLastDamageSoundTimer;
 	float TimeSinceLastDamageSound;
+	float TargetCharacterMovementSoundDelay{ 1.0f };
+	float CurrentCharacterMovementSoundDelay{ 10.0f };
 	float TargetActionSoundDelay{ 1.0f };
 	float CurrentActionSoundDelay{ 10.0f };
 	float TargetAttackSoundDelay{ 1.0f };
 	float CurrentAttackSoundDelay{ 10.0f };
 	float TargetDamageSoundDelay{ 1.0f };
 	float CurrentDamageSoundDelay{ 10.0f };
+
+	FALSXTCharacterMovementSound LastCharacterMovementSound;
+	FALSXTWeaponMovementSound LastWeaponMovementSound;
+	FALSXTWeaponActionSound LastWeaponActionSound;
 	FALSXTCharacterActionSound LastCharacterActionSound;
 	FALSXTCharacterActionSound LastCharacterAttackSound;
 	FALSXTCharacterDamageSound LastCharacterDamageSound;
@@ -119,6 +163,12 @@ private:
 	bool ShouldPlayActionSound(const FGameplayTag& Strength, const float Stamina);
 	bool ShouldPlayAttackSound(const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const float Stamina);
 	bool ShouldPlayDamageSound(const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);	
+	bool ShouldPlayDeathSound(const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
+
+	void StartTimeSinceLastCharacterMovementSoundTimer(const float Delay);
+	void IncrementTimeSinceLastCharacterMovementSound();
+	void ResetTimeSinceLastCharacterMovementSoundTimer();
+
 	void StartTimeSinceLastActionSoundTimer(const float Delay);
 	void IncrementTimeSinceLastActionSound();
 	void ResetTimeSinceLastActionSoundTimer();

@@ -135,6 +135,12 @@ namespace ALSXTSexTags
 	UE_DEFINE_GAMEPLAY_TAG(Female, TEXT("Als.Sex.Female"))
 }
 
+namespace ALSXTVoiceVariantTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Default, TEXT("Als.Voice Variant.Default"))
+	UE_DEFINE_GAMEPLAY_TAG(Variant01, TEXT("Als.Voice Variant.Variant 01"))
+}
+
 namespace ALSXTStatusTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Normal, TEXT("Als.Status.Normal"))
@@ -147,6 +153,7 @@ namespace ALSXTFacialExpressionTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Als.Facial Expression.None"))
 	UE_DEFINE_GAMEPLAY_TAG(Happy, TEXT("Als.Facial Expression.Happy"))
+	UE_DEFINE_GAMEPLAY_TAG(Pain, TEXT("Als.Facial Expression.Pain"))
 }
 
 namespace ALSXTFreelookingTags
@@ -574,4 +581,64 @@ namespace ALSXTForegripPositionTags
 	UE_DEFINE_GAMEPLAY_TAG(VerticalGrip, FName{ TEXTVIEW("Als.Foregrip Position.Vertical Grip") })
 	UE_DEFINE_GAMEPLAY_TAG(AngledForeGrip, FName{ TEXTVIEW("Als.Foregrip Position.Angled Fore Grip") })
 	UE_DEFINE_GAMEPLAY_TAG(TopHorizontalGrip, FName{ TEXTVIEW("Als.Foregrip Position.Top Horizontal Grip") })
+}
+
+namespace ALSXTCharacterMovementSoundTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Walking, FName{ TEXTVIEW("Als.Character Movement Sound.Walking") })
+	UE_DEFINE_GAMEPLAY_TAG(Running, FName{ TEXTVIEW("Als.Character Movement Sound.Running") })
+	UE_DEFINE_GAMEPLAY_TAG(Sprinting, FName{ TEXTVIEW("Als.Character Movement Sound.Sprinting") })
+	UE_DEFINE_GAMEPLAY_TAG(Jumping, FName{ TEXTVIEW("Als.Character Movement Sound.Jumping") })
+	UE_DEFINE_GAMEPLAY_TAG(Crouch, FName{ TEXTVIEW("Als.Character Movement Sound.Crouch") })
+	UE_DEFINE_GAMEPLAY_TAG(Uncrouch, FName{ TEXTVIEW("Als.Character Movement Sound.Uncrouch") })
+	UE_DEFINE_GAMEPLAY_TAG(GettingUp, FName{ TEXTVIEW("Als.Character Movement Sound.Getting Up") })
+	UE_DEFINE_GAMEPLAY_TAG(Equip, FName{ TEXTVIEW("Als.Character Movement Sound.Equip") })
+	UE_DEFINE_GAMEPLAY_TAG(Unequip, FName{ TEXTVIEW("Als.Character Movement Sound.Unequip") })
+	UE_DEFINE_GAMEPLAY_TAG(ChangeCombatStance, FName{ TEXTVIEW("Als.Character Movement Sound.Change Combat Stance") })
+	UE_DEFINE_GAMEPLAY_TAG(Blocking, FName{ TEXTVIEW("Als.Character Movement Sound.Blocking") })
+	UE_DEFINE_GAMEPLAY_TAG(ChangeWeaponReadyPosition, FName{ TEXTVIEW("Als.Character Movement Sound.Change Weapon Ready Position") })
+	UE_DEFINE_GAMEPLAY_TAG(ChangeGripPosition, FName{ TEXTVIEW("Als.Character Movement Sound.Change Grip Position") })
+	UE_DEFINE_GAMEPLAY_TAG(ChangeForegripPosition, FName{ TEXTVIEW("Als.Character Movement Sound.Change Foregrip Position") })
+	UE_DEFINE_GAMEPLAY_TAG(ChangeSightPosition, FName{ TEXTVIEW("Als.Character Movement Sound.Change Sight Position") })
+	UE_DEFINE_GAMEPLAY_TAG(Gesture, FName{ TEXTVIEW("Als.Character Movement Sound.Gesture") })
+	UE_DEFINE_GAMEPLAY_TAG(MantlingLow, FName{ TEXTVIEW("Als.Character Movement Sound.Mantling Low") })
+	UE_DEFINE_GAMEPLAY_TAG(MantlingHigh, FName{ TEXTVIEW("Als.Character Movement Sound.Mantling High") })
+	UE_DEFINE_GAMEPLAY_TAG(Vaulting, FName{ TEXTVIEW("Als.Character Movement Sound.Vaulting") })
+	UE_DEFINE_GAMEPLAY_TAG(Leaning, FName{ TEXTVIEW("Als.Character Movement Sound.Leaning") })
+	UE_DEFINE_GAMEPLAY_TAG(Flip, FName{ TEXTVIEW("Als.Character Movement Sound.Flip") })
+}
+
+namespace ALSXTObjectWeightTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Stealth, FName{ TEXTVIEW("Als.Object Weight.Stealth") })
+	UE_DEFINE_GAMEPLAY_TAG(VeryLight, FName{ TEXTVIEW("Als.Object Weight.VeryLight") })
+	UE_DEFINE_GAMEPLAY_TAG(Light, FName{ TEXTVIEW("Als.Object Weight.Light") })
+	UE_DEFINE_GAMEPLAY_TAG(Default, FName{ TEXTVIEW("Als.Object Weight.Default") })
+	UE_DEFINE_GAMEPLAY_TAG(Heavy, FName{ TEXTVIEW("Als.Object Weight.Heavy") })
+	UE_DEFINE_GAMEPLAY_TAG(VeryHeavy, FName{ TEXTVIEW("Als.Object Weight.VeryHeavy") })
+	UE_DEFINE_GAMEPLAY_TAG(ExtremelyHeavy, FName{ TEXTVIEW("Als.Object Weight.ExtremelyHeavy") })
+	UE_DEFINE_GAMEPLAY_TAG(MassivelyHeavy, FName{ TEXTVIEW("Als.Object Weight.MassivelyHeavy") })
+}
+
+namespace ALSXTWeaponTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(M4, FName{ TEXTVIEW("Als.Weapon.M4") })
+	UE_DEFINE_GAMEPLAY_TAG(Pistol, FName{ TEXTVIEW("Als.Weapon.Pistol") })
+	UE_DEFINE_GAMEPLAY_TAG(PistolTwoHanded, FName{ TEXTVIEW("Als.Weapon.Pistol Two Handed") })
+	UE_DEFINE_GAMEPLAY_TAG(Knife, FName{ TEXTVIEW("Als.Weapon.Knife") })
+}
+
+namespace ALSXTWeaponActionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Reloading, FName{ TEXTVIEW("Als.Weapon Action.Reloading") })
+	UE_DEFINE_GAMEPLAY_TAG(Cycling, FName{ TEXTVIEW("Als.Weapon Action.Cycling") })
+	UE_DEFINE_GAMEPLAY_TAG(InpectingMagazine, FName{ TEXTVIEW("Als.Weapon Action.Inpecting Magazine") })
+	UE_DEFINE_GAMEPLAY_TAG(InspectingChamber, FName{ TEXTVIEW("Als.Weapon Action.Inspecting Chamber") })
+	UE_DEFINE_GAMEPLAY_TAG(ClearingJam, FName{ TEXTVIEW("Als.Weapon Action.Clearing Jam") })
+}
+
+namespace ALSXTMotionSoundAreaTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Upper, FName{ TEXTVIEW("Als.Motion Sound Area.Upper") })
+	UE_DEFINE_GAMEPLAY_TAG(Lower, FName{ TEXTVIEW("Als.Motion Sound Area.Lower") })
 }

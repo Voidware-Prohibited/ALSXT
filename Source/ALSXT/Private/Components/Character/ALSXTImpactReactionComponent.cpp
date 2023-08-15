@@ -941,7 +941,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 	FVector RangedVelocity = Character->GetVelocity();
 	VelocityLength = FMath::GetMappedRangeValueClamped(VelocityRange, ConversionRange, Character->GetVelocity().Length());
 
-	if (Character->GetVelocity().Length() > FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
+	if (ShouldPerformImpactResponse() && Character->GetVelocity().Length() > FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
 	{
 		if (Character->GetLocomotionAction() == AlsLocomotionActionTags::Sliding)
 		{

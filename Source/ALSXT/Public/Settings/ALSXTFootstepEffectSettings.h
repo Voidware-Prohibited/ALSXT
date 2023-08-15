@@ -12,6 +12,12 @@ struct ALSXT_API FALSXTGeneralFootstepEffectSettings
 	bool bEnableFootstepEffects { true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableEquipmentSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableOverlayObjectSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableVertexPaintTrace { true };
 
 };

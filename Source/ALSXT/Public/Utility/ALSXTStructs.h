@@ -775,6 +775,15 @@ struct ALSXT_API FALSXTCharacterActionSound
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Sex", AllowPrivateAccess))
+	FGameplayTagContainer Sex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Voice Variant", AllowPrivateAccess))
+	FGameplayTagContainer Variant;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode", AllowPrivateAccess))
+	FGameplayTagContainer Overlay;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", AllowPrivateAccess))
 	FGameplayTagContainer Strength;
 
@@ -786,7 +795,112 @@ struct ALSXT_API FALSXTCharacterActionSound
 
 	bool operator==(const FALSXTCharacterActionSound& other) const
 	{
-		return (other.Strength == Strength) && (other.Stamina == Stamina) && (other.CharacterSound == CharacterSound);
+		return (other.Sex == Sex) && (other.Overlay == Overlay) && (other.Strength == Strength) && (other.Stamina == Stamina) && (other.CharacterSound == CharacterSound);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterMovementSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode", AllowPrivateAccess))
+	FGameplayTagContainer Overlay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Character Movement Sound", AllowPrivateAccess))
+	FGameplayTagContainer Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Object Weight", AllowPrivateAccess))
+	FGameplayTagContainer Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FALSXTCharacterSound Sound;
+
+	bool operator==(const FALSXTCharacterMovementSound& other) const
+	{
+		return (other.Overlay == Overlay) && (other.Type == Type) && (other.Weight == Weight) && (other.Sound == Sound);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterMovementSounds
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FALSXTCharacterMovementSound> Sounds;
+
+	bool operator==(const FALSXTCharacterMovementSounds& other) const
+	{
+		return (other.Sounds == Sounds);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTWeaponMovementSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Weapon", AllowPrivateAccess))
+	FGameplayTagContainer Weapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Character Movement Sound", AllowPrivateAccess))
+	FGameplayTagContainer Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FALSXTCharacterSound Sound;
+
+	bool operator==(const FALSXTWeaponMovementSound& other) const
+	{
+		return (other.Weapon == Weapon) && (other.Type == Type) && (other.Sound == Sound);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTWeaponMovementSounds
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FALSXTWeaponMovementSound> Sounds;
+
+	bool operator==(const FALSXTWeaponMovementSounds& other) const
+	{
+		return (other.Sounds == Sounds);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTWeaponActionSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Weapon", AllowPrivateAccess))
+	FGameplayTagContainer Weapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Weapon Action", AllowPrivateAccess))
+	FGameplayTagContainer Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FALSXTCharacterSound Sound;
+
+	bool operator==(const FALSXTWeaponActionSound& other) const
+	{
+		return (other.Weapon == Weapon) && (other.Type == Type) && (other.Sound == Sound);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTWeaponActionSounds
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FALSXTWeaponActionSound> Sounds;
+
+	bool operator==(const FALSXTWeaponActionSounds& other) const
+	{
+		return (other.Sounds == Sounds);
 	}
 };
 
@@ -794,6 +908,12 @@ USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTCharacterDamageSound
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Sex", AllowPrivateAccess))
+	FGameplayTagContainer Sex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Voice Variant", AllowPrivateAccess))
+	FGameplayTagContainer Variant;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Form;
@@ -806,7 +926,7 @@ struct ALSXT_API FALSXTCharacterDamageSound
 
 	bool operator==(const FALSXTCharacterDamageSound& other) const
 	{
-		return (other.Form == Form) && (other.Damage == Damage) && (other.CharacterSound == CharacterSound);
+		return (other.Sex == Sex) && (other.Variant == Variant) && (other.Form == Form) && (other.Damage == Damage) && (other.CharacterSound == CharacterSound);
 	}
 };
 
@@ -1125,5 +1245,22 @@ struct ALSXT_API FForegripPositions
 	bool operator==(const FForegripPositions& other) const
 	{
 		return (other.Default == Default) && (other.MagazineWell == MagazineWell) && (other.Vertical == Vertical) && (other.Angled == Angled) && (other.Top == Top);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FMotionSoundAreaMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Character Movement Sound", TitleProperty = "{Motions}", AllowPrivateAccess))
+	FGameplayTagContainer Motions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (Categories = "Als.Motion Sound Area", TitleProperty = "{MotionSoundArea}", AllowPrivateAccess))
+	FGameplayTag MotionSoundArea;
+
+	bool operator==(const FMotionSoundAreaMap& other) const
+	{
+		return (other.Motions == Motions) && (other.MotionSoundArea == MotionSoundArea);
 	}
 };

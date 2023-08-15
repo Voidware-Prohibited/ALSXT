@@ -16,8 +16,23 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Seat Interface")
 	void GetSeatLocationAndRotation(FVector& Location, FRotator& Rotation);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Seat Interface")
+	bool CanUseHandsWhileSeated();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Seat Interface")
+	bool CanSeatBeOccupied();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Seat Interface")
+	bool IsSeatOccupied();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Seat Interface")
+	void OccupySeat();
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Seat Interface")
 	TArray<AActor*> GetSwitchableSeats();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Seat Interface")
+	void UnoccupySeat();
 
 };

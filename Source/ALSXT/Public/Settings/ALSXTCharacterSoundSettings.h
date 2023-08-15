@@ -20,17 +20,40 @@ class ALSXT_API UALSXTCharacterSoundSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Strength} {Stamina} {Sound}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds|Movement", Meta = (ForceInlineRow, TitleProperty = "{Sounds}"))
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTCharacterMovementSounds> MovementSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds|Movement", Meta = (ForceInlineRow, TitleProperty = "{Sounds}", ToolTip = "A second Movement Sound Layer for Accents only"))
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTCharacterMovementSounds> MovementAccentSounds;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds", Meta = (TitleProperty = "{Strength} {Stamina} {Sound}", AllowPrivateAccess))
 	TArray<FALSXTCharacterActionSound> ActionSounds;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Strength} {Stamina} {Sound}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds", Meta = (TitleProperty = "{Strength} {Stamina} {Sound}", AllowPrivateAccess))
 	TArray<FALSXTCharacterActionSound> AttackSounds;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Form} {Damage} {Sound}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds", Meta = (TitleProperty = "{Form} {Damage} {Sound}", AllowPrivateAccess))
 	TArray<FALSXTCharacterDamageSound> DamageSounds;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Form} {Damage} {Sound}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds", Meta = (TitleProperty = "{Form} {Damage} {Sound}", AllowPrivateAccess))
 	TArray<FALSXTCharacterDamageSound> DeathSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (TitleProperty = "{MotionSoundArea}", ToolTip = "Set where to get Surface Types to use for each Movement Sound"))
+	TArray<FMotionSoundAreaMap> SoundSourcesForMotions;
+};
+
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UALSXTWeaponSoundSettings : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds", Meta = (Categories = "Als.Weapon", ForceInlineRow))
+	TArray<FALSXTWeaponMovementSound> WeaponMovementSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds", Meta = (Categories = "Als.Weapon", ForceInlineRow))
+	TArray<FALSXTWeaponActionSound> WeaponActionSounds;
+	
 };
 
 USTRUCT(BlueprintType)
@@ -39,7 +62,7 @@ struct ALSXT_API FALSXTGeneralCharacterSoundSettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bEnableCharacterSounds{ true };
+	bool bEnableMovementSounds{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableActionSounds{ true };

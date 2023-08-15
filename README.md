@@ -43,6 +43,10 @@ ALSXT is not automatically synced with the main ALS-Refactored repository, but i
 - Build your Solution in Visual Studio again
 - Once compilation is successful you can now begin using ALSXT in your project
 
+# Settings
+
+Most Settings are set in the ALSXT Character Settings Data Assets in the Character Blueprint. This is where you would customize animations, sounds, parameters and toggle features.
+
 # Contributions
 
 If you wish to contribute, please ensure you are in sync with both ALSXT and ALS-Refactored. While I try to stay in sync with ALS-Refactored, at times it may be temporarily out of sync and features may break or need refactoring.

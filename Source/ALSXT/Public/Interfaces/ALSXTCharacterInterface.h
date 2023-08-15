@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NativeGameplayTags.h"
+#include "Chaos/ChaosEngineInterface.h"
 #include "ALSXTCharacterInterface.generated.h"
 
 UINTERFACE(Blueprintable)
@@ -18,6 +19,15 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void GetVoiceInfo(const FGameplayTag& Sex, const FGameplayTag& VoiceVariant, float& Speed, float& Pitch);
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
+  FALSXTClothingState GetClothingState();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Movement")
+  void GetClothingSurfaceForMovement(TEnumAsByte<EPhysicalSurface>& Surface, UPARAM(meta = (Categories = "Als.Character Movement Sound"))FGameplayTag Movement);
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Movement")
+  void GetAccentSurfaceForMovement(TEnumAsByte<EPhysicalSurface>& Surface, UPARAM(meta = (Categories = "Als.Character Movement Sound"))FGameplayTag Movement);
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   FALSXTBumpPoseState GetCrowdNavigationPoseState();
