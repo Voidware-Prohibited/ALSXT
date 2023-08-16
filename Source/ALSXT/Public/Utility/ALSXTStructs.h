@@ -1259,8 +1259,11 @@ struct ALSXT_API FMotionSoundAreaMap
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (Categories = "Als.Motion Sound Area", TitleProperty = "{MotionSoundArea}", AllowPrivateAccess))
 	FGameplayTag MotionSoundArea;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (TitleProperty = "{MotionSoundArea}", AllowPrivateAccess))
+	FName MotionSoundBone;
+
 	bool operator==(const FMotionSoundAreaMap& other) const
 	{
-		return (other.Motions == Motions) && (other.MotionSoundArea == MotionSoundArea);
+		return (other.Motions == Motions) && (other.MotionSoundArea == MotionSoundArea) && (other.MotionSoundBone == MotionSoundBone);
 	}
 };

@@ -60,6 +60,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	bool DebugMode { false };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	FALSXTGeneralCharacterSoundSettings GeneralCharacterSoundSettings;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayCharacterMovementSound();
 
@@ -81,11 +84,23 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayDeathSound();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool ShouldPlayMovementAccentSound(const FGameplayTag& Type, const FGameplayTag& Strength);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool ShouldPlayWeaponMovementSound(const FGameplayTag& Type, const FGameplayTag& Strength);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
 	float GetHealth();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
 	float GetStamina();
+
+	UFUNCTION(BlueprintCallable, Category = "Movement Sound")
+	FName GetSocketForMovement(const FGameplayTag MovementType);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	FGameplayTag ConvertWeightTagToStrengthTag(const FGameplayTag Weight);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	FGameplayTag ConvertStaminaToStaminaTag(const float Stamina);
@@ -115,7 +130,7 @@ public:
 	FALSXTCharacterDamageSound SelectDeathSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Strength);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Weight"))
-	void PlayCharacterMovementSound(UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
+	void PlayCharacterMovementSound(bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type"))
 	void PlayWeaponMovementSound(UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type);
@@ -137,21 +152,25 @@ public:
 
 private:
 	FTimerHandle TimeSinceLastCharacterMovementSoundTimer;
-	float TimeSinceLastCharacterMovementSound;
+	float TimeSinceLastCharacterMovementSound{ 10.0f };
 	FTimerHandle TimeSinceLastActionSoundTimer;
-	float TimeSinceLastActionSound;
+	float TimeSinceLastActionSound{ 10.0f };
 	FTimerHandle TimeSinceLastAttackSoundTimer;
-	float TimeSinceLastAttackSound;
+	float TimeSinceLastAttackSound{ 10.0f };
 	FTimerHandle TimeSinceLastDamageSoundTimer;
-	float TimeSinceLastDamageSound;
+	float TimeSinceLastDamageSound{ 10.0f };
 	float TargetCharacterMovementSoundDelay{ 1.0f };
-	float CurrentCharacterMovementSoundDelay{ 10.0f };
+	float CurrentCharacterMovementSoundDelay{ 0.0f };
 	float TargetActionSoundDelay{ 1.0f };
-	float CurrentActionSoundDelay{ 10.0f };
+	float CurrentActionSoundDelay{ 0.0f };
 	float TargetAttackSoundDelay{ 1.0f };
-	float CurrentAttackSoundDelay{ 10.0f };
+	float CurrentAttackSoundDelay{ 0.0f };
 	float TargetDamageSoundDelay{ 1.0f };
-	float CurrentDamageSoundDelay{ 10.0f };
+	float CurrentDamageSoundDelay{ 0.0f };
+
+	// USoundBase* ActionSound{ nullptr };
+	// TArray<FAudioParameter> ActionSounds;
+	// ActionSound->GetAllDefaultParameters(ActionSounds);
 
 	FALSXTCharacterMovementSound LastCharacterMovementSound;
 	FALSXTWeaponMovementSound LastWeaponMovementSound;
@@ -178,11 +197,11 @@ private:
 	void StartTimeSinceLastDamageSoundTimer(const float Delay);
 	void IncrementTimeSinceLastDamageSound();
 	void ResetTimeSinceLastDamageSoundTimer();
-	void PlaySound(FALSXTCharacterSound Sound);
+	void PlaySound(FALSXTCharacterSound Sound, FVector Location, FRotator Rotation, float Pitch);
 
 	UFUNCTION(Server, Reliable)
-	void ServerPlaySound(FALSXTCharacterSound Sound);
+	void ServerPlaySound(FALSXTCharacterSound Sound, FVector Location, FRotator Rotation, float Pitch);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastPlaySound(FALSXTCharacterSound Sound);
+	void MulticastPlaySound(FALSXTCharacterSound Sound, FVector Location, FRotator Rotation, float Pitch);
 };

@@ -20,6 +20,9 @@ class ALSXT_API UALSXTCharacterSoundSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds", Meta = (AllowPrivateAccess))
+	USoundBase* SoundMixer{ nullptr };
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds|Movement", Meta = (ForceInlineRow, TitleProperty = "{Sounds}"))
 	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTCharacterMovementSounds> MovementSounds;
 
@@ -38,7 +41,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds", Meta = (TitleProperty = "{Form} {Damage} {Sound}", AllowPrivateAccess))
 	TArray<FALSXTCharacterDamageSound> DeathSounds;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (TitleProperty = "{MotionSoundArea}", ToolTip = "Set where to get Surface Types to use for each Movement Sound"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (TitleProperty = "{MotionSoundArea}", ToolTip = "Set where to get Surface Types to use for each Movement Sound."))
 	TArray<FMotionSoundAreaMap> SoundSourcesForMotions;
 };
 
@@ -65,6 +68,9 @@ struct ALSXT_API FALSXTGeneralCharacterSoundSettings
 	bool bEnableMovementSounds{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableMovementAccentSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableActionSounds{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -75,6 +81,24 @@ struct ALSXT_API FALSXTGeneralCharacterSoundSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableDeathSounds{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	FName VoiceSocketName { "head" };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess, ToolTip = "Minimum Delay between Character Movement Sounds"))
+	FVector2D CharacterMovementSoundDelay { 1.0f, 2.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess, ToolTip = "Minimum Delay between Action Sounds"))
+	FVector2D ActionSoundDelay { 1.0f, 2.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess, ToolTip = "Minimum Delay between Attack Sounds"))
+	FVector2D AttackSoundDelay { 1.0f, 2.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess, ToolTip = "Minimum Delay between Damage Sounds"))
+	FVector2D DamageSoundDelay { 1.0f, 2.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (TitleProperty = "{MotionSoundArea}", ToolTip = "Set where to get Surface Types to use for each Movement Sound."))
+	TArray<FMotionSoundAreaMap> SoundSourcesForMotions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bDebugMode{ false };

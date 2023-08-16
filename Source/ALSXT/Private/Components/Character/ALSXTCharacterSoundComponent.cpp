@@ -52,7 +52,7 @@ void UALSXTCharacterSoundComponent::ResetTimeSinceLastCharacterMovementSoundTime
 void UALSXTCharacterSoundComponent::StartTimeSinceLastActionSoundTimer(const float Delay)
 {
 	ResetTimeSinceLastActionSoundTimer();
-	TimeSinceLastActionSound = 0.0f;
+	TargetActionSoundDelay = FMath::RandRange(GeneralCharacterSoundSettings.ActionSoundDelay.X, GeneralCharacterSoundSettings.ActionSoundDelay.Y);
 	GetWorld()->GetTimerManager().SetTimer(TimeSinceLastActionSoundTimer, this, &UALSXTCharacterSoundComponent::IncrementTimeSinceLastActionSound, Delay, false);
 }
 
@@ -60,7 +60,7 @@ void UALSXTCharacterSoundComponent::IncrementTimeSinceLastActionSound()
 {
 	TimeSinceLastActionSound = TimeSinceLastActionSound + 0.1f;
 	
-	if (TimeSinceLastActionSound >= CurrentActionSoundDelay)
+	if (TimeSinceLastActionSound >= TargetActionSoundDelay)
 	{
 		ResetTimeSinceLastActionSoundTimer();
 	}
@@ -69,7 +69,7 @@ void UALSXTCharacterSoundComponent::IncrementTimeSinceLastActionSound()
 void UALSXTCharacterSoundComponent::ResetTimeSinceLastActionSoundTimer()
 {
 	GetWorld()->GetTimerManager().ClearTimer(TimeSinceLastActionSoundTimer);
-	CurrentActionSoundDelay = 0.0f;
+	TimeSinceLastActionSound = 0.0f;
 }
 
 void UALSXTCharacterSoundComponent::StartTimeSinceLastAttackSoundTimer(const float Delay)
@@ -118,6 +118,39 @@ void UALSXTCharacterSoundComponent::ResetTimeSinceLastDamageSoundTimer()
 	CurrentDamageSoundDelay = 0.0f;
 }
 
+FName UALSXTCharacterSoundComponent::GetSocketForMovement(const FGameplayTag MovementType)
+{
+	FName FoundSocketName;
+	for (FMotionSoundAreaMap SoundSourcesForMotionsEntry : GeneralCharacterSoundSettings.SoundSourcesForMotions)
+	{
+		if (SoundSourcesForMotionsEntry.Motions.HasTag(MovementType))
+		{
+			FoundSocketName = SoundSourcesForMotionsEntry.MotionSoundBone;
+		}
+	}
+	return FoundSocketName;
+}
+
+FGameplayTag UALSXTCharacterSoundComponent::ConvertWeightTagToStrengthTag(const FGameplayTag Weight)
+{
+	if (Weight == ALSXTObjectWeightTags::Stealth || Weight == ALSXTObjectWeightTags::VeryLight || Weight == ALSXTObjectWeightTags::Light)
+	{
+		return ALSXTActionStrengthTags::Light;
+	}
+	else if (Weight == ALSXTObjectWeightTags::Default)
+	{
+		return ALSXTActionStrengthTags::Medium;
+	}
+	else if (Weight == ALSXTObjectWeightTags::Heavy || Weight == ALSXTObjectWeightTags::VeryHeavy || Weight == ALSXTObjectWeightTags::MassivelyHeavy)
+	{
+		return ALSXTActionStrengthTags::Heavy;
+	}
+	else
+	{
+		return ALSXTActionStrengthTags::Medium;
+	}
+}
+
 FGameplayTag UALSXTCharacterSoundComponent::ConvertStaminaToStaminaTag(const float Stamina)
 {
 	if (Stamina >= 0.75)
@@ -163,7 +196,7 @@ FALSXTCharacterMovementSound UALSXTCharacterSoundComponent::SelectCharacterMovem
 	}
 
 	// Filter sounds based on Tag parameters
-	for (auto Sound : Sounds)
+	for (FALSXTCharacterMovementSound Sound : Sounds)
 	{
 		FGameplayTagContainer CurrentTagsContainer;
 		CurrentTagsContainer.AppendTags(Sound.Type);
@@ -519,7 +552,7 @@ FALSXTCharacterDamageSound UALSXTCharacterSoundComponent::SelectDeathSound(UALSX
 
 bool UALSXTCharacterSoundComponent::ShouldPlayActionSound(const FGameplayTag& Strength, const float Stamina)
 {
-		// return (TimeSinceLastActionSound >= CurrentActionSoundDelay);
+	// return (TimeSinceLastActionSound >= TargetActionSoundDelay);
 	return true;
 }
 
@@ -538,31 +571,93 @@ bool UALSXTCharacterSoundComponent::ShouldPlayDeathSound(const FGameplayTag& Att
 	return true;
 }
 
-void UALSXTCharacterSoundComponent::PlayCharacterMovementSound(const FGameplayTag& Type, const FGameplayTag& Weight)
+void UALSXTCharacterSoundComponent::PlayCharacterMovementSound(bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& Weight)
 {
 	if (!CanPlayCharacterMovementSound())
 	{
 		return;
 	}
 
-	float Delay = FMath::RandRange(ActionSoundDelay.X, ActionSoundDelay.Y);
-	StartTimeSinceLastActionSoundTimer(Delay);
+	
 	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
-	FALSXTCharacterMovementSound Sound = SelectCharacterMovementSound(Settings, Type, Weight);
+	FALSXTCharacterMovementSound CharacterMovementSound = SelectCharacterMovementSound(Settings, Type, Weight);
 
-	if (!IsValid(Sound.Sound.Sound.Sound))
+	if (!IsValid(CharacterMovementSound.Sound.Sound.Sound))
 	{
 		return;
 	}
 
+	float Delay = FMath::RandRange(ActionSoundDelay.X, ActionSoundDelay.Y);
+	StartTimeSinceLastActionSoundTimer(Delay);
+
+	FName CharacterMovementSoundSocket = GetSocketForMovement(Type);
+	FVector CharacterMovementSoundLocation;
+	FRotator CharacterMovementSoundRotation;
+	Character->GetMesh()->GetSocketWorldLocationAndRotation(CharacterMovementSoundSocket, CharacterMovementSoundLocation, CharacterMovementSoundRotation);
+
+	
+	// MOVEMENT
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
-		MulticastPlaySound(Sound.Sound);
+		MulticastPlaySound(CharacterMovementSound.Sound, CharacterMovementSoundLocation, CharacterMovementSoundRotation, 1.0);
 	}
 	else
 	{
-		ServerPlaySound(Sound.Sound);
+		ServerPlaySound(CharacterMovementSound.Sound, CharacterMovementSoundLocation, CharacterMovementSoundRotation, 1.0);
 	}
+
+	FGameplayTag MovementStrength = ConvertWeightTagToStrengthTag(Weight);
+	
+	// ACCENT
+	if (ShouldPlayMovementAccentSound(Type, MovementStrength) && AccentSound)
+	{
+		FALSXTCharacterMovementSound CharacterMovementAccentSound = SelectCharacterMovementAccentSound(Settings, Type, Weight);
+
+		if (!IsValid(CharacterMovementAccentSound.Sound.Sound.Sound))
+		{
+			return;
+		}
+
+		FName CharacterMovementAccentSoundSocket = GetSocketForMovement(Type);
+		FVector CharacterMovementAccentSoundLocation;
+		FRotator CharacterMovementAccentSoundRotation;
+		Character->GetMesh()->GetSocketWorldLocationAndRotation(CharacterMovementAccentSoundSocket, CharacterMovementSoundLocation, CharacterMovementSoundRotation);
+
+		if (Character->GetLocalRole() >= ROLE_Authority)
+		{
+			MulticastPlaySound(CharacterMovementAccentSound.Sound, CharacterMovementSoundLocation, CharacterMovementSoundRotation, 1.0);
+		}
+		else
+		{
+			ServerPlaySound(CharacterMovementAccentSound.Sound, CharacterMovementSoundLocation, CharacterMovementSoundRotation, 1.0);
+		}
+	}
+
+	//WEAPON
+	if (ShouldPlayWeaponMovementSound(Type, MovementStrength) && WeaponSound)
+	{
+		FALSXTWeaponMovementSound WeaponMovementSound = SelectWeaponMovementSound(Settings, Type);
+
+		if (!IsValid(WeaponMovementSound.Sound.Sound.Sound))
+		{
+			return;
+		}
+
+		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
+		FVector WeaponMovementSoundLocation;
+		FRotator WeaponMovementSoundRotation;
+		Character->GetMesh()->GetSocketWorldLocationAndRotation(WeaponMovementSoundSocket, CharacterMovementSoundLocation, CharacterMovementSoundRotation);
+
+		if (Character->GetLocalRole() >= ROLE_Authority)
+		{
+			MulticastPlaySound(WeaponMovementSound.Sound, CharacterMovementSoundLocation, CharacterMovementSoundRotation, 1.0);
+		}
+		else
+		{
+			ServerPlaySound(WeaponMovementSound.Sound, CharacterMovementSoundLocation, CharacterMovementSoundRotation, 1.0);
+		}
+	}
+
 }
 
 void UALSXTCharacterSoundComponent::PlayWeaponMovementSound(const FGameplayTag& Type)
@@ -573,9 +668,14 @@ void UALSXTCharacterSoundComponent::PlayWeaponMovementSound(const FGameplayTag& 
 	}
 
 	float Delay = FMath::RandRange(ActionSoundDelay.X, ActionSoundDelay.Y);
-	StartTimeSinceLastActionSoundTimer(Delay);
+	// StartTimeSinceLastActionSoundTimer(Delay);
 	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
 	FALSXTWeaponMovementSound Sound = SelectWeaponMovementSound(Settings, Type);
+
+	FName Socket;
+	FVector SoundLocation;
+	FRotator SoundRotation;
+	// Character->Mesh->GetSocketWorldLocationAndRotation(Socket, SoundLocation, SoundRotation);
 
 	if (!IsValid(Sound.Sound.Sound.Sound))
 	{
@@ -584,11 +684,11 @@ void UALSXTCharacterSoundComponent::PlayWeaponMovementSound(const FGameplayTag& 
 
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
-		MulticastPlaySound(Sound.Sound);
+		MulticastPlaySound(Sound.Sound, SoundLocation, SoundRotation, 1.0);
 	}
 	else
 	{
-		ServerPlaySound(Sound.Sound);
+		ServerPlaySound(Sound.Sound, SoundLocation, SoundRotation, 1.0);
 	}
 }
 
@@ -604,6 +704,11 @@ void UALSXTCharacterSoundComponent::PlayWeaponActionSound(const FGameplayTag& Ty
 	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
 	FALSXTWeaponActionSound Sound = SelectWeaponActionSound(Settings, Type);
 
+	FName Socket;
+	FVector SoundLocation;
+	FRotator SoundRotation;
+	// Character->Mesh->GetSocketWorldLocationAndRotation(Socket, SoundLocation, SoundRotation);
+
 	if (!IsValid(Sound.Sound.Sound.Sound))
 	{
 		return;
@@ -611,39 +716,62 @@ void UALSXTCharacterSoundComponent::PlayWeaponActionSound(const FGameplayTag& Ty
 
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
-		MulticastPlaySound(Sound.Sound);
+		MulticastPlaySound(Sound.Sound, SoundLocation, SoundRotation, 1.0);
 	}
 	else
 	{
-		ServerPlaySound(Sound.Sound);
+		ServerPlaySound(Sound.Sound, SoundLocation, SoundRotation, 1.0);
 	}
 }
 
 void UALSXTCharacterSoundComponent::PlayActionSound(const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
 {	
+	if (Character->GetLocalRole() <= ROLE_SimulatedProxy)
+	{
+		return;
+	}
+
 	if (!CanPlayActionSound() || !ShouldPlayActionSound(Strength, Stamina))
 	{
 		return;
 	}
 
-	float Delay = FMath::RandRange(ActionSoundDelay.X, ActionSoundDelay.Y);
+	float Delay = FMath::RandRange(GeneralCharacterSoundSettings.ActionSoundDelay.X, GeneralCharacterSoundSettings.ActionSoundDelay.Y);
 	StartTimeSinceLastActionSoundTimer(Delay);
 	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
-	FALSXTCharacterActionSound Sound = SelectActionSound(Settings, Sex, Variant, Overlay, Strength, Stamina);
+	FALSXTCharacterActionSound ActionSound = SelectActionSound(Settings, Sex, Variant, Overlay, Strength, Stamina);
 
-	if (!IsValid(Sound.CharacterSound.Sound.Sound))
+	FName Socket;
+	FVector SoundLocation;
+	FRotator SoundRotation;
+	Character->GetMesh()->GetSocketWorldLocationAndRotation(GeneralCharacterSoundSettings.VoiceSocketName, SoundLocation, SoundRotation);
+
+	if (!IsValid(ActionSound.CharacterSound.Sound.Sound))
 	{
 		return;
 	}
 
-	if (Character->GetLocalRole() >= ROLE_Authority)
+
+	if (Character->GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		MulticastPlaySound(Sound.CharacterSound);
+		// Server
+		ServerPlaySound(ActionSound.CharacterSound, SoundLocation, SoundRotation, 1.0);
 	}
-	else
+	else if (Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
 	{
-		ServerPlaySound(Sound.CharacterSound);
+		// Reg
+		PlaySound(ActionSound.CharacterSound, SoundLocation, SoundRotation, 1.0);
 	}
+
+
+	// if (Character->GetLocalRole() >= ROLE_Authority)
+	// {
+	// 	MulticastPlaySound(Sound.CharacterSound, SoundLocation, SoundRotation, 1.0);
+	// }
+	// else
+	// {
+	// 	ServerPlaySound(Sound.CharacterSound, SoundLocation, SoundRotation, 1.0);
+	// }
 }
 
 void UALSXTCharacterSoundComponent::PlayAttackSound(const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float Stamina) 
@@ -658,6 +786,11 @@ void UALSXTCharacterSoundComponent::PlayAttackSound(const FGameplayTag& Sex, con
 	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
 	FALSXTCharacterActionSound Sound = SelectAttackSound(Settings, Sex, Variant, Overlay, Strength, Stamina);
 
+	FName Socket;
+	FVector SoundLocation;
+	FRotator SoundRotation;
+	// Character->Mesh->GetSocketWorldLocationAndRotation(Socket, SoundLocation, SoundRotation);
+
 	if (!IsValid(Sound.CharacterSound.Sound.Sound))
 	{
 		return;
@@ -665,11 +798,11 @@ void UALSXTCharacterSoundComponent::PlayAttackSound(const FGameplayTag& Sex, con
 
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
-		MulticastPlaySound(Sound.CharacterSound);
+		MulticastPlaySound(Sound.CharacterSound, SoundLocation, SoundRotation, 1.0);
 	}
 	else
 	{
-		ServerPlaySound(Sound.CharacterSound);
+		ServerPlaySound(Sound.CharacterSound, SoundLocation, SoundRotation, 1.0);
 	}
 }
 
@@ -685,6 +818,11 @@ void UALSXTCharacterSoundComponent::PlayDamageSound(const FGameplayTag& Sex, con
 	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
 	FALSXTCharacterDamageSound Sound = SelectDamageSound(Settings, Sex, Variant, Overlay, AttackForm, Strength);
 
+	FName Socket;
+	FVector SoundLocation;
+	FRotator SoundRotation;
+	// Character->Mesh->GetSocketWorldLocationAndRotation(Socket, SoundLocation, SoundRotation);
+
 	if (!IsValid(Sound.CharacterSound.Sound.Sound))
 	{
 		return;
@@ -692,11 +830,11 @@ void UALSXTCharacterSoundComponent::PlayDamageSound(const FGameplayTag& Sex, con
 
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
-		MulticastPlaySound(Sound.CharacterSound);
+		MulticastPlaySound(Sound.CharacterSound, SoundLocation, SoundRotation, 1.0);
 	}
 	else
 	{
-		ServerPlaySound(Sound.CharacterSound);
+		ServerPlaySound(Sound.CharacterSound, SoundLocation, SoundRotation, 1.0);
 	}
 }
 
@@ -712,6 +850,11 @@ void UALSXTCharacterSoundComponent::PlayDeathSound(const FGameplayTag& Sex, cons
 	StartTimeSinceLastDamageSoundTimer(Delay);
 	FALSXTCharacterDamageSound Sound = SelectDeathSound(Settings, Sex, Variant, Overlay, AttackForm, Strength);
 
+	FName Socket;
+	FVector SoundLocation;
+	FRotator SoundRotation;
+	// Character->Mesh->GetSocketWorldLocationAndRotation(Socket, SoundLocation, SoundRotation);
+
 	if (!IsValid(Sound.CharacterSound.Sound.Sound))
 	{
 		return;
@@ -719,15 +862,15 @@ void UALSXTCharacterSoundComponent::PlayDeathSound(const FGameplayTag& Sex, cons
 
 	if (Character->GetLocalRole() >= ROLE_Authority)
 	{
-		MulticastPlaySound(Sound.CharacterSound);
+		MulticastPlaySound(Sound.CharacterSound, SoundLocation, SoundRotation, 1.0);
 	}
 	else
 	{
-		ServerPlaySound(Sound.CharacterSound);
+		ServerPlaySound(Sound.CharacterSound, SoundLocation, SoundRotation, 1.0);
 	}
 }
 
-void UALSXTCharacterSoundComponent::PlaySound(FALSXTCharacterSound Sound)
+void UALSXTCharacterSoundComponent::PlaySound(FALSXTCharacterSound Sound, FVector Location, FRotator Rotation, float Pitch)
 {
 	if (Sound.Sound.Sound)
 	{
@@ -747,12 +890,12 @@ void UALSXTCharacterSoundComponent::PlaySound(FALSXTCharacterSound Sound)
 	}
 }
 
-void UALSXTCharacterSoundComponent::ServerPlaySound_Implementation(FALSXTCharacterSound Sound) 
+void UALSXTCharacterSoundComponent::ServerPlaySound_Implementation(FALSXTCharacterSound Sound, FVector Location, FRotator Rotation, float Pitch)
 {
-	MulticastPlaySound(Sound);
+	MulticastPlaySound(Sound, Location, Rotation, Pitch);
 }
 
-void UALSXTCharacterSoundComponent::MulticastPlaySound_Implementation(FALSXTCharacterSound Sound)
+void UALSXTCharacterSoundComponent::MulticastPlaySound_Implementation(FALSXTCharacterSound Sound, FVector Location, FRotator Rotation, float Pitch)
 {
-	PlaySound(Sound);
+	PlaySound(Sound, Location, Rotation, Pitch);
 }

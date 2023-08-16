@@ -180,6 +180,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TEnumAsByte<ETraceTypeQuery> SurfaceTraceChannel;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool EnableVertexPaintTrace{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool EnableCharacterMovementSound{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool EnableCharacterMovementAccentSound{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool EnableWeaponMovementSound{ true };
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ClampMin = 0, ForceUnits = "cm"))
 	float SurfaceTraceDistance{50.0f};
 
