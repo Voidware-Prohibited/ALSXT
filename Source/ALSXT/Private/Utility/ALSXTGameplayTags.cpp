@@ -30,7 +30,7 @@ namespace AlsLocomotionActionTags
 	UE_DEFINE_GAMEPLAY_TAG(ThrowDefault, TEXT("Als.LocomotionAction.Throw.Default"))
 	UE_DEFINE_GAMEPLAY_TAG(Vaulting, TEXT("Als.LocomotionAction.Vaulting"))
 	UE_DEFINE_GAMEPLAY_TAG(Sliding, TEXT("Als.LocomotionAction.Sliding"))
-	UE_DEFINE_GAMEPLAY_TAG(StandingBackflip, TEXT("Als.LocomotionAction.Acrobatic"))
+	UE_DEFINE_GAMEPLAY_TAG(Acrobatic, TEXT("Als.LocomotionAction.Acrobatic"))
 	UE_DEFINE_GAMEPLAY_TAG(WallJumping, TEXT("Als.LocomotionAction.Wall Jumping"))
 	UE_DEFINE_GAMEPLAY_TAG(WallRunning, TEXT("Als.LocomotionAction.Wall Running"))
 	UE_DEFINE_GAMEPLAY_TAG(Emote, TEXT("Als.LocomotionAction.Emote"))
@@ -80,6 +80,16 @@ namespace ALSXTVaultTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(High, TEXT("Als.Vault Type.High"))
 	UE_DEFINE_GAMEPLAY_TAG(Fence, TEXT("Als.Vault Type.Fence"))
 	UE_DEFINE_GAMEPLAY_TAG(InAir, TEXT("Als.Vault Type.In Air"))
+}
+
+namespace ALSXTAcrobaticActionTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Flip, TEXT("Als.Acrobatic Action.Flip"))
+	UE_DEFINE_GAMEPLAY_TAG(WallJump, TEXT("Als.Acrobatic Action.Wall Jump"))
+	UE_DEFINE_GAMEPLAY_TAG(WallRun, TEXT("Als.Acrobatic Action.Wall Run"))
+	UE_DEFINE_GAMEPLAY_TAG(WallRunLeft, TEXT("Als.Acrobatic Action.Wall Run Left"))
+	UE_DEFINE_GAMEPLAY_TAG(WallRunRight, TEXT("Als.Acrobatic Action.Wall Run Right"))
+
 }
 
 namespace ALSXTPhysicalAnimationModeTags
@@ -595,6 +605,7 @@ namespace ALSXTCharacterMovementSoundTags
 	UE_DEFINE_GAMEPLAY_TAG(Equip, FName{ TEXTVIEW("Als.Character Movement Sound.Equip") })
 	UE_DEFINE_GAMEPLAY_TAG(Unequip, FName{ TEXTVIEW("Als.Character Movement Sound.Unequip") })
 	UE_DEFINE_GAMEPLAY_TAG(ChangeCombatStance, FName{ TEXTVIEW("Als.Character Movement Sound.Change Combat Stance") })
+	UE_DEFINE_GAMEPLAY_TAG(Impact, FName{ TEXTVIEW("Als.Character Movement Sound.Impact") })
 	UE_DEFINE_GAMEPLAY_TAG(Blocking, FName{ TEXTVIEW("Als.Character Movement Sound.Blocking") })
 	UE_DEFINE_GAMEPLAY_TAG(ChangeWeaponReadyPosition, FName{ TEXTVIEW("Als.Character Movement Sound.Change Weapon Ready Position") })
 	UE_DEFINE_GAMEPLAY_TAG(ChangeGripPosition, FName{ TEXTVIEW("Als.Character Movement Sound.Change Grip Position") })
@@ -641,4 +652,12 @@ namespace ALSXTMotionSoundAreaTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Upper, FName{ TEXTVIEW("Als.Motion Sound Area.Upper") })
 	UE_DEFINE_GAMEPLAY_TAG(Lower, FName{ TEXTVIEW("Als.Motion Sound Area.Lower") })
+}
+
+namespace ALSXTBreathTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Regular, FName{ TEXTVIEW("Als.Breath Type.Regular") })
+	UE_DEFINE_GAMEPLAY_TAG(Coughing, FName{ TEXTVIEW("Als.Breath Type.Coughing") })
+	UE_DEFINE_GAMEPLAY_TAG(Cold, FName{ TEXTVIEW("Als.Breath Type.Cold") })
+	UE_DEFINE_GAMEPLAY_TAG(Injured, FName{ TEXTVIEW("Als.Breath Type.Injured") })
 }

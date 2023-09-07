@@ -86,14 +86,24 @@ bool UALSXTCombatComponent::IsTartgetObstructed()
 	{
 		ObjectQueryParameters.AddObjectTypesToQuery(UCollisionProfile::Get()->ConvertToCollisionChannel(false, ObjectType));
 	}
+	FCollisionQueryParams CollisionQueryParameters;
+	CollisionQueryParameters.AddIgnoredActor(GetOwner());
+	CollisionQueryParameters.AddIgnoredActor(CurrentTarget.HitResult.GetActor());
 
-	if (GetWorld()->LineTraceMultiByObjectType(OutHits, CharLoc, CurrentTarget.HitResult.GetActor()->GetActorLocation(), ObjectQueryParameters))
+	if (GetWorld()->LineTraceMultiByObjectType(OutHits, CharLoc, CurrentTarget.HitResult.GetActor()->GetActorLocation(), ObjectQueryParameters, CollisionQueryParameters))
 	{
-		if (CombatSettings.UnlockWhenTargetIsObstructed)
-		{
-			ClearCurrentTarget();
+		bool ValidObstruction = false;
+		for (FHitResult Hit : OutHits)
+		{		
+			ValidObstruction = true;
+			if (CombatSettings.UnlockWhenTargetIsObstructed)
+			{
+				ClearCurrentTarget();
+			}
+			return true;
+
 		}
-		return true;
+		return ValidObstruction;		
 	}
 	else
 	{

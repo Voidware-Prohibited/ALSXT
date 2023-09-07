@@ -22,6 +22,9 @@
 #include "Utility/AlsMath.h"
 #include "Utility/AlsUtility.h"
 
+// ReSharper disable once CppUnusedIncludeDirective
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ALSXTAnimNotify_SlideEffects)
+
 FString UALSXTAnimNotify_SlideEffects::GetNotifyName_Implementation() const
 {
 	return FString("ALSXT Slide Effects");

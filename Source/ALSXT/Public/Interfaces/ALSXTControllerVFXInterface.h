@@ -13,11 +13,23 @@ class ALSXT_API IALSXTControllerVFXInterface {
 
 public:
 
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Sprinting")
-	void AddSprintingEffect(float Magnitude, float PostDelay);
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Character")
+    AALSXTCharacter* GetCharacter();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Camera")
+    UAlsCameraComponent* GetCamera();
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Camera")
+    FVector GetCameraLocation();
+
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Camera")
+    FRotator GetCameraRotation();
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Sprinting")
+	void SetRadialBlurEffect(float Amount);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Sprinting")
-	void ResetSprintingEffect();
+	void ResetRadialBlurEffect();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Focus")
 	void SetFocusEffect(bool Focus);
@@ -32,16 +44,10 @@ public:
 	void ResetSuppressionEffect();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Blinded")
-	void AddBlindedEffect(float Magnitude, float Length, float FadeOutLength);
+	void AddBlindnessEffect(float Magnitude, float Length, float FadeOutLength);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Blinded")
-	void ResetBlindedEffect();
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Flashbang")
-	void AddFlashbangEffect(float Magnitude, float Length, float FadeOutLength);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Flashbang")
-	void ResetFlashbangEffect();
+	void ResetBlindnessEffect();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Fly By")
 	void AddProjectileFlyByEffect(USoundBase* Sound, FVector Location, FRotator Rotation);

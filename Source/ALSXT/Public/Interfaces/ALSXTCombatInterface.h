@@ -52,6 +52,9 @@ public:
   bool WillDamageKillPlayer(float& Damage);
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  AActor* GetCurrentTarget();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   FALSXTCombatState GetCombatState();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")

@@ -19,8 +19,6 @@ void UALSXTCharacterCustomizationComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
 }
 
 

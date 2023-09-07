@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "ALSXTCharacter.h"
 #include "ALSXTCharacterCustomizationComponent.generated.h"
 
 
@@ -24,5 +25,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	AALSXTCharacter* Character {Cast<AALSXTCharacter>(GetOwner())};
 };

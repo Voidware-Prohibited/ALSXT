@@ -25,7 +25,7 @@ public class ALSXT : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "CoreUObject", "NetCore", "Engine", "PhysicsCore", "UMG", "GameplayTags", "GameplayCameras", "AIModule", "AnimGraphRuntime", "ControlRig", "Niagara", "EnhancedInput", "ALS", "ALSCamera",
+				"Core", "CoreUObject", "NetCore", "Engine", "PhysicsCore", "AudioExtensions", "UMG", "GameplayTags", "GameplayCameras", "AIModule", "AnimGraphRuntime", "ControlRig", "Niagara", "EnhancedInput", "ALS", "ALSCamera",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

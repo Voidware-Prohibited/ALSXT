@@ -2,6 +2,9 @@
 
 
 #include "Components/PlayerController/ALSXTPlayerViewportEffectsComponent.h"
+#include "Interfaces/ALSXTControllerVFXInterface.h"
+#include "Engine/Scene.h"
+#include "Math/UnrealMathUtility.h"
 
 // Sets default values for this component's properties
 UALSXTPlayerViewportEffectsComponent::UALSXTPlayerViewportEffectsComponent()
@@ -19,7 +22,16 @@ void UALSXTPlayerViewportEffectsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	if (GetOwner()->GetLocalRole() != ROLE_AutonomousProxy)
+	{
+		return;
+	}
+
+	if (GeneralCameraEffectsSettings.bEnableEffects)
+	{
+		Character = IALSXTControllerVFXInterface::Execute_GetCharacter(GetOwner());
+		Camera = IALSXTControllerVFXInterface::Execute_GetCamera(GetOwner());
+	}
 	
 }
 

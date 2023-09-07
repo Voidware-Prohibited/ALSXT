@@ -2,15 +2,13 @@
 
 
 #include "Notify/ALSXTAnimNotify_CharacterMovementSound.h"
-
 #include "AlsCharacter.h"
 #include "ALSXTAnimationInstance.h"
 #include "ALSXTCharacter.h"
-#include "Animation/AnimInstance.h"
-#include "Components/AudioComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 
-#include "Notify/ALSXTAnimNotify_FootstepEffects.h"
+// ReSharper disable once CppUnusedIncludeDirective
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ALSXTAnimNotify_CharacterMovementSound)
 
 
 FString UALSXTAnimNotify_CharacterMovementSound::GetNotifyName_Implementation() const
@@ -23,11 +21,11 @@ void UALSXTAnimNotify_CharacterMovementSound::Notify(USkeletalMeshComponent* Mes
 {
 	Super::Notify(Mesh, Animation, EventReference);
 
-	if (!IsValid(Mesh) || !ALS_ENSURE(IsValid(CharacterMovementSoundNotifySettings)))
+	if (!IsValid(Mesh))
 	{
 		return;
 	}
-
+	const auto* World{ Mesh->GetWorld() };
 	const auto* Character{ Cast<AAlsCharacter>(Mesh->GetOwner()) };
 	AALSXTCharacter* ALSXTCharacter{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
 
@@ -35,11 +33,11 @@ void UALSXTAnimNotify_CharacterMovementSound::Notify(USkeletalMeshComponent* Mes
 	{
 		return;
 	}
+	// FGameplayTag WeightTag = IALSXTCharacterInterface::Execute_GetWeightTag(ALSXTCharacter);
 
-	const auto CapsuleScale{ IsValid(ALSXTCharacter) ? ALSXTCharacter->GetCapsuleComponent()->GetComponentScale().Z : 1.0f };
-
-	const auto* World{ Mesh->GetWorld() };
-	const auto* AnimationInstance{ Mesh->GetAnimInstance() };
-	const auto* ALSXTAnimationInstance{ Cast<UALSXTAnimationInstance>(Mesh->GetAnimInstance()) };
-
+	if (World->WorldType != EWorldType::EditorPreview)
+	{
+	FGameplayTag WeightTag = IALSXTCharacterInterface::Execute_GetWeightTag(ALSXTCharacter);	
+	IALSXTCharacterInterface::Execute_PlayCharacterMovementSound(ALSXTCharacter, EnableCharacterMovementAccentSound, EnableWeaponMovementSound, MovementType, WeightTag);
+	}
 }
