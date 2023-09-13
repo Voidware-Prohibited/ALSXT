@@ -19,6 +19,9 @@ struct ALSXT_API FALSXTVaultingParameters
 	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FVector_NetQuantize100 TargetHandPlantRelativeLocation{ForceInit};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FVector_NetQuantize100 TargetRelativeLocation{ForceInit};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
@@ -105,6 +108,15 @@ struct ALSXT_API FALSXTGeneralVaultingSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ClampMax = 180, ForceUnits = "deg"))
 	float MaxReachAngle{50.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm"))
+	float WalkVaultingForwardDistance { 100.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm"))
+	float RunVaultingForwardDistance { 175.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm"))
+	float SprintVaultingForwardDistance { 225.0f };
 
 	// If a dynamic object has a speed bigger than this value, then do not start mantling.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceUnits = "cm/s"))

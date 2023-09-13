@@ -64,6 +64,36 @@ public:
 	float CurrentHighEffectAmount{ 0.0f };
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void AddDrunkEffect(float NewMagnitude, float RecoveryDelay);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	void OnDrunkEffectChanged(float NewMagnitude);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void ResetDrunkEffect();
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void BeginFadeOutDrunkEffect(float NewRecoveryScale, float NewRecoveryDelay);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void FadeOutDrunkEffect();
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void AddHighEffect(float NewMagnitude, float RecoveryDelay);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	void OnHighEffectChanged(float NewMagnitude);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void ResetHighEffect();
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void BeginFadeOutHighEffect(float NewRecoveryScale, float NewRecoveryDelay);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void FadeOutHighEffect();
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void AddSuppression(float NewMagnitude, float RecoveryDelay);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
@@ -94,21 +124,6 @@ public:
 	void FadeOutBlindnessEffect();
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void AddDamageEffect(float NewMagnitude, float RecoveryDelay);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	void OnDamageEffectChanged(float NewMagnitude);
-
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void ResetDamageEffect();
-
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void BeginFadeOutDamageEffect(float NewRecoveryScale, float NewRecoveryDelay);
-
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void FadeOutDamageEffect();
-
-	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void AddConcussionEffect(float NewMagnitude, float RecoveryDelay);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
@@ -124,52 +139,49 @@ public:
 	void FadeOutConcussionEffect();
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void AddDrunkEffect(float NewMagnitude, float RecoveryDelay);
+	void AddDamageEffect(float NewMagnitude, float RecoveryDelay);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	void OnDrunkEffectChanged(float NewMagnitude);
+	void OnDamageEffectChanged(float NewMagnitude);
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void ResetDrunkEffect();
+	void ResetDamageEffect();
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void BeginFadeOutDrunkEffect(float NewRecoveryScale, float NewRecoveryDelay);
+	void BeginFadeOutDamageEffect(float NewRecoveryScale, float NewRecoveryDelay);
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void FadeOutDrunkEffect();
-
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void AddHighEffect(float NewMagnitude, float RecoveryDelay);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	void OnHighEffectChanged(float NewMagnitude);
-
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void ResetHighEffect();
-
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void BeginFadeOutHighEffect(float NewRecoveryScale, float NewRecoveryDelay);
-
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void FadeOutHighEffect();
+	void FadeOutDamageEffect();
 
 private:
+	// Timer Handles
 	FTimerHandle CameraEffectsTraceTimer;
 	FTimerHandle RadialBlurTimer;
-	FTimerHandle SuppressionFadeOutTimer;
 	FTimerHandle DrunkEffectFadeOutTimer;
 	FTimerHandle HighEffectFadeOutTimer;
+	FTimerHandle SuppressionFadeOutTimer;
 	FTimerHandle BlindnessEffectFadeOutTimer;
 	FTimerHandle ConcussionEffectFadeOutTimer;
+	FTimerHandle DamageEffectFadeOutTimer;
 
+	// Material Indexes
 	int32 RadialBlurBlendableIndex;
-	int32 SuppressionBlendableIndex;
 	int32 DrunkEffectBlendableIndex;
 	int32 HighEffectBlendableIndex;
+	int32 SuppressionBlendableIndex;
 	int32 BlindnessEffectBlendableIndex;
 	int32 ConcussionEffectBlendableIndex;
+	int32 DamageEffectBlendableIndex;
 	int32 DeathEffectBlendableIndex;
+
+	// Recovery (Fade-Out) Scales
 	float RecoveryScale {0.0f};
+	float DrunkEffectRecoveryScale{ 0.0f };
+	float HighEffectRecoveryScale{ 0.0f };
+	float SuppressionEffectRecoveryScale{ 0.0f };
+	float BlindnessEffectRecoveryScale{ 0.0f };
+	float ConcussionEffectRecoveryScale{ 0.0f };
+	float DamageEffectRecoveryScale{ 0.0f };
 
 	void Initialize();
 

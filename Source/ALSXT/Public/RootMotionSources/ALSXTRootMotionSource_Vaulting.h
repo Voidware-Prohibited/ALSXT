@@ -21,6 +21,9 @@ public:
 	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
 
 	UPROPERTY()
+	FVector PlantingRelativeLocation{ForceInit};
+
+	UPROPERTY()
 	FVector TargetRelativeLocation{ForceInit};
 
 	UPROPERTY()

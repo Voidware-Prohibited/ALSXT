@@ -166,22 +166,35 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 {
 	const auto ActorLocation{GetActorLocation()};
 	const auto ActorYawAngle{UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(GetActorRotation().Yaw))};
+	const auto* Capsule{ GetCapsuleComponent() };
+	const auto CapsuleScale{ Capsule->GetComponentScale().Z };
+	const auto CapsuleRadius{ Capsule->GetScaledCapsuleRadius() };
+	const auto CapsuleHalfHeight{ Capsule->GetScaledCapsuleHalfHeight() };
+	const FVector CapsuleBottomLocation{ ActorLocation.X, ActorLocation.Y, ActorLocation.Z - CapsuleHalfHeight };
+	const auto TraceCapsuleRadius{ CapsuleRadius - 1.0f };
+	const auto LedgeHeightDelta{ UE_REAL_TO_FLOAT((TraceSettings.LedgeHeight.GetMax() - TraceSettings.LedgeHeight.GetMin()) * CapsuleScale) };
+#if ENABLE_DRAW_DEBUG
+	const auto bDisplayDebug{ UAlsUtility::ShouldDisplayDebugForActor(this, UAlsConstants::MantlingDebugDisplayName()) };
+#endif
+
+	// FORWARD TRACE
+	// Trace forward to find an obstacle object
 
 	float ForwardTraceAngle;
 	if (LocomotionState.bHasSpeed)
 	{
 		ForwardTraceAngle = LocomotionState.bHasInput
-			                    ? LocomotionState.VelocityYawAngle +
-			                      FMath::ClampAngle(LocomotionState.InputYawAngle - LocomotionState.VelocityYawAngle,
-			                                        -ALSXTSettings->Vaulting.MaxReachAngle, ALSXTSettings->Vaulting.MaxReachAngle)
-			                    : LocomotionState.VelocityYawAngle;
+			? LocomotionState.VelocityYawAngle +
+			FMath::ClampAngle(LocomotionState.InputYawAngle - LocomotionState.VelocityYawAngle,
+				-ALSXTSettings->Vaulting.MaxReachAngle, ALSXTSettings->Vaulting.MaxReachAngle)
+			: LocomotionState.VelocityYawAngle;
 	}
 	else
 	{
 		ForwardTraceAngle = LocomotionState.bHasInput ? LocomotionState.InputYawAngle : ActorYawAngle;
 	}
 
-	const auto ForwardTraceDeltaAngle{FRotator3f::NormalizeAxis(ForwardTraceAngle - ActorYawAngle)};
+	const auto ForwardTraceDeltaAngle{ FRotator3f::NormalizeAxis(ForwardTraceAngle - ActorYawAngle) };
 	if (FMath::Abs(ForwardTraceDeltaAngle) > ALSXTSettings->Vaulting.TraceAngleThreshold)
 	{
 		return false;
@@ -198,38 +211,17 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 			ActorYawAngle + FMath::ClampAngle(ForwardTraceDeltaAngle, -ALSXTSettings->Vaulting.MaxReachAngle, ALSXTSettings->Vaulting.MaxReachAngle))
 	};
 
-#if ENABLE_DRAW_DEBUG
-	 const auto bDisplayDebug{UAlsUtility::ShouldDisplayDebugForActor(this, UAlsConstants::MantlingDebugDisplayName())};
-#endif
-
-	const auto* Capsule{GetCapsuleComponent()};
-
-	const auto CapsuleScale{Capsule->GetComponentScale().Z};
-	const auto CapsuleRadius{Capsule->GetScaledCapsuleRadius()};
-	const auto CapsuleHalfHeight{Capsule->GetScaledCapsuleHalfHeight()};
-
-	const FVector CapsuleBottomLocation{ActorLocation.X, ActorLocation.Y, ActorLocation.Z - CapsuleHalfHeight};
-
-	const auto TraceCapsuleRadius{CapsuleRadius - 1.0f};
-
-	const auto LedgeHeightDelta{UE_REAL_TO_FLOAT((TraceSettings.LedgeHeight.GetMax() - TraceSettings.LedgeHeight.GetMin()) * CapsuleScale)};
-
-	// Trace forward to find an object the character cannot walk on.
-
 	static const FName ForwardTraceTag{__FUNCTION__ TEXT(" (Forward Trace)")};
-
 	auto ForwardTraceStart{CapsuleBottomLocation - ForwardTraceDirection * CapsuleRadius};
 	ForwardTraceStart.Z += (TraceSettings.LedgeHeight.X + TraceSettings.LedgeHeight.Y) *
 		0.5f * CapsuleScale - UCharacterMovementComponent::MAX_FLOOR_DIST;
-
 	auto ForwardTraceEnd{ForwardTraceStart + ForwardTraceDirection * (CapsuleRadius + (TraceSettings.ReachDistance + 1.0f) * CapsuleScale)};
-
 	const auto ForwardTraceCapsuleHalfHeight{LedgeHeightDelta * 0.5f};
-
 	FHitResult ForwardTraceHit;
+
 	GetWorld()->SweepSingleByObjectType(ForwardTraceHit, ForwardTraceStart, ForwardTraceEnd, FQuat::Identity, ObjectQueryParameters,
-	                                    FCollisionShape::MakeCapsule(TraceCapsuleRadius, ForwardTraceCapsuleHalfHeight),
-	                                    {ForwardTraceTag, false, this});
+		FCollisionShape::MakeCapsule(TraceCapsuleRadius, ForwardTraceCapsuleHalfHeight),
+		{ ForwardTraceTag, false, this });
 	
 	auto* TargetPrimitive{ForwardTraceHit.GetComponent()};
 
@@ -251,21 +243,20 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		return false;
 	}
 
+	// DEPTH TRACE
+	// Check if obstacle object is thin enough to vault
+	
 	// Set Local Variables
 	FHitResult DepthTraceHit;
 	static const FName DepthTraceTag{ __FUNCTION__ TEXT(" (Depth Trace)") };
 	FVector HitLocation = ForwardTraceHit.ImpactPoint;
 	FVector HitNormal = ForwardTraceHit.ImpactNormal;
-
-	// Depth Trace Start Location.
 	FVector DepthStartLocation = HitLocation + (ForwardTraceHit.ImpactNormal * (TraceSettings.MaxDepth * -1));
 	FVector DepthEndLocation = ForwardTraceHit.ImpactPoint + (ForwardTraceHit.ImpactNormal * (1 * -1));
+	TArray<AActor*> DepthIgnoreActors;
+	DepthIgnoreActors.Add(this);
 
-	// Depth Trace. Check if less than max depth.
-	GetWorld()->SweepSingleByObjectType(DepthTraceHit, DepthStartLocation, DepthEndLocation, FQuat::Identity, ObjectQueryParameters,
-		FCollisionShape::MakeCapsule(TraceCapsuleRadius, ForwardTraceCapsuleHalfHeight),
-		{ DepthTraceTag, false, this });
-
+	UKismetSystemLibrary::CapsuleTraceSingleForObjects(GetWorld(), DepthStartLocation, DepthEndLocation, CapsuleRadius, CapsuleHalfHeight / 2, ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, DepthIgnoreActors, EDrawDebugTrace::None, DepthTraceHit, true, FLinearColor::Black, FLinearColor::Red, 5.0f);
 
 	// Check if object is thicker than MaxDepth
 	if(!DepthTraceHit.IsValidBlockingHit())
@@ -312,13 +303,30 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		DownwardTraceStart.X,
 		DownwardTraceStart.Y,
 		CapsuleBottomLocation.Z +
-		TraceSettings.LedgeHeight.GetMin() * CapsuleScale + TraceCapsuleRadius - UCharacterMovementComponent::MAX_FLOOR_DIST
+		TraceSettings.LedgeHeight.GetMin()
+		//TraceSettings.LedgeHeight.GetMin() * CapsuleScale + TraceCapsuleRadius - UCharacterMovementComponent::MAX_FLOOR_DIST
 	};
 
+	TArray<FHitResult> DownwardTraceHits;
 	FHitResult DownwardTraceHit;
 	GetWorld()->SweepSingleByObjectType(DownwardTraceHit, DownwardTraceStart, DownwardTraceEnd, FQuat::Identity,
 	                                    ObjectQueryParameters, FCollisionShape::MakeSphere(TraceCapsuleRadius),
 	                                    {DownwardTraceTag, false, this});
+
+	TArray<AActor*> DownwardIgnoreActors;
+	DownwardIgnoreActors.Add(this);
+
+	UKismetSystemLibrary::LineTraceMultiForObjects(GetWorld(), DownwardTraceStart, DownwardTraceEnd, ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, DownwardIgnoreActors, EDrawDebugTrace::None, DownwardTraceHits, true, FLinearColor::White, FLinearColor::Green, 5.0f);
+
+	for (FHitResult DownTraceHit : DownwardTraceHits)
+	{
+		// Check if DownTrace Hit Actor is the Same and Forward Hit Race Actor
+		// TODO Check instead if Perpendicular to Forward Trace Normal
+		if (ForwardTraceHit.GetActor() == DownTraceHit.GetActor())
+		{
+			DownwardTraceHit = DownTraceHit;
+		}
+	}
 
 	if (!GetCharacterMovement()->IsWalkable(DownwardTraceHit))
 	{
@@ -338,11 +346,6 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		return false;
 	}
 
-	// Check if the capsule has room to stand at the downward trace's location. If so,
-	// set that location as the target transform and calculate the Vaulting height.
-
-	static const FName FreeSpaceTraceTag{__FUNCTION__ TEXT(" (Free Space Overlap)")};
-
 	const FVector TargetLocation{
 		DownwardTraceHit.ImpactPoint.X,
 		DownwardTraceHit.ImpactPoint.Y,
@@ -351,28 +354,6 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 
 	const FVector TargetCapsuleLocation{TargetLocation.X, TargetLocation.Y, TargetLocation.Z + CapsuleHalfHeight};
 
-	if (GetWorld()->OverlapAnyTestByObjectType(TargetCapsuleLocation, FQuat::Identity, ObjectQueryParameters,
-	                                           FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight),
-	                                           {FreeSpaceTraceTag, false, this}))
-	{
-#if ENABLE_DRAW_DEBUG
-		if (bDisplayDebug)
-		{
-			UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
-			                                                    ForwardTraceCapsuleHalfHeight, true, ForwardTraceHit, {0.0f, 0.25f, 1.0f},
-			                                                    {0.0f, 0.75f, 1.0f}, TraceSettings.bDrawFailedTraces ? 5.0f : 0.0f);
-
-			UAlsUtility::DrawDebugSweepSingleSphere(GetWorld(), DownwardTraceStart, DownwardTraceEnd, TraceCapsuleRadius,
-			                                        false, DownwardTraceHit, {0.25f, 0.0f, 1.0f}, {0.75f, 0.0f, 1.0f},
-			                                        TraceSettings.bDrawFailedTraces ? 7.5f : 0.0f);
-
-			DrawDebugCapsule(GetWorld(), TargetCapsuleLocation, CapsuleHalfHeight, CapsuleRadius, FQuat::Identity,
-			                 FColor::Red, false, TraceSettings.bDrawFailedTraces ? 10.0f : 0.0f);
-		}
-#endif
-
-		return false;
-	}
 
 #if ENABLE_DRAW_DEBUG
 	if (bDisplayDebug)
@@ -395,16 +376,33 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	static const FName LandingTraceTag{ __FUNCTION__ TEXT(" (Landing Trace)") };
 
 	// Set Local Variables
-	//const FVector LandingStartLocation{	TargetCapsuleLocation + (DepthTraceHit.Normal * 60) + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1)) };
-	const FVector LandingStartLocation{ TargetCapsuleLocation + (DepthTraceHit.Normal * 60) };
-	const FVector LandingEndLocation{ LandingStartLocation.X, LandingStartLocation.Y, GetActorLocation().Z };
+	// const FVector LandingStartLocation{	TargetCapsuleLocation + (DepthTraceHit.Normal * 60) + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1)) };
+	const FVector LandingStartLocation{ TargetCapsuleLocation };
+	const FVector ActionRoomCheckLocation{ TargetCapsuleLocation - (GetActorUpVector() * (CapsuleHalfHeight / 2)) };
+	// const FVector LandingStartLocation = TargetCapsuleLocation;
+	//const FVector LandingEndLocation{ LandingStartLocation.X, LandingStartLocation.Y, GetActorLocation().Z };
+
+	float ForwardMomentumLandingDistance {0.0f};
+	if (GetVelocity().Size() < 333.0)
+	{
+		ForwardMomentumLandingDistance = ALSXTSettings->Vaulting.WalkVaultingForwardDistance;
+	}
+	if (GetVelocity().Size() > 333.0 && GetVelocity().Size() < 600.0)
+	{
+		ForwardMomentumLandingDistance = ALSXTSettings->Vaulting.RunVaultingForwardDistance;
+	}
+	if (GetVelocity().Size() > 600.0)
+	{
+		ForwardMomentumLandingDistance = ALSXTSettings->Vaulting.SprintVaultingForwardDistance;
+	}
+
+	const FVector LandingEndLocation{ GetActorLocation() + (GetActorForwardVector() * ForwardMomentumLandingDistance) };
 	TArray<FHitResult> HitResults;
 	TArray<AActor*> IgnoreActors;
-	// EDrawDebugTrace VaultRoomDebugType;
-	// TEnumAsByte<EDrawDebugTrace::None>* DebugTrace;
+	IgnoreActors.Add(this);
 
 	// Trace for room for Vaulting action
-	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), LandingStartLocation, LandingEndLocation, CapsuleRadius, CapsuleHalfHeight, ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
+	if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), ActionRoomCheckLocation, ActionRoomCheckLocation, CapsuleRadius, CapsuleHalfHeight/2, ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Yellow, FLinearColor::Blue, 5.0f))
 	{
 		FString LandingHit = HitResults[0].GetActor()->GetName();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LandingHit);
@@ -414,52 +412,21 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	//
 	// Landing Location Trace
 
-	const FVector LandingLocation = LandingEndLocation - (DownwardTraceHit.Normal * 10);
-	// const FVector LandingLocation = LandingEndLocation;
-	// Landing Location Trace Hit Result
+	const FVector PotentialLandingLocation{ GetActorLocation() - (ForwardTraceHit.ImpactNormal * ForwardMomentumLandingDistance) };
+	const FVector PotentialLandingLocationTraceEnd{ PotentialLandingLocation - (GetActorUpVector() * 20.0f) };
+	FVector HandPlantLocation;
+	const FVector LandingLocation = LandingEndLocation;
 	FHitResult LandingLocationTraceHit;
 	TArray <FHitResult> LandingLocationTraceHits;
 	TArray <FHitResult> LandingPoints;
 	FHitResult LandingPoint;
 	FVector LandingPointLocation;
+	FALSXTVaultingParameters Parameters;
 	static const FName LandingLocationTraceTag{ __FUNCTION__ TEXT(" (Landing Location Trace)") };
 
 	// Trace for Landing Location
 
-	UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), LandingEndLocation, LandingLocation, CapsuleRadius, CapsuleHalfHeight, ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::ForDuration, LandingLocationTraceHits, true, FLinearColor::Green, FLinearColor::Red, 5.0f);
-
-	for (auto LandingLocHit : LandingLocationTraceHits)
-	{
-		if (!GetCharacterMovement()->IsWalkable(LandingLocHit))
-		{
-			return false;
-		}
-		else
-		{
-			LandingPoints.Add(LandingLocHit);
-		}
-	}
-
-	for (auto LandingPt : LandingPoints)
-	{
-		if (LandingPt.ImpactPoint.Z > LandingPoint.ImpactPoint.Z)
-		{
-			LandingPoint = LandingPt;
-		}
-	}
-
-	// LandingPointLocation = LandingLocationTraceHits[0].ImpactPoint + (LandingLocationTraceHits[0].Normal * 1);
-	LandingPointLocation = LandingPoint.ImpactPoint - (LandingPoint.Normal * CapsuleHalfHeight);
-	LandingPointLocation = LandingPointLocation + (LandingPoint.Normal * 1);
-	// LandingPointLocation = LandingLocation;
-
-	const auto TargetRotation{(-ForwardTraceHit.ImpactNormal.GetSafeNormal2D()).ToOrientationQuat()};
-
-	FALSXTVaultingParameters Parameters;
-
-	Parameters.TargetPrimitive = TargetPrimitive;
-	Parameters.VaultingHeight = UE_REAL_TO_FLOAT((TargetLocation.Z - CapsuleBottomLocation.Z) / CapsuleScale);
-	// Parameters.VaultingHeight = UE_REAL_TO_FLOAT(TargetLocation.Z);
+	bool LandingLocationHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), PotentialLandingLocation, PotentialLandingLocationTraceEnd, CapsuleRadius, CapsuleHalfHeight, ALSXTSettings->Vaulting.VaultingTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, LandingLocationTraceHits, true, FLinearColor::Green, FLinearColor::Red, 2.5f);
 
 	// Determine the Vaulting type by checking the movement mode and Vaulting height.
 	// TODO Expand this
@@ -467,13 +434,49 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	Parameters.LocomotionMode = GetLocomotionMode();
 	Parameters.Gait = GetGait();
 	Parameters.VaultingType = LocomotionMode != AlsLocomotionModeTags::Grounded
-		                          ? ALSXTVaultTypeTags::InAir
-		                          : Parameters.VaultingHeight > ALSXTSettings->Vaulting.VaultingHighHeightThreshold
-		                          ? ALSXTVaultTypeTags::High
-		                          : ALSXTVaultTypeTags::Low;
+		? ALSXTVaultTypeTags::InAir
+		: Parameters.VaultingHeight > ALSXTSettings->Vaulting.VaultingHighHeightThreshold
+		? ALSXTVaultTypeTags::High
+		: ALSXTVaultTypeTags::Low;
 
 	FVaultAnimation VaultingAnimation{ SelectVaultingMontage(GetDesiredGait(), Parameters.VaultingType) };
 	Parameters.VaultAnimation = VaultingAnimation;
+
+	if (LandingLocationHit)
+	{
+		for (auto LandingLocHit : LandingLocationTraceHits)
+		{
+			if (!GetCharacterMovement()->IsWalkable(LandingLocHit))
+			{
+				LandingPoints.Add(LandingLocHit);
+			}
+		}
+
+		for (auto LandingPt : LandingPoints)
+		{
+			if (LandingPt.ImpactPoint.Z > LandingPoint.ImpactPoint.Z)
+			{
+				LandingPoint = LandingPt;
+			}
+		}
+
+		HandPlantLocation = DownwardTraceHit.ImpactPoint - (GetActorUpVector() * VaultingAnimation.VerticalOffset);
+		// LandingPointLocation = DownwardTraceHit.ImpactPoint - (GetActorUpVector() * VaultingAnimation.VerticalOffset) - (ForwardTraceHit.ImpactNormal * CapsuleRadius);
+		LandingPointLocation = DownwardTraceHit.ImpactPoint - (GetActorUpVector() * VaultingAnimation.VerticalOffset) - (ForwardTraceHit.ImpactNormal * ForwardMomentumLandingDistance);
+
+	}
+	else
+	{
+		HandPlantLocation = DownwardTraceHit.ImpactPoint - (GetActorUpVector() * VaultingAnimation.VerticalOffset);
+		// LandingPointLocation = DownwardTraceHit.ImpactPoint - (GetActorUpVector() *  VaultingAnimation.VerticalOffset) - (ForwardTraceHit.ImpactNormal * CapsuleRadius);
+		LandingPointLocation = DownwardTraceHit.ImpactPoint - (GetActorUpVector() * VaultingAnimation.VerticalOffset) - (ForwardTraceHit.ImpactNormal * ForwardMomentumLandingDistance);
+	}
+
+	const auto TargetRotation{(-ForwardTraceHit.ImpactNormal.GetSafeNormal2D()).ToOrientationQuat()};
+
+	Parameters.TargetPrimitive = TargetPrimitive;
+	Parameters.VaultingHeight = UE_REAL_TO_FLOAT((TargetLocation.Z - CapsuleBottomLocation.Z) / CapsuleScale);
+	// Parameters.VaultingHeight = UE_REAL_TO_FLOAT(TargetLocation.Z);
 
 	if (!ALSXTSettings->Vaulting.bAllowVaulting || GetLocalRole() <= ROLE_SimulatedProxy || !IsVaultingAllowedToStart(VaultingAnimation))
 	{
@@ -490,10 +493,6 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 		// const auto TargetRelativeTransform{
 		// 	TargetPrimitive->GetComponentTransform().GetRelativeTransform({TargetRotation, TargetLocation})
 		// };
-		// 
-		// Parameters.TargetRelativeLocation = TargetRelativeTransform.GetLocation();
-		// Parameters.TargetRelativeRotation = TargetRelativeTransform.Rotator();
-
 		// const auto TargetRelativeTransform{
 		// 	TargetPrimitive->GetComponentTransform().GetRelativeTransform({TargetRotation, LandingEndLocation + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1))})
 		// };
@@ -502,14 +501,15 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 			TargetPrimitive->GetComponentTransform().GetRelativeTransform({TargetRotation, LandingPointLocation})
 		};
 
-		Parameters.TargetRelativeLocation = TargetRelativeTransform.GetLocation();
+		Parameters.TargetHandPlantRelativeLocation = HandPlantLocation;
+		// Parameters.TargetRelativeLocation = TargetRelativeTransform.GetLocation();
+		Parameters.TargetRelativeLocation = LandingPointLocation;
 		Parameters.TargetRelativeRotation = TargetRelativeTransform.Rotator();
 	}
 	else
 	{
+		Parameters.TargetHandPlantRelativeLocation = HandPlantLocation;
 		// Parameters.TargetRelativeLocation = TargetLocation;
-		// Parameters.TargetRelativeRotation = TargetRotation.Rotator();
-		
 		// Parameters.TargetRelativeLocation = LandingEndLocation + (DownwardTraceHit.Normal * -(CapsuleHalfHeight * 1));
 		Parameters.TargetRelativeLocation = LandingPointLocation;
 		Parameters.TargetRelativeRotation = TargetRotation.Rotator();
@@ -610,6 +610,7 @@ void AALSXTCharacter::StartVaultingImplementation(const FALSXTVaultingParameters
 	Vaulting->Duration = Duration / PlayRate;
 	Vaulting->VaultingSettings = VaultingSettings;
 	Vaulting->TargetPrimitive = bUseRelativeLocation ? Parameters.TargetPrimitive : nullptr;
+	Vaulting->PlantingRelativeLocation = Parameters.TargetHandPlantRelativeLocation;
 	Vaulting->TargetRelativeLocation = Parameters.TargetRelativeLocation;
 	Vaulting->TargetRelativeRotation = TargetRelativeRotation;
 	Vaulting->ActorFeetLocationOffset = ActorFeetLocationOffset;

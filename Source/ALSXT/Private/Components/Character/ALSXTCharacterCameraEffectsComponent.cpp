@@ -71,11 +71,11 @@ void UALSXTCharacterCameraEffectsComponent::BeginPlay()
 				GetWorld()->GetTimerManager().SetTimer(RadialBlurTimer, this, &UALSXTCharacterCameraEffectsComponent::SetRadialBlur, 0.01f, true);
 			}
 
-			if (GeneralCameraEffectsSettings.bEnableSuppressionEffect)
+			if (GeneralCameraEffectsSettings.bEnableDrunkEffect)
 			{
-				const FWeightedBlendable SuppressionBlend{ 0.0f, GeneralCameraEffectsSettings.SuppressionEffectMaterial };
-				PostProcessComponent->Settings.WeightedBlendables.Array.Add(SuppressionBlend);
-				SuppressionBlendableIndex = PostProcessComponent->Settings.WeightedBlendables.Array.Num() - 1;
+				const FWeightedBlendable DrunkBlend{ 0.0f, GeneralCameraEffectsSettings.DrunkEffectMaterial };
+				PostProcessComponent->Settings.WeightedBlendables.Array.Add(DrunkBlend);
+				DrunkEffectBlendableIndex = PostProcessComponent->Settings.WeightedBlendables.Array.Num() - 1;
 			}
 
 			if (GeneralCameraEffectsSettings.bEnableHighEffect)
@@ -83,6 +83,34 @@ void UALSXTCharacterCameraEffectsComponent::BeginPlay()
 				const FWeightedBlendable HighEffectBlend{ 0.0f, GeneralCameraEffectsSettings.HighEffectMaterial };
 				PostProcessComponent->Settings.WeightedBlendables.Array.Add(HighEffectBlend);
 				HighEffectBlendableIndex = PostProcessComponent->Settings.WeightedBlendables.Array.Num() - 1;
+			}
+
+			if (GeneralCameraEffectsSettings.bEnableSuppressionEffect)
+			{
+				const FWeightedBlendable SuppressionBlend{ 0.0f, GeneralCameraEffectsSettings.SuppressionEffectMaterial };
+				PostProcessComponent->Settings.WeightedBlendables.Array.Add(SuppressionBlend);
+				SuppressionBlendableIndex = PostProcessComponent->Settings.WeightedBlendables.Array.Num() - 1;
+			}
+
+			if (GeneralCameraEffectsSettings.bEnableBlindnessEffect)
+			{
+				const FWeightedBlendable BlindnessBlend{ 0.0f, GeneralCameraEffectsSettings.BlindnessEffectMaterial };
+				PostProcessComponent->Settings.WeightedBlendables.Array.Add(BlindnessBlend);
+				BlindnessEffectBlendableIndex = PostProcessComponent->Settings.WeightedBlendables.Array.Num() - 1;
+			}
+
+			if (GeneralCameraEffectsSettings.bEnableConcussionEffect)
+			{
+				const FWeightedBlendable ConcussionBlend{ 0.0f, GeneralCameraEffectsSettings.ConcussionEffectMaterial };
+				PostProcessComponent->Settings.WeightedBlendables.Array.Add(ConcussionBlend);
+				ConcussionEffectBlendableIndex = PostProcessComponent->Settings.WeightedBlendables.Array.Num() - 1;
+			}
+
+			if (GeneralCameraEffectsSettings.bEnableDamageEffect)
+			{
+				const FWeightedBlendable DamageBlend{ 0.0f, GeneralCameraEffectsSettings.DamageEffectMaterial };
+				PostProcessComponent->Settings.WeightedBlendables.Array.Add(DamageBlend);
+				DamageEffectBlendableIndex = PostProcessComponent->Settings.WeightedBlendables.Array.Num() - 1;
 			}
 		}
 		
@@ -196,102 +224,191 @@ void UALSXTCharacterCameraEffectsComponent::FadeOutSuppression()
 
 void UALSXTCharacterCameraEffectsComponent::AddBlindnessEffect(float NewMagnitude, float RecoveryDelay)
 {
-	//
+	if (GeneralCameraEffectsSettings.bEnableBlindnessEffect)
+	{
+		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(BlindnessEffectBlendableIndex))
+		{
+			PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.BlindnessEffectMaxWeight);
+			BeginFadeOutBlindnessEffect(1.0f, RecoveryDelay);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::ResetBlindnessEffect()
 {
-	//
+	PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight = 0.0f;
 }
 
 void UALSXTCharacterCameraEffectsComponent::BeginFadeOutBlindnessEffect(float NewRecoveryScale, float NewRecoveryDelay)
 {
-	//
+	BlindnessEffectRecoveryScale = NewRecoveryScale;
+	GetWorld()->GetTimerManager().SetTimer(BlindnessEffectFadeOutTimer, this, &UALSXTCharacterCameraEffectsComponent::FadeOutBlindnessEffect, 0.01f, true, NewRecoveryDelay);
 }
 
 void UALSXTCharacterCameraEffectsComponent::FadeOutBlindnessEffect()
 {
-	//
+	if (IsValid(PostProcessComponent))
+	{
+		PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight - 0.001 * BlindnessEffectRecoveryScale), 0.0f, 1.0);
+
+		if (PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight <= 0.0)
+		{
+			Character->GetWorld()->GetTimerManager().ClearTimer(BlindnessEffectFadeOutTimer);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::AddDamageEffect(float NewMagnitude, float RecoveryDelay)
 {
-	//
+	if (GeneralCameraEffectsSettings.bEnableDamageEffect)
+	{
+		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(DamageEffectBlendableIndex))
+		{
+			PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.DamageEffectMaxWeight);
+			BeginFadeOutDamageEffect(1.0f, RecoveryDelay);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::ResetDamageEffect()
 {
-	//
+	if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(DamageEffectBlendableIndex))
+	{
+		PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight = 0.0f;
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::BeginFadeOutDamageEffect(float NewRecoveryScale, float NewRecoveryDelay)
 {
-	//
+	DamageEffectRecoveryScale = NewRecoveryScale;
+	GetWorld()->GetTimerManager().SetTimer(DamageEffectFadeOutTimer, this, &UALSXTCharacterCameraEffectsComponent::FadeOutDamageEffect, 0.01f, true, NewRecoveryDelay);
 }
 
 void UALSXTCharacterCameraEffectsComponent::FadeOutDamageEffect()
 {
-	//
+	if (IsValid(PostProcessComponent))
+	{
+		PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight - 0.001 * DamageEffectRecoveryScale), 0.0f, 1.0);
+
+		if (PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight <= 0.0)
+		{
+			Character->GetWorld()->GetTimerManager().ClearTimer(DamageEffectFadeOutTimer);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::AddConcussionEffect(float NewMagnitude, float RecoveryDelay)
 {
-	//
+	if (GeneralCameraEffectsSettings.bEnableConcussionEffect)
+	{
+		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(ConcussionEffectBlendableIndex))
+		{
+			PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.ConcussionEffectMaxWeight);
+			BeginFadeOutConcussionEffect(1.0f, RecoveryDelay);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::ResetConcussionEffect()
 {
-	//
+	PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight = 0.0f;
 }
 
 void UALSXTCharacterCameraEffectsComponent::BeginFadeOutConcussionEffect(float NewRecoveryScale, float NewRecoveryDelay)
 {
-	//
+	ConcussionEffectRecoveryScale = NewRecoveryScale;
+	GetWorld()->GetTimerManager().SetTimer(ConcussionEffectFadeOutTimer, this, &UALSXTCharacterCameraEffectsComponent::FadeOutConcussionEffect, 0.01f, true, NewRecoveryDelay);
 }
 
 void UALSXTCharacterCameraEffectsComponent::FadeOutConcussionEffect()
 {
-	//
+	if (IsValid(PostProcessComponent))
+	{
+		PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight - 0.001 * ConcussionEffectRecoveryScale), 0.0f, 1.0);
+
+		if (PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight <= 0.0)
+		{
+			Character->GetWorld()->GetTimerManager().ClearTimer(ConcussionEffectFadeOutTimer);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::AddDrunkEffect(float NewMagnitude, float RecoveryDelay)
 {
-	//
+	if (GeneralCameraEffectsSettings.bEnableDrunkEffect)
+	{
+		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(DrunkEffectBlendableIndex))
+		{
+			PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.DrunkEffectMaxWeight);
+			BeginFadeOutDrunkEffect(1.0f, RecoveryDelay);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::ResetDrunkEffect()
 {
-	//
+	if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(DrunkEffectBlendableIndex))
+	{
+		PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight = 0.0f;
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::BeginFadeOutDrunkEffect(float NewRecoveryScale, float NewRecoveryDelay)
 {
-	//
+	DrunkEffectRecoveryScale = NewRecoveryScale;
+	GetWorld()->GetTimerManager().SetTimer(DrunkEffectFadeOutTimer, this, &UALSXTCharacterCameraEffectsComponent::FadeOutDrunkEffect, 0.01f, true, NewRecoveryDelay);
 }
 
 void UALSXTCharacterCameraEffectsComponent::FadeOutDrunkEffect()
 {
-	//
+	if (IsValid(PostProcessComponent))
+	{
+		PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight - 0.001 * DrunkEffectRecoveryScale), 0.0f, 1.0);
+
+		if (PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight <= 0.0)
+		{
+			Character->GetWorld()->GetTimerManager().ClearTimer(DrunkEffectFadeOutTimer);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::AddHighEffect(float NewMagnitude, float RecoveryDelay)
 {
-	//
+	if (GeneralCameraEffectsSettings.bEnableHighEffect)
+	{
+		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(HighEffectBlendableIndex))
+		{
+			PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.HighEffectMaxWeight);
+			BeginFadeOutHighEffect(1.0f, RecoveryDelay);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::ResetHighEffect()
 {
-	//
+	if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(HighEffectBlendableIndex))
+	{
+		PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight = 0.0f;
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::BeginFadeOutHighEffect(float NewRecoveryScale, float NewRecoveryDelay)
 {
-	//
+	HighEffectRecoveryScale = NewRecoveryScale;
+	GetWorld()->GetTimerManager().SetTimer(HighEffectFadeOutTimer, this, &UALSXTCharacterCameraEffectsComponent::FadeOutHighEffect, 0.01f, true, NewRecoveryDelay);
 }
 
 void UALSXTCharacterCameraEffectsComponent::FadeOutHighEffect()
 {
-	//
+	if (IsValid(PostProcessComponent))
+	{
+		PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight - 0.001 * HighEffectRecoveryScale), 0.0f, 1.0);
+
+		if (PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight <= 0.0)
+		{
+			Character->GetWorld()->GetTimerManager().ClearTimer(HighEffectFadeOutTimer);
+		}
+	}
 }
 
 void UALSXTCharacterCameraEffectsComponent::SetRadialBlur()

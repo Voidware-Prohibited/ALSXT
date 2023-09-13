@@ -21,6 +21,12 @@ struct ALSXT_API FALSXTGeneralCameraEffectsSettings
 	bool bEnableSuppressionEffect { true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
+	bool bEnableBlindnessEffect { true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
+	bool bEnableConcussionEffect { true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
 	bool bEnableDamageEffect { true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
@@ -104,57 +110,6 @@ struct ALSXT_API FALSXTGeneralCameraEffectsSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Radial Blur Effect")
 	float RadialBlurMaxWeight {1.0f};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Suppression Effect")
-	TObjectPtr<UMaterialInstance> SuppressionEffectMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Suppression Effect")
-	float SuppressionEffectAmount { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Suppression Effect")
-	float SuppressionEffectBaseFadeOutSpeed { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blindness Effect")
-	TObjectPtr<UMaterialInstance> BlindnessEffectMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blindness Effect")
-	float BlindnessEffectAmount { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blindness Effect")
-	float BlindnessEffectMaxWeight { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blindness Effect")
-	float BlindnessEffectBaseFadeOutSpeed { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Effect")
-	TObjectPtr<UMaterialInstance> DamageEffectMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Effect")
-	float DamageEffectAmount { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Effect")
-	float DamageEffectMaxWeight { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Effect")
-	float DamageEffectBaseFadeOutSpeed { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Concussion Effect")
-	TObjectPtr<UMaterialInstance> ConcussionEffectMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Concussion Effect")
-	float ConcussionEffectAmount { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Concussion Effect")
-	float ConcussionEffectMaxWeight { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Concussion Effect")
-	float ConcussionEffectBaseFadeOutSpeed { 1.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Effect")
-	TObjectPtr<UMaterialInstance> DeathEffectMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Effect")
-	float DeathEffectAmount { 1.0 };
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drunk Effect")
 	TObjectPtr<UMaterialInstance> DrunkEffectMaterial;
 
@@ -178,4 +133,61 @@ struct ALSXT_API FALSXTGeneralCameraEffectsSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "High Effect")
 	float HighEffectBaseFadeOutSpeed { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Suppression Effect")
+	TObjectPtr<UMaterialInstance> SuppressionEffectMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Suppression Effect")
+	float SuppressionEffectAmount { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Suppression Effect")
+	float SuppressionEffectMaxWeight{ 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Suppression Effect")
+	float SuppressionEffectBaseFadeOutSpeed { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blindness Effect")
+	TObjectPtr<UMaterialInstance> BlindnessEffectMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blindness Effect")
+	float BlindnessEffectAmount { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blindness Effect")
+	float BlindnessEffectMaxWeight { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blindness Effect")
+	float BlindnessEffectBaseFadeOutSpeed { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Concussion Effect")
+	TObjectPtr<UMaterialInstance> ConcussionEffectMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Concussion Effect")
+	float ConcussionEffectAmount { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Concussion Effect")
+	float ConcussionEffectMaxWeight { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Concussion Effect")
+	float ConcussionEffectBaseFadeOutSpeed { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Effect")
+	TObjectPtr<UMaterialInstance> DamageEffectMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Effect")
+	float DamageEffectAmount { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Effect")
+	float DamageEffectMaxWeight { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Effect")
+	float DamageEffectBaseFadeOutSpeed { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Effect")
+	TObjectPtr<UMaterialInstance> DeathEffectMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Effect")
+	float DeathEffectAmount { 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Effect")
+	float DeathEffectMaxWeight { 1.0 };
 };

@@ -50,6 +50,15 @@ void FALSXTRootMotionSource_Vaulting::PrepareRootMotion(const float SimulationDe
 
 	// Calculate target transform from the stored relative transform to follow along with moving objects.
 
+	auto PlantingTargetTransform{
+		TargetPrimitive.IsValid()
+			? FTransform{TargetRelativeRotation, PlantingRelativeLocation, TargetPrimitive->GetComponentScale()}
+			.GetRelativeTransformReverse(TargetPrimitive->GetComponentTransform())
+			: FTransform{TargetRelativeRotation, PlantingRelativeLocation}
+	};
+
+	// Calculate target transform from the stored relative transform to follow along with moving objects.
+
 	auto TargetTransform{
 		TargetPrimitive.IsValid()
 			? FTransform{TargetRelativeRotation, TargetRelativeLocation, TargetPrimitive->GetComponentScale()}
@@ -87,8 +96,8 @@ void FALSXTRootMotionSource_Vaulting::PrepareRootMotion(const float SimulationDe
 		{
 			// Calculate the animation offset. This would be the location the actual animation starts at relative to the target transform.
 
-			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * VaultingState.VaultingParameters.VaultAnimation.Montage.StartRelativeLocation.X};
-			AnimationLocationOffset.Z = VaultingState.VaultingParameters.VaultAnimation.Montage.StartRelativeLocation.Z;
+			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * VaultingState.VaultingParameters.TargetHandPlantRelativeLocation.X};
+			AnimationLocationOffset.Z = VaultingState.VaultingParameters.TargetHandPlantRelativeLocation.Z;
 			AnimationLocationOffset *= Character.GetMesh()->GetComponentScale().Z;
 
 			// Blend into the animation offset and final offset at the same time.

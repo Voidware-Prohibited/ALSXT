@@ -13,8 +13,14 @@ class ALSXT_API IALSXTControllerVFXInterface {
 
 public:
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Character")
+    APlayerController* GetPlayerController();
+
     UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Character")
     AALSXTCharacter* GetCharacter();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Character")
+    APlayerCameraManager* GetPlayerCameraManager();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Camera")
     UAlsCameraComponent* GetCamera();
@@ -37,6 +43,18 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Focus")
 	void ResetFocusEffect();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Drunken")
+	void AddDrunkEffect(float Magnitude, float Length, float FadeInLength, float FadeOutLength);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Drunken")
+	void ResetDrunkEffect();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|High")
+	void AddHighEffect(float Magnitude, float Length, float FadeInLength, float FadeOutLength);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|High")
+	void ResetHighEffect();
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Suppression")
 	void AddSuppressionEffect(float Magnitude, float PostDelay);
 
@@ -52,27 +70,21 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Fly By")
 	void AddProjectileFlyByEffect(USoundBase* Sound, FVector Location, FRotator Rotation);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")
-	void AddDamageEffect(float Damage, const FGameplayTag& DamageType, const FHitResult& HitResult, float PostDelay);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")
-	void ResetDamageEffect();
-
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Concussion")
 	void AddConcussionEffect(float Magnitude, float Length, float FadeInLength, float FadeOutLength);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Concussion")
 	void ResetConcussionEffect();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Drunken")
-	void AddDrunkEffect(float Magnitude, float Length, float FadeInLength, float FadeOutLength);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")
+	void AddDamageEffect(float Damage, const FGameplayTag& DamageType, const FHitResult& HitResult, float PostDelay);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Drunken")
-	void ResetDrunkEffect();
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")
+	void ResetDamageEffect();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|High")
-	void AddHighEffect(float Magnitude, float Length, float FadeInLength, float FadeOutLength);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")
+	void AddDeathEffect(float Damage, const FGameplayTag& DamageType, const FHitResult& HitResult, float PostDelay);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|High")
-	void ResetHighEffect();
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")
+	void ResetDeathEffect();
 };

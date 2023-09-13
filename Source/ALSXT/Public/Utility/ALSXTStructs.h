@@ -377,9 +377,12 @@ struct ALSXT_API FVaultAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo Montage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float VerticalOffset {0.0f};
+
 	bool operator==(const FVaultAnimation& other) const
 	{
-		return (other.VaultType == VaultType) && (other.Gait == Gait) && (other.Montage == Montage);
+		return (other.VaultType == VaultType) && (other.Gait == Gait) && (other.Montage == Montage) && (other.VerticalOffset == VerticalOffset);
 	}
 };
 
