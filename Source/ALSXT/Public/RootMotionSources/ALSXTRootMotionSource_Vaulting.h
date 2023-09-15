@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameFramework/RootMotionSource.h"
+#include "State/ALSXTVaultingState.h"
 #include "ALSXTRootMotionSource_Vaulting.generated.h"
 
 class UALSXTVaultingSettings;

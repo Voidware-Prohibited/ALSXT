@@ -51,28 +51,13 @@ struct ALSXT_API FALSXTGeneralCameraEffectsSettings
 	float MaxDOFTraceDistance { 12000.0 };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field")
+	UCurveVector* FirstPersonFocalDistanceToFStopCurve {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field")
+	UCurveVector* ThirdPersonFocalDistanceToFStopCurve {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field")
 	TEnumAsByte<ETraceTypeQuery> TraceType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field|First Person")
-	float FirstPersonMinFStop { 0.025 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field|First Person")
-	float FirstPersonMaxFStop { 0.2 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field|First Person")
-	float FirstPersonAimedMinFStop { 0.025 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field|First Person")
-	float FirstPersonAimedMaxFStop { 0.2 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field|Third Person")
-	float ThirdPersonMinFStop { 0.2 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field|Third Person")
-	float ThirdPersonMaxFStop { 0.5 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field|Third Person")
-	float ThirdPersonAimedMinFStop { 0.025 };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field|Third Person")
 	float ThirdPersonAimedMaxFStop { 0.175 };

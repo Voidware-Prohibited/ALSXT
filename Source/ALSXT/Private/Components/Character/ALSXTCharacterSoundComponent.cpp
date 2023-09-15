@@ -30,8 +30,8 @@ void UALSXTCharacterSoundComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 void UALSXTCharacterSoundComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	Character = Cast<AALSXTCharacter>(GetOwner());
-	AlsCharacter = Cast<AAlsCharacter>(GetOwner());
+	Character = Cast<AALSXTCharacter>(GetOuter());
+	AlsCharacter = Cast<AAlsCharacter>(GetOuter());
 	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
 
 	if (IsValid(Settings))
@@ -45,10 +45,10 @@ void UALSXTCharacterSoundComponent::BeginPlay()
 		// 	ServerSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, Character->GetMesh(), Character->GetMesh()->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), Character->GetMesh()->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
 		// }
 
-		MulticastSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, Character->GetMesh(), Character->GetMesh()->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), Character->GetMesh()->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
+		// MulticastSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, Character->GetMesh(), Character->GetMesh()->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), Character->GetMesh()->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
 		// ServerSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, Character->GetMesh(), Character->GetMesh()->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), Character->GetMesh()->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
 		// ClientSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, Character->GetMesh(), Character->GetMesh()->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), Character->GetMesh()->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
-		// SpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, Character->GetMesh(), Character->GetMesh()->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), Character->GetMesh()->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
+		SpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, Character->GetMesh(), Character->GetMesh()->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), Character->GetMesh()->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
 
 		// if (Character->GetLocalRole() == ROLE_AutonomousProxy)
 		// {
@@ -59,24 +59,6 @@ void UALSXTCharacterSoundComponent::BeginPlay()
 		// {
 		// 	// Reg
 		//   MulticastSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, Character->GetMesh(), Character->GetMesh()->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), Character ->GetMesh()->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
-		// }
-		
-		// CurrentStamina = IALSXTCharacterInterface::Execute_GetStamina(GetOwner());
-		// TArray<FALSXTBreathSound> BreathSounds = SelectBreathSounds(Settings, Character->GetDesiredSex(), ALSXTVoiceVariantTags::Default, ALSXTBreathTypeTags::Regular, CurrentStamina);
-		// TArray<TObjectPtr<UObject>> BreathSoundAssets;
-		// 
-		// for (FALSXTBreathSound BS : BreathSounds)
-		// {
-		// 	for (FSound BreathSoundsAssets : BS.Sounds)
-		// 	{
-		// 		BreathSoundAssets.Add(BreathSoundsAssets.Sound);
-		// 	}
-		// }
-		// 
-		// if (IsValid(VocalizationMixerAudioComponent))
-		// {
-		// 	VocalizationMixerAudioComponent->SetObjectArrayParameter("Breath", BreathSoundAssets);
-		// 	VocalizationMixerAudioComponent->SetTriggerParameter("UE.Source.OnPlay");
 		// }
 
 		// Setup Delegate for each time a vocalization plays
@@ -1477,6 +1459,7 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 
 			if (IsValid(CharacterMovementSoundMixer))
 			{
+				CharacterMovementSoundMixer->SetIsReplicated(true);
 				CharacterMovementSoundMixer->Stop();
 				if (CharacterMovementSound)
 				{
@@ -1511,6 +1494,7 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 			WeaponMovementAudioComponent = UGameplayStatics::SpawnSoundAtLocation(Character->GetWorld(), Settings->WeaponMovementMixer, WeaponMovementSocketLocation, WeaponMovementSocketRotation, 10.0f, MotionSounds.WeaponMovementSoundsPitch);
 			if (IsValid(WeaponMovementAudioComponent))
 			{
+				WeaponMovementAudioComponent->SetIsReplicated(true);
 				FSound NewWeaponMovementSound;
 				DetermineNewSound(MotionSounds.WeaponMovementSounds, PreviousWeaponMovementAssets, NewWeaponMovementSound);
 				float NewCharacterMovementSoundPitch = FMath::RandRange(NewWeaponMovementSound.PitchRange.X, NewWeaponMovementSound.PitchRange.Y);
@@ -1588,8 +1572,12 @@ void UALSXTCharacterSoundComponent::SpawnAudioComponent(UAudioComponent* AudioCo
 	
 	if (!AttachmentSocket.IsNone())
 	{
-		VocalizationMixerAudioComponent = UGameplayStatics::SpawnSoundAttached(Sound, Component, AttachmentSocket, Location, EAttachLocation::SnapToTarget, true, Volume, 1.0f, 0.0f, false);
-		// AudioComponent->Play();
+		VocalizationMixerAudioComponent = UGameplayStatics::SpawnSoundAttached(Sound, Component, AttachmentSocket, Location, EAttachLocation::KeepWorldPosition, true, Volume, 1.0f, 0.0f, false);
+
+		if (IsValid(VocalizationMixerAudioComponent))
+		{
+			VocalizationMixerAudioComponent->SetIsReplicated(true);
+		}
 	}
 	else
 	{

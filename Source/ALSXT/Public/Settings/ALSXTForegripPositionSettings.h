@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utility/ALSXTStructs.h"
 #include "ALSXTForegripPositionSettings.generated.h"
 
 USTRUCT(BlueprintType)

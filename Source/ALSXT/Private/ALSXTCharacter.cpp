@@ -301,7 +301,7 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 	{
 		if (ActionValue.Get<bool>())
 		{
-			if (TryStopRagdolling())
+			if (StopRagdolling())
 			{
 				return;
 			}
@@ -314,7 +314,7 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 			{
 				return;
 			}
-			if (TryStartMantlingGrounded())
+			if (StartMantlingGrounded())
 			{
 				return;
 			}
@@ -383,7 +383,7 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 
 void AALSXTCharacter::InputRagdoll()
 {
-	if (!TryStopRagdolling())
+	if (!StopRagdolling())
 	{
 		StartRagdolling();
 	}
@@ -394,7 +394,7 @@ void AALSXTCharacter::InputRoll()
 	static constexpr auto PlayRate{ 1.3f };
 	if(CanRoll())
 	{
-		TryStartRolling(PlayRate);
+		StartRolling(PlayRate);
 	}
 }
 

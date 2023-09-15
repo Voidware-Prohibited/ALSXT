@@ -6,6 +6,7 @@
 #include "Engine/Scene.h"
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Curves/CurveVector.h"
 
 // Sets default values for this component's properties
 UALSXTPlayerViewportEffectsComponent::UALSXTPlayerViewportEffectsComponent()
@@ -169,17 +170,19 @@ void UALSXTPlayerViewportEffectsComponent::DepthOfFieldTrace()
 		HitDistance = Hit ? OutHit.Distance : 0.0f;
 	}
 
+	float UnaimedFirstPersonFStop = GeneralCameraEffectsSettings.FirstPersonFocalDistanceToFStopCurve->GetVectorValue(HitDistance).X;
+	float UnaimedThirdPersonFStop = GeneralCameraEffectsSettings.ThirdPersonFocalDistanceToFStopCurve->GetVectorValue(HitDistance).X;
+	float AimedFirstPersonFStop = GeneralCameraEffectsSettings.FirstPersonFocalDistanceToFStopCurve->GetVectorValue(HitDistance).Y;
+	float AimedThirdPersonFStop = GeneralCameraEffectsSettings.ThirdPersonFocalDistanceToFStopCurve->GetVectorValue(HitDistance).Y;
+	FGameplayTag CurrentCombatStance = Character->GetDesiredCombatStance();
+	float FirstPersonFStop = CurrentCombatStance == ALSXTCombatStanceTags::Aiming ? AimedFirstPersonFStop : UnaimedFirstPersonFStop;
+	float ThirdPersonFStop = CurrentCombatStance == ALSXTCombatStanceTags::Aiming ? AimedThirdPersonFStop : UnaimedThirdPersonFStop;
+
+	PostProcessComponent->Settings.DepthOfFieldFstop = Character->GetViewMode() == AlsViewModeTags::FirstPerson ? FirstPersonFStop : ThirdPersonFStop;
 	PostProcessComponent->Settings.DepthOfFieldFocalDistance = HitDistance;
-	// PostProcessComponent->Settings.DepthOfFieldFocalRegion = HitDistance;
+	PostProcessComponent->Settings.DepthOfFieldFocalRegion = HitDistance;
 	// PostProcessComponent->Settings.DepthOfFieldFarTransitionRegion = HitDistance + 100.0f;
 	// PostProcessComponent->Settings.DepthOfFieldNearTransitionRegion = FMath::Min(0.0, HitDistance);
-	FGameplayTag CurrentCombatStance = Character->GetDesiredCombatStance();
-	FVector2D FirstPersonRange = CurrentCombatStance == ALSXTCombatStanceTags::Aiming ? FVector2D{ GeneralCameraEffectsSettings.FirstPersonAimedMinFStop, GeneralCameraEffectsSettings.FirstPersonAimedMaxFStop } : FVector2D{ GeneralCameraEffectsSettings.FirstPersonMinFStop, GeneralCameraEffectsSettings.FirstPersonMaxFStop };
-	FVector2D ThirdPersonRange = CurrentCombatStance == ALSXTCombatStanceTags::Aiming ? FVector2D{ GeneralCameraEffectsSettings.ThirdPersonAimedMinFStop, GeneralCameraEffectsSettings.ThirdPersonAimedMaxFStop } : FVector2D{ GeneralCameraEffectsSettings.ThirdPersonMinFStop, GeneralCameraEffectsSettings.ThirdPersonMaxFStop };
-	FVector2D ViewModeFStopRange = Character->GetViewMode() == AlsViewModeTags::FirstPerson ? FirstPersonRange : ThirdPersonRange;
-	PostProcessComponent->Settings.DepthOfFieldFstop = FMath::GetMappedRangeValueClamped(FVector2D{ 0.0, GeneralCameraEffectsSettings.MaxDOFTraceDistance }, ViewModeFStopRange, HitDistance);
-	// PostProcessComponent->Settings.DepthOfFieldFarTransitionRegion = OutHit.Distance + 500.0f;
-	// PostProcessComponent->Settings.DepthOfFieldNearTransitionRegion = 20.f;
 }
 
 void UALSXTPlayerViewportEffectsComponent::SetRadialBlurEffect()

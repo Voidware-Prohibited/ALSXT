@@ -17,9 +17,24 @@ public:
 	// Sets default values for this component's properties
 	UALSXTIdleAnimationComponent();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	FRotator PreviousControlRotation;
+	bool bIsIdle;
+
+	TArray<TObjectPtr<UAnimMontage>> PreviousMontages;
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	TArray<FIdleAnimation> SelectIdleAnimations(const FGameplayTag& Sex, const FGameplayTag& Stance, const FGameplayTag& Overlay, const FGameplayTag& Injury);
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	UAnimMontage* GetNewIdleAnimation(TArray<FIdleAnimation> IdleAnimations);
+
+	void SetNewAnimation(UAnimMontage* Animation, int NoRepeats);
 
 public:	
 	// Called every frame
@@ -34,18 +49,42 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTALSXTGeneralIdleAnimationSettings IdleAnimationSettings;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UAnimMontage* CurrentIdleMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
 	float IdleCounterCurrent{ 0.0f };
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	float CurrentTimeBetweenAnimations{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	float TargetTimeBetweenAnimations{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
 	float IdleCounterTarget{ 0.0f };
+
 	FTimerHandle IdleCounterTimerHandle;
+	FTimerHandle DelayBetweenAnimationsTimerHandle;
+	FTimerDelegate DelayBetweenAnimationsTimerDelegate;
 	FTimerDelegate IdleCounterTimerDelegate;
 	FTimerHandle CameraRotationTimerHandle;
 	FTimerDelegate CameraRotationTimerDelegate;
 	FVector CameraOffset{ FVector::ZeroVector };
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	bool ShouldIdle();
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UALSXTIdleAnimationSettings* SelectIdleSettings();
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	bool IsPlayerIdle();
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	void SetPlayerIdle(bool NewIdle);
+
+	bool IsPlayerInputIdle();
 
 	void StartIdleCounterTimer();
 
@@ -55,6 +94,12 @@ public:
 	void ResetIdleCounterTimer();
 
 	void StartCameraRotationTimer();
+
+	void StartDelayBetweenAnimationsTimer(float InitialDelay);
+	
+	void DelayBetweenAnimationsTimer();
+
+	void ResetDelayBetweenAnimationsTimer();
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	void CameraRotationTimer();

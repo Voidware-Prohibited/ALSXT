@@ -1228,15 +1228,27 @@ struct ALSXT_API FIdleAnimation
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Health", TitleProperty = "{Health}", AllowPrivateAccess))
-	FGameplayTagContainer Health;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Sex", TitleProperty = "{Sex}", AllowPrivateAccess))
+	FGameplayTagContainer Sex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode", TitleProperty = "{Overlay}", AllowPrivateAccess))
+	FGameplayTagContainer Overlay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", TitleProperty = "{Stance}", AllowPrivateAccess))
+	FGameplayTagContainer Stance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Injury", TitleProperty = "{Injury}", AllowPrivateAccess))
+	FGameplayTagContainer Injury;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Locomotion Variant", TitleProperty = "{Variant}", AllowPrivateAccess))
+	FGameplayTagContainer Variant;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UAnimMontage> Montage { nullptr };
 
 	bool operator==(const FIdleAnimation& other) const
 	{
-		return (other.Health == Health) && (other.Montage == Montage);
+		return (other.Sex == Sex) && (other.Overlay == Overlay) && (other.Stance == Stance) && (other.Injury == Injury) && (other.Variant == Variant) && (other.Montage == Montage);
 	}
 };
 

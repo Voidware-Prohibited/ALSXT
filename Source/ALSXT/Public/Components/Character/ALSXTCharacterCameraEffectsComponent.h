@@ -27,12 +27,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
-	// APlayerController* PlayerController {Cast<APlayerController>(GetOwner())};
-
-	// UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
-	// AALSXTCharacter* Character { Cast<AALSXTCharacter>(Cast<APlayerController>(GetOwner()).GetPawn())};
-	
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	AALSXTCharacter* Character {Cast<AALSXTCharacter>(GetOwner())};
 
@@ -184,12 +178,7 @@ private:
 	float DamageEffectRecoveryScale{ 0.0f };
 
 	void Initialize();
-
 	void CameraEffectsTrace();
-
 	void SetRadialBlur();
-
 	void SetDepthOfField();
-
-
 };
