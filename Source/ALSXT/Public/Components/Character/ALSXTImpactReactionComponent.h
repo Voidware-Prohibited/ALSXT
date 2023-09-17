@@ -51,9 +51,9 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	float GetDynamicAttackFallenMinimumTime();
 
-	float GetImpactFallenMinimumTime();
+	float GetImpactFallenMinimumTime(FDoubleHitResult Hit);
 
-	float GetAttackFallenMinimumTime();
+	float GetAttackFallenMinimumTime(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void CrowdNavigationVelocityTimer();
@@ -86,12 +86,12 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void BraceForImpactTimer();
 
-	void StartImpactFallenTimer();
+	void StartImpactFallenTimer(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void ImpactFallenTimer();
 
-	void StartAttackFallenTimer();
+	void StartAttackFallenTimer(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void AttackFallenTimer();
@@ -111,6 +111,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTGeneralImpactReactionSettings ImpactReactionSettings;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<FDoubleHitResult> PreviousImpacts;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<FAttackDoubleHitResult> PreviousAttackImpacts;
+
 	void ObstacleTrace();
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
@@ -127,6 +133,12 @@ public:
 
 	UFUNCTION(Server, Unreliable)
 	void ServerProcessNewImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	FDoubleHitResult GetLastImpact() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	FAttackDoubleHitResult GetLastAttackImpact() const;
 
 	//
 
@@ -331,13 +343,28 @@ public:
 	bool ShouldClutchImpactPoint();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanCrowdNavigationFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldCrowdNavigationFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanImpactFall();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldImpactFall();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanAttackFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldAttackFall();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanSyncedAttackFall();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldSyncedAttackFall();
@@ -873,10 +900,10 @@ private:
 	void MulticastStartClutchImpactPoint(UAnimSequenceBase* Pose, FVector ImpactPoint);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartImpactFall(FDoubleHitResult Hit, FActionMontageInfo Montage);
+	void ServerStartImpactFall(FDoubleHitResult Hit, FActionMontageInfo Montage, FActionMontageInfo FallMontage);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartImpactFall(FDoubleHitResult Hit, FActionMontageInfo Montage);
+	void MulticastStartImpactFall(FDoubleHitResult Hit, FActionMontageInfo Montage, FActionMontageInfo FallMontage);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartImpactFallIdle(FDoubleHitResult Hit, FActionMontageInfo Montage);
@@ -885,16 +912,16 @@ private:
 	void MulticastStartImpactFallIdle(FDoubleHitResult Hit, FActionMontageInfo Montage);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartAttackFall(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+	void ServerStartAttackFall(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, FActionMontageInfo FallMontage);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartAttackFall(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+	void MulticastStartAttackFall(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, FActionMontageInfo FallMontage);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartAttackFallIdle(UAnimMontage* Montage);
+	void ServerStartAttackFallIdle(UAnimMontage* Montage, FAttackDoubleHitResult Hit);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartAttackFallIdle(UAnimMontage* Montage);
+	void MulticastStartAttackFallIdle(UAnimMontage* Montage, FAttackDoubleHitResult Hit);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartSyncedAttackFall(FActionMontageInfo Montage);
@@ -990,13 +1017,13 @@ private:
 
 	void StartClutchImpactPointImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint);
 
-	void StartImpactFallImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage);
+	void StartImpactFallImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage, FActionMontageInfo FallMontage);
 
 	void StartImpactFallIdleImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage);
 
-	void StartAttackFallImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
+	void StartAttackFallImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, FActionMontageInfo FallMontage);
 
-	void StartAttackFallIdleImplementation(UAnimMontage* Montage);
+	void StartAttackFallIdleImplementation(UAnimMontage* Montage, FAttackDoubleHitResult Hit);
 
 	void StartSyncedAttackFallImplementation(FActionMontageInfo Montage);
 

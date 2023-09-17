@@ -1346,7 +1346,6 @@ void AALSXTCharacter::SetDesiredStatus(const FGameplayTag& NewStatusTag)
 {
 	if (DesiredStatus != NewStatusTag)
 	{
-		DesiredStatus = NewStatusTag;
 
 		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredStatus, this)
 
@@ -1359,6 +1358,8 @@ void AALSXTCharacter::SetDesiredStatus(const FGameplayTag& NewStatusTag)
 				// MulticastSetDesiredStatus(NewStatusTag);
 				// ServerSetDesiredStatus(NewStatusTag);
 				SetStatus(NewStatusTag);
+				DesiredStatus = NewStatusTag;
+				Status = NewStatusTag;
 			}
 	}
 }
@@ -1395,7 +1396,7 @@ void AALSXTCharacter::SetStatus(const FGameplayTag& NewStatusTag)
 			GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
 			SetDesiredStance(AlsStanceTags::Standing);
 			UnCrouch();
-			IALSXTCharacterInterface::Execute_TryGetUp(this);
+			// IALSXTCharacterInterface::Execute_TryGetUp(this);
 		}
 
 		OnStatusChanged(PreviousStatus);
