@@ -1572,7 +1572,7 @@ void UALSXTCharacterSoundComponent::SpawnAudioComponent(UAudioComponent* AudioCo
 	
 	if (!AttachmentSocket.IsNone())
 	{
-		VocalizationMixerAudioComponent = UGameplayStatics::SpawnSoundAttached(Sound, Component, AttachmentSocket, Location, EAttachLocation::KeepWorldPosition, true, Volume, 1.0f, 0.0f, false);
+		VocalizationMixerAudioComponent = UGameplayStatics::SpawnSoundAttached(Sound, Component, AttachmentSocket, Location, EAttachLocation::KeepWorldPosition, true, Volume, 1.0f, 0.0f, nullptr, nullptr, false);
 
 		if (IsValid(VocalizationMixerAudioComponent))
 		{
