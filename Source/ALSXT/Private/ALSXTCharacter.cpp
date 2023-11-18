@@ -37,6 +37,21 @@ AALSXTCharacter::AALSXTCharacter()
 	Camera->SetupAttachment(GetMesh());
 	Camera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
 
+	BodyParts = CreateDefaultSubobject<USceneComponent>(TEXT("Body Parts"));
+	BodyParts->SetupAttachment(GetMesh());
+
+	HeadDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Head Dummy Shadow"));
+	HeadDummyShadow->SetupAttachment(BodyParts);
+	HeadDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	HeadDummyShadow->SetHiddenInGame(true);
+	HeadDummyShadow->bCastHiddenShadow = true;
+
+	ClothingSlots = CreateDefaultSubobject<USceneComponent>(TEXT("Clothing Slots"));
+	ClothingSlots->SetupAttachment(GetMesh());
+
+	PhysicsConstraints = CreateDefaultSubobject<USceneComponent>(TEXT("Physics Constraints"));
+	PhysicsConstraints->SetupAttachment(this->RootComponent);
+
 	AimAnimationHelperBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Aim Animation Helper Box"));
 	AimAnimationHelperBox->SetupAttachment(this->RootComponent);
 	AimAnimationHelperBox->SetBoxExtent(FVector(0.1f, 32.0f, 360.0f), true);

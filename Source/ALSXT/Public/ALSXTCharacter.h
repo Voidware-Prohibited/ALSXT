@@ -51,6 +51,18 @@ public:
 	TObjectPtr<UAlsCameraComponent> Camera;
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<USceneComponent> BodyParts;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<USkeletalMeshComponent> HeadDummyShadow;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<USceneComponent> ClothingSlots;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<USceneComponent> PhysicsConstraints;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UBoxComponent> AimAnimationHelperBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
