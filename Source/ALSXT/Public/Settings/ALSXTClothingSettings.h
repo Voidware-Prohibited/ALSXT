@@ -17,7 +17,7 @@ struct ALSXT_API FALSXTClothingItem
 	FGameplayTagContainer ClothingState{FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	TEnumAsByte<EPhysicalSurface> SurfaceType;
+	TEnumAsByte<EPhysicalSurface> SurfaceType {SurfaceType_Default};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
 	float BaseDamage{ 0.0f };

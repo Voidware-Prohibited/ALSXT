@@ -38,7 +38,7 @@ AALSXTCharacter::AALSXTCharacter()
 	Camera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
 
 	AimAnimationHelperBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Aim Animation Helper Box"));
-	AimAnimationHelperBox->AttachToComponent(this->RootComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true));
+	AimAnimationHelperBox->SetupAttachment(this->RootComponent);
 	AimAnimationHelperBox->SetBoxExtent(FVector(0.1f, 32.0f, 360.0f), true);
 	AimAnimationHelperBox->SetCollisionObjectType(ECC_Visibility);
 	AimAnimationHelperBox->SetGenerateOverlapEvents(true);

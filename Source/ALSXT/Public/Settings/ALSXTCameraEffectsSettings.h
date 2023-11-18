@@ -57,7 +57,7 @@ struct ALSXT_API FALSXTGeneralCameraEffectsSettings
 	UCurveVector* ThirdPersonFocalDistanceToFStopCurve {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field")
-	TEnumAsByte<ETraceTypeQuery> TraceType;
+	TEnumAsByte<ETraceTypeQuery> TraceType {TraceTypeQuery1};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field|Third Person")
 	float ThirdPersonAimedMaxFStop { 0.175 };

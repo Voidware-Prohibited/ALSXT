@@ -1,31 +1,67 @@
-# Advanced Locomotion System Refactored XT
+<h1 align="center">ALSXT - ALS-Refactored XT</h1>
 
-![ALSXT](ALSXT.png)
+<p align="center">
+<img src="ALSXT.png" alt="ALSXT">
+</p>
 
-An Unreal Engine 5 plugin that extends Advanced Locomotion System Refactored with expanded Character States, Improved Foot Print system, Sliding, Physical Animation, Vaulting, Wallrunning and more planned.
+<p align="center">
+    <a href="https://github.com/Voidware-Prohibited/ALSXT/commits/master">
+    <img src="https://img.shields.io/github/last-commit/Voidware-Prohibited/ALSXT.svg?style=flat-square&logo=github&logoColor=white"
+         alt="GitHub last commit">
+     </a>
+    <a href="https://github.com/Voidware-Prohibited/ALSXT/issues">
+    <img src="https://img.shields.io/github/issues-raw/Voidware-Prohibited/ALSXT.svg?style=flat-square&logo=github&logoColor=white"
+         alt="GitHub issues">
+    </a>
+    <a href="https://github.com/Voidware-Prohibited/ALSXT/pulls">
+    <img src="https://img.shields.io/github/issues-pr-raw/Voidware-Prohibited/ALSXT.svg?style=flat-square&logo=github&logoColor=white"
+         alt="GitHub pull requests">
+    </a>
+    <a href="https://github.com/Voidware-Prohibited/ALSXT/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/Voidware-Prohibited/ALSXT.svg?style=flat-square&logo=github&logoColor=white"
+         alt="MIT License">
+    </a>
+    <a href="https://github.com/sponsors/colorindarkness">
+    <img src="https://img.shields.io/github/sponsors/colorindarkness.svg?style=flat-square&logo=github&logoColor=white"
+         alt="Become a Sponsor">
+    </a>
+    <a href="https://www.patreon.com/colorindarkness">
+    <img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dcolorindarkness%26type%3Dpatrons&style=flat"
+         alt="Become a Patron">
+    </a>
+</p>
 
-_ALSXT is under heavy development, some features may not be finished or production-ready_
-_Contibutors and PRs are welcome_
+An Unreal Engine 5 plugin that extends ALS-Refactored with a set of popular replicated gameplay features, to demonstrate the extendability of ALS-Refactored in a Modular, Data-Driven, UE5 Way. The feature-set is informed by First and Third Person Tactical Shooters, Action Shooters and the parent project [Target Vector](https://github.com/Voidware-Prohibited/TargetVector).
+
+_ALSXT is under heavy development, many features may not be finished or production-ready_.
+
+_[Contibutors](#Contributions) and PRs are welcome_.
 
 # Introduction
 
 **Features**
 
-- Combat Component _In Progress_.
-- Impact Reactions (Blending reaction animations with Physical Animation) _In Progress_.
-- Sliding Locomotion Action.
-- Advanced Footprints System.
-- Character Sound Component.
-- Expanded Character States (Combat Stance, Sex, Variant, Weapon Ready Position).
-- Vaulting _In Progress_.
-- Camera FX Component _In Progress_.
-- Gestures _Coming Soon_.
-- Emotes _Coming Soon_.
-- Stationary Modes (Sitting etc) _Coming Soon_.
-- Actobatic Actions (Wallrunning etc)  _Coming Soon_.
+- Expanded Character States (Combat Stance, Sex, Variant, Weapon Ready Position)
+- Sliding Locomotion Action (with Sound, Decal and Particle Support)
+- Expanded Footprints System (Independent foot states, Saturation, Material Transfer, Vertex Paint Support(Static Mesh only, In Progress))
+- Combat Component _In Progress_
+- Impact Reactions (Blending reaction animations with Physical Animation) _In Progress_
+- Character Sound Component_In Progress_
+- Idle Animation Component _In Progress_
+- Paintable Skeletal Mesh Component _In Progress_
+- Vaulting _In Progress_
+- Camera FX Component _In Progress_
+- Acrobatic Actions (Flipping, Wallrunning etc) _In Progress_
+- Basic Stats Component (Stamina and Health to demonstate the functionality of various components)
 
+**Planned Features**
+- New Skeletal Mesh and Clothing set with Morph Targets/Shape Keys
+- Clothing Component (Clothing States, Paintable)
+- Gestures
+- Emotes
+- Stationary Modes (Sitting etc)
 
-**Dependecies**
+**Dependencies**
 
 - [Advanced Locomotion System Refactored](https://github.com/Sixze/ALS-Refactored/)
 
@@ -45,11 +81,15 @@ ALSXT is not automatically synced with the main ALS-Refactored repository, but i
 
 # Settings
 
-Most Settings are set in the ALSXT Character Settings Data Assets in the Character Blueprint. This is where you would customize animations, sounds, parameters and toggle features.
+Most Settings are set in the ALSXT Character Settings Data Assets in the Character Blueprint. This is where you would customize animations, sounds, parameters and toggle features. Components are configured similarly. Components may have some general settings that are editable when clicking on the Component inside the Character Blueprint.
 
 # Contributions
 
-If you wish to contribute, please ensure you are in sync with both ALSXT and ALS-Refactored. While I try to stay in sync with ALS-Refactored, at times it may be temporarily out of sync and features may break or need refactoring.
+I'm looking for help with implementing Root Motion for Vaulting, Wallrunning, Walljumping!
+Any advice regarding making actions more GAS-friendly would be welcome!
+
+If you wish to contribute, please ensure you are in sync with ALSXT, message me and I'll set up permissions for you. While I try to stay in sync with ALS-Refactored, at times it may be temporarily out of sync and features may break or need refactoring.
+Please submit an issue for any Compile error fixes. Most are usually the result of ALSXT not being synced to ALS-R.
 
 # License
 
@@ -83,6 +123,10 @@ Original content and code in this repository is under the MIT license. Any git s
 
 # Special Thanks
 
+[Sixze](https://github.com/Sixze)
+
 [Freesound](https://freesound.org/)
 
-[Sixze](https://github.com/Sixze)
+[SketchFab](https://sketchfab.com/)
+
+[Mixamo](https://www.mixamo.com)

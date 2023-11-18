@@ -1181,6 +1181,44 @@ struct ALSXT_API FALSXTElementalParticleActor
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTMeshPaintCriteria
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Surfaces}", AllowPrivateAccess))
+	TArray<TEnumAsByte<EPhysicalSurface>> Surfaces;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Mesh Paint Type", TitleProperty = "{PaintType}", AllowPrivateAccess))
+	FGameplayTag PaintType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Elemental Condition", TitleProperty = "{Conditions}", AllowPrivateAccess))
+	FGameplayTagContainer Conditions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	bool FadeOut{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float FadeOutDelay{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float FadeOutSpeed{ 0.0f };
+
+	bool operator==(const FALSXTMeshPaintCriteria& other) const
+	{
+		return (other.Surfaces == Surfaces) && (other.PaintType == PaintType) && (other.Conditions == Conditions) && (other.FadeOut == FadeOut) && (other.FadeOutDelay == FadeOutDelay) && (other.FadeOutSpeed == FadeOutSpeed);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTMeshPaintCriteriaMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Surfaces}", AllowPrivateAccess))
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTMeshPaintCriteria> MeshPaintCriteriaMap;
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTElementalInteraction
 {
 	GENERATED_BODY()

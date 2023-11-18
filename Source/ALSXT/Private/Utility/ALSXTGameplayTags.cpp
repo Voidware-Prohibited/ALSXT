@@ -661,3 +661,12 @@ namespace ALSXTBreathTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(Cold, FName{ TEXTVIEW("Als.Breath Type.Cold") })
 	UE_DEFINE_GAMEPLAY_TAG(Injured, FName{ TEXTVIEW("Als.Breath Type.Injured") })
 }
+
+namespace ALSXTMeshPaintTypeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(BloodDamage, FName{ TEXTVIEW("Als.Mesh Paint Type.Blood Damage") })
+	UE_DEFINE_GAMEPLAY_TAG(SurfaceDamage, FName{ TEXTVIEW("Als.Mesh Paint Type.Surface Damage") })
+	UE_DEFINE_GAMEPLAY_TAG(BackSpatter, FName{ TEXTVIEW("Als.Mesh Paint Type.Back Spatter") })
+	UE_DEFINE_GAMEPLAY_TAG(Saturation, FName{ TEXTVIEW("Als.Mesh Paint Type.Saturation") })
+	UE_DEFINE_GAMEPLAY_TAG(Burn, FName{ TEXTVIEW("Als.Mesh Paint Type.Burn") })
+}

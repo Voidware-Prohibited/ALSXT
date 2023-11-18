@@ -11,6 +11,8 @@
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTSlidingSettings.h"
 #include "Settings/ALSXTFPEyeFocusSettings.h"
+#include "Settings/ALSXTMeshRenderSettings.h"
+#include "Settings/ALSXTMeshPaintingSettings.h"
 #include "ALSXTCharacterSettings.generated.h"
 
 /**
@@ -42,6 +44,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FALSXTFPEyeFocusSettings FirstPersonEyeFocus;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FALSXTGeneralALSXTMeshRenderSettings MeshRender;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FALSXTGlobalGeneralMeshPaintingSettings MeshPainting;
 
 	UALSXTCharacterSettings();
 	
