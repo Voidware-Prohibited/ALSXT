@@ -37,6 +37,22 @@ AALSXTCharacter::AALSXTCharacter()
 	Camera->SetupAttachment(GetMesh());
 	Camera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
 
+	BodyCamera = CreateDefaultSubobject<UCineCameraComponent>(TEXT("Body Camera"));
+	BodyCamera->SetupAttachment(GetMesh(), FName("spine_03"));
+	BodyCamera->SetRelativeRotation_Direct({ 0.0f, 90.0f, -90.0f });
+	BodyCamera->SetRelativeLocation_Direct({ 0.0f, 20.72f, 0.0f });
+
+	KillerCameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Killer Camera Spring Arm"));
+	KillerCameraSpringArm->SetupAttachment(GetMesh());
+	KillerCameraSpringArm->SetRelativeRotation_Direct({ 10.0f, 300.0f, 0.0f });
+	KillerCameraSpringArm->SetRelativeLocation_Direct({ 0.0f, 0.0f, 122.0f });
+	KillerCameraSpringArm->TargetArmLength = 250.0;
+
+	KillerCamera = CreateDefaultSubobject<UCineCameraComponent>(TEXT("Killer Camera"));
+	KillerCamera->SetupAttachment(KillerCameraSpringArm);
+	KillerCamera->SetRelativeRotation_Direct({ 0.0f, 0.0f, 0.0f });
+	KillerCamera->SetRelativeLocation_Direct({ -250.0f, 0.0f, 0.0f });
+
 	BodyParts = CreateDefaultSubobject<USceneComponent>(TEXT("Body Parts"));
 	BodyParts->SetupAttachment(GetMesh());
 

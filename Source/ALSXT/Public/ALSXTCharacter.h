@@ -4,6 +4,12 @@
 #include "GameFramework/Character.h"
 #include "ALSXTCharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Components/Mesh/ALSXTPaintableSkeletalMeshComponent.h"
+#include "Components/Mesh/ALSXTPaintableStaticMeshComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "CineCameraComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTCombatSettings.h"
 #include "Settings/ALSXTImpactReactionSettings.h"
@@ -18,6 +24,7 @@
 #include "State/ALSXTSlidingState.h"
 #include "State/ALSXTVaultingState.h"
 #include "Interfaces/ALSXTCombatInterface.h"
+#include "Interfaces/ALSXTMeshPaintingInterface.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
@@ -31,7 +38,7 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
 
 UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
-class ALSXT_API AALSXTCharacter : public AAlsCharacter
+class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTMeshPaintingInterface
 {
 	GENERATED_BODY()
 
@@ -49,6 +56,15 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UCineCameraComponent> BodyCamera;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<USpringArmComponent> KillerCameraSpringArm;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UCineCameraComponent> KillerCamera;
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<USceneComponent> BodyParts;
