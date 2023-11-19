@@ -1,6 +1,8 @@
 // MIT
 
 #include "Components/Character/ALSXTImpactReactionComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "Components/CapsuleComponent.h"
 #include "Utility/ALSXTStructs.h"
 #include "ALSXTCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -58,7 +60,13 @@ void UALSXTImpactReactionComponent::BeginPlay()
 	AttackFallenTimerDelegate.BindUFunction(this, "AttackFallenTimer");
 	ClutchImpactPointTimerDelegate.BindUFunction(this, "ClutchImpactPointTimer");
 
-	Character->GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &UALSXTImpactReactionComponent::OnCapsuleHit);
+	if (Character)
+	{
+		// CharacterCapsule = Character->GetCapsuleComponent();
+		// CharacterCapsule->OnComponentHit.Add(this, &UALSXTImpactReactionComponent::OnCapsuleHit);
+		// Character->OnActorHit.AddDynamic(this, &UALSXTImpactReactionComponent::OnCapsuleHit);
+		// CharacterCapsule->OnComponentHit.AddDynamic(this, &UALSXTImpactReactionComponent::OnCapsuleHit);
+	}
 }
 
 

@@ -91,6 +91,12 @@ public:
 	class UPhysicalAnimationComponent* PhysicalAnimation;
 
 protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
+	TObjectPtr<UALSXTPaintableSkeletalMeshComponent> ALSXTMesh;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
+	TObjectPtr<UALSXTCharacterMovementComponent> ALSXTCharacterMovement;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
 

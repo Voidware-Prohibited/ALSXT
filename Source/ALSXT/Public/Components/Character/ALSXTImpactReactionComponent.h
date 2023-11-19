@@ -103,6 +103,9 @@ public:
 	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
+	UCapsuleComponent* CharacterCapsule{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	UAnimInstance* AnimInstance{ nullptr };
 
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };

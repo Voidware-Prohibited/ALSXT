@@ -84,6 +84,9 @@ AALSXTCharacter::AALSXTCharacter()
 	AimAnimationHelperBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Overlap);
 	AimAnimationHelperBox->bEditableWhenInherited = false;
 
+	// ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());
+	// ALSXTMesh = Cast<UALSXTPaintableSkeletalMeshComponent>(GetMesh());
+
 	// Add Physical Animation Component
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
 	AddOwnedComponent(PhysicalAnimation);
