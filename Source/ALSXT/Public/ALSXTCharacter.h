@@ -78,6 +78,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<USceneComponent> PhysicsConstraints;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TObjectPtr<USceneCaptureComponent2D> MeshPaintingSceneCaptureComponent;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UBoxComponent> AimAnimationHelperBox;
 
@@ -88,9 +91,6 @@ public:
 	class UPhysicalAnimationComponent* PhysicalAnimation;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
-	TObjectPtr<UALSXTCharacterMovementComponent> ALSXTCharacterMovement;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
 

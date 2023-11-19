@@ -68,6 +68,13 @@ AALSXTCharacter::AALSXTCharacter()
 	PhysicsConstraints = CreateDefaultSubobject<USceneComponent>(TEXT("Physics Constraints"));
 	PhysicsConstraints->SetupAttachment(this->RootComponent);
 
+	MeshPaintingSceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Mesh Painting Scene Capture Component"));
+	MeshPaintingSceneCaptureComponent->SetupAttachment(GetMesh());
+	MeshPaintingSceneCaptureComponent->SetRelativeRotation_Direct({ -90.0f, 90.0f, 0.0f });
+	MeshPaintingSceneCaptureComponent->SetRelativeLocation_Direct({ 0.0f, 0.0f, 250.0f });
+	MeshPaintingSceneCaptureComponent->ProjectionType = ECameraProjectionMode::Orthographic;
+	MeshPaintingSceneCaptureComponent->CompositeMode = ESceneCaptureCompositeMode::SCCM_Additive;
+
 	AimAnimationHelperBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Aim Animation Helper Box"));
 	AimAnimationHelperBox->SetupAttachment(this->RootComponent);
 	AimAnimationHelperBox->SetBoxExtent(FVector(0.1f, 32.0f, 360.0f), true);
@@ -76,8 +83,6 @@ AALSXTCharacter::AALSXTCharacter()
 	AimAnimationHelperBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	AimAnimationHelperBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Overlap);
 	AimAnimationHelperBox->bEditableWhenInherited = false;
-
-	ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());
 
 	// Add Physical Animation Component
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
