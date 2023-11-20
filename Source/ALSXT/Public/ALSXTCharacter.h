@@ -65,15 +65,66 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UCineCameraComponent> KillerCamera;
+
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> OverlaySkeletalMesh;
+
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableStaticMeshComponent> OverlayStaticMesh;
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<USceneComponent> BodyParts;
+
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Head;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<USkeletalMeshComponent> HeadDummyShadow;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<USceneComponent> ClothingSlots;
+
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Head;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<USkeletalMeshComponent> HeadDummyShadow;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<USceneComponent> ClothingSlots;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Headwear;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Eyewear;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Earwear;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> BottomUnderwear;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> TopUnderwear;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Bottom;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Top;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> TopJacket;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> TopVest;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Gloves;
+	// 
+	// UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	// TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Footwear;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<USceneComponent> PhysicsConstraints;
@@ -101,6 +152,22 @@ protected:
 	int32 VaultingRootMotionSourceId;
 
 public:
+	virtual USceneCaptureComponent2D* GetSceneCaptureComponent_Implementation() const override;
+
+	virtual void GetElementalCondition_Implementation(USceneComponent* Component, UPARAM(meta = (Categories = "Als.Elemental Condition"))FGameplayTag& ElementalCondition) const override;
+
+	virtual void PaintMesh_Implementation(USceneComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Location, float Radius) const override;
+
+	virtual void VolumePaintMesh_Implementation(USceneComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Origin, FVector Extent) const override;
+
+	virtual void ResetPaintTypeOnComponent_Implementation(USceneComponent* Component, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType) const override;
+
+	virtual void ResetPaintOnComponent_Implementation(USceneComponent* Component) const override;
+
+	virtual void ResetPaintTypeOnAllComponents_Implementation(UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType) const override;
+
+	virtual void ResetPaintOnAllComponents_Implementation() const override;
+
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void DisableInputMovement(const bool Disable);
 

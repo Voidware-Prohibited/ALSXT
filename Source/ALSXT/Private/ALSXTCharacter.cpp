@@ -56,14 +56,59 @@ AALSXTCharacter::AALSXTCharacter()
 	BodyParts = CreateDefaultSubobject<USceneComponent>(TEXT("Body Parts"));
 	BodyParts->SetupAttachment(GetMesh());
 
+	// Head = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Head"));
+	// Head->SetupAttachment(BodyParts);
+	// Head->SetCollisionProfileName("CharacterMesh");
+	// Head->bEnableUpdateRateOptimizations = false;
+	// Head->AlwaysLoadOnClient = true;
+	// Head->AlwaysLoadOnServer = true;
+	// Head->bOwnerNoSee = false;
+	// Head->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// Head->bCastDynamicShadow = true;
+	// Head->bAffectDynamicIndirectLighting = true;
+	// Head->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+
 	HeadDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Head Dummy Shadow"));
 	HeadDummyShadow->SetupAttachment(BodyParts);
 	HeadDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	HeadDummyShadow->SetHiddenInGame(true);
 	HeadDummyShadow->bCastHiddenShadow = true;
 
+	// OverlaySkeletalMesh = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("New Overlay Skeletal Mesh"));
+	// OverlaySkeletalMesh->SetupAttachment(GetMesh());
+	// OverlaySkeletalMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+
+	// OverlayStaticMesh = CreateDefaultSubobject<UALSXTPaintableStaticMeshComponent>(TEXT("New Overlay Static Mesh"));
+	// OverlayStaticMesh->SetupAttachment(GetMesh());
+	// OverlayStaticMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+
 	ClothingSlots = CreateDefaultSubobject<USceneComponent>(TEXT("Clothing Slots"));
 	ClothingSlots->SetupAttachment(GetMesh());
+
+	// ClothingSlots = CreateDefaultSubobject<USceneComponent>(TEXT("Clothing Slots"));
+	// ClothingSlots->SetupAttachment(GetMesh());
+	// Headwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Headwear"));
+	// Headwear->SetupAttachment(ClothingSlots);
+	// Eyewear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Eyewear"));
+	// Eyewear->SetupAttachment(ClothingSlots);
+	// Earwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Earwear"));
+	// Earwear->SetupAttachment(ClothingSlots);
+	// BottomUnderwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Bottom Underwear"));
+	// BottomUnderwear->SetupAttachment(ClothingSlots);
+	// TopUnderwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top Underwear"));
+	// TopUnderwear->SetupAttachment(ClothingSlots);
+	// Bottom = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Bottom"));
+	// Bottom->SetupAttachment(ClothingSlots);
+	// Top = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top"));
+	// Top->SetupAttachment(ClothingSlots);
+	// TopJacket = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top Jacket"));
+	// TopJacket->SetupAttachment(ClothingSlots);
+	// TopVest = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top Vest"));
+	// TopVest->SetupAttachment(ClothingSlots);
+	// Gloves = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Gloves"));
+	// Gloves->SetupAttachment(ClothingSlots);
+	// Footwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Footwear"));
+	// Footwear->SetupAttachment(ClothingSlots);
 
 	PhysicsConstraints = CreateDefaultSubobject<USceneComponent>(TEXT("Physics Constraints"));
 	PhysicsConstraints->SetupAttachment(this->RootComponent);
@@ -596,6 +641,81 @@ void AALSXTCharacter::Crouch(const bool bClientSimulation)
 bool AALSXTCharacter::IsAimingDownSights_Implementation() const
 {
 	return (IsDesiredAiming() && CanAimDownSights() && (GetViewMode() == AlsViewModeTags::FirstPerson) && (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral));
+}
+
+USceneCaptureComponent2D* AALSXTCharacter::GetSceneCaptureComponent_Implementation() const
+{
+	return MeshPaintingSceneCaptureComponent;
+}
+
+void AALSXTCharacter::GetElementalCondition_Implementation(USceneComponent* Component, FGameplayTag& ElementalCondition) const
+{
+	if (Cast<UALSXTPaintableSkeletalMeshComponent>(Component))
+	{
+		ElementalCondition = Cast<UALSXTPaintableSkeletalMeshComponent>(Component)->GetElementalCondition();
+	}
+	if (Cast<UALSXTPaintableStaticMeshComponent>(Component))
+	{
+		ElementalCondition = Cast<UALSXTPaintableStaticMeshComponent>(Component)->GetElementalCondition();
+	}
+}
+
+void AALSXTCharacter::PaintMesh_Implementation(USceneComponent* Component, EPhysicalSurface SurfaceType, const FGameplayTag PaintType, FVector Location, float Radius) const
+{
+	if (Cast<UALSXTPaintableSkeletalMeshComponent>(Component))
+	{
+		Cast<UALSXTPaintableSkeletalMeshComponent>(Component)->PaintMesh(SurfaceType, PaintType, Location, Radius);
+	}
+	if (Cast<UALSXTPaintableStaticMeshComponent>(Component))
+	{
+		Cast<UALSXTPaintableStaticMeshComponent>(Component)->PaintMesh(SurfaceType, PaintType, Location, Radius);
+	}
+}
+
+void AALSXTCharacter::VolumePaintMesh_Implementation(USceneComponent* Component, EPhysicalSurface SurfaceType, const FGameplayTag PaintType, FVector Origin, FVector Extent) const
+{
+	if (Cast<UALSXTPaintableSkeletalMeshComponent>(Component))
+	{
+		Cast<UALSXTPaintableSkeletalMeshComponent>(Component)->VolumePaintMesh(SurfaceType, PaintType, Origin, Extent);
+	}
+	if (Cast<UALSXTPaintableStaticMeshComponent>(Component))
+	{
+		Cast<UALSXTPaintableStaticMeshComponent>(Component)->VolumePaintMesh(SurfaceType, PaintType, Origin, Extent);
+	}
+}
+
+void AALSXTCharacter::ResetPaintTypeOnComponent_Implementation(USceneComponent* Component, const FGameplayTag PaintType) const
+{
+	if (Cast<UALSXTPaintableSkeletalMeshComponent>(Component))
+	{
+		Cast<UALSXTPaintableSkeletalMeshComponent>(Component)->ResetAllChannels();
+	}
+	if (Cast<UALSXTPaintableStaticMeshComponent>(Component))
+	{
+		Cast<UALSXTPaintableStaticMeshComponent>(Component)->ResetAllChannels();
+	}
+}
+
+void AALSXTCharacter::ResetPaintOnComponent_Implementation(USceneComponent* Component) const
+{
+	if (Cast<UALSXTPaintableSkeletalMeshComponent>(Component))
+	{
+		Cast<UALSXTPaintableSkeletalMeshComponent>(Component)->ResetAllChannels();
+	}
+	if (Cast<UALSXTPaintableStaticMeshComponent>(Component))
+	{
+		Cast<UALSXTPaintableStaticMeshComponent>(Component)->ResetAllChannels();
+	}
+}
+
+void AALSXTCharacter::ResetPaintTypeOnAllComponents_Implementation(const FGameplayTag PaintType) const
+{
+
+}
+
+void AALSXTCharacter::ResetPaintOnAllComponents_Implementation() const
+{
+	
 }
 
 // Vaulting State
