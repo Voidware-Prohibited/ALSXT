@@ -77,7 +77,7 @@ AALSXTCharacter::AALSXTCharacter()
 	// OverlaySkeletalMesh = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("New Overlay Skeletal Mesh"));
 	// OverlaySkeletalMesh->SetupAttachment(GetMesh());
 	// OverlaySkeletalMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
-
+	// 
 	// OverlayStaticMesh = CreateDefaultSubobject<UALSXTPaintableStaticMeshComponent>(TEXT("New Overlay Static Mesh"));
 	// OverlayStaticMesh->SetupAttachment(GetMesh());
 	// OverlayStaticMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
@@ -85,8 +85,6 @@ AALSXTCharacter::AALSXTCharacter()
 	ClothingSlots = CreateDefaultSubobject<USceneComponent>(TEXT("Clothing Slots"));
 	ClothingSlots->SetupAttachment(GetMesh());
 
-	// ClothingSlots = CreateDefaultSubobject<USceneComponent>(TEXT("Clothing Slots"));
-	// ClothingSlots->SetupAttachment(GetMesh());
 	// Headwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Headwear"));
 	// Headwear->SetupAttachment(ClothingSlots);
 	// Eyewear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Eyewear"));
@@ -641,6 +639,11 @@ void AALSXTCharacter::Crouch(const bool bClientSimulation)
 bool AALSXTCharacter::IsAimingDownSights_Implementation() const
 {
 	return (IsDesiredAiming() && CanAimDownSights() && (GetViewMode() == AlsViewModeTags::FirstPerson) && (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral));
+}
+
+FALSXTGlobalGeneralMeshPaintingSettings AALSXTCharacter::GetGlobalGeneralMeshPaintingSettings_Implementation() const
+{
+	return ALSXTSettings->MeshPainting;
 }
 
 USceneCaptureComponent2D* AALSXTCharacter::GetSceneCaptureComponent_Implementation() const

@@ -58,11 +58,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	UALSXTMeshPaintingSettingsMap* MeshPaintingSettingsMap;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
 
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
-	FALSXTGeneralMeshPaintingSettings GeneralMeshPaintingSettings;
+	FALSXTGlobalGeneralMeshPaintingSettings GlobalGeneralMeshPaintingSettings;
+
+	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	FALSXTGeneralMeshPaintingSettings ComponentGeneralMeshPaintingSettings;
 
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	UALSXTMeshPaintingSettings* MeshPaintingSettings;

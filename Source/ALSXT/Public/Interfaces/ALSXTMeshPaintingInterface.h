@@ -14,6 +14,15 @@ class ALSXT_API IALSXTMeshPaintingInterface {
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")
+	FALSXTGlobalGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings() const;
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Mesh Painting Interface")
+	FALSXTServerMeshPaintingSettings GetServerGeneralMeshPaintingSettings() const;
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Mesh Painting Interface")
+	FALSXTGeneralMeshPaintingSettings GetUserGeneralMeshPaintingSettings() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")
 	USceneCaptureComponent2D* GetSceneCaptureComponent() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")

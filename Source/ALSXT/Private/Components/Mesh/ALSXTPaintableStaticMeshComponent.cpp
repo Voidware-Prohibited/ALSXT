@@ -2,6 +2,7 @@
 
 
 #include "Components/Mesh/ALSXTPaintableStaticMeshComponent.h"
+#include "Interfaces/ALSXTMeshPaintingInterface.h"
 #include "Settings/ALSXTCharacterSettings.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetRenderingLibrary.h"
@@ -15,14 +16,21 @@ void UALSXTPaintableStaticMeshComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetMaterial(0)->IsValidLowLevelFast())
+	if (GetOwner()->GetClass()->ImplementsInterface(UALSXTMeshPaintingInterface::StaticClass()))
 	{
-		FALSXTGeneralMeshPaintingSettings GlobalGeneralMeshPaintingSettings{ GetGlobalGeneralMeshPaintingSettings() };
-		FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ GetServerGeneralMeshPaintingSettings() };
-		FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ GetUserGeneralMeshPaintingSettings() };
-		if (GlobalGeneralMeshPaintingSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting)
+		if (IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner()))
 		{
-			// InitializeMaterials();
+			SceneCaptureComponent = IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner());
+			if (GetMaterial(0)->IsValidLowLevelFast())
+			{
+				GlobalGeneralMeshPaintingSettings = IALSXTMeshPaintingInterface::Execute_GetGlobalGeneralMeshPaintingSettings(GetOwner());
+				FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
+				FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetUserGeneralMeshPaintingSettings(GetOwner()) };
+				if (GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting)
+				{
+					// InitializeMaterials();
+				}
+			}
 		}
 	}
 }
@@ -33,10 +41,9 @@ bool UALSXTPaintableStaticMeshComponent::SetStaticMesh(UStaticMesh* NewMesh)
 
 	if (GetMaterial(0)->IsValidLowLevelFast())
 	{
-		FALSXTGeneralMeshPaintingSettings GlobalGeneralMeshPaintingSettings{ GetGlobalGeneralMeshPaintingSettings() };
-		FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ GetServerGeneralMeshPaintingSettings() };
-		FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ GetUserGeneralMeshPaintingSettings() };
-		if (GlobalGeneralMeshPaintingSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting)
+		FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
+		FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetUserGeneralMeshPaintingSettings(GetOwner()) };
+		if (GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting)
 		{
 			// InitializeMaterials();
 		}
@@ -47,7 +54,7 @@ bool UALSXTPaintableStaticMeshComponent::SetStaticMesh(UStaticMesh* NewMesh)
 
 void UALSXTPaintableStaticMeshComponent::InitializeMaterials()
 {
-	FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ GetServerGeneralMeshPaintingSettings() };
+	FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
 	PhysicalMaterialMapTexture = GetMaterial(0)->GetPhysicalMaterialMask()->MaskTexture;
 	PhysicalMaterialMask = GetMaterial(0)->GetPhysicalMaterialMask();
 
@@ -137,7 +144,6 @@ void UALSXTPaintableStaticMeshComponent::InitializeMaterials()
 
 void UALSXTPaintableStaticMeshComponent::SetSceneCaptureRenderTarget(UTextureRenderTarget2D* NewRenderTarget)
 {
-	// SceneCaptureComponent->Get()->TextureTarget = NewRenderTarget;
 	SceneCaptureComponent->TextureTarget = NewRenderTarget;
 }
 
@@ -245,29 +251,28 @@ TEnumAsByte<EPhysicalSurface> UALSXTPaintableStaticMeshComponent::GetSurfaceAtLo
 bool UALSXTPaintableStaticMeshComponent::CanBePainted(const FGameplayTag PaintType)
 {
 	// Ideally, User Settings should only apply for Single Player/Offline Play. The Server Browser/Match Making should not allow for Users with a setting disabled to connect to a Server with the same setting Enabled
-	FALSXTGeneralMeshPaintingSettings GlobalGeneralMeshPaintingSettings{ GetGlobalGeneralMeshPaintingSettings() };
-	FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ GetServerGeneralMeshPaintingSettings() };
-	FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ GetUserGeneralMeshPaintingSettings() };
+	FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
+	FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetUserGeneralMeshPaintingSettings(GetOwner()) };
 
 	if (PaintType == ALSXTMeshPaintTypeTags::BloodDamage)
 	{
-		return GlobalGeneralMeshPaintingSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.bEnableBloodDamage && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableBloodDamage && UserGeneralMeshPaintingSettings.bEnableBloodDamage;
+		return GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableBloodDamage && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableBloodDamage && UserGeneralMeshPaintingSettings.bEnableBloodDamage;
 	}
 	if (PaintType == ALSXTMeshPaintTypeTags::BackSpatter)
 	{
-		return GlobalGeneralMeshPaintingSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.bEnableBackspatter && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableBackspatter && UserGeneralMeshPaintingSettings.bEnableBackspatter;
+		return GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableBackspatter && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableBackspatter && UserGeneralMeshPaintingSettings.bEnableBackspatter;
 	}
 	if (PaintType == ALSXTMeshPaintTypeTags::Burn)
 	{
-		return GlobalGeneralMeshPaintingSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.bEnableBurnDamage && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableBurnDamage && UserGeneralMeshPaintingSettings.bEnableBurnDamage;
+		return GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableBurnDamage && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableBurnDamage && UserGeneralMeshPaintingSettings.bEnableBurnDamage;
 	}
 	if (PaintType == ALSXTMeshPaintTypeTags::SurfaceDamage)
 	{
-		return GlobalGeneralMeshPaintingSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.bEnableSurfaceDamage && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableSurfaceDamage && UserGeneralMeshPaintingSettings.bEnableSurfaceDamage;
+		return GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableSurfaceDamage && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableSurfaceDamage && UserGeneralMeshPaintingSettings.bEnableSurfaceDamage;
 	}
 	if (PaintType == ALSXTMeshPaintTypeTags::Saturation)
 	{
-		return GlobalGeneralMeshPaintingSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.bEnableSaturation && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableSaturation && UserGeneralMeshPaintingSettings.bEnableSaturation;
+		return GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting && GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableSaturation && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableSaturation && UserGeneralMeshPaintingSettings.bEnableSaturation;
 	}
 	else
 	{

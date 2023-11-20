@@ -55,11 +55,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	UALSXTMeshPaintingSettingsMap* MeshPaintingSettingsMap;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
 
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
-	FALSXTGeneralMeshPaintingSettings GeneralMeshPaintingSettings;
+	FALSXTGlobalGeneralMeshPaintingSettings GlobalGeneralMeshPaintingSettings;
+
+	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	FALSXTGeneralMeshPaintingSettings ComponentGeneralMeshPaintingSettings;
 
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	UALSXTMeshPaintingSettings* MeshPaintingSettings;
@@ -162,14 +165,14 @@ public:
 	void SetSceneCaptureRenderTarget(UTextureRenderTarget2D* NewRenderTarget);
 
 	// General Settings
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	FALSXTGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	FALSXTServerMeshPaintingSettings GetServerGeneralMeshPaintingSettings();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	FALSXTGeneralMeshPaintingSettings GetUserGeneralMeshPaintingSettings();
+	// UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	// FALSXTGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings();
+	// 
+	// UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	// FALSXTServerMeshPaintingSettings GetServerGeneralMeshPaintingSettings();
+	// 
+	// UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	// FALSXTGeneralMeshPaintingSettings GetUserGeneralMeshPaintingSettings();
 
 	// Settings Map
 	UFUNCTION(BlueprintCallable, Category = "Settings")
