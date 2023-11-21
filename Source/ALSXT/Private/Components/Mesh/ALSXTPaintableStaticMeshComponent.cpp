@@ -15,24 +15,27 @@ UALSXTPaintableStaticMeshComponent::UALSXTPaintableStaticMeshComponent()
 void UALSXTPaintableStaticMeshComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (GetOwner()->GetClass()->ImplementsInterface(UALSXTMeshPaintingInterface::StaticClass()))
+	
+	if (GetStaticMesh())
 	{
-		if (IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner()))
+		if (GetOwner()->GetClass()->ImplementsInterface(UALSXTMeshPaintingInterface::StaticClass()))
 		{
-			SceneCaptureComponent = IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner());
-			if (GetMaterial(0)->IsValidLowLevelFast())
+			if (IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner()))
 			{
-				GlobalGeneralMeshPaintingSettings = IALSXTMeshPaintingInterface::Execute_GetGlobalGeneralMeshPaintingSettings(GetOwner());
-				FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
-				FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetUserGeneralMeshPaintingSettings(GetOwner()) };
-				if (GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting)
+				SceneCaptureComponent = IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner());
+				if (GetMaterial(0)->IsValidLowLevelFast())
 				{
-					// InitializeMaterials();
+					GlobalGeneralMeshPaintingSettings = IALSXTMeshPaintingInterface::Execute_GetGlobalGeneralMeshPaintingSettings(GetOwner());
+					FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
+					FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetUserGeneralMeshPaintingSettings(GetOwner()) };
+					if (GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting)
+					{
+						// InitializeMaterials();
+					}
 				}
 			}
 		}
-	}
+	}	
 }
 
 bool UALSXTPaintableStaticMeshComponent::SetStaticMesh(UStaticMesh* NewMesh)

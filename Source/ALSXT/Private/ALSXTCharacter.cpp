@@ -13,7 +13,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Net/UnrealNetwork.h"
 #include "Net/Core/PushModel/PushModel.h"
-//
+#include "Components/SceneComponent.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "Settings/ALSXTCharacterSettings.h"
 #include "Settings/ALSXTVaultingSettings.h"
@@ -34,6 +34,12 @@
 AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UALSXTPaintableSkeletalMeshComponent>(AAlsCharacter::MeshComponentName).SetDefaultSubobjectClass<UALSXTCharacterMovementComponent>(AAlsCharacter::CharacterMovementComponentName))
 {
+	BodyParts = CreateDefaultSubobject<USceneComponent>(TEXT("Body Parts"));
+	BodyParts->SetupAttachment(GetMesh());
+	
+	ClothingSlots = CreateDefaultSubobject<USceneComponent>(TEXT("Clothing Slots"));
+	ClothingSlots->SetupAttachment(GetMesh());
+
 	Camera = CreateDefaultSubobject<UAlsCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(GetMesh());
 	Camera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
@@ -54,20 +60,17 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	KillerCamera->SetRelativeRotation_Direct({ 0.0f, 0.0f, 0.0f });
 	KillerCamera->SetRelativeLocation_Direct({ -250.0f, 0.0f, 0.0f });
 
-	BodyParts = CreateDefaultSubobject<USceneComponent>(TEXT("Body Parts"));
-	BodyParts->SetupAttachment(GetMesh());
-
-	// Head = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Head"));
-	// Head->SetupAttachment(BodyParts);
-	// Head->SetCollisionProfileName("CharacterMesh");
-	// Head->bEnableUpdateRateOptimizations = false;
-	// Head->AlwaysLoadOnClient = true;
-	// Head->AlwaysLoadOnServer = true;
-	// Head->bOwnerNoSee = false;
-	// Head->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
-	// Head->bCastDynamicShadow = true;
-	// Head->bAffectDynamicIndirectLighting = true;
-	// Head->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Head = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Head"));
+	Head->SetupAttachment(BodyParts);
+	Head->SetCollisionProfileName("CharacterMesh");
+	Head->bEnableUpdateRateOptimizations = false;
+	Head->AlwaysLoadOnClient = true;
+	Head->AlwaysLoadOnServer = true;
+	Head->bOwnerNoSee = false;
+	Head->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	Head->bCastDynamicShadow = true;
+	Head->bAffectDynamicIndirectLighting = true;
+	Head->PrimaryComponentTick.TickGroup = TG_PrePhysics;
 
 	HeadDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Head Dummy Shadow"));
 	HeadDummyShadow->SetupAttachment(BodyParts);
@@ -83,31 +86,137 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	// OverlayStaticMesh->SetupAttachment(GetMesh());
 	// OverlayStaticMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 
-	ClothingSlots = CreateDefaultSubobject<USceneComponent>(TEXT("Clothing Slots"));
-	ClothingSlots->SetupAttachment(GetMesh());
-
 	// Headwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Headwear"));
 	// Headwear->SetupAttachment(ClothingSlots);
+	// Headwear->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// Headwear->bEnableUpdateRateOptimizations = false;
+	// Headwear->AlwaysLoadOnClient = true;
+	// Headwear->AlwaysLoadOnServer = true;
+	// Headwear->bOwnerNoSee = false;
+	// Headwear->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// Headwear->bCastDynamicShadow = true;
+	// Headwear->bAffectDynamicIndirectLighting = true;
+	// Headwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// Eyewear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Eyewear"));
 	// Eyewear->SetupAttachment(ClothingSlots);
+	// Eyewear->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// Eyewear->bEnableUpdateRateOptimizations = false;
+	// Eyewear->AlwaysLoadOnClient = true;
+	// Eyewear->AlwaysLoadOnServer = true;
+	// Eyewear->bOwnerNoSee = false;
+	// Eyewear->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// Eyewear->bCastDynamicShadow = true;
+	// Eyewear->bAffectDynamicIndirectLighting = true;
+	// Eyewear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// Earwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Earwear"));
 	// Earwear->SetupAttachment(ClothingSlots);
+	// Earwear->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// Earwear->bEnableUpdateRateOptimizations = false;
+	// Earwear->AlwaysLoadOnClient = true;
+	// Earwear->AlwaysLoadOnServer = true;
+	// Earwear->bOwnerNoSee = false;
+	// Earwear->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// Earwear->bCastDynamicShadow = true;
+	// Earwear->bAffectDynamicIndirectLighting = true;
+	// Earwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// BottomUnderwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Bottom Underwear"));
 	// BottomUnderwear->SetupAttachment(ClothingSlots);
+	// BottomUnderwear->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// BottomUnderwear->bEnableUpdateRateOptimizations = false;
+	// BottomUnderwear->AlwaysLoadOnClient = true;
+	// BottomUnderwear->AlwaysLoadOnServer = true;
+	// BottomUnderwear->bOwnerNoSee = false;
+	// BottomUnderwear->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// BottomUnderwear->bCastDynamicShadow = true;
+	// BottomUnderwear->bAffectDynamicIndirectLighting = true;
+	// BottomUnderwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// TopUnderwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top Underwear"));
 	// TopUnderwear->SetupAttachment(ClothingSlots);
+	// TopUnderwear->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// TopUnderwear->bEnableUpdateRateOptimizations = false;
+	// TopUnderwear->AlwaysLoadOnClient = true;
+	// TopUnderwear->AlwaysLoadOnServer = true;
+	// TopUnderwear->bOwnerNoSee = false;
+	// TopUnderwear->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// TopUnderwear->bCastDynamicShadow = true;
+	// TopUnderwear->bAffectDynamicIndirectLighting = true;
+	// TopUnderwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// Bottom = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Bottom"));
 	// Bottom->SetupAttachment(ClothingSlots);
+	// Bottom->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// Bottom->bEnableUpdateRateOptimizations = false;
+	// Bottom->AlwaysLoadOnClient = true;
+	// Bottom->AlwaysLoadOnServer = true;
+	// Bottom->bOwnerNoSee = false;
+	// Bottom->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// Bottom->bCastDynamicShadow = true;
+	// Bottom->bAffectDynamicIndirectLighting = true;
+	// Bottom->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// Top = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top"));
 	// Top->SetupAttachment(ClothingSlots);
+	// Top->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// Top->bEnableUpdateRateOptimizations = false;
+	// Top->AlwaysLoadOnClient = true;
+	// Top->AlwaysLoadOnServer = true;
+	// Top->bOwnerNoSee = false;
+	// Top->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// Top->bCastDynamicShadow = true;
+	// Top->bAffectDynamicIndirectLighting = true;
+	// Top->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// TopJacket = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top Jacket"));
 	// TopJacket->SetupAttachment(ClothingSlots);
+	// TopJacket->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// TopJacket->bEnableUpdateRateOptimizations = false;
+	// TopJacket->AlwaysLoadOnClient = true;
+	// TopJacket->AlwaysLoadOnServer = true;
+	// TopJacket->bOwnerNoSee = false;
+	// TopJacket->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// TopJacket->bCastDynamicShadow = true;
+	// TopJacket->bAffectDynamicIndirectLighting = true;
+	// TopJacket->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// TopVest = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top Vest"));
 	// TopVest->SetupAttachment(ClothingSlots);
+	// TopVest->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// TopVest->bEnableUpdateRateOptimizations = false;
+	// TopVest->AlwaysLoadOnClient = true;
+	// TopVest->AlwaysLoadOnServer = true;
+	// TopVest->bOwnerNoSee = false;
+	// TopVest->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// TopVest->bCastDynamicShadow = true;
+	// TopVest->bAffectDynamicIndirectLighting = true;
+	// TopVest->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// Gloves = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Gloves"));
 	// Gloves->SetupAttachment(ClothingSlots);
+	// Gloves->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// Gloves->bEnableUpdateRateOptimizations = false;
+	// Gloves->AlwaysLoadOnClient = true;
+	// Gloves->AlwaysLoadOnServer = true;
+	// Gloves->bOwnerNoSee = false;
+	// Gloves->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// Gloves->bCastDynamicShadow = true;
+	// Gloves->bAffectDynamicIndirectLighting = true;
+	// Gloves->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	// 
 	// Footwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Footwear"));
 	// Footwear->SetupAttachment(ClothingSlots);
+	// Footwear->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	// Footwear->bEnableUpdateRateOptimizations = false;
+	// Footwear->AlwaysLoadOnClient = true;
+	// Footwear->AlwaysLoadOnServer = true;
+	// Footwear->bOwnerNoSee = false;
+	// Footwear->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	// Footwear->bCastDynamicShadow = true;
+	// Footwear->bAffectDynamicIndirectLighting = true;
+	// Footwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
 
 	PhysicsConstraints = CreateDefaultSubobject<USceneComponent>(TEXT("Physics Constraints"));
 	PhysicsConstraints->SetupAttachment(this->RootComponent);

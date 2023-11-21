@@ -81,7 +81,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	UPhysicalMaterialMask* PhysicalMaterialMask;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Mesh, Meta = (AllowPrivateAccess))
 	TArray<UPhysicalMaterial*> PhysicalMaterialMap;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (Categories = "Als.Elemental Condition", AllowPrivateAccess))

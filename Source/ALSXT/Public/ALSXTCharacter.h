@@ -30,6 +30,7 @@
 class UALSXTAnimationInstance;
 class UALSXTCharacterMovementComponent;
 class UALSXTCharacterSettings;
+class USceneComponent;
 class UAlsCameraComponent;
 class UInputMappingContext;
 class UInputAction;
@@ -144,10 +145,6 @@ protected:
 
 public:
 	virtual FALSXTGlobalGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings_Implementation() const override;
-	// 
-	// virtual FALSXTGeneralMeshPaintingSettings GetServerGeneralMeshPaintingSettings_Implementation() const override;
-	// 
-	// virtual FALSXTGeneralMeshPaintingSettings GetUserGeneralMeshPaintingSettings_Implementation() const override;
 
 	virtual USceneCaptureComponent2D* GetSceneCaptureComponent_Implementation() const override;
 
