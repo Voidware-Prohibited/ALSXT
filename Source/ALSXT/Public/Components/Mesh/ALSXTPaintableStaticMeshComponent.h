@@ -163,16 +163,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void SetSceneCaptureRenderTarget(UTextureRenderTarget2D* NewRenderTarget);
 
-	// General Settings
-	// UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	// FALSXTGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings();
-	// 
-	// UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	// FALSXTServerMeshPaintingSettings GetServerGeneralMeshPaintingSettings();
-	// 
-	// UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	// FALSXTGeneralMeshPaintingSettings GetUserGeneralMeshPaintingSettings();
-
 	// Settings Map
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Settings")
 	UALSXTMeshPaintingSettingsMap* GetMeshPaintingSettingsMap() const;
