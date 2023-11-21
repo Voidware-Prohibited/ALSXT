@@ -43,6 +43,8 @@ class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTMeshPaintin
 	GENERATED_BODY()
 
 public:
+	AALSXTCharacter(const FObjectInitializer& ObjectInitializer);
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Als Character", Meta = (AllowPrivateAccess))
 	TObjectPtr<UALSXTCharacterSettings> ALSXTSettings;
 

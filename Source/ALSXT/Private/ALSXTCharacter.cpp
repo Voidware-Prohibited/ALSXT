@@ -31,7 +31,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
-AALSXTCharacter::AALSXTCharacter()
+AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UALSXTPaintableSkeletalMeshComponent>(AAlsCharacter::MeshComponentName).SetDefaultSubobjectClass<UALSXTCharacterMovementComponent>(AAlsCharacter::CharacterMovementComponentName))
 {
 	Camera = CreateDefaultSubobject<UAlsCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(GetMesh());
@@ -127,8 +128,8 @@ AALSXTCharacter::AALSXTCharacter()
 	AimAnimationHelperBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Overlap);
 	AimAnimationHelperBox->bEditableWhenInherited = false;
 
-	// ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());
-	// ALSXTMesh = Cast<UALSXTPaintableSkeletalMeshComponent>(GetMesh());
+	ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());
+	ALSXTMesh = Cast<UALSXTPaintableSkeletalMeshComponent>(GetMesh());
 
 	// Add Physical Animation Component
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
