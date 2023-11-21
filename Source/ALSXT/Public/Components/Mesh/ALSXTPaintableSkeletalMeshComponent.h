@@ -162,6 +162,12 @@ public:
 
 	void SetSkeletalMesh(USkeletalMesh* NewMesh, bool bReinitPose) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Settings")
+	bool IsMeshPaintingConfigured() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Settings")
+	bool IsMeshPaintingEnabled() const;
+
 	// Scene Capture
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void SetSceneCaptureRenderTarget(UTextureRenderTarget2D* NewRenderTarget);

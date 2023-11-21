@@ -159,6 +159,12 @@ public:
 
 	bool SetStaticMesh(UStaticMesh* NewMesh) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Settings")
+	bool IsMeshPaintingConfigured() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Settings")
+	bool IsMeshPaintingEnabled() const;
+
 	// Scene Capture
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void SetSceneCaptureRenderTarget(UTextureRenderTarget2D* NewRenderTarget);

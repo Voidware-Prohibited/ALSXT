@@ -16,24 +16,13 @@ void UALSXTPaintableSkeletalMeshComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetSkeletalMeshAsset())
+	if (IsMeshPaintingConfigured())
 	{
-		if (GetOwner()->GetClass()->ImplementsInterface(UALSXTMeshPaintingInterface::StaticClass()))
+		SceneCaptureComponent = IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner());
+		GlobalGeneralMeshPaintingSettings = IALSXTMeshPaintingInterface::Execute_GetGlobalGeneralMeshPaintingSettings(GetOwner());
+		if (IsMeshPaintingEnabled())
 		{
-			if (IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner()))
-			{
-				SceneCaptureComponent = IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner());
-				if (GetMaterial(0)->IsValidLowLevelFast())
-				{
-					GlobalGeneralMeshPaintingSettings = IALSXTMeshPaintingInterface::Execute_GetGlobalGeneralMeshPaintingSettings(GetOwner());
-					FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
-					FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetUserGeneralMeshPaintingSettings(GetOwner()) };
-					if (GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting)
-					{
-						// InitializeMaterials();
-					}
-				}
-			}
+			// InitializeMaterials();
 		}
 	}
 }
@@ -42,7 +31,7 @@ void UALSXTPaintableSkeletalMeshComponent::SetSkeletalMesh(USkeletalMesh* NewMes
 {
 	Super::SetSkeletalMesh(NewMesh, bReinitPose);
 
-	if (GetMaterial(0)->IsValidLowLevelFast())
+	if (GetMaterial(0))
 	{
 		FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
 		FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetUserGeneralMeshPaintingSettings(GetOwner()) };
@@ -51,6 +40,34 @@ void UALSXTPaintableSkeletalMeshComponent::SetSkeletalMesh(USkeletalMesh* NewMes
 			// InitializeMaterials();
 		}
 	}
+}
+
+bool UALSXTPaintableSkeletalMeshComponent::IsMeshPaintingConfigured() const
+{
+	if (!GetSkeletalMeshAsset())
+	{
+		return false;
+	}
+	if (!GetMaterial(0))
+	{
+		return false;
+	}
+	if (!GetOwner()->GetClass()->ImplementsInterface(UALSXTMeshPaintingInterface::StaticClass()))
+	{
+		return false;
+	}
+	if (!IALSXTMeshPaintingInterface::Execute_GetSceneCaptureComponent(GetOwner()))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool UALSXTPaintableSkeletalMeshComponent::IsMeshPaintingEnabled() const
+{
+	FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
+	FALSXTGeneralMeshPaintingSettings UserGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetUserGeneralMeshPaintingSettings(GetOwner()) };
+	return GlobalGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && ServerGeneralMeshPaintingSettings.GeneralSettings.bEnableMeshPainting && UserGeneralMeshPaintingSettings.bEnableMeshPainting;
 }
 
 void UALSXTPaintableSkeletalMeshComponent::InitializeMaterials()

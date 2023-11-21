@@ -78,14 +78,6 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	HeadDummyShadow->SetHiddenInGame(true);
 	HeadDummyShadow->bCastHiddenShadow = true;
 
-	// OverlaySkeletalMesh = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("New Overlay Skeletal Mesh"));
-	// OverlaySkeletalMesh->SetupAttachment(GetMesh());
-	// OverlaySkeletalMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
-	// 
-	// OverlayStaticMesh = CreateDefaultSubobject<UALSXTPaintableStaticMeshComponent>(TEXT("New Overlay Static Mesh"));
-	// OverlayStaticMesh->SetupAttachment(GetMesh());
-	// OverlayStaticMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
-
 	Headwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Headwear"));
 	Headwear->SetupAttachment(ClothingSlots);
 	Headwear->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
@@ -217,6 +209,28 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Footwear->bCastDynamicShadow = true;
 	Footwear->bAffectDynamicIndirectLighting = true;
 	Footwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+
+	OverlaySkeletalMesh = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Overlay Skeletal Mesh"));
+	OverlaySkeletalMesh->SetupAttachment(GetMesh());
+	OverlaySkeletalMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	OverlaySkeletalMesh->bEnableUpdateRateOptimizations = false;
+	OverlaySkeletalMesh->AlwaysLoadOnClient = true;
+	OverlaySkeletalMesh->AlwaysLoadOnServer = true;
+	OverlaySkeletalMesh->bOwnerNoSee = false;
+	OverlaySkeletalMesh->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	OverlaySkeletalMesh->bCastDynamicShadow = true;
+	OverlaySkeletalMesh->bAffectDynamicIndirectLighting = true;
+	OverlaySkeletalMesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+
+	OverlayStaticMesh = CreateDefaultSubobject<UALSXTPaintableStaticMeshComponent>(TEXT("Overlay Static Mesh"));
+	OverlayStaticMesh->SetupAttachment(GetMesh());
+	OverlayStaticMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	OverlayStaticMesh->AlwaysLoadOnClient = true;
+	OverlayStaticMesh->AlwaysLoadOnServer = true;
+	OverlayStaticMesh->bOwnerNoSee = false;
+	OverlayStaticMesh->bCastDynamicShadow = true;
+	OverlayStaticMesh->bAffectDynamicIndirectLighting = true;
+	OverlayStaticMesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
 
 	PhysicsConstraints = CreateDefaultSubobject<USceneComponent>(TEXT("Physics Constraints"));
 	PhysicsConstraints->SetupAttachment(this->RootComponent);
