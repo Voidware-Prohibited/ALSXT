@@ -31,6 +31,11 @@ class ALSXT_API UALSXTPaintableStaticMeshComponent : public UALSXTViewModelStati
 public:
 	UALSXTPaintableStaticMeshComponent();
 
+private:
+	UPROPERTY(EditAnywhere, Transient, Setter = SetMeshPaintingSettingsMap, BlueprintSetter = SetMeshPaintingSettingsMap, Getter = GetMeshPaintingSettingsMap, BlueprintGetter = GetMeshPaintingSettingsMap, Category = Mesh)
+	TObjectPtr <UALSXTMeshPaintingSettingsMap> MeshPaintingSettingsMap;
+
+public:
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeStaticMeshMaterialSignature OnChangeMeshMaterial;
 
@@ -48,12 +53,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeStaticMeshElementalConditionSignature OnChangeItemMeshElementalCondition;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TObjectPtr<UALSXTCharacterSettings> ALSXTSettings;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UALSXTMeshPaintingSettingsMap* MeshPaintingSettingsMap;
 
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
@@ -175,8 +174,8 @@ public:
 	// FALSXTGeneralMeshPaintingSettings GetUserGeneralMeshPaintingSettings();
 
 	// Settings Map
-	UFUNCTION(BlueprintCallable, Category = "Settings")
-	UALSXTMeshPaintingSettingsMap* GetMeshPaintingSettingsMap();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Settings")
+	UALSXTMeshPaintingSettingsMap* GetMeshPaintingSettingsMap() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void SetMeshPaintingSettingsMap(UALSXTMeshPaintingSettingsMap* NewMeshPaintingSettingsMap);

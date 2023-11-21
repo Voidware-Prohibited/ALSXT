@@ -152,7 +152,7 @@ void UALSXTPaintableStaticMeshComponent::SetPhysicalMaterialMask(UPhysicalMateri
 	PhysicalMaterialMask = NewPhysicalMaterialMask;
 }
 
-UALSXTMeshPaintingSettingsMap* UALSXTPaintableStaticMeshComponent::GetMeshPaintingSettingsMap()
+UALSXTMeshPaintingSettingsMap* UALSXTPaintableStaticMeshComponent::GetMeshPaintingSettingsMap() const
 {
 	return MeshPaintingSettingsMap;
 }
