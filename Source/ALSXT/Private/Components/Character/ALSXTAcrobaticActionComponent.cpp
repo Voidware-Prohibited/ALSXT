@@ -1,6 +1,7 @@
 // MIT
 
 #include "Components/Character/ALSXTAcrobaticActionComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Kismet/KismetSystemLibrary.h"
 
