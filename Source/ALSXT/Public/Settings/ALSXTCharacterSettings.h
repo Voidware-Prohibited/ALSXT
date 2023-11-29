@@ -15,9 +15,15 @@
 #include "Settings/ALSXTMeshPaintingSettings.h"
 #include "ALSXTCharacterSettings.generated.h"
 
-/**
- * 
- */
+UENUM(BlueprintType)
+enum class ESide : uint8
+{
+	Message UMETA(DisplayName = "Left"),
+	Warning UMETA(DisplayName = "Right"),
+	Count UMETA(Hidden)
+};
+ENUM_RANGE_BY_COUNT(ESide, ESide::Count);
+
 UCLASS()
 class ALSXT_API UALSXTCharacterSettings : public UAlsCharacterSettings
 {
