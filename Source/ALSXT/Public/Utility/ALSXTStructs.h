@@ -777,6 +777,103 @@ struct ALSXT_API FALSXTCharacterSound
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterVoiceParameters
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Sex", AllowPrivateAccess))
+	FGameplayTagContainer Sex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Voice Variant", AllowPrivateAccess))
+	FGameplayTagContainer Variant;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (ClampMin=0.5f, ClampMax=1.5f, AllowPrivateAccess))
+	float Speed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (ClampMin = 0.5f, ClampMax = 1.5f, AllowPrivateAccess))
+	float Pitch;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterEyeParameters
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FVector EyeColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FVector EyeColor2;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterSkinParameters
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FVector SkinColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FVector SkinColor2;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterHairParameters
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FString HairStyleID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FVector HairColor1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FVector HairColor2;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterMorphParameter
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FName MorphName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	float Value;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterClothingItem
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Sex", AllowPrivateAccess))
+	FGameplayTagContainer ClothingSlot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FString ClothingItemID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Item Condition", AllowPrivateAccess))
+	FGameplayTag ClothingItemCondition;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Clothing State", AllowPrivateAccess))
+	FGameplayTagContainer ClothingItemStates;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterIdentity
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	FALSXTCharacterVoiceParameters Voice;
+
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTBreathSound
 {
 	GENERATED_BODY()
@@ -800,6 +897,27 @@ struct ALSXT_API FALSXTBreathSound
 	{
 		return (other.Sex == Sex) && (other.Variant == Variant) && (other.BreathType == BreathType) && (other.Stamina == Stamina) && (other.Sounds == Sounds);
 	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTBreathParticle
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stamina", TitleProperty = "{Stamina}", AllowPrivateAccess))
+	FGameplayTagContainer Stamina;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Breath Type", TitleProperty = "{BreathType}", AllowPrivateAccess))
+	FGameplayTagContainer BreathType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<UNiagaraSystem*> Particles;
+
+	bool operator==(const FALSXTBreathParticle& other) const
+	{
+		return (other.Stamina == Stamina) && (other.Particles == Particles);
+	}
+
 };
 
 USTRUCT(BlueprintType)

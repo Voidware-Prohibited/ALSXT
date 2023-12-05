@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Settings/ALSXTIdleAnimationSettings.h"
+#include "State/ALSXTStatusState.h"
 #include "ALSXTIdleAnimationComponent.generated.h"
 
 
@@ -48,6 +49,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTALSXTGeneralIdleAnimationSettings IdleAnimationSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
+	FALSXTStatusState StatusState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
 	UAnimMontage* CurrentIdleMontage;

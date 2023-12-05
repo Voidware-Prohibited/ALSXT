@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Utility/ALSXTStructs.h"
+#include "Utility/ALSXTGameplayTags.h"
+#include "NativeGameplayTags.h"
 #include "ALSXTIdleAnimationSettings.generated.h"
 
 UCLASS(Blueprintable, BlueprintType)
@@ -21,6 +23,10 @@ struct ALSXT_API FALSXTALSXTGeneralIdleAnimationSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableIdleAnimations{ true };
+
+	/* Idle Animations will only play in these Stamina levels */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stamina", TitleProperty = "{Stamina}"))
+	FGameplayTagContainer EligibleStaminaLevels{ ALSXTStaminaTags::Full };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
 	FVector2D TimeDelayBeforeIdle{ 20.0f, 30.0f };

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "AlsAnimationInstance.h"
 #include "State/AlsFeetState.h"
+#include "State/ALSXTStatusState.h"
+#include "State/ALSXTBreathState.h"
 #include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTBumpPoseState.h"
 #include "ALSXTCharacter.h"
@@ -30,6 +32,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	TObjectPtr<AALSXTCharacter> ALSXTCharacter;
 
+	UPROPERTY(BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTStaminaThresholdSettings StaminaThresholdSettings;
+
+	UPROPERTY(BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTCharacterBreathEffectsSettings CharacterBreathEffectsSettings;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag Freelooking{ALSXTFreelookingTags::False};
 
@@ -50,6 +58,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag WeaponReadyPosition{ALSXTWeaponReadyPositionTags::None};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTStatusState StatusState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTBreathState BreathState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTAimState AimState;
@@ -160,6 +174,14 @@ protected:
 	// Turn In Place
 
 	virtual bool IsTurnInPlaceAllowed() override;
+
+	void UpdateStatusState();
+	void UpdateBreathState();
+	bool ShouldUpdateBreathState() const;
+	bool ShouldTransitionBreathState();
+	FALSXTTargetBreathState CalculateTargetBreathState();
+	void SetTargetBreathState(FALSXTTargetBreathState NewTargetBreathState);
+	void TransitionBreathState();
 };
 
 inline UALSXTAnimationInstanceSettings* UALSXTAnimationInstance::GetALSXTSettingsUnsafe() const

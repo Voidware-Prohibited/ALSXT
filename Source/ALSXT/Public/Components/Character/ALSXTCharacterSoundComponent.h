@@ -38,6 +38,10 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool ShouldPlayDeathSoundModeration();
 
+private:
+	FVector VoiceSocketLocation{ FVector::ZeroVector };
+	FRotator VoiceSocketRotation{ FRotator::ZeroRotator };
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -48,6 +52,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 
+	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
+	FALSXTCharacterBreathEffectsSettings BreathParticleSettings;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (Categories = "Als.Voice Variant", AllowPrivateAccess))
 	FGameplayTag VoiceVariant {ALSXTVoiceVariantTags::Default};
 
@@ -56,6 +63,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTag CurrentStaminaTag {ALSXTStaminaTags::Optimal};
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	FGameplayTag CurrentBreathType{ ALSXTBreathTypeTags::Regular };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
 	UAudioComponent* CharacterMovementSoundMixer{ nullptr };
@@ -71,6 +81,21 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FSound CurrentBreathSound;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<FALSXTBreathSound> CurrentBreathSounds;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<FALSXTBreathSound> CurrentHoldingBreathSounds;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<FALSXTBreathSound> CurrentExhalingSounds;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	UNiagaraSystem* CurrentBreathParticle;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<UNiagaraSystem*> CurrentBreathParticles;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FSound CurrentVocalizationSound;
@@ -89,6 +114,15 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	TArray<UObject*> PreviousBreathsAssets;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<UObject*> PreviousHoldBreathAssets;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<UObject*> PreviousExhaleAssets;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	TArray<UObject*> PreviousBreathsParticleAssets;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	TArray<UObject*> PreviousVocalizationsAssets;
@@ -112,10 +146,31 @@ public:
 	// FOnAudioPlayStateChanged OnAudioPlayStateChanged();
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	void UpdateStaminaThresholds();
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	void UpdateStamina(bool& StaminaTagChanged);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	void UpdateVoiceSocketLocation();
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	void UpdateVoiceSocketRotation();
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	void DetermineNewSound(TArray<FSound> Sounds, TArray<UObject*> PreviousAssetsReferences, FSound& ResultSound);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	UNiagaraSystem* DetermineNewBreathParticle();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ServerPlayBreathParticle(UNiagaraSystem* NiagaraSystem);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	void SetNewSound(UObject* Sound, TArray<UObject*> PreviousAssetsReferences, int NoRepeats);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	void PlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	void OnVocalization(FSound Vocalization);
@@ -172,6 +227,12 @@ public:
 	FGameplayTag ConvertStaminaToStaminaTag(const float Stamina);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	TArray<FALSXTBreathSound> SelectBreathSoundsNew(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& BreathType, const FGameplayTag& Stamina);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	TArray<UNiagaraSystem*> SelectBreathParticles(const FGameplayTag& BreathType, const FGameplayTag& Stamina);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	TArray<FALSXTBreathSound> SelectBreathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& BreathType, const float Stamina);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
@@ -197,10 +258,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	TArray<FALSXTCharacterDamageSound> SelectDeathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Strength);
-
-	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, BreathType, Stamina"))
-	void PlayBreathSound(UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.Breath Type"))const FGameplayTag& BreathType, const float Stamina);
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Weight"))
 	void PlayCharacterMovementSound(bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
 
@@ -223,9 +281,8 @@ public:
 	void PlayDeathSound(UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Attack Method"))const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
 
 private:
-	FTimerHandle BreathTimer;
-	float BreathDelay{ 3.0f };
-	float TimeSinceLastBreath{ 0.0f };
+	float StaminaOptimalThreshold = 0.75;
+	float StaminaLowThreshold = 0.25;
 	
 	FTimerHandle TimeSinceLastCharacterMovementSoundTimer;
 	float TimeSinceLastCharacterMovementSound{ 10.0f };
@@ -248,9 +305,13 @@ private:
 	float TargetDamageSoundDelay{ 1.0f };
 	float CurrentDamageSoundDelay{ 0.0f };
 
+	UNiagaraSystem* LastBreathParticle {nullptr};
 	FALSXTCharacterMovementSound LastCharacterMovementSound;
 	FALSXTWeaponMovementSound LastWeaponMovementSound;
 	FALSXTWeaponActionSound LastWeaponActionSound;
+	FALSXTBreathSound LastCharacterBreathSound;
+	FALSXTBreathSound LastCharacterHoldingBreathSound;
+	FALSXTBreathSound LastCharacterExhaleSound;
 	FALSXTCharacterActionSound LastCharacterActionSound;
 	FALSXTCharacterActionSound LastCharacterAttackSound;
 	FALSXTCharacterDamageSound LastCharacterDamageSound;
@@ -261,10 +322,6 @@ private:
 	bool ShouldPlayAttackSound(const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const float Stamina);
 	bool ShouldPlayDamageSound(const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);	
 	bool ShouldPlayDeathSound(const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
-
-	void StartBreathTimer();
-	void IncrementBreathTimer();
-	void ResetBreathTimer();
 	
 	void StartTimeSinceLastCharacterMovementSoundTimer(const float Delay);
 	void IncrementTimeSinceLastCharacterMovementSound();

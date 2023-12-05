@@ -1,7 +1,7 @@
 // MIT
 
-
 #include "Components/Character/ALSXTIdleAnimationComponent.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 
 // Sets default values for this component's properties
 UALSXTIdleAnimationComponent::UALSXTIdleAnimationComponent()
@@ -47,6 +47,7 @@ void UALSXTIdleAnimationComponent::BeginPlay()
 void UALSXTIdleAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	StatusState = IALSXTCharacterInterface::Execute_GetStatusState(Character);
 	if (IsValid(CurrentIdleMontage) && !IsPlayerInputIdle())
 	{
 		StopIdle();
@@ -194,7 +195,8 @@ void UALSXTIdleAnimationComponent::IdleCounterTimer()
 	if (IsPlayerInputIdle())
 	{
 		IdleCounterCurrent = IdleCounterCurrent + 0.01;
-		if (IdleCounterCurrent >= IdleCounterTarget && ShouldIdle())
+		
+		if (IdleCounterCurrent >= IdleCounterTarget && IdleAnimationSettings.EligibleStaminaLevels.HasTag(StatusState.CurrentStaminaTag) && ShouldIdle())
 		{
 			GetWorld()->GetTimerManager().ClearTimer(DelayBetweenAnimationsTimerHandle);
 			ResetIdleCounterTimer();

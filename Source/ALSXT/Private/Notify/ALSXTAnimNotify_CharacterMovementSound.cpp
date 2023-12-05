@@ -25,6 +25,7 @@ void UALSXTAnimNotify_CharacterMovementSound::Notify(USkeletalMeshComponent* Mes
 	{
 		return;
 	}
+
 	const auto* World{ Mesh->GetWorld() };
 	const auto* Character{ Cast<AAlsCharacter>(Mesh->GetOwner()) };
 	AALSXTCharacter* ALSXTCharacter{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
@@ -33,11 +34,10 @@ void UALSXTAnimNotify_CharacterMovementSound::Notify(USkeletalMeshComponent* Mes
 	{
 		return;
 	}
-	// FGameplayTag WeightTag = IALSXTCharacterInterface::Execute_GetWeightTag(ALSXTCharacter);
 
 	if (World->WorldType != EWorldType::EditorPreview)
 	{
-	FGameplayTag WeightTag = IALSXTCharacterInterface::Execute_GetWeightTag(ALSXTCharacter);	
-	IALSXTCharacterInterface::Execute_PlayCharacterMovementSound(ALSXTCharacter, EnableCharacterMovementAccentSound, EnableWeaponMovementSound, MovementType, WeightTag);
+		FGameplayTag WeightTag = IALSXTCharacterInterface::Execute_GetWeightTag(ALSXTCharacter);	
+		IALSXTCharacterInterface::Execute_PlayCharacterMovementSound(ALSXTCharacter, EnableCharacterMovementAccentSound, EnableWeaponMovementSound, MovementType, WeightTag);
 	}
 }

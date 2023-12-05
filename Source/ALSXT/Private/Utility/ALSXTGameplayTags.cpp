@@ -531,6 +531,7 @@ namespace ALSXTWeaponObstructionTags
 
 namespace ALSXTStaminaTags
 {
+	UE_DEFINE_GAMEPLAY_TAG(Full, TEXT("Als.Stamina.Full"))
 	UE_DEFINE_GAMEPLAY_TAG(Optimal, TEXT("Als.Stamina.Optimal"))
 	UE_DEFINE_GAMEPLAY_TAG(Half, TEXT("Als.Stamina.Half"))
 	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Stamina.Low"))
@@ -566,6 +567,14 @@ namespace ALSXTDefenseTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(Redirection, TEXT("Als.Defense Type.Redirection"))
 	UE_DEFINE_GAMEPLAY_TAG(Cybernetic, TEXT("Als.Defense Type.Cybernetic"))
 	UE_DEFINE_GAMEPLAY_TAG(Device, TEXT("Als.Defense Type.Device"))
+}
+
+namespace ALSXTItemConditionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Prestine, TEXT("Als.Item Condition.Prestine"))
+	UE_DEFINE_GAMEPLAY_TAG(Good, TEXT("Als.Item Condition.Good"))
+	UE_DEFINE_GAMEPLAY_TAG(Worn, TEXT("Als.Item Condition.Worn"))
+	UE_DEFINE_GAMEPLAY_TAG(Ruined, TEXT("Als.Item Condition.Ruined"))
 }
 
 namespace ALSXTClothingStateTags

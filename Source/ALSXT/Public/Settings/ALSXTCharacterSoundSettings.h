@@ -40,6 +40,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Sex} {Variant} {BreathType} {Stamina}", AllowPrivateAccess))
 	TArray<FALSXTBreathSound> BreathSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Sex} {Variant} {BreathType} {Stamina}", AllowPrivateAccess))
+	TArray<FALSXTBreathSound> HoldingBreathSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Sex} {Variant} {BreathType} {Stamina}", AllowPrivateAccess))
+	TArray<FALSXTBreathSound> ExhalingSounds;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Strength} {Stamina} {Sound}", AllowPrivateAccess))
 	TArray<FALSXTCharacterActionSound> ActionSounds;
