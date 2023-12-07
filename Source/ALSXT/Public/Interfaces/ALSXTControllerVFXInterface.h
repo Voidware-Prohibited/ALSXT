@@ -83,6 +83,12 @@ public:
 	void ResetDamageEffect();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")
+	void AddNearDeathEffect(float Damage, const FGameplayTag& DamageType);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")
+	void ResetNearDeathEffect();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")
 	void AddDeathEffect(float Damage, const FGameplayTag& DamageType, const FHitResult& HitResult, float PostDelay);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Damage")

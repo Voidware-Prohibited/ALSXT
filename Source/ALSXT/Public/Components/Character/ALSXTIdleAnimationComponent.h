@@ -30,7 +30,7 @@ protected:
 	TArray<TObjectPtr<UAnimMontage>> PreviousMontages;
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
-	TArray<FIdleAnimation> SelectIdleAnimations(const FGameplayTag& Sex, const FGameplayTag& Stance, const FGameplayTag& Overlay, const FGameplayTag& Injury);
+	TArray<FIdleAnimation> SelectIdleAnimations(const FGameplayTag& Sex, const FGameplayTag& Stance, const FGameplayTag& Overlay, const FGameplayTag& Injury, const FGameplayTag& CombatStance);
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	UAnimMontage* GetNewIdleAnimation(TArray<FIdleAnimation> IdleAnimations);

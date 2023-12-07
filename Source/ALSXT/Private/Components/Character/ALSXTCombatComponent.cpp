@@ -449,6 +449,11 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 
 void UALSXTCombatComponent::Attack(const FGameplayTag& ActionType, const FGameplayTag& AttackType, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate)
 {
+	if (Character->GetLocomotionAction() == AlsLocomotionActionTags::PrimaryAction)
+	{
+		return;
+	}
+	
 	FGameplayTag NewStance = ALSXTActionStanceTags::Standing;
 
 	if (Character->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
@@ -529,7 +534,7 @@ void UALSXTCombatComponent::StartAttack(const FGameplayTag& AttackType, const FG
 
 	FAttackAnimation Montage{ SelectAttackMontage(AttackType, Stance, Strength, BaseDamage) };
 
-	if (!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsAttackAllowedToStart(Montage.Montage.Montage))
+	if (!IsValid(Montage.Montage.Montage) || !IsAttackAllowedToStart(Montage.Montage.Montage))
 	{
 		return;
 	}

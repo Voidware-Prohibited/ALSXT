@@ -24,6 +24,9 @@ struct ALSXT_API FALSXTBreathState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Breath Type"))
 	FGameplayTag BreathType{ ALSXTBreathTypeTags::Regular };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Holding Breath"))
+	FGameplayTag HoldingBreath{ ALSXTHoldingBreathTags::False };
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
 	float CurrentBreathRate { 1.0 };

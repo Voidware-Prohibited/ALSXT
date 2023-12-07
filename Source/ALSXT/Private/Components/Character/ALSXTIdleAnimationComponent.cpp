@@ -76,7 +76,7 @@ bool UALSXTIdleAnimationComponent::IsPlayerInputIdle()
 	return bIsInputIdle;
 }
 
-TArray<FIdleAnimation> UALSXTIdleAnimationComponent::SelectIdleAnimations(const FGameplayTag& Sex, const FGameplayTag& Stance, const FGameplayTag& Overlay, const FGameplayTag& Injury)
+TArray<FIdleAnimation> UALSXTIdleAnimationComponent::SelectIdleAnimations(const FGameplayTag& Sex, const FGameplayTag& Stance, const FGameplayTag& Overlay, const FGameplayTag& Injury, const FGameplayTag& CombatStance)
 {
 	UALSXTIdleAnimationSettings* Settings = SelectIdleSettings();
 	TArray<FIdleAnimation> Animations = Settings->IdleAnimations;
@@ -86,6 +86,7 @@ TArray<FIdleAnimation> UALSXTIdleAnimationComponent::SelectIdleAnimations(const 
 	TagsContainer.AddTag(Stance);
 	TagsContainer.AddTag(Overlay);
 	TagsContainer.AddTag(Injury);
+	TagsContainer.AddTag(CombatStance);
 
 	// Return if there are no sounds
 	if (Animations.Num() < 1)
@@ -102,6 +103,7 @@ TArray<FIdleAnimation> UALSXTIdleAnimationComponent::SelectIdleAnimations(const 
 		CurrentTagsContainer.AppendTags(Animation.Stance);
 		CurrentTagsContainer.AppendTags(Animation.Overlay);
 		CurrentTagsContainer.AppendTags(Animation.Injury);
+		CurrentTagsContainer.AppendTags(Animation.CombatStance);
 
 		if (CurrentTagsContainer.HasAll(TagsContainer))
 		{
@@ -276,7 +278,7 @@ void UALSXTIdleAnimationComponent::ResetCameraRotationTimer()
 void UALSXTIdleAnimationComponent::StartIdle()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "StartIdle");
-	TArray<FIdleAnimation> SelectedAnimations = SelectIdleAnimations(Character->GetDesiredSex(), Character->GetStance(), Character->GetOverlayMode(), ALSXTInjuryTags::None);
+	TArray<FIdleAnimation> SelectedAnimations = SelectIdleAnimations(Character->GetDesiredSex(), Character->GetStance(), Character->GetOverlayMode(), ALSXTInjuryTags::None, Character->GetDesiredCombatStance());
 	SetNewAnimation(GetNewIdleAnimation(SelectedAnimations), 1);
 	float MontageLength {0.0f};
 	if (IsValid(CurrentIdleMontage))

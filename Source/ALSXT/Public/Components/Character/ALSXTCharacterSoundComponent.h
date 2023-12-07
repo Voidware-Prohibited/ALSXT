@@ -13,6 +13,9 @@
 #include "Components/AudioComponent.h"
 #include "ALSXTCharacterSoundComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVocalizationSignature, FSound, Vocalization);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMovementSoundSignature, FSound, MovementSound);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponMovementSoundSignature, FSound, WeaponMovementSound);
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ALSXT_API UALSXTCharacterSoundComponent : public UActorComponent
@@ -24,6 +27,15 @@ public:
 	UALSXTCharacterSoundComponent();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnVocalizationSignature OnVocalization;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnMovementSoundSignature OnMovementSound;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponMovementSoundSignature OnWeaponMovementSound;
 
 protected:
 	// Called when the game starts
@@ -171,12 +183,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	void PlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
-	void OnVocalization(FSound Vocalization);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
-	void OnMovementSound(FSound MovementSound);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayBreathSound();

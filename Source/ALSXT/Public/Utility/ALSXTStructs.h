@@ -1399,6 +1399,9 @@ struct ALSXT_API FIdleAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Locomotion Variant", TitleProperty = "{Variant}", AllowPrivateAccess))
 	FGameplayTagContainer Variant;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Combat Stance", TitleProperty = "{CombatStance}", AllowPrivateAccess))
+	FGameplayTagContainer CombatStance;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UAnimMontage> Montage { nullptr };
 

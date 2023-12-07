@@ -91,6 +91,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 
 	DefensiveModeState = ALSXTCharacter->GetDefensiveModeState();
 	WeaponObstruction = ALSXTCharacter->GetWeaponObstruction();
+	BreathState.HoldingBreath = ALSXTCharacter->GetDesiredHoldingBreath();
 }
 
 void UALSXTAnimationInstance::NativeThreadSafeUpdateAnimation(const float DeltaTime)
@@ -188,15 +189,25 @@ bool UALSXTAnimationInstance::ShouldTransitionBreathState()
 FALSXTTargetBreathState UALSXTAnimationInstance::CalculateTargetBreathState()
 {
 	FALSXTTargetBreathState NewTargetBreathState;
-	FVector2D ConversionRange{ 0, 1 };
-	FVector2D UtilizedStaminaRange{ 0, StaminaThresholdSettings.StaminaOptimalThreshold };
-	float CurrentStaminaConverted = FMath::GetMappedRangeValueClamped(UtilizedStaminaRange, ConversionRange, StatusState.CurrentStamina);
-	float PlayRateConverted = FMath::GetMappedRangeValueClamped(ConversionRange, CharacterBreathEffectsSettings.BreathAnimationPlayRateRange, CurrentStaminaConverted);
-	float BlendConverted = FMath::GetMappedRangeValueClamped(ConversionRange, CharacterBreathEffectsSettings.BreathAnimationBlendRange, CurrentStaminaConverted);
-	NewTargetBreathState.Alpha = BlendConverted;
-	NewTargetBreathState.Rate = PlayRateConverted;
-	NewTargetBreathState.TransitionRate = 1.0;
-	return NewTargetBreathState;
+
+	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::True)
+	{
+		NewTargetBreathState.Alpha = 0.0;
+		NewTargetBreathState.Rate = 0.0;
+		return NewTargetBreathState;
+	}
+	else
+	{
+		FVector2D ConversionRange{ 0, 1 };
+		FVector2D UtilizedStaminaRange{ 0, StaminaThresholdSettings.StaminaOptimalThreshold };
+		float CurrentStaminaConverted = FMath::GetMappedRangeValueClamped(UtilizedStaminaRange, ConversionRange, StatusState.CurrentStamina);
+		float PlayRateConverted = FMath::GetMappedRangeValueClamped(ConversionRange, CharacterBreathEffectsSettings.BreathAnimationPlayRateRange, CurrentStaminaConverted);
+		float BlendConverted = FMath::GetMappedRangeValueClamped(ConversionRange, CharacterBreathEffectsSettings.BreathAnimationBlendRange, CurrentStaminaConverted);
+		NewTargetBreathState.Alpha = BlendConverted;
+		NewTargetBreathState.Rate = PlayRateConverted;
+		NewTargetBreathState.TransitionRate = 1.0;
+		return NewTargetBreathState;
+	}
 }
 
 void UALSXTAnimationInstance::TransitionBreathState()

@@ -845,6 +845,16 @@ void AALSXTCharacter::ResetPaintOnAllComponents_Implementation() const
 	
 }
 
+// UALSXTCharacterSoundSettings* AALSXTCharacter::SelectCharacterSoundSettings_Implementation() const
+// {
+// 
+// }
+// 
+// UALSXTWeaponSoundSettings* AALSXTCharacter::SelectWeaponSoundSettings_Implementation() const
+// {
+// 
+// }
+
 // Vaulting State
 void AALSXTCharacter::SetVaultingState(const FALSXTVaultingState& NewVaultingState)
 {

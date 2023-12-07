@@ -192,7 +192,8 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTa
 
 					VocalizationMixerAudioComponent->SetTriggerParameter("BreathInput");
 					Character->MakeNoise(1.0, Character, Character->GetMesh()->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), 10, "Vocal");
-					OnVocalization(NewBreathSound);
+					OnVocalization.Broadcast(NewBreathSound);
+					//OnVocalization(NewBreathSound);
 				}
 			}
 			if (BreathParticleSettings.VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
@@ -236,7 +237,8 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTa
 
 					VocalizationMixerAudioComponent->SetTriggerParameter("BreathInput");
 					Character->MakeNoise(1.0, Character, VoiceSocketLocation, 10, "Vocal");
-					OnVocalization(NewBreathSound);
+					// OnVocalization(NewBreathSound);
+					OnVocalization.Broadcast(NewBreathSound);
 				}
 			}
 			if (BreathParticleSettings.VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
@@ -1663,7 +1665,8 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 
 			VocalizationMixerAudioComponent->SetTriggerParameter("BreathInput");
 			Character->MakeNoise(1.0, Character, VoiceSocketLocation, 10, "Vocal");
-			OnVocalization(NewBreathSound);
+			// OnVocalization(NewBreathSound);
+			OnVocalization.Broadcast(NewBreathSound);
 			// CurrentBreathParticles = SelectBreathParticles(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner()), CurrentStaminaTag);
 			// UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(DetermineNewBreathParticle(), Character->GetMesh(), GeneralCharacterSoundSettings.VoiceSocketName, NewVoiceSocketLocation, NewVoiceSocketRotation, EAttachLocation::KeepRelativeOffset, true, true, ENCPoolMethod::None, true);
 			
@@ -1688,7 +1691,8 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 
 			VocalizationMixerAudioComponent->SetTriggerParameter("VocalizationInput");
 			Character->MakeNoise(1.0, Character, NewVoiceSocketLocation, 10, "Vocal");
-			OnVocalization(NewVocalizationSound);
+			// OnVocalization(NewVocalizationSound);
+			OnVocalization.Broadcast(NewVocalizationSound);
 
 			if (BreathParticleSettings.VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
 			{
