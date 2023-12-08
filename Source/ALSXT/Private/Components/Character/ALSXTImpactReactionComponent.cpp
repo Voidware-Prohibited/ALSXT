@@ -333,7 +333,7 @@ void UALSXTImpactReactionComponent::ClutchImpactPointTimer()
 
 	if (IsValid(GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult.HitResult.HitResult.GetActor()))
 	{
-		if (ShouldPerformAttackResponse())
+		if (IALSXTCollisionInterface::Execute_ShouldPerformAttackResponse(GetOwner()))
 		{
 			// AttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
 			// AttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
@@ -344,7 +344,7 @@ void UALSXTImpactReactionComponent::ClutchImpactPointTimer()
 	{
 		if (IsValid(GetImpactReactionState().ImpactReactionParameters.ImpactHit.HitResult.HitResult.GetActor()))
 		{
-			if (ShouldPerformImpactResponse())
+			if (IALSXTCollisionInterface::Execute_ShouldPerformImpactResponse(GetOwner()))
 			{
 				ImpactResponse(GetImpactReactionState().ImpactReactionParameters.ImpactHit);
 			}
@@ -608,7 +608,7 @@ void UALSXTImpactReactionComponent::AttackFallenTimer()
 		SetImpactReactionState(Params);
 		GetWorld()->GetTimerManager().ClearTimer(AttackFallenTimerHandle);
 
-		if (ImpactReactionSettings.bEnableAutoGetUp && CanGetUp() && ShouldGetUp())
+		if (ImpactReactionSettings.bEnableAutoGetUp && IALSXTCollisionInterface::Execute_CanGetUp(GetOwner()) && IALSXTCollisionInterface::Execute_ShouldGetUp(GetOwner()))
 		{
 			Character->SetDesiredStatus(ALSXTStatusTags::Normal);
 			AttackGetUp(Params.ImpactReactionParameters.AttackHit);
@@ -620,7 +620,7 @@ void UALSXTImpactReactionComponent::AttackFallenTimer()
 
 void UALSXTImpactReactionComponent::OnCrowdNavigationReactionBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (ShouldCrowdNavigationFall())
+	if (IALSXTCollisionInterface::Execute_ShouldCrowdNavigationFall(GetOwner()))
 	{
 		CrowdNavigationFall();
 	}
@@ -630,7 +630,7 @@ void UALSXTImpactReactionComponent::OnBumpReactionBlendOut(UAnimMontage* Montage
 {
 	// GetWorld()->GetTimerManager().ClearTimer(BumpVelocityTimerHandle);
 	GetWorld()->GetTimerManager().SetTimer(BumpVelocityTimerHandle, BumpVelocityTimerDelegate, 0.1f, true);
-	if (ShouldCrowdNavigationFall())
+	if (IALSXTCollisionInterface::Execute_ShouldCrowdNavigationFall(GetOwner()))
 	{
 		CrowdNavigationFall();
 	}
@@ -638,7 +638,7 @@ void UALSXTImpactReactionComponent::OnBumpReactionBlendOut(UAnimMontage* Montage
 
 void UALSXTImpactReactionComponent::OnImpactReactionBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (ShouldImpactFall() && IsValid(GetImpactReactionState().ImpactReactionParameters.ImpactHit.HitResult.HitResult.GetActor()))
+	if (IALSXTCollisionInterface::Execute_ShouldImpactFall(GetOwner()) && IsValid(GetImpactReactionState().ImpactReactionParameters.ImpactHit.HitResult.HitResult.GetActor()))
 	{
 		Character->ResetDefensiveModeState();
 		Character->SetDesiredDefensiveMode(ALSXTDefensiveModeTags::None);
@@ -651,7 +651,7 @@ void UALSXTImpactReactionComponent::OnAttackReactionBlendOut(UAnimMontage* Monta
 	
 	if (IsValid(GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult.HitResult.HitResult.GetActor()))
 	{
-		if (CanAttackFall() && ShouldAttackFall())
+		if (IALSXTCollisionInterface::Execute_CanAttackFall(GetOwner()) && IALSXTCollisionInterface::Execute_ShouldAttackFall(GetOwner()))
 		{
 			Character->ResetDefensiveModeState();
 			Character->SetDesiredDefensiveMode(ALSXTDefensiveModeTags::None);
@@ -659,15 +659,15 @@ void UALSXTImpactReactionComponent::OnAttackReactionBlendOut(UAnimMontage* Monta
 		}
 		else
 		{
-			if (ShouldStabilize())
+			if (IALSXTCollisionInterface::Execute_ShouldStabilize(GetOwner()))
 			{
 				Stabilize(GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult);
 			}
-			if (ShouldClutchImpactPoint())
+			if (IALSXTCollisionInterface::Execute_ShouldClutchImpactPoint(GetOwner()))
 			{
 				ClutchImpactPoint(GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult);
 			}
-			else if (IsValid(GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult.OriginHitResult.HitResult.GetActor()) && ShouldPerformAttackResponse())
+			else if (IsValid(GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult.OriginHitResult.HitResult.GetActor()) && IALSXTCollisionInterface::Execute_ShouldPerformAttackResponse(GetOwner()))
 			{
 				StartAttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
 			}
@@ -681,7 +681,7 @@ void UALSXTImpactReactionComponent::OnAttackReactionBlendOut(UAnimMontage* Monta
 
 void UALSXTImpactReactionComponent::OnSyncedAttackReactionBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (ShouldSyncedAttackFall())
+	if (IALSXTCollisionInterface::Execute_ShouldSyncedAttackFall(GetOwner()))
 	{
 
 	}
@@ -691,7 +691,7 @@ void UALSXTImpactReactionComponent::OnClutchImpactPointBlendOut(UAnimMontage* Mo
 {
 	if (IsValid(GetImpactReactionState().ImpactReactionParameters.AttackHit.DoubleHitResult.HitResult.HitResult.GetActor()))
 	{
-		if (ShouldPerformAttackResponse())
+		if (IALSXTCollisionInterface::Execute_ShouldPerformAttackResponse(GetOwner()))
 		{
 			AttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
 		}
@@ -700,7 +700,7 @@ void UALSXTImpactReactionComponent::OnClutchImpactPointBlendOut(UAnimMontage* Mo
 	{
 		if (IsValid(GetImpactReactionState().ImpactReactionParameters.ImpactHit.HitResult.HitResult.GetActor()))
 		{
-			if (ShouldPerformImpactResponse())
+			if (IALSXTCollisionInterface::Execute_ShouldPerformImpactResponse(GetOwner()))
 			{
 				ImpactResponse(GetImpactReactionState().ImpactReactionParameters.ImpactHit);
 			}
@@ -725,7 +725,7 @@ void UALSXTImpactReactionComponent::OnBraceForImpactBlendOut(UAnimMontage* Monta
 
 void UALSXTImpactReactionComponent::OnCrowdNavigationFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (ShouldPerformCrowdNavigationResponse())
+	if (IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationResponse(GetOwner()))
 	{
 		CrowdNavigationResponse();
 	}
@@ -733,7 +733,7 @@ void UALSXTImpactReactionComponent::OnCrowdNavigationFallGetupBlendOut(UAnimMont
 
 void UALSXTImpactReactionComponent::OnImpactFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (ShouldPerformImpactResponse())
+	if (IALSXTCollisionInterface::Execute_ShouldPerformImpactResponse(GetOwner()))
 	{
 		ImpactResponse(GetImpactReactionState().ImpactReactionParameters.ImpactHit);
 	}
@@ -741,7 +741,7 @@ void UALSXTImpactReactionComponent::OnImpactFallGetupBlendOut(UAnimMontage* Mont
 
 void UALSXTImpactReactionComponent::OnAttackFallGetupBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (ShouldPerformAttackResponse())
+	if (IALSXTCollisionInterface::Execute_ShouldPerformAttackResponse(GetOwner()))
 	{
 		// AttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
 		StartAttackResponse(GetImpactReactionState().ImpactReactionParameters.AttackHit);
@@ -951,7 +951,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 	FVector RangedVelocity = Character->GetVelocity();
 	VelocityLength = FMath::GetMappedRangeValueClamped(VelocityRange, ConversionRange, Character->GetVelocity().Length());
 
-	if (ShouldPerformImpactResponse() && Character->GetVelocity().Length() > FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
+	if (IALSXTCollisionInterface::Execute_ShouldPerformImpactResponse(GetOwner()) && Character->GetVelocity().Length() > FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
 	{
 		if (Character->GetLocomotionAction() == AlsLocomotionActionTags::Sliding)
 		{
@@ -1013,7 +1013,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 							NewCrowdNavigationPoseState.Pose = SelectCrowdNavigationPose(DoubleHitResult.ImpactSide, DoubleHitResult.ImpactForm);
 							SetCrowdNavigationPoseState(NewCrowdNavigationPoseState);
 						}
-						else if ((Character->GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral && ShouldPerformCrowdNavigationReaction()) || (Character->GetVelocity().Length() >= 650.0f && ShouldPerformCrowdNavigationReaction()))
+						else if ((Character->GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())) || (Character->GetVelocity().Length() >= 650.0f && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())))
 						{
 							CrowdNavigationReaction(Character->GetDesiredGait(), OriginSideTag, FormTag);
 						}
@@ -4202,7 +4202,7 @@ void UALSXTImpactReactionComponent::StartBumpReactionImplementation(FActionMonta
 		Character->GetMesh()->AddImpulseToAllBodiesBelow(CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.BoneName, false, true);
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 
-		if (ShouldClutchImpactPoint())
+		if (IALSXTCollisionInterface::Execute_ShouldClutchImpactPoint(GetOwner()))
 		{
 			ClutchImpactPoint(CurrentImpactReactionState.ImpactReactionParameters.BumpHit);
 		}
@@ -4270,13 +4270,13 @@ void UALSXTImpactReactionComponent::StartCrowdNavigationReactionImplementation(F
 		Character->GetMesh()->AddImpulseToAllBodiesBelow(CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.BoneName, false, true);
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 
-		if (ShouldCrowdNavigationFall())
+		if (IALSXTCollisionInterface::Execute_ShouldCrowdNavigationFall(GetOwner()))
 		{
 			CrowdNavigationFall();
 		}
 		else
 		{
-			if (ShouldClutchImpactPoint())
+			if (IALSXTCollisionInterface::Execute_ShouldClutchImpactPoint(GetOwner()))
 			{
 				ClutchImpactPoint(CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit);
 			}
@@ -4429,13 +4429,13 @@ void UALSXTImpactReactionComponent::StartAttackReactionImplementation(FAttackDou
 		Character->GetMesh()->AddImpulseToAllBodiesBelow(Hit.DoubleHitResult.HitResult.Impulse * 1000, Hit.DoubleHitResult.HitResult.HitResult.BoneName, false, true);
 		Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 
-		if (CanAttackFall() && ShouldAttackFall())
+		if (IALSXTCollisionInterface::Execute_CanAttackFall(GetOwner()) && IALSXTCollisionInterface::Execute_ShouldAttackFall(GetOwner()))
 		{
 			AttackFall(Hit);
 		}
 		else
 		{
-			if (ShouldClutchImpactPoint())
+			if (IALSXTCollisionInterface::Execute_ShouldClutchImpactPoint(GetOwner()))
 			{
 				ClutchImpactPoint(Hit.DoubleHitResult);
 			}
@@ -4714,7 +4714,7 @@ void UALSXTImpactReactionComponent::StartAttackGetUpImplementation(FAttackDouble
 
 		Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage.Montage, 1.0f);
 
-		if (AnimInstance && ShouldPerformAttackResponse())
+		if (AnimInstance && IALSXTCollisionInterface::Execute_ShouldPerformAttackResponse(GetOwner()))
 		{
 			OnAttackFallGetupBlendOutDelegate.BindUObject(this, &UALSXTImpactReactionComponent::OnAttackFallGetupBlendOut);
 			AnimInstance->Montage_SetBlendingOutDelegate(OnAttackFallGetupBlendOutDelegate);

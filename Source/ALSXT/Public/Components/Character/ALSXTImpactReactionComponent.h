@@ -114,10 +114,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTGeneralImpactReactionSettings ImpactReactionSettings;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	TArray<FDoubleHitResult> PreviousImpacts;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	TArray<FAttackDoubleHitResult> PreviousAttackImpacts;
 
 	void ObstacleTrace();
@@ -179,10 +179,10 @@ protected:
 	void OnBumpPoseStateChanged(const FALSXTBumpPoseState& PreviousBumpPoseState);
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_CrowdNavigationPoseState", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "State", ReplicatedUsing = "OnReplicate_CrowdNavigationPoseState", Meta = (AllowPrivateAccess))
 	FALSXTBumpPoseState CrowdNavigationPoseState;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_BumpPoseState", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "State", ReplicatedUsing = "OnReplicate_BumpPoseState", Meta = (AllowPrivateAccess))
 	FALSXTBumpPoseState BumpPoseState;
 
 	void AnticipationTrace();
