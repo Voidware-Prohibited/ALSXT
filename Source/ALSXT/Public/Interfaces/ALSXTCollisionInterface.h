@@ -3,6 +3,7 @@
 #include "NativeGameplayTags.h"
 #include "Utility/ALSXTStructs.h"
 #include "State/ALSXTImpactReactionState.h"
+#include "Settings/ALSXTElementalInteractionSettings.h"
 #include "ALSXTCollisionInterface.generated.h"
 
 UINTERFACE(Blueprintable)
@@ -15,6 +16,12 @@ class ALSXT_API IALSXTCollisionInterface {
 
 public:
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Settings")
+	UALSXTImpactReactionSettings* SelectImpactReactionSettings();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Settings")
+	UALSXTElementalInteractionSettings* SelectElementalInteractionSettings();
+	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Parameters")
 	void GetActorMass(float& Mass);
 

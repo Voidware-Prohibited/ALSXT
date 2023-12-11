@@ -185,6 +185,9 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = "State", ReplicatedUsing = "OnReplicate_BumpPoseState", Meta = (AllowPrivateAccess))
 	FALSXTBumpPoseState BumpPoseState;
 
+	UPROPERTY(BlueprintReadOnly, Category = "State", ReplicatedUsing = "OnReplicate_ObstacleImpactHistory", Meta = (AllowPrivateAccess))
+	TArray<FImpactHistoryEntry> ObstacleImpactHistory;
+
 	void AnticipationTrace();
 
 	UFUNCTION()
@@ -192,6 +195,9 @@ private:
 
 	UFUNCTION()
 	void OnReplicate_BumpPoseState(const FALSXTBumpPoseState& PreviousBumpPoseStateState);
+
+	UFUNCTION()
+	void OnReplicate_ObstacleImpactHistory(const TArray<FImpactHistoryEntry> PreviousObstacleImpactHistory);
 
 	UFUNCTION(Server, Unreliable)
 	void ServerSetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
@@ -210,6 +216,8 @@ private:
 
 	UFUNCTION(BlueprintCallable, Category = "Vitals") 
 	float GetBaseVelocityDamage();
+
+	bool ValidateNewHit(AActor* ActorToCheck);
 
 	// BlendOut Delegates
 

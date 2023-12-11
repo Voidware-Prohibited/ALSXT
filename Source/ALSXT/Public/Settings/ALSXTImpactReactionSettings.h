@@ -299,7 +299,7 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", meta=(TitleProperty="{Settings}", ForceInlineRow))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", meta=(TitleProperty="{Location}", ForceInlineRow))
 	TMap<FName, FBoneLocationEntry> BoneLocationMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

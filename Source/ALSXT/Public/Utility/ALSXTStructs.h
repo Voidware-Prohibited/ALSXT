@@ -124,6 +124,24 @@ struct ALSXT_API FBoneLocationEntry
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FImpactHistoryEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
+	AActor* Actor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
+	double Time;
+
+	bool operator==(const FImpactHistoryEntry& other) const
+	{
+		return (other.Actor == Actor);
+	}
+
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FExtendedHitResult
 {
 	GENERATED_BODY()

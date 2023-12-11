@@ -5,6 +5,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Utility/ALSXTStructs.h"
 #include "ALSXTCharacter.h"
+#include "Engine/World.h"
+#include "GameFrameWork/GameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/RandomStream.h"
 #include "Utility/AlsMacros.h"
@@ -35,6 +37,7 @@ void UALSXTImpactReactionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 	Parameters.Condition = COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CrowdNavigationPoseState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, BumpPoseState, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, ObstacleImpactHistory, Parameters)
 }
 
 
@@ -244,12 +247,12 @@ bool UALSXTImpactReactionComponent::GetAttackFallLocation(FVector& Location, FAt
 
 float UALSXTImpactReactionComponent::GetImpactFallenMinimumTime(FDoubleHitResult Hit)
 {
-	return FGenericPlatformMath::Min(GetDynamicImpactFallenMinimumTime(), SelectImpactReactionSettings()->ImpactFallenMinimumTime);
+	return FGenericPlatformMath::Min(GetDynamicImpactFallenMinimumTime(), IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner())->ImpactFallenMinimumTime);
 }
 
 float UALSXTImpactReactionComponent::GetAttackFallenMinimumTime(FAttackDoubleHitResult Hit)
 {
-	return FGenericPlatformMath::Min(GetDynamicImpactFallenMinimumTime(), SelectImpactReactionSettings()->AttackFallenMinimumTime);
+	return FGenericPlatformMath::Min(GetDynamicImpactFallenMinimumTime(), IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner())->AttackFallenMinimumTime);
 }
 
 void UALSXTImpactReactionComponent::CrowdNavigationVelocityTimer()
@@ -931,6 +934,49 @@ float UALSXTImpactReactionComponent::GetBaseVelocityDamage()
 	return FMath::GetMappedRangeValueClamped(VelocityRange, ConversionRange, Character->GetVelocity().Length());
 }
 
+bool UALSXTImpactReactionComponent::ValidateNewHit(AActor* ActorToCheck)
+{
+	double NewHitTime;
+	NewHitTime = GetWorld()->GetTimeSeconds();
+	bool RecentlyHit{ false };
+	FImpactHistoryEntry EntryToCheck;
+	EntryToCheck.Actor = ActorToCheck;
+
+	if (ObstacleImpactHistory.Contains(EntryToCheck)) //Actor Already in History
+	{
+		double PreviousTime;
+		int FoundIndex = ObstacleImpactHistory.Find(EntryToCheck);
+		FImpactHistoryEntry FoundEntry = ObstacleImpactHistory[FoundIndex];
+		PreviousTime = FoundEntry.Time;
+		double TimeResult;
+		TimeResult = NewHitTime - PreviousTime;
+		RecentlyHit = TimeResult <= 0.33;
+
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString((RecentlyHit)? TEXT("True"):TEXT("False")));
+		// GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(NewHitTime));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::SanitizeFloat(TimeResult));
+		ObstacleImpactHistory.RemoveAt(FoundIndex);		
+		if (ObstacleImpactHistory.Num() >= 6)
+		{
+			ObstacleImpactHistory.RemoveAt(0);
+		}
+		FImpactHistoryEntry NewEntry{ ActorToCheck, GetWorld()->GetTimeSeconds() };
+		ObstacleImpactHistory.Add(NewEntry);
+		return !RecentlyHit;
+	}
+	else // Actor not in History. Add New Element
+	{
+		if (ObstacleImpactHistory.Num() >= 6)
+		{
+			ObstacleImpactHistory.RemoveAt(0);
+		}
+		FImpactHistoryEntry NewEntry{ ActorToCheck, GetWorld()->GetTimeSeconds() };
+		ObstacleImpactHistory.Add(NewEntry);
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::SanitizeFloat(NewHitTime));
+		return true;
+	}
+}
+
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
 	const auto* Capsule{ Character->GetCapsuleComponent() };
@@ -972,107 +1018,98 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 				TArray<AActor*> IgnoreActorsOrigin;
 				IgnoreActorsOrigin.Add(HitResult.GetActor());
 
-				if (UKismetSystemLibrary::CapsuleTraceSingleForObjects(GetWorld(), HitResult.ImpactPoint, StartLocation, CapsuleRadius, CapsuleHalfHeight / 2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActorsOrigin, EDrawDebugTrace::None, OriginHitResult, false, FLinearColor::Green, FLinearColor::Red, 5.0f))
+				if (ValidateNewHit(HitResult.GetActor()))
 				{
-					FALSXTImpactReactionState NewImpactReactionState;
-					FDoubleHitResult DoubleHitResult;
-					DoubleHitResult.HitResult.HitResult = HitResult;
-					DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
-					DoubleHitResult.OriginHitResult.ImpactGait = Character->GetDesiredGait();
-					DoubleHitResult.HitResult.ImpactSide = LocationToActorImpactSide(HitResult.GetActor(), HitResult.ImpactPoint);
-
-					if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCollisionInterface::StaticClass()))
+					if (HitResult.GetComponent()->GetOwner() != GetOwner() && UKismetSystemLibrary::CapsuleTraceSingleForObjects(GetWorld(), HitResult.ImpactPoint, StartLocation, CapsuleRadius, CapsuleHalfHeight / 2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActorsOrigin, EDrawDebugTrace::None, OriginHitResult, false, FLinearColor::Green, FLinearColor::Red, 5.0f))
 					{
-						IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), DoubleHitResult.HitResult.Mass);
-						IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), DoubleHitResult.HitResult.Velocity);
-					}
-					else
-					{
-						DoubleHitResult.HitResult.Mass = 100.00f;
-						DoubleHitResult.HitResult.Velocity = HitResult.GetActor()->GetVelocity();
-					}
-
-					DoubleHitResult.Strength = ConvertVelocityToStrength(DoubleHitResult.HitResult.Velocity);
-					FGameplayTag SideTag = LocationToImpactSide(HitResult.ImpactPoint);
-					FGameplayTag OriginSideTag = LocationToImpactSide(OriginHitResult.ImpactPoint);
-					TEnumAsByte<EPhysicalSurface> OriginPhysSurf = OriginHitResult.PhysMaterial->SurfaceType;
-					TEnumAsByte<EPhysicalSurface> PhysSurf = HitResult.PhysMaterial->SurfaceType;
-					FGameplayTag FormTag = ConvertPhysicalSurfaceToFormTag(OriginPhysSurf);
-					DoubleHitResult.ImpactForm = FormTag;
-					DoubleHitResult.ImpactSide = SideTag;
-					IALSXTCollisionInterface::Execute_GetActorMass(Character, DoubleHitResult.OriginHitResult.Mass);
-					IALSXTCollisionInterface::Execute_GetActorVelocity(Character, DoubleHitResult.OriginHitResult.Velocity);
-					// NewImpactReactionState.ImpactReactionParameters = ImpactReactionParameters;
-
-					if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCharacterInterface::StaticClass()) && IALSXTCharacterInterface::Execute_GetCombatStance(HitResult.GetActor()) == ALSXTCombatStanceTags::Neutral)
-					{
-						if (Character->GetVelocity().Length() < FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
-						{
-							// Use Static Pose instead
-							FALSXTBumpPoseState NewCrowdNavigationPoseState;
-							NewCrowdNavigationPoseState.Pose = SelectCrowdNavigationPose(DoubleHitResult.ImpactSide, DoubleHitResult.ImpactForm);
-							SetCrowdNavigationPoseState(NewCrowdNavigationPoseState);
-						}
-						else if ((Character->GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())) || (Character->GetVelocity().Length() >= 650.0f && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())))
-						{
-							CrowdNavigationReaction(Character->GetDesiredGait(), OriginSideTag, FormTag);
-						}
-						NewImpactReactionState.ImpactReactionParameters.CrowdNavigationHit = DoubleHitResult;
-						NewImpactReactionState.ImpactReactionParameters.ImpactType = ALSXTImpactTypeTags::CrowdNavigation;
-						SetImpactReactionState(NewImpactReactionState);
-						IALSXTCharacterInterface::Execute_CrowdNavigationReaction(HitResult.GetActor(), Character->GetDesiredGait(), DoubleHitResult, SideTag, FormTag);
-					}
-					else 
-					{
-						NewImpactReactionState.ImpactReactionParameters.BumpHit = DoubleHitResult;
-						NewImpactReactionState.ImpactReactionParameters.ImpactType = ALSXTImpactTypeTags::Bump;
-						SetImpactReactionState(NewImpactReactionState);
-
-						if (ImpactReactionSettings.DebugMode)
-						{
-							FString VelMsg = "Vel: ";
-							VelMsg.Append(FString::SanitizeFloat(Character->GetVelocity().Length()));
-							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, VelMsg);
-						}
-
-						if (Character->GetVelocity().Length() < FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
-						{
-							// Use Static Pose instead
-							FALSXTBumpPoseState NewBumpPoseState;
-							NewBumpPoseState.Pose = SelectBumpPose(DoubleHitResult.ImpactSide, DoubleHitResult.ImpactForm);
-							SetBumpPoseState(NewBumpPoseState);
-						}
-						else if (Character->GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral || (Character->GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral && Character->GetVelocity().Length() >= 650.0f))
-						{
-							BumpReaction(Character->GetDesiredGait(), SideTag, FormTag);
-						}
+						FALSXTImpactReactionState NewImpactReactionState;
+						FDoubleHitResult DoubleHitResult;
+						DoubleHitResult.HitResult.HitResult = HitResult;
+						DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
+						DoubleHitResult.OriginHitResult.ImpactGait = Character->GetDesiredGait();
+						DoubleHitResult.HitResult.ImpactSide = LocationToActorImpactSide(HitResult.GetActor(), HitResult.ImpactPoint);
 
 						if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCollisionInterface::StaticClass()))
-						{	
-							IALSXTCollisionInterface::Execute_ActorBumpCollision(HitResult.GetActor(), DoubleHitResult);						
+						{
+							IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), DoubleHitResult.HitResult.Mass);
+							IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), DoubleHitResult.HitResult.Velocity);
+						}
+						else
+						{
+							DoubleHitResult.HitResult.Mass = 100.00f;
+							DoubleHitResult.HitResult.Velocity = HitResult.GetActor()->GetVelocity();
+						}
+
+						DoubleHitResult.Strength = ConvertVelocityToStrength(DoubleHitResult.HitResult.Velocity);
+						FGameplayTag SideTag = LocationToImpactSide(HitResult.ImpactPoint);
+						FGameplayTag OriginSideTag = LocationToImpactSide(OriginHitResult.ImpactPoint);
+						TEnumAsByte<EPhysicalSurface> OriginPhysSurf = OriginHitResult.PhysMaterial->SurfaceType;
+						TEnumAsByte<EPhysicalSurface> PhysSurf = HitResult.PhysMaterial->SurfaceType;
+						FGameplayTag FormTag = ConvertPhysicalSurfaceToFormTag(OriginPhysSurf);
+						DoubleHitResult.ImpactForm = FormTag;
+						DoubleHitResult.ImpactSide = SideTag;
+						IALSXTCollisionInterface::Execute_GetActorMass(Character, DoubleHitResult.OriginHitResult.Mass);
+						IALSXTCollisionInterface::Execute_GetActorVelocity(Character, DoubleHitResult.OriginHitResult.Velocity);
+						// NewImpactReactionState.ImpactReactionParameters = ImpactReactionParameters;
+
+						if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCharacterInterface::StaticClass()) && IALSXTCharacterInterface::Execute_GetCombatStance(HitResult.GetActor()) == ALSXTCombatStanceTags::Neutral)
+						{
+							if (Character->GetVelocity().Length() < FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
+							{
+								// Use Static Pose instead
+								FALSXTBumpPoseState NewCrowdNavigationPoseState;
+								NewCrowdNavigationPoseState.Pose = SelectCrowdNavigationPose(DoubleHitResult.ImpactSide, DoubleHitResult.ImpactForm);
+								SetCrowdNavigationPoseState(NewCrowdNavigationPoseState);
+							}
+							else if ((Character->GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())) || (Character->GetVelocity().Length() >= 650.0f && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())))
+							{
+								CrowdNavigationReaction(Character->GetDesiredGait(), OriginSideTag, FormTag);
+							}
+							NewImpactReactionState.ImpactReactionParameters.CrowdNavigationHit = DoubleHitResult;
+							NewImpactReactionState.ImpactReactionParameters.ImpactType = ALSXTImpactTypeTags::CrowdNavigation;
+							SetImpactReactionState(NewImpactReactionState);
+							IALSXTCharacterInterface::Execute_CrowdNavigationReaction(HitResult.GetActor(), Character->GetDesiredGait(), DoubleHitResult, SideTag, FormTag);
+						}
+						else
+						{
+							NewImpactReactionState.ImpactReactionParameters.BumpHit = DoubleHitResult;
+							NewImpactReactionState.ImpactReactionParameters.ImpactType = ALSXTImpactTypeTags::Bump;
+							SetImpactReactionState(NewImpactReactionState);
+
+							if (ImpactReactionSettings.DebugMode)
+							{
+								FString VelMsg = "Vel: ";
+								VelMsg.Append(FString::SanitizeFloat(Character->GetVelocity().Length()));
+								GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, VelMsg);
+							}
+
+							if (Character->GetVelocity().Length() < FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
+							{
+								// Use Static Pose instead
+								FALSXTBumpPoseState NewBumpPoseState;
+								NewBumpPoseState.Pose = SelectBumpPose(DoubleHitResult.ImpactSide, DoubleHitResult.ImpactForm);
+								SetBumpPoseState(NewBumpPoseState);
+							}
+							else if (Character->GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral || (Character->GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral && Character->GetVelocity().Length() >= 650.0f))
+							{
+								BumpReaction(Character->GetDesiredGait(), SideTag, FormTag);
+							}
+
+							if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCollisionInterface::StaticClass()))
+							{
+								IALSXTCollisionInterface::Execute_ActorBumpCollision(HitResult.GetActor(), DoubleHitResult);
+							}
 						}
 					}
-				}
 
-				// AALSXTCharacter* HitIsCharacter = Cast<AALSXTCharacter>(HitResult.GetActor());
-				// if (HitIsCharacter) 
-				// {
-				// 	// ...
-				// }
-				// else
-				// {
-				// 
-				// }
-
-				if (ImpactReactionSettings.DebugMode)
-				{
-					FString BumpHit = "Bump: ";
-					BumpHit.Append(HitResult.GetActor()->GetName());
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, BumpHit);
-				}
-			}
-			
-			
+					if (ImpactReactionSettings.DebugMode)
+					{
+						FString BumpHit = "Bump: ";
+						BumpHit.Append(HitResult.GetActor()->GetName());
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, BumpHit);
+					}
+				}							
+			}						
 		}
 	}
 	else
@@ -1303,6 +1340,11 @@ void UALSXTImpactReactionComponent::ServerProcessNewBumpPoseState_Implementation
 void UALSXTImpactReactionComponent::OnReplicate_BumpPoseState(const FALSXTBumpPoseState& PreviousBumpPoseState)
 {
 	OnBumpPoseStateChanged(PreviousBumpPoseState);
+}
+
+void UALSXTImpactReactionComponent::OnReplicate_ObstacleImpactHistory(const TArray<FImpactHistoryEntry> PreviousObstacleImpactHistory)
+{
+	// OnBumpPoseStateChanged(PreviousBumpPoseState);
 }
 
 void UALSXTImpactReactionComponent::OnBumpPoseStateChanged_Implementation(const FALSXTBumpPoseState& PreviousBumpPoseState) {}
@@ -2387,7 +2429,7 @@ UALSXTElementalInteractionSettings* UALSXTImpactReactionComponent::GetElementalI
 
 FAnticipationPose UALSXTImpactReactionComponent::SelectImpactAnticipationMontage_Implementation(const FGameplayTag& Velocity , const FGameplayTag& Stance, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
 {
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
 	TArray<FAnticipationPose> Montages = SelectedImpactReactionSettings->ImpactAnticipationPoses;
 	TArray<FAnticipationPose> FilteredMontages;
 	FAnticipationPose SelectedImpactAnticipationPose;
@@ -2455,7 +2497,7 @@ FAnticipationPose UALSXTImpactReactionComponent::SelectImpactAnticipationMontage
 
 FAnticipationPose UALSXTImpactReactionComponent::SelectAttackAnticipationMontage_Implementation(const FGameplayTag& CharacterCombatStance, const FGameplayTag& Strength, const FGameplayTag& Stance, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
 {
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
 	TArray<FAnticipationPose> Montages = SelectedImpactReactionSettings->AttackAnticipationPoses;
 	TArray<FAnticipationPose> FilteredMontages;
 	FAnticipationPose SelectedAttackAnticipationPose;
@@ -2523,7 +2565,7 @@ FAnticipationPose UALSXTImpactReactionComponent::SelectAttackAnticipationMontage
 
 FAnticipationPose UALSXTImpactReactionComponent::SelectDefensiveMontage_Implementation(const FGameplayTag& Strength, const FGameplayTag& Stance, const FGameplayTag& Side, const FGameplayTag& Form, const FGameplayTag& Health)
 {
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
 	TArray<FAnticipationPose> Montages = SelectedImpactReactionSettings->DefensivePoses;
 	TArray<FAnticipationPose> FilteredMontages;
 	FAnticipationPose SelectedDefensivePose;
@@ -2591,7 +2633,7 @@ FAnticipationPose UALSXTImpactReactionComponent::SelectDefensiveMontage_Implemen
 
 FBumpReactionAnimation UALSXTImpactReactionComponent::SelectBumpReactionMontage_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form)
 {
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
 	TArray<FBumpReactionAnimation> Montages = SelectedImpactReactionSettings->BumpReactionAnimations;
 	TArray<FBumpReactionAnimation> FilteredMontages;
 	FBumpReactionAnimation SelectedBumpReactionAnimation;
@@ -2664,7 +2706,7 @@ UAnimSequenceBase* UALSXTImpactReactionComponent::SelectCrowdNavigationPose_Impl
 
 FBumpReactionAnimation UALSXTImpactReactionComponent::SelectCrowdNavigationReactionMontage_Implementation(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form)
 {
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
 	TArray<FBumpReactionAnimation> Montages = SelectedImpactReactionSettings->CrowdNavigationReactionAnimations;
 	TArray<FBumpReactionAnimation> FilteredMontages;
 	FBumpReactionAnimation SelectedCrowdNavigationReactionAnimation;
@@ -2737,7 +2779,7 @@ UAnimSequenceBase* UALSXTImpactReactionComponent::SelectBumpPose_Implementation(
 
 FAttackReactionAnimation UALSXTImpactReactionComponent::SelectAttackReactionMontage_Implementation(FAttackDoubleHitResult Hit)
 {
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
 	TArray<FAttackReactionAnimation> Montages = SelectedImpactReactionSettings->AttackReactionAnimations;
 	TArray<FAttackReactionAnimation> FilteredMontages;
 	FAttackReactionAnimation SelectedAttackReactionAnimation;
@@ -2804,7 +2846,7 @@ FAttackReactionAnimation UALSXTImpactReactionComponent::SelectAttackReactionMont
 
 FImpactReactionAnimation UALSXTImpactReactionComponent::SelectImpactReactionMontage_Implementation(FDoubleHitResult Hit)
 {
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
 	TArray<FImpactReactionAnimation> Montages = SelectedImpactReactionSettings->ImpactReactionAnimations;
 	TArray<FImpactReactionAnimation> FilteredMontages;
 	FImpactReactionAnimation SelectedAttackReactionAnimation;
@@ -2954,7 +2996,7 @@ FFallenAnimation UALSXTImpactReactionComponent::SelectImpactFallAnimations_Imple
 
 FFallenAnimation UALSXTImpactReactionComponent::SelectAttackFallAnimations_Implementation(FAttackDoubleHitResult Hit)
 {
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = SelectImpactReactionSettings();
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
 	TArray<FGameplayTag> TagsArray = { ALSXTActionStrengthTags::Light, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt };
 	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
 	TArray<FFallenAnimation> Montages = SelectedImpactReactionSettings->AttackFallenAnimations;
@@ -3107,7 +3149,7 @@ FActionMontageInfo UALSXTImpactReactionComponent::SelectAttackFallMontage_Implem
 
 UAnimSequenceBase* UALSXTImpactReactionComponent::SelectBraceForImpactPose_Implementation(const FGameplayTag& Side)
 {
-	TArray<FAnticipationPose> BracePoses = SelectImpactReactionSettings()->BraceForImpactPoses;
+	TArray<FAnticipationPose> BracePoses = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner())->BraceForImpactPoses;
 	TArray<FAnticipationPose> FilteredBracePoses;
 	UAnimSequenceBase* SelectedPose{ nullptr };
 	const FGameplayTag Health = HealthToHealthTag(GetHealth());

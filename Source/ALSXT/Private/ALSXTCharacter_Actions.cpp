@@ -215,7 +215,24 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	auto ForwardTraceStart{CapsuleBottomLocation - ForwardTraceDirection * CapsuleRadius};
 	ForwardTraceStart.Z += (TraceSettings.LedgeHeight.X + TraceSettings.LedgeHeight.Y) *
 		0.5f * CapsuleScale - UCharacterMovementComponent::MAX_FLOOR_DIST;
-	auto ForwardTraceEnd{ForwardTraceStart + ForwardTraceDirection * (CapsuleRadius + (TraceSettings.ReachDistance + 1.0f) * CapsuleScale)};
+	float ReachDistance;
+
+	ReachDistance = TraceSettings.BaseReachDistance * FMath::Clamp((GetVelocity().Length() * TraceSettings.ReachDistanceVelocityMultiplier), 1, 500);
+
+	// if (GetDesiredGait() == AlsGaitTags::Sprinting)
+	// {
+	// 	ReachDistance = TraceSettings.SprintingReachDistance;
+	// }
+	// else if (GetDesiredGait() == AlsGaitTags::Running)
+	// {
+	// 	ReachDistance = TraceSettings.RunningReachDistance;
+	// }
+	// else
+	// {
+	// 	ReachDistance = TraceSettings.WalkingReachDistance;
+	// }
+
+	auto ForwardTraceEnd{ForwardTraceStart + ForwardTraceDirection * (CapsuleRadius + (ReachDistance + 1.0f) * CapsuleScale)};
 	const auto ForwardTraceCapsuleHalfHeight{LedgeHeightDelta * 0.5f};
 	FHitResult ForwardTraceHit;
 
