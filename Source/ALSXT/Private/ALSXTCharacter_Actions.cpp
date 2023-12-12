@@ -449,7 +449,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	// TODO Expand this
 
 	Parameters.LocomotionMode = GetLocomotionMode();
-	Parameters.Gait = GetGait();
+	Parameters.Gait = GetDesiredGait();
 	Parameters.VaultingType = LocomotionMode != AlsLocomotionModeTags::Grounded
 		? ALSXTVaultTypeTags::InAir
 		: Parameters.VaultingHeight > ALSXTSettings->Vaulting.VaultingHighHeightThreshold

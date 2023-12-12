@@ -27,6 +27,7 @@
 #include "Interfaces/ALSXTSeatInterface.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
 #include "Interfaces/ALSXTMeshPaintingInterface.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
@@ -41,7 +42,7 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
 
 UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
-class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTSeatInterface, public IALSXTCollisionInterface, public IALSXTMeshPaintingInterface
+class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTSeatInterface, public IALSXTCollisionInterface, public IALSXTMeshPaintingInterface, public IALSXTCharacterInterface
 {
 	GENERATED_BODY()
 

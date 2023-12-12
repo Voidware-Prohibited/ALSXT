@@ -15,6 +15,7 @@
 #include "ALSXTCharacter.h"
 #include "Interfaces/ALSXTTargetLockInterface.h"
 #include "Interfaces/ALSXTCombatInterface.h"
+#include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
 
 // Sets default values for this component's properties
 UALSXTCombatComponent::UALSXTCombatComponent()
@@ -902,6 +903,10 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 
 		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::PrimaryAction);
 		// Crouch(); //Hack
+
+		FALSXTCharacterVoiceParameters VoiceParameters = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(GetOwner());
+
+		IALSXTCharacterSoundComponentInterface::Execute_PlayAttackSound(GetOwner(), true, true, true, VoiceParameters.Sex, VoiceParameters.Variant, Character->GetOverlayMode(), CombatParameters.Strength, CombatParameters.AttackType, IALSXTCharacterInterface::Execute_GetStamina(GetOwner()));
 	}
 }
 

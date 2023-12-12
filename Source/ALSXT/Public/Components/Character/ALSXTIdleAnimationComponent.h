@@ -95,6 +95,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	void IdleCounterTimer();
 
+	UFUNCTION(BlueprintCallable, Category = "Timerc")
 	void ResetIdleCounterTimer();
 
 	void StartCameraRotationTimer();

@@ -359,6 +359,12 @@ namespace ALSXTCombatStanceTags
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Aiming)
 }
 
+namespace ALSXTIdleAnimationActivityTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Neutral)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Smoking)
+}
+
 namespace ALSXTUnarmedAttackTypeTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(LeftFist)

@@ -800,10 +800,10 @@ struct ALSXT_API FALSXTCharacterVoiceParameters
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Sex", AllowPrivateAccess))
-	FGameplayTagContainer Sex;
+	FGameplayTag Sex;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Voice Variant", AllowPrivateAccess))
-	FGameplayTagContainer Variant;
+	FGameplayTag Variant;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (ClampMin=0.5f, ClampMax=1.5f, AllowPrivateAccess))
 	float Speed;
@@ -1420,12 +1420,18 @@ struct ALSXT_API FIdleAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Combat Stance", TitleProperty = "{CombatStance}", AllowPrivateAccess))
 	FGameplayTagContainer CombatStance;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Idle Animation Activity", TitleProperty = "{Activity}", AllowPrivateAccess))
+	FGameplayTagContainer Activity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	bool Loops{ false };
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UAnimMontage> Montage { nullptr };
 
 	bool operator==(const FIdleAnimation& other) const
 	{
-		return (other.Sex == Sex) && (other.Overlay == Overlay) && (other.Stance == Stance) && (other.Injury == Injury) && (other.Variant == Variant) && (other.Montage == Montage);
+		return (other.Sex == Sex) && (other.Overlay == Overlay) && (other.Stance == Stance) && (other.Injury == Injury) && (other.Variant == Variant) && (other.CombatStance == CombatStance) && (other.Activity == Activity) && (other.Loops == Loops) && (other.Montage == Montage);
 	}
 };
 

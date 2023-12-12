@@ -248,7 +248,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	AimAnimationHelperBox->SetCollisionObjectType(ECC_Visibility);
 	AimAnimationHelperBox->SetGenerateOverlapEvents(true);
 	AimAnimationHelperBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	AimAnimationHelperBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Overlap);
+	AimAnimationHelperBox->SetCollisionResponseToChannel(ECC_Camera, ECR_Overlap);
 	AimAnimationHelperBox->bEditableWhenInherited = false;
 
 	ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());

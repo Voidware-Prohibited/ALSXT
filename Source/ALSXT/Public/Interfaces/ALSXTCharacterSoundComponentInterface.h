@@ -49,7 +49,7 @@ public:
 	FRotator GetVoiceSocketRotation();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
-	FGameplayTag GetBreathType();
+	FGameplayTag GetCurrentBreathType();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
 	FGameplayTag GetHoldingBreath();

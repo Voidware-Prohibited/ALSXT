@@ -1339,10 +1339,13 @@ void UALSXTCharacterSoundComponent::PlayAttackSound(bool MovementSound, bool Acc
 	//ATTACK
 	if (ShouldPlayAttackSound(AttackMode, Strength, Stamina))
 	{
-		TArray<FALSXTCharacterActionSound> AttackSounds = SelectAttackSounds(Settings, Sex, Variant, Overlay, Strength, Stamina);
+		TArray<FALSXTCharacterActionSound> AttackSounds = SelectAttackSounds(Settings, Sex, ALSXTVoiceVariantTags::Default, Overlay, Strength, Stamina);
+		// TArray<FSound> Sounds;
+
+		TArray<FALSXTCharacterActionSound> ActionSounds = SelectActionSounds(Settings, Character->GetDesiredSex(), ALSXTVoiceVariantTags::Default, Character->GetOverlayMode(), Strength, Stamina);
 		TArray<FSound> Sounds;
 
-		for (FALSXTCharacterActionSound AC : AttackSounds)
+		for (FALSXTCharacterActionSound AC : ActionSounds)
 		{
 			Sounds.Append(AC.Sounds);
 		}

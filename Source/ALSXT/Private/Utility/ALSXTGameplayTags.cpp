@@ -363,6 +363,12 @@ namespace ALSXTCombatStanceTags
 	UE_DEFINE_GAMEPLAY_TAG(Aiming, TEXT("Als.Combat Stance.Aiming"))
 }
 
+namespace ALSXTIdleAnimationActivityTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Neutral, TEXT("Als.Idle Animation Activity.Neutral"))
+	UE_DEFINE_GAMEPLAY_TAG(Smoking, TEXT("Als.Idle Animation Activity.Smoking"))
+}
+
 namespace ALSXTUnarmedAttackTypeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(LeftFist, TEXT("Als.Unarmed Attack Type.Left Fist"))
