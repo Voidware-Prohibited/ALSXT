@@ -861,6 +861,25 @@ struct ALSXT_API FALSXTCharacterMorphParameter
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
 	float Value;
+
+	bool operator==(const FALSXTCharacterMorphParameter& other) const
+	{
+		return (other.MorphName == MorphName) && (other.Value == Value);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTCharacterMorphParameters
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
+	TArray<FALSXTCharacterMorphParameter> Parameters;
+
+	bool operator==(const FALSXTCharacterMorphParameters& other) const
+	{
+		return (other.Parameters == Parameters);
+	}
 };
 
 USTRUCT(BlueprintType)

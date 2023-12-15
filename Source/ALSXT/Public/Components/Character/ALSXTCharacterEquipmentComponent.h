@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ALSXTClothingComponent.generated.h"
+#include "ALSXTCharacterEquipmentComponent.generated.h"
 
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ALSXT_API UALSXTClothingComponent : public UActorComponent
+class ALSXT_API UALSXTCharacterEquipmentComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UALSXTClothingComponent();
+	UALSXTCharacterEquipmentComponent();
 
 protected:
 	// Called when the game starts

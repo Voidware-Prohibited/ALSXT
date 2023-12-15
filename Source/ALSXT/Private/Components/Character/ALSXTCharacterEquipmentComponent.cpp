@@ -1,10 +1,10 @@
 // MIT
 
 
-#include "Components/Character/ALSXTClothingComponent.h"
+#include "Components/Character/ALSXTCharacterEquipmentComponent.h"
 
 // Sets default values for this component's properties
-UALSXTClothingComponent::UALSXTClothingComponent()
+UALSXTCharacterEquipmentComponent::UALSXTCharacterEquipmentComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -15,7 +15,7 @@ UALSXTClothingComponent::UALSXTClothingComponent()
 
 
 // Called when the game starts
-void UALSXTClothingComponent::BeginPlay()
+void UALSXTCharacterEquipmentComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -25,7 +25,7 @@ void UALSXTClothingComponent::BeginPlay()
 
 
 // Called every frame
-void UALSXTClothingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UALSXTCharacterEquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
