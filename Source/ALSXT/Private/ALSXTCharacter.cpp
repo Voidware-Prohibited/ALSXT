@@ -257,6 +257,9 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	// Add Physical Animation Component
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
 	AddOwnedComponent(PhysicalAnimation);
+
+	CharacterCustomization = CreateDefaultSubobject<UALSXTCharacterCustomizationComponent>(TEXT("Character Customization"));
+	AddOwnedComponent(CharacterCustomization);
 }
 
 void AALSXTCharacter::Tick(const float DeltaTime)
@@ -340,6 +343,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PreviousLookInput, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FreelookState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, AimState, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, bMovementEnabled, Parameters)
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
 }
@@ -407,7 +411,7 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 
 void AALSXTCharacter::DisableInputMovement(const bool Disable)
 {
-
+	bMovementEnabled = !Disable;
 }
 
 void AALSXTCharacter::DisableLookAt(const bool Disable)
@@ -435,7 +439,7 @@ void AALSXTCharacter::InputLook(const FInputActionValue& ActionValue)
 
 void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 {
-	if (GetDesiredStatus() == ALSXTStatusTags::Normal)
+	if (GetDesiredStatus() == ALSXTStatusTags::Normal && bMovementEnabled)
 	{
 		const auto Value{ UAlsMath::ClampMagnitude012D(ActionValue.Get<FVector2D>()) };
 		FRotator CapsuleRotation = GetActorRotation();
@@ -504,7 +508,7 @@ void AALSXTCharacter::InputCrouch()
 
 void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 {
-	if (CanJump())
+	if (CanJump() && bMovementEnabled)
 	{
 		if (ActionValue.Get<bool>())
 		{

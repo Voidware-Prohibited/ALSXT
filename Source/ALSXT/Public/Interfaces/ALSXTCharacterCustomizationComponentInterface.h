@@ -22,4 +22,10 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Customization Component Interface")
   FALSXTCharacterMorphParameters GetAllCustomMorphTargets();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Customization Component Interface")
+  void SetEquipmentMorphTarget(FALSXTCharacterMorphParameter MorphTarget);
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Customization Component Interface")
+  void SetEquipmentCustomMorphTargets(FALSXTCharacterMorphParameters MorphTargetName);
 };

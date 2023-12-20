@@ -7,6 +7,7 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/Mesh/ALSXTPaintableSkeletalMeshComponent.h"
 #include "Components/Mesh/ALSXTPaintableStaticMeshComponent.h"
+#include "Components/Character/ALSXTCharacterCustomizationComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "CineCameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -23,11 +24,13 @@
 #include "State/ALSXTFreelookState.h"
 #include "State/ALSXTSlidingState.h"
 #include "State/ALSXTVaultingState.h"
+#include "Interfaces/ALSXTCharacterCustomizationComponentInterface.h"
 #include "Interfaces/ALSXTCombatInterface.h"
-#include "Interfaces/ALSXTSeatInterface.h"
+#include "Interfaces/ALSXTStationaryModeComponentInterface.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
 #include "Interfaces/ALSXTMeshPaintingInterface.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTIdleAnimationComponentInterface.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
@@ -42,7 +45,7 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
 
 UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
-class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTSeatInterface, public IALSXTCollisionInterface, public IALSXTMeshPaintingInterface, public IALSXTCharacterInterface
+class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTCharacterCustomizationComponentInterface, public IALSXTStationaryModeComponentInterface, public IALSXTCollisionInterface, public IALSXTMeshPaintingInterface, public IALSXTCharacterInterface, public IALSXTIdleAnimationComponentInterface
 {
 	GENERATED_BODY()
 
@@ -134,6 +137,9 @@ public:
 	class UALSXTCharacterSoundComponent* CharacterSound;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	class UALSXTCharacterCustomizationComponent* CharacterCustomization;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UPhysicalAnimationComponent* PhysicalAnimation;
 
 protected:
@@ -199,6 +205,9 @@ protected:
 	void OnVaultingStateChanged(const FALSXTVaultingState& PreviousVaultingState);
 
 private:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Replicated, Meta = (AllowPrivateAccess))
+	bool bMovementEnabled {true};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess, ShowInnerProperties))
 	TObjectPtr<UALSXTAnimationInstance> XTAnimationInstance;
