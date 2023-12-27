@@ -1144,6 +1144,26 @@ struct ALSXT_API FALSXTImpactSound
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactPointParticle
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UNiagaraSystem* Particle{ nullptr };
+
+	bool operator==(const FALSXTImpactPointParticle& other) const
+	{
+		return (other.Velocity == Velocity) && (other.Form == Form) && (other.Particle == Particle);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTImpactParticle
 {
 	GENERATED_BODY()
@@ -1158,7 +1178,7 @@ struct ALSXT_API FALSXTImpactParticle
 	FGameplayTagContainer Form;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FALSXTCharacterSound ImpactParticle;
+	UNiagaraSystem* ImpactParticle{ nullptr };
 
 	bool operator==(const FALSXTImpactParticle& other) const
 	{

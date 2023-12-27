@@ -382,6 +382,11 @@ void UALSXTCombatComponent::RotatePlayerToTarget(FTargetHitResultEntry Target)
 	}
 }
 
+void UALSXTCombatComponent::DashToTarget()
+{
+
+}
+
 // Combat State
 void UALSXTCombatComponent::SetCombatState(const FALSXTCombatState& NewCombatState)
 {

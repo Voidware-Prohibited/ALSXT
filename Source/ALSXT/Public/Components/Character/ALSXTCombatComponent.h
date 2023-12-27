@@ -80,6 +80,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	float GetAngle(FVector Target);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanTarget();
+
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void TryTraceForTargets();
 
@@ -117,6 +120,18 @@ public:
 	void RotatePlayerToTarget(FTargetHitResultEntry Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool IsDashToTargetEnabled();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool CanDashToTarget();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	bool ShouldDashToTarget();
+
+	UFUNCTION(BlueprintCallable, Category = "Target Lock")
+	void DashToTarget();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanAttack();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
@@ -151,9 +166,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attack", Meta = (AutoCreateRefTerm = "ActionType, AttackType, Strength"))
 	void Attack(UPARAM(meta = (Categories = "Als.Action Type"))const FGameplayTag& ActionType, UPARAM(meta = (Categories = "Als.Attack Type"))const FGameplayTag& AttackType, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, float BaseDamage, float PlayRate = 1.0f);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanTarget();
 
 protected:
 

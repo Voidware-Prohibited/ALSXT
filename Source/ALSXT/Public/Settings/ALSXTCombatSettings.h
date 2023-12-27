@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utility/ALSXTStructs.h"
+#include "Utility/ALSXTCombatStructs.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
 #include "ALSXTCombatSettings.generated.h"
@@ -67,6 +68,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Velocity} {Side} {Form} {Health}", AllowPrivateAccess))
 	TArray<FAnticipationPose> BlockingPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Velocity} {Form}", AllowPrivateAccess))
+	TArray<FALSXTAttackImpactCameraShake> CameraShakes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	int32 ConsecutiveHitsForSpecialAttack{5};
@@ -136,6 +140,9 @@ struct ALSXT_API FALSXTGeneralCombatSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
 	bool bEnableAttacks{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableCameraShake{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
 	bool bEnableSyncedAttacks{ true };

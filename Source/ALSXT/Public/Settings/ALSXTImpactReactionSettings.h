@@ -194,6 +194,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Falling", Meta = (TitleProperty = "{Sounds}", AllowPrivateAccess))
 	FALSXTImpactSoundMap BodyFallSounds;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particle}", AllowPrivateAccess))
+	TArray<FALSXTImpactPointParticle> ImpactPointParticles;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
 	FALSXTImpactParticleMap ImpactParticles;
 
@@ -241,6 +244,15 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableParticles{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableImpactParticles{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableImpactParticleActors{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableImpactPointParticles{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableClutchImpactPoint{ true };

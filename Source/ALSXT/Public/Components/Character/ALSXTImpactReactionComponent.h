@@ -555,6 +555,9 @@ public:
 	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UNiagaraSystem* GetImpactPointParticle(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UNiagaraSystem* GetBodyFallParticle(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
