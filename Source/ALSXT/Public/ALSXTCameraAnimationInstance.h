@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AlsCameraAnimationInstance.h"
 #include "Utility/ALSXTGameplayTags.h"
+#include "Settings/ALSXTCameraAnimationInstanceSettings.h"
 #include "ALSXTCharacter.h"
 #include "ALSXTCameraAnimationInstance.generated.h"
 
@@ -66,7 +67,16 @@ private:
 		FGameplayTag WeaponReadyPosition {
 		ALSXTWeaponReadyPositionTags::None
 	};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
+	UALSXTGeneralCameraAnimationInstanceSettings* GeneralCameraAnimationInstanceSettings{nullptr};
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
+	UALSXTCameraAnimationInstanceSettings* CameraAnimationInstanceSettings{ nullptr };
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTCameraAnimationInstanceState CameraAnimationInstanceState;
+
 	virtual void OnFirstPersonOverrideChangedEvent();
 	float FirstPersonOverride{ GetCurveValue("FirstPersonOverride") };
 	float PreviousFirstPersonOverride{ GetCurveValue("FirstPersonOverride") };

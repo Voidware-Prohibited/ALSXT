@@ -185,6 +185,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	TopVest->bCastDynamicShadow = true;
 	TopVest->bAffectDynamicIndirectLighting = true;
 	TopVest->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	TopVest->PrimaryComponentTick.TickGroup = TG_PrePhysics;
 	
 	Gloves = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Gloves"));
 	Gloves->SetupAttachment(ClothingSlots);
@@ -603,7 +604,7 @@ void AALSXTCharacter::InputRagdoll()
 void AALSXTCharacter::InputRoll()
 {
 	static constexpr auto PlayRate{ 1.3f };
-	if(CanRoll())
+	if(CanRoll() && bMovementEnabled)
 	{
 		StartRolling(PlayRate);
 	}
