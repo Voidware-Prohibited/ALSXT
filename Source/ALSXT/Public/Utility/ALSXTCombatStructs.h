@@ -13,14 +13,14 @@ struct ALSXT_API FALSXTAttackImpactCameraShake
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Velocity", AllowPrivateAccess))
 	FGameplayTagContainer Velocity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Form;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	UCameraShakeBase* CameraShake{ nullptr };
+	TSubclassOf<UCameraShakeBase> CameraShake{ nullptr };
 
 	bool operator==(const FALSXTAttackImpactCameraShake& other) const
 	{

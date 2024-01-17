@@ -194,11 +194,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Falling", Meta = (TitleProperty = "{Sounds}", AllowPrivateAccess))
 	FALSXTImpactSoundMap BodyFallSounds;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particle}", AllowPrivateAccess))
-	TArray<FALSXTImpactPointParticle> ImpactPointParticles;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
 	FALSXTImpactParticleMap ImpactParticles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
+	TArray <FALSXTImpactParticleActor> ImpactParticleActors;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particle}", AllowPrivateAccess))
+	TArray<FALSXTImpactPointParticle> ImpactPointParticles;
 
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float ImpactHeight) const;

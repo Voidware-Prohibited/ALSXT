@@ -15,6 +15,7 @@
 #include "Interfaces/ALSXTCombatInterface.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values for this component's properties
 UALSXTImpactReactionComponent::UALSXTImpactReactionComponent()
@@ -4459,6 +4460,15 @@ void UALSXTImpactReactionComponent::StartAttackReactionImplementation(FAttackDou
 					1.0f, 1.0f);
 			}
 		}
+		if (ImpactReactionSettings.EnableImpactPointParticles)
+		{
+			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GetImpactPointParticle(Hit.DoubleHitResult), Hit.DoubleHitResult.HitResult.HitResult.ImpactPoint, NewRotation, { 1.0f, 1.0f, 1.0f }, true, true, ENCPoolMethod::None, true);
+		}
+		if (ImpactReactionSettings.EnableParticles)
+		{
+
+		}
+
 		if (UKismetSystemLibrary::IsValidClass(ParticleActor))
 		{
 			// ServerSpawnParticleActor(Hit, ParticleActor);
