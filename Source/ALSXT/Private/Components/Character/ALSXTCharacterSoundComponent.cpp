@@ -918,6 +918,51 @@ TArray<FALSXTCharacterDamageSound> UALSXTCharacterSoundComponent::SelectDamageSo
 
 }
 
+TArray<FALSXTResponseVocalization> UALSXTCharacterSoundComponent::SelectResponseVocalizations(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Velocity, const FGameplayTag& Form, const FGameplayTag& Health, const bool Mature)
+{
+	FGameplayTagContainer TagsContainer;
+	TArray<FALSXTResponseVocalization> ResponseVocalizations = Settings->ResponseVocalizations;
+	TArray<FALSXTResponseVocalization> FilteredResponseVocalizations;
+	FALSXTResponseVocalization SelectedDeathSound;
+	TagsContainer.AddTagFast(Sex);
+	TagsContainer.AddTagFast(Variant);
+	TagsContainer.AddTagFast(Velocity);
+	TagsContainer.AddTagFast(Form);
+	FGameplayTag DeathTag = ALSXTDamageAmountTags::Moderate;
+	TagsContainer.AddTagFast(DeathTag);
+
+	// Return if there are no sounds
+	if (ResponseVocalizations.Num() < 1)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "No Sounds");
+		return FilteredResponseVocalizations;
+	}
+
+	// Filter sounds based on Tag parameters
+	for (auto DeathSound : ResponseVocalizations)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(DeathSound.Sex);
+		CurrentTagsContainer.AppendTags(DeathSound.Variant);
+		CurrentTagsContainer.AppendTags(DeathSound.Velocity);
+		CurrentTagsContainer.AppendTags(DeathSound.Form);
+		CurrentTagsContainer.AppendTags(DeathSound.Health);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredResponseVocalizations.Add(DeathSound);
+		}
+	}
+
+	// Return if Return is there are no filtered sounds
+	if (FilteredResponseVocalizations.Num() < 1)
+	{
+		return FilteredResponseVocalizations;
+	}
+
+	return FilteredResponseVocalizations;
+}
+
 TArray<FALSXTCharacterDamageSound> UALSXTCharacterSoundComponent::SelectDeathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Strength)
 {
 	FGameplayTagContainer TagsContainer;

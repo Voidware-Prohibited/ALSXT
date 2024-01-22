@@ -1249,6 +1249,38 @@ struct ALSXT_API FALSXTImpactSoundMap
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTResponseVocalization
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Sex", TitleProperty = "{Sex}", AllowPrivateAccess))
+	FGameplayTagContainer Sex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Variant", TitleProperty = "{Variant}", AllowPrivateAccess))
+	FGameplayTagContainer Variant;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Velocity", TitleProperty = "{Velocity}", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	bool Mature;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FALSXTCharacterSound ResponseVocalization;
+
+	bool operator==(const FALSXTResponseVocalization& other) const
+	{
+		return (other.Sex == Sex) && (other.Variant == Variant) && (other.Velocity == Velocity) && (other.Form == Form) && (other.Health == Health) && (other.Mature == Mature) && (other.ResponseVocalization == ResponseVocalization);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTImpactParticleMap
 {
 	GENERATED_BODY()

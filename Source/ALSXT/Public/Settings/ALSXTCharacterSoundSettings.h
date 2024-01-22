@@ -56,6 +56,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Form} {Damage} {Sound}", AllowPrivateAccess))
 	TArray<FALSXTCharacterDamageSound> DamageSounds;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Impact", Meta = (TitleProperty = "{Sounds}", AllowPrivateAccess))
+	TArray<FALSXTResponseVocalization> ResponseVocalizations;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Form} {Damage} {Sound}", AllowPrivateAccess))
 	TArray<FALSXTCharacterDamageSound> DeathSounds;
 

@@ -263,6 +263,9 @@ public:
 	TArray<FALSXTCharacterDamageSound> SelectDamageSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& AttackMethod, const FGameplayTag& Form, const FGameplayTag& Strength);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	TArray<FALSXTResponseVocalization> SelectResponseVocalizations(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Velocity, const FGameplayTag& Form, const FGameplayTag& Health, const bool Mature);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	TArray<FALSXTCharacterDamageSound> SelectDeathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Strength);
 	
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Weight"))

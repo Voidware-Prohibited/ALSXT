@@ -619,7 +619,7 @@ void AALSXTCharacter::InputRotationMode()
 
 void AALSXTCharacter::InputViewMode()
 {
-	const auto PreviousViewMode{ GetViewMode() };
+	const FGameplayTag PreviousViewMode{ GetViewMode() };
 	auto DesiredViewMode{ FGameplayTag::EmptyTag };
 	DesiredViewMode == (GetViewMode() == AlsViewModeTags::ThirdPerson ? AlsViewModeTags::FirstPerson : AlsViewModeTags::ThirdPerson);
 	if (CanSetToViewMode(DesiredViewMode)) 
