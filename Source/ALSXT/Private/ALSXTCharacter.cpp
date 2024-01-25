@@ -343,6 +343,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponObstruction, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PreviousLookInput, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FreelookState, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, HeadLookAtState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, AimState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, bMovementEnabled, Parameters)
 
@@ -1514,6 +1515,10 @@ void AALSXTCharacter::OnReplicate_AimState(const FALSXTAimState& PreviousAimStat
 
 void AALSXTCharacter::OnAimStateChanged_Implementation(const FALSXTAimState& PreviousAimState) {}
 
+
+//Freelooking
+
+
 void AALSXTCharacter::SetFreelookState(const FALSXTFreelookState& NewFreelookState)
 {
 	const auto PreviousFreelookState{ FreelookState };
@@ -1550,6 +1555,41 @@ void AALSXTCharacter::OnReplicate_FreelookState(const FALSXTFreelookState& Previ
 }
 
 void AALSXTCharacter::OnFreelookStateChanged_Implementation(const FALSXTFreelookState& PreviousFreelookState) {}
+
+// Head Look At State
+
+
+void AALSXTCharacter::SetHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState)
+{
+	const auto PreviousHeadLookAtState{ HeadLookAtState };
+
+	HeadLookAtState = NewHeadLookAtState;
+
+	OnHeadLookAtStateChanged(PreviousHeadLookAtState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetHeadLookAtState(NewHeadLookAtState);
+	}
+}
+
+void AALSXTCharacter::ServerSetHeadLookAtState_Implementation(const FALSXTHeadLookAtState& NewHeadLookAtState)
+{
+	SetHeadLookAtState(NewHeadLookAtState);
+}
+
+
+void AALSXTCharacter::ServerProcessNewHeadLookAtState_Implementation(const FALSXTHeadLookAtState& NewHeadLookAtState)
+{
+	ProcessNewHeadLookAtState(NewHeadLookAtState);
+}
+
+void AALSXTCharacter::OnReplicate_HeadLookAtState(const FALSXTHeadLookAtState& PreviousHeadLookAtState)
+{
+	OnHeadLookAtStateChanged(PreviousHeadLookAtState);
+}
+
+void AALSXTCharacter::OnHeadLookAtStateChanged_Implementation(const FALSXTHeadLookAtState& PreviousHeadLookAtState) {}
 
 void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState)
 {

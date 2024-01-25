@@ -9,6 +9,7 @@
 #include "State/ALSXTBreathState.h"
 #include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTBumpPoseState.h"
+#include "State/ALSXTHeadLookAtState.h"
 #include "ALSXTCharacter.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
@@ -70,6 +71,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTFreelookState FreelookState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTHeadLookAtState HeadLookAtState;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTBumpPoseState CrowdNavigationPoseState;

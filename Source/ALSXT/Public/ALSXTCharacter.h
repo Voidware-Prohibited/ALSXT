@@ -22,6 +22,7 @@
 #include "State/ALSXTAimState.h"
 #include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTFreelookState.h"
+#include "State/ALSXTHeadLookAtState.h"
 #include "State/ALSXTSlidingState.h"
 #include "State/ALSXTVaultingState.h"
 #include "Interfaces/ALSXTCharacterCustomizationComponentInterface.h"
@@ -299,6 +300,35 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnFreelookStateChanged(const FALSXTFreelookState& PreviousFreelookState);
+
+	// HeadLookAt
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", ReplicatedUsing = "OnReplicate_HeadLookAtState", Meta = (AllowPrivateAccess))
+	FALSXTHeadLookAtState HeadLookAtState;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTHeadLookAtState& GetHeadLookAtState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHeadLookAtState"))
+	void SetHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHeadLookAtState"))
+	FALSXTHeadLookAtState ProcessNewHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState);
+
+private:
+	UFUNCTION(Server, Unreliable)
+	void ServerSetHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState);
+
+	UFUNCTION()
+	void OnReplicate_HeadLookAtState(const FALSXTHeadLookAtState& PreviousHeadLookAtState);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnHeadLookAtStateChanged(const FALSXTHeadLookAtState& PreviousHeadLookAtState);
 
 private:
 	// Sex
@@ -1728,6 +1758,11 @@ inline const FALSXTFootprintsState& AALSXTCharacter::GetFootprintsState() const
 inline const FALSXTFreelookState& AALSXTCharacter::GetFreelookState() const
 {
 	return FreelookState;
+}
+
+inline const FALSXTHeadLookAtState& AALSXTCharacter::GetHeadLookAtState() const
+{
+	return HeadLookAtState;
 }
 
 inline const FALSXTAimState& AALSXTCharacter::GetAimState() const
