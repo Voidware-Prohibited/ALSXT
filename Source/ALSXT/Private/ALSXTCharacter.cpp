@@ -78,6 +78,42 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	HeadDummyShadow->SetHiddenInGame(true);
 	HeadDummyShadow->bCastHiddenShadow = true;
 
+	Hair = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Hair"));
+	Hair->SetupAttachment(BodyParts);
+	Hair->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	Hair->bEnableUpdateRateOptimizations = false;
+	Hair->AlwaysLoadOnClient = true;
+	Hair->AlwaysLoadOnServer = true;
+	Hair->bOwnerNoSee = false;
+	Hair->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	Hair->bCastDynamicShadow = true;
+	Hair->bAffectDynamicIndirectLighting = true;
+	Hair->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+
+	HairDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hair Dummy Shadow"));
+	HairDummyShadow->SetupAttachment(BodyParts);
+	HairDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	HairDummyShadow->SetHiddenInGame(true);
+	HairDummyShadow->bCastHiddenShadow = true;
+
+	FacialHair = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Facial Hair"));
+	FacialHair->SetupAttachment(BodyParts);
+	FacialHair->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	FacialHair->bEnableUpdateRateOptimizations = false;
+	FacialHair->AlwaysLoadOnClient = true;
+	FacialHair->AlwaysLoadOnServer = true;
+	FacialHair->bOwnerNoSee = false;
+	FacialHair->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	FacialHair->bCastDynamicShadow = true;
+	FacialHair->bAffectDynamicIndirectLighting = true;
+	FacialHair->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+
+	FacialHairDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Facial Hair Dummy Shadow"));
+	FacialHairDummyShadow->SetupAttachment(BodyParts);
+	FacialHairDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	FacialHairDummyShadow->SetHiddenInGame(true);
+	FacialHairDummyShadow->bCastHiddenShadow = true;
+
 	Headwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Headwear"));
 	Headwear->SetupAttachment(ClothingSlots);
 	Headwear->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
@@ -89,6 +125,30 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Headwear->bCastDynamicShadow = true;
 	Headwear->bAffectDynamicIndirectLighting = true;
 	Headwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+
+	HeadwearDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Headwear Dummy Shadow"));
+	HeadwearDummyShadow->SetupAttachment(ClothingSlots);
+	HeadwearDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	HeadwearDummyShadow->SetHiddenInGame(true);
+	HeadwearDummyShadow->bCastHiddenShadow = true;
+
+	Facewear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Facewear"));
+	Facewear->SetupAttachment(ClothingSlots);
+	Facewear->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	Facewear->bEnableUpdateRateOptimizations = false;
+	Facewear->AlwaysLoadOnClient = true;
+	Facewear->AlwaysLoadOnServer = true;
+	Facewear->bOwnerNoSee = false;
+	Facewear->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	Facewear->bCastDynamicShadow = true;
+	Facewear->bAffectDynamicIndirectLighting = true;
+	Facewear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+
+	FacewearDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Facewear Dummy Shadow"));
+	FacewearDummyShadow->SetupAttachment(ClothingSlots);
+	FacewearDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	FacewearDummyShadow->SetHiddenInGame(true);
+	FacewearDummyShadow->bCastHiddenShadow = true;
 	
 	Eyewear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Eyewear"));
 	Eyewear->SetupAttachment(ClothingSlots);
@@ -101,6 +161,12 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Eyewear->bCastDynamicShadow = true;
 	Eyewear->bAffectDynamicIndirectLighting = true;
 	Eyewear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+
+	EyewearDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Eyewear Dummy Shadow"));
+	EyewearDummyShadow->SetupAttachment(ClothingSlots);
+	EyewearDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	EyewearDummyShadow->SetHiddenInGame(true);
+	EyewearDummyShadow->bCastHiddenShadow = true;
 	
 	Earwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Earwear"));
 	Earwear->SetupAttachment(ClothingSlots);

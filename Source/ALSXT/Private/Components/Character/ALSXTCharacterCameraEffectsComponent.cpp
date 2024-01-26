@@ -3,6 +3,7 @@
 #include "Components/Character/ALSXTCharacterCameraEffectsComponent.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Engine/Scene.h"
+#include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
 
 // Sets default values for this component's properties
@@ -21,6 +22,19 @@ void UALSXTCharacterCameraEffectsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (GeneralCameraEffectsSettings.bEnableEffects && GeneralCameraEffectsSettings.bEnableMovementCameraShake && IsValid(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake))
+	{
+		if (Character->GetViewMode() == AlsViewModeTags::FirstPerson)
+		{
+			UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+		}
+		if (Character->GetViewMode() == AlsViewModeTags::ThirdPerson && GeneralCameraEffectsSettings.bEnableMovementCameraShake)
+		{
+			GetWorld()->GetTimerManager().SetTimer(CameraShakeTimer, this, &UALSXTCharacterCameraEffectsComponent::SetRadialBlur, 0.01f, true);
+			UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+		}
+	}
+
 	if (GetOwner()->GetLocalRole() != ROLE_AutonomousProxy)
 	{
 		return;
@@ -33,6 +47,19 @@ void UALSXTCharacterCameraEffectsComponent::BeginPlay()
 		// PostProcessComponent = Character->AddComponentByClass(UPostProcessComponent::StaticClass(), false, Character->GetTransform(), false);
 		FString PostProcessComponentName = "PostProcess Component";
 		PostProcessComponent = NewObject<UPostProcessComponent>(this, UPostProcessComponent::StaticClass(), *PostProcessComponentName);
+
+		if (GeneralCameraEffectsSettings.bEnableMovementCameraShake && IsValid(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake))
+		{
+			if (Character->GetViewMode() == AlsViewModeTags::FirstPerson)
+			{
+				UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+			}
+			if (Character->GetViewMode() == AlsViewModeTags::ThirdPerson && GeneralCameraEffectsSettings.bEnableMovementCameraShake)
+			{
+				GetWorld()->GetTimerManager().SetTimer(CameraShakeTimer, this, &UALSXTCharacterCameraEffectsComponent::SetRadialBlur, 0.01f, true);
+				UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake, 1.0f,ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+			}
+		}
 
 		if (PostProcessComponent != nullptr)
 		{
@@ -139,6 +166,91 @@ void UALSXTCharacterCameraEffectsComponent::Initialize()
 	{
 		TraceStartPoint = IALSXTCharacterInterface::Execute_GetCameraLocationOld(GetOwner());
 	}
+}
+
+void UALSXTCharacterCameraEffectsComponent::UpdateCameraShake()
+{
+	if (CurrentRotationMode == Character->GetRotationMode() && CurrentViewMode == Character->GetViewMode() && CurrentGait == Character->GetDesiredGait() && CurrentStance == Character->GetDesiredStance() && IsPlayerCurrentlyMoving == (Character->GetVelocity().Size() > 0.0))
+	{
+		return;
+	}
+
+	if (Character->GetDesiredStance() == AlsStanceTags::Standing)
+	{
+		FGameplayTag NewGait = Character->GetDesiredGait();
+		float NewVelocity = Character->GetVelocity().Size();
+		bool NewIsPlayerCurrentlyMoving = Character->GetVelocity().Size() > 0.0;
+
+		if (CurrentGait == AlsGaitTags::Walking && !NewIsPlayerCurrentlyMoving)
+		{
+			if (Character->GetViewMode() == AlsViewModeTags::FirstPerson && GeneralCameraEffectsSettings.bEnableFirstPersonDefaultCameraShake && IsValid(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake))
+			{
+				UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+			}
+			if (Character->GetViewMode() == AlsViewModeTags::ThirdPerson && GeneralCameraEffectsSettings.bEnableThirdPersonDefaultCameraShake && IsValid(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake))
+			{
+				UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+			}
+		}
+		if (CurrentGait == AlsGaitTags::Walking && NewIsPlayerCurrentlyMoving)
+		{
+
+		}
+		if (CurrentGait == AlsGaitTags::Running)
+		{
+
+		}
+		if (CurrentGait == AlsGaitTags::Sprinting)
+		{
+
+		}
+	}
+	if (Character->GetDesiredStance() == AlsStanceTags::Crouching)
+	{
+
+	}
+	
+	
+	if (CurrentViewMode != Character->GetViewMode())
+	{
+		CurrentViewMode = Character->GetViewMode();
+	}
+	if (CurrentStance != Character->GetDesiredStance())
+	{
+		CurrentStance = Character->GetDesiredStance();
+	}
+	
+	if (CurrentGait != Character->GetDesiredGait())
+	{
+		CurrentGait = Character->GetDesiredGait();
+		float Velocity = Character->GetVelocity().Size();
+
+		if (CurrentGait == AlsGaitTags::Walking && Velocity < 1.0f)
+		{
+			if (Character->GetViewMode() == AlsViewModeTags::ThirdPerson && GeneralCameraEffectsSettings.bEnableThirdPersonDefaultCameraShake)
+			{
+
+			}
+			
+			UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+		}
+		if (CurrentGait == AlsGaitTags::Walking && Velocity > 1.0f)
+		{
+
+		}
+		if (CurrentGait == AlsGaitTags::Running)
+		{
+
+		}
+		if (CurrentGait == AlsGaitTags::Sprinting)
+		{
+
+		}
+	}
+	
+	float Velocity = Character->GetVelocity().Size();
+	float BlurAmount = FMath::GetMappedRangeValueClamped(FVector2D{ 0.0, GeneralCameraEffectsSettings.RadialBlurMaxVelocity }, FVector2D{ 0.0f, GeneralCameraEffectsSettings.RadialBlurMaxWeight }, Velocity);
+	PostProcessComponent->Settings.WeightedBlendables.Array[0].Weight = BlurAmount;
 }
 
 void UALSXTCharacterCameraEffectsComponent::CameraEffectsTrace()

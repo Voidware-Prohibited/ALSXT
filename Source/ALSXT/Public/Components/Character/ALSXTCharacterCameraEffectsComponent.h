@@ -9,7 +9,6 @@
 #include "Settings/ALSXTCameraEffectsSettings.h"
 #include "ALSXTCharacterCameraEffectsComponent.generated.h"
 
-
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ALSXT_API UALSXTCharacterCameraEffectsComponent : public UActorComponent
 {
@@ -37,6 +36,21 @@ public:
 	UPostProcessComponent* PostProcessComponent{ nullptr };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	FGameplayTag CurrentRotationMode{ AlsRotationModeTags::ViewDirection };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	FGameplayTag CurrentGait{ AlsGaitTags::Walking };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	FGameplayTag CurrentStance{ AlsStanceTags::Standing };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	FGameplayTag CurrentViewMode{ AlsViewModeTags::FirstPerson };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	bool IsPlayerCurrentlyMoving{ false };
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	float CurrentRadialBlurAmount{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
@@ -56,6 +70,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	float CurrentHighEffectAmount{ 0.0f };
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void UpdateCameraShake();
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void AddDrunkEffect(float NewMagnitude, float RecoveryDelay);
@@ -149,6 +166,7 @@ public:
 
 private:
 	// Timer Handles
+	FTimerHandle CameraShakeTimer;
 	FTimerHandle CameraEffectsTraceTimer;
 	FTimerHandle RadialBlurTimer;
 	FTimerHandle DrunkEffectFadeOutTimer;

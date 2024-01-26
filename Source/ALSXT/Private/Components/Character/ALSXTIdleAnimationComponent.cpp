@@ -1,6 +1,7 @@
 // MIT
 
 #include "Components/Character/ALSXTIdleAnimationComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 
 // Sets default values for this component's properties
