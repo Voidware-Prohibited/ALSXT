@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "ALSXTCharacter.h"
 #include "Settings/ALSXTIdleAnimationSettings.h"
 #include "State/ALSXTStatusState.h"
 #include "ALSXTIdleAnimationComponent.generated.h"
