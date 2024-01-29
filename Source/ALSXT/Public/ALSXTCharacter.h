@@ -18,6 +18,7 @@
 #include "Utility/ALSXTGameplayTags.h"
 #include "Engine/EngineTypes.h"
 #include "Utility/ALSXTStructs.h"
+#include "State/ALSXTPoseState.h"
 #include "State/ALSXTFootstepState.h"
 #include "State/ALSXTAimState.h"
 #include "State/ALSXTDefensiveModeState.h"
@@ -173,6 +174,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
 	TObjectPtr<UALSXTCharacterMovementComponent> ALSXTCharacterMovement;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
+	FALSXTPoseState ALSXTPoseState;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
@@ -203,6 +207,20 @@ public:
 	void DisableLookAt(const bool Disable);
 
 public:
+	// Pose State
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTPoseState& GetALSXTPoseState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewPoseState"))
+	void SetALSXTPoseState(const FALSXTPoseState& NewALSXTPoseState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewPoseState"))
+	FALSXTPoseState ProcessNewALSXTPoseState(const FALSXTPoseState& NewALSXTPoseState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewALSXTPoseState(const FALSXTPoseState& NewALSXTPoseState);
+
+	// Vaulting State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
 	FALSXTVaultingState VaultingState;
 
@@ -220,12 +238,22 @@ public:
 
 private:
 	UFUNCTION(Server, Unreliable)
+	void ServerSetALSXTPoseState(const FALSXTPoseState& NewALSXTPoseState);
+
+	UFUNCTION()
+	void OnReplicate_ALSXTPoseState(const FALSXTPoseState& PreviousALSXTPoseState);
+
+
+	UFUNCTION(Server, Unreliable)
 	void ServerSetVaultingState(const FALSXTVaultingState& NewVaultingState);
 
 	UFUNCTION()
 	void OnReplicate_VaultingState(const FALSXTVaultingState& PreviousVaultingState);
 
 protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnALSXTPoseStateChanged(const FALSXTPoseState& PreviousALSXTPoseState);
+	
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnVaultingStateChanged(const FALSXTVaultingState& PreviousVaultingState);
 
@@ -1768,6 +1796,11 @@ protected:
 	void OnWeaponObstructionChanged(const FGameplayTag& PreviousWeaponObstructionTag);
 
 };
+
+inline const FALSXTPoseState& AALSXTCharacter::GetALSXTPoseState() const
+{
+	return ALSXTPoseState;
+}
 
 inline const FALSXTVaultingState& AALSXTCharacter::GetVaultingState() const
 {

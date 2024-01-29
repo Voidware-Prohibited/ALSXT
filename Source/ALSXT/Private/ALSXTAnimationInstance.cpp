@@ -1,10 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ALSXTAnimationInstance.h"
+#include "ALSXTAnimationInstanceProxy.h"
 #include "ALSXTCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Utility/ALSXTConstants.h"
 #include "ALS/Public/Utility/AlsMacros.h"
 #include "Math/UnrealMathUtility.h"
 #include "Stats/Stats.h"
@@ -129,7 +130,10 @@ void UALSXTAnimationInstance::NativePostEvaluateAnimation()
 	bPendingUpdate = false;
 }
 
-
+FAnimInstanceProxy* UALSXTAnimationInstance::CreateAnimInstanceProxy()
+{
+	return new FALSXTAnimationInstanceProxy{ this };
+}
 
 bool UALSXTAnimationInstance::IsSpineRotationAllowed()
 {
@@ -145,6 +149,45 @@ bool UALSXTAnimationInstance::IsRotateInPlaceAllowed()
 bool UALSXTAnimationInstance::IsTurnInPlaceAllowed()
 {
 	return Super::IsTurnInPlaceAllowed() && ALSXTCharacter->GetDesiredFreelooking() != ALSXTFreelookingTags::True;
+}
+
+void UALSXTAnimationInstance::RefreshALSXTPose()
+{
+	const auto& Curves{ GetProxyOnAnyThread<FALSXTAnimationInstanceProxy>().GetAnimationCurves(EAnimCurveType::AttributeCurve) };
+
+	static const auto GetCurveValue{
+		[](const TMap<FName, float>& Curves, const FName& CurveName) -> float
+		{
+			const auto* Value{Curves.Find(CurveName)};
+
+			return Value != nullptr ? *Value : 0.0f;
+		}
+	};
+
+	ALSXTPoseState.LeanLeftAmount = GetCurveValue(Curves, UALSXTConstants::PoseLeanLeftCurveName());
+	ALSXTPoseState.LeanRightAmount = GetCurveValue(Curves, UALSXTConstants::PoseLeanRightCurveName());
+
+	ALSXTPoseState.CantedAmount = GetCurveValue(Curves, UALSXTConstants::PoseCantedCurveName());
+
+	ALSXTPoseState.VaultingAmount = GetCurveValue(Curves, UALSXTConstants::PoseVaultingCurveName());
+	ALSXTPoseState.SlidingAmount = GetCurveValue(Curves, UALSXTConstants::PoseSlidingCurveName());
+
+	ALSXTPoseState.WallJumpAmount = GetCurveValue(Curves, UALSXTConstants::PoseWallJumpCurveName());
+	ALSXTPoseState.WallRunAmount = GetCurveValue(Curves, UALSXTConstants::PoseWallRunCurveName());
+
+	ALSXTPoseState.StationaryAmount = GetCurveValue(Curves, UALSXTConstants::PoseStationaryCurveName());
+	ALSXTPoseState.SeatedAmount = GetCurveValue(Curves, UALSXTConstants::PoseSeatedCurveName());
+
+	// Use the grounded pose curve value to "unweight" the gait pose curve. This is used to
+	// instantly get the full gait value from the very beginning of transitions to grounded states.
+
+	// PoseState.UnweightedGaitAmount = PoseState.GroundedAmount > 0.0f
+	// 	? PoseState.GaitAmount / PoseState.GroundedAmount
+	// 	: PoseState.GaitAmount;
+	// 
+	// PoseState.UnweightedGaitWalkingAmount = UAlsMath::Clamp01(PoseState.UnweightedGaitAmount);
+	// PoseState.UnweightedGaitRunningAmount = UAlsMath::Clamp01(PoseState.UnweightedGaitAmount - 1.0f);
+	// PoseState.UnweightedGaitSprintingAmount = UAlsMath::Clamp01(PoseState.UnweightedGaitAmount - 2.0f);
 }
 
 void UALSXTAnimationInstance::UpdateStatusState()

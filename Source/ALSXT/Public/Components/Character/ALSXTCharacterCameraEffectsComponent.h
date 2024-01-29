@@ -51,6 +51,12 @@ public:
 	bool IsPlayerCurrentlyMoving{ false };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	UCameraShakeBase* CurrentCameraShake;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+	void OnCameraShakeChanged();
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	float CurrentRadialBlurAmount{ 0.0f };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))

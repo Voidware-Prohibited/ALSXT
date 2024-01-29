@@ -2,6 +2,7 @@
 
 #include "NativeGameplayTags.h"
 #include "Chaos/ChaosEngineInterface.h"
+#include "Settings/ALSXTCameraEffectsSettings.h"
 #include "ALSXTCharacterInterface.generated.h"
 
 UINTERFACE(Blueprintable)
@@ -37,6 +38,9 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   FGameplayTag GetBreathType();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
+  UALSXTCameraShakeSettings* SelectCameraShakeSettings();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   FVector GetCameraLocationOld();

@@ -927,6 +927,39 @@ void AALSXTCharacter::ResetPaintOnAllComponents_Implementation() const
 // 
 // }
 
+// ALSXT Pose State
+void AALSXTCharacter::SetALSXTPoseState(const FALSXTPoseState& NewALSXTPoseState)
+{
+	const auto PreviousALSXTPoseState{ ALSXTPoseState };
+
+	ALSXTPoseState = NewALSXTPoseState;
+
+	OnALSXTPoseStateChanged(PreviousALSXTPoseState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetALSXTPoseState(NewALSXTPoseState);
+	}
+}
+
+void AALSXTCharacter::ServerSetALSXTPoseState_Implementation(const FALSXTPoseState& NewALSXTPoseState)
+{
+	SetALSXTPoseState(NewALSXTPoseState);
+}
+
+void AALSXTCharacter::ServerProcessNewALSXTPoseState_Implementation(const FALSXTPoseState& NewALSXTPoseState)
+{
+	ProcessNewALSXTPoseState(NewALSXTPoseState);
+}
+
+void AALSXTCharacter::OnReplicate_ALSXTPoseState(const FALSXTPoseState& PreviousALSXTPoseState)
+{
+	OnALSXTPoseStateChanged(PreviousALSXTPoseState);
+}
+
+void AALSXTCharacter::OnALSXTPoseStateChanged_Implementation(const FALSXTPoseState& PreviousALSXTPoseState) {}
+
+
 // Vaulting State
 void AALSXTCharacter::SetVaultingState(const FALSXTVaultingState& NewVaultingState)
 {

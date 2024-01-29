@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AlsAnimationInstance.h"
 #include "State/AlsFeetState.h"
+#include "State/ALSXTPoseState.h"
 #include "State/ALSXTStatusState.h"
 #include "State/ALSXTBreathState.h"
 #include "State/ALSXTDefensiveModeState.h"
@@ -59,6 +60,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag WeaponReadyPosition{ALSXTWeaponReadyPositionTags::None};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient)
+	FALSXTPoseState ALSXTPoseState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTStatusState StatusState;
@@ -147,6 +151,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	bool DoesOverlayObjectUseLeftHandIK{ false };
 
+private:
+	void RefreshALSXTPose();
+
 public:
 
 	UALSXTAnimationInstance();
@@ -160,6 +167,9 @@ public:
 	virtual void NativeThreadSafeUpdateAnimation(float DeltaTime) override;
 
 	virtual void NativePostEvaluateAnimation() override;
+
+protected:
+	virtual FAnimInstanceProxy* CreateAnimInstanceProxy() override;
 
 	// Core
 

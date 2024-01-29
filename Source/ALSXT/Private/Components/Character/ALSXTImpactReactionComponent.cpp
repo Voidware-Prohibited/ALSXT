@@ -89,7 +89,7 @@ void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, A
 {
 	if ((OtherActor != NULL) && (OtherActor != Character) && (OtherComp != NULL))
 	{
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I Hit: %s"), *OtherActor->GetName()));
+		if (GEngine && ImpactReactionSettings.DebugMode) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I Hit: %s"), *OtherActor->GetName()));
 
 		if (UKismetSystemLibrary::DoesImplementInterface(OtherActor, UALSXTCharacterInterface::StaticClass()))
 		{
@@ -953,9 +953,9 @@ bool UALSXTImpactReactionComponent::ValidateNewHit(AActor* ActorToCheck)
 		TimeResult = NewHitTime - PreviousTime;
 		RecentlyHit = TimeResult <= 0.33;
 
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString((RecentlyHit)? TEXT("True"):TEXT("False")));
+		if (GEngine && ImpactReactionSettings.DebugMode) GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString((RecentlyHit)? TEXT("True"):TEXT("False")));
 		// GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(NewHitTime));
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::SanitizeFloat(TimeResult));
+		if (GEngine && ImpactReactionSettings.DebugMode) GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::SanitizeFloat(TimeResult));
 		ObstacleImpactHistory.RemoveAt(FoundIndex);		
 		if (ObstacleImpactHistory.Num() >= 6)
 		{
@@ -973,7 +973,7 @@ bool UALSXTImpactReactionComponent::ValidateNewHit(AActor* ActorToCheck)
 		}
 		FImpactHistoryEntry NewEntry{ ActorToCheck, GetWorld()->GetTimeSeconds() };
 		ObstacleImpactHistory.Add(NewEntry);
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::SanitizeFloat(NewHitTime));
+		if (GEngine && ImpactReactionSettings.DebugMode) GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::SanitizeFloat(NewHitTime));
 		return true;
 	}
 }
@@ -1061,10 +1061,16 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 								FALSXTBumpPoseState NewCrowdNavigationPoseState;
 								NewCrowdNavigationPoseState.Pose = SelectCrowdNavigationPose(DoubleHitResult.ImpactSide, DoubleHitResult.ImpactForm);
 								SetCrowdNavigationPoseState(NewCrowdNavigationPoseState);
+
+								// Set Physical Animation Component Curves/Profile Here
+								Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Bump, DoubleHitResult.HitResult.HitResult.BoneName);
 							}
 							else if ((Character->GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())) || (Character->GetVelocity().Length() >= 650.0f && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())))
 							{
 								CrowdNavigationReaction(Character->GetDesiredGait(), OriginSideTag, FormTag);
+
+								// Set Physical Animation Component Curves/Profile Here
+								Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Bump, DoubleHitResult.HitResult.HitResult.BoneName);
 							}
 							NewImpactReactionState.ImpactReactionParameters.CrowdNavigationHit = DoubleHitResult;
 							NewImpactReactionState.ImpactReactionParameters.ImpactType = ALSXTImpactTypeTags::CrowdNavigation;
@@ -1084,16 +1090,23 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 								GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, VelMsg);
 							}
 
-							if (Character->GetVelocity().Length() < FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
+							if (Character->GetVelocity().Length() < ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity)
 							{
 								// Use Static Pose instead
 								FALSXTBumpPoseState NewBumpPoseState;
 								NewBumpPoseState.Pose = SelectBumpPose(DoubleHitResult.ImpactSide, DoubleHitResult.ImpactForm);
 								SetBumpPoseState(NewBumpPoseState);
+
+								// Set Physical Animation Component Curves/Profile Here
+								Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Hit, DoubleHitResult.HitResult.HitResult.BoneName);
+
 							}
-							else if (Character->GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral || (Character->GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral && Character->GetVelocity().Length() >= 650.0f))
+							else if ((Character->GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral  && ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity) || (Character->GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral && Character->GetVelocity().Length() >= 650.0f))
 							{
 								BumpReaction(Character->GetDesiredGait(), SideTag, FormTag);
+
+								// Set Physical Animation Component Curves/Profile Here
+								Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::Hit, DoubleHitResult.HitResult.HitResult.BoneName);
 							}
 
 							if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCollisionInterface::StaticClass()))
@@ -1116,6 +1129,10 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 	else
 	{
 		TraceDistance = 0.0f;
+		if (Character->GetPhysicalAnimationMode() != ALSXTPhysicalAnimationModeTags::None)
+		{
+			Character->SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "head");
+		}
 		return;
 	}
 }

@@ -1,8 +1,67 @@
 #pragma once
 
 #include "Engine/EngineTypes.h"
+#include "Engine/DataAsset.h"
 #include "Camera/CameraShakeBase.h"
 #include "ALSXTCameraEffectsSettings.generated.h"
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTMovementCameraShakeSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
+	TSubclassOf<UCameraShakeBase> ThirdPersonDefaultCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
+	TSubclassOf<UCameraShakeBase> ThirdPersonWalkCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
+	TSubclassOf <UCameraShakeBase> ThirdPersonRunCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
+	TSubclassOf <UCameraShakeBase> ThirdPersonSprintCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
+	TSubclassOf<UCameraShakeBase> ThirdPersonCrouchCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
+	TSubclassOf <UCameraShakeBase> ThirdPersonCrouchWalkCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
+	TSubclassOf <UCameraShakeBase> ThirdPersonCrouchRunCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
+	TSubclassOf <UCameraShakeBase> FirstPersonDefaultCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
+	TSubclassOf <UCameraShakeBase> FirstPersonWalkCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
+	TSubclassOf <UCameraShakeBase> FirstPersonRunCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
+	TSubclassOf <UCameraShakeBase> FirstPersonSprintCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
+	TSubclassOf <UCameraShakeBase> FirstPersonCrouchCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
+	TSubclassOf <UCameraShakeBase> FirstPersonCrouchWalkCameraShake{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
+	TSubclassOf <UCameraShakeBase> FirstPersonCrouchRunCameraShake{ nullptr };
+};
+
+UCLASS()
+class ALSXT_API UALSXTCameraShakeSettings : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Shake")
+	FALSXTMovementCameraShakeSettings CameraShakeSettings;
+};
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTGeneralCameraEffectsSettings
@@ -37,6 +96,9 @@ struct ALSXT_API FALSXTGeneralCameraEffectsSettings
 	bool bEnableRadialBlurEffect { true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
+	bool bEnableFrostEffect{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
 	bool bEnableSuppressionEffect { true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
@@ -59,42 +121,6 @@ struct ALSXT_API FALSXTGeneralCameraEffectsSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Debug")
 	bool bDebugMode { false };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf<UCameraShakeBase> ThirdPersonDefaultCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf<UCameraShakeBase> ThirdPersonWalkCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf <UCameraShakeBase> ThirdPersonRunCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf <UCameraShakeBase> ThirdPersonSprintCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf <UCameraShakeBase> ThirdPersonCrouchWalkCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf <UCameraShakeBase> ThirdPersonCrouchRunCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonDefaultCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonWalkCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonRunCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonSprintCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonCrouchWalkCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonCrouchRunCameraShake{ nullptr };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field")
 	float DepthOfFieldEffectAmount { 1.0 };

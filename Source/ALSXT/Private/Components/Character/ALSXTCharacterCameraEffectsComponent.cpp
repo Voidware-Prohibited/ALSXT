@@ -4,6 +4,7 @@
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Engine/Scene.h"
 #include "Kismet/GameplayStatics.h"
+#include "Curves/CurveVector.h"
 #include "Math/UnrealMathUtility.h"
 
 // Sets default values for this component's properties
@@ -22,19 +23,6 @@ void UALSXTCharacterCameraEffectsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GeneralCameraEffectsSettings.bEnableEffects && GeneralCameraEffectsSettings.bEnableMovementCameraShake && IsValid(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake))
-	{
-		if (Character->GetViewMode() == AlsViewModeTags::FirstPerson)
-		{
-			UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
-		}
-		if (Character->GetViewMode() == AlsViewModeTags::ThirdPerson && GeneralCameraEffectsSettings.bEnableMovementCameraShake)
-		{
-			GetWorld()->GetTimerManager().SetTimer(CameraShakeTimer, this, &UALSXTCharacterCameraEffectsComponent::SetRadialBlur, 0.01f, true);
-			UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
-		}
-	}
-
 	if (GetOwner()->GetLocalRole() != ROLE_AutonomousProxy)
 	{
 		return;
@@ -48,17 +36,14 @@ void UALSXTCharacterCameraEffectsComponent::BeginPlay()
 		FString PostProcessComponentName = "PostProcess Component";
 		PostProcessComponent = NewObject<UPostProcessComponent>(this, UPostProcessComponent::StaticClass(), *PostProcessComponentName);
 
-		if (GeneralCameraEffectsSettings.bEnableMovementCameraShake && IsValid(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake))
+		if (GeneralCameraEffectsSettings.bEnableMovementCameraShake && Character->Implements<UALSXTCharacterInterface>() && IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner()))
 		{
-			if (Character->GetViewMode() == AlsViewModeTags::FirstPerson)
-			{
-				UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
-			}
-			if (Character->GetViewMode() == AlsViewModeTags::ThirdPerson && GeneralCameraEffectsSettings.bEnableMovementCameraShake)
-			{
-				GetWorld()->GetTimerManager().SetTimer(CameraShakeTimer, this, &UALSXTCharacterCameraEffectsComponent::SetRadialBlur, 0.01f, true);
-				UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake, 1.0f,ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
-			}
+			CurrentRotationMode = AlsRotationModeTags::ViewDirection;
+			CurrentViewMode = Character->GetViewMode();
+			CurrentGait = AlsGaitTags::Walking;
+			CurrentStance = AlsStanceTags::Standing;
+			IsPlayerCurrentlyMoving = false;
+			GetWorld()->GetTimerManager().SetTimer(CameraShakeTimer, this, &UALSXTCharacterCameraEffectsComponent::UpdateCameraShake, 0.01f, true);
 		}
 
 		if (PostProcessComponent != nullptr)
@@ -170,87 +155,201 @@ void UALSXTCharacterCameraEffectsComponent::Initialize()
 
 void UALSXTCharacterCameraEffectsComponent::UpdateCameraShake()
 {
+	if (!GetWorld() || !Character->Implements<UALSXTCharacterInterface>() || !IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner()))
+	{
+		return;
+	}
+	
+	CurrentRotationMode = Character->GetRotationMode();
+	CurrentViewMode = Character->GetViewMode();
+	CurrentGait = Character->GetDesiredGait();
+	CurrentStance = Character->GetDesiredStance();
+	IsPlayerCurrentlyMoving = (Character->GetVelocity().Size() > 0.0);
+
 	if (CurrentRotationMode == Character->GetRotationMode() && CurrentViewMode == Character->GetViewMode() && CurrentGait == Character->GetDesiredGait() && CurrentStance == Character->GetDesiredStance() && IsPlayerCurrentlyMoving == (Character->GetVelocity().Size() > 0.0))
 	{
 		return;
 	}
 
-	if (Character->GetDesiredStance() == AlsStanceTags::Standing)
+	if (CurrentStance == AlsStanceTags::Standing)
 	{
-		FGameplayTag NewGait = Character->GetDesiredGait();
-		float NewVelocity = Character->GetVelocity().Size();
-		bool NewIsPlayerCurrentlyMoving = Character->GetVelocity().Size() > 0.0;
-
-		if (CurrentGait == AlsGaitTags::Walking && !NewIsPlayerCurrentlyMoving)
+		if (CurrentGait == AlsGaitTags::Walking && !IsPlayerCurrentlyMoving)
 		{
-			if (Character->GetViewMode() == AlsViewModeTags::FirstPerson && GeneralCameraEffectsSettings.bEnableFirstPersonDefaultCameraShake && IsValid(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake))
+			if (CurrentViewMode == AlsViewModeTags::FirstPerson)
 			{
-				UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.FirstPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonDefaultCameraShake, false);
+				if (GeneralCameraEffectsSettings.bEnableFirstPersonDefaultCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonDefaultCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}				
+				OnCameraShakeChanged();
+				return;
 			}
-			if (Character->GetViewMode() == AlsViewModeTags::ThirdPerson && GeneralCameraEffectsSettings.bEnableThirdPersonDefaultCameraShake && IsValid(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake))
+			if (CurrentViewMode == AlsViewModeTags::ThirdPerson)
 			{
-				UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonDefaultCameraShake, false);
+				if (GeneralCameraEffectsSettings.bEnableThirdPersonDefaultCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonDefaultCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}				
+				OnCameraShakeChanged();
+				return;
 			}
 		}
-		if (CurrentGait == AlsGaitTags::Walking && NewIsPlayerCurrentlyMoving)
+		if (CurrentGait == AlsGaitTags::Walking && IsPlayerCurrentlyMoving)
 		{
+			if (CurrentViewMode == AlsViewModeTags::FirstPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonWalkCameraShake, false);
 
+				if (GeneralCameraEffectsSettings.bEnableWalkingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonWalkCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonWalkCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
+			if (CurrentViewMode == AlsViewModeTags::ThirdPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonWalkCameraShake, false);
+
+				if (GeneralCameraEffectsSettings.bEnableWalkingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonWalkCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonWalkCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
 		}
 		if (CurrentGait == AlsGaitTags::Running)
 		{
+			if (CurrentViewMode == AlsViewModeTags::FirstPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonRunCameraShake, false);
+				
+				if (GeneralCameraEffectsSettings.bEnableRunningCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonRunCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonRunCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
+			if (CurrentViewMode == AlsViewModeTags::ThirdPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonRunCameraShake, false);
 
+				if (GeneralCameraEffectsSettings.bEnableRunningCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonRunCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonRunCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
 		}
 		if (CurrentGait == AlsGaitTags::Sprinting)
 		{
-
-		}
-	}
-	if (Character->GetDesiredStance() == AlsStanceTags::Crouching)
-	{
-
-	}
-	
-	
-	if (CurrentViewMode != Character->GetViewMode())
-	{
-		CurrentViewMode = Character->GetViewMode();
-	}
-	if (CurrentStance != Character->GetDesiredStance())
-	{
-		CurrentStance = Character->GetDesiredStance();
-	}
-	
-	if (CurrentGait != Character->GetDesiredGait())
-	{
-		CurrentGait = Character->GetDesiredGait();
-		float Velocity = Character->GetVelocity().Size();
-
-		if (CurrentGait == AlsGaitTags::Walking && Velocity < 1.0f)
-		{
-			if (Character->GetViewMode() == AlsViewModeTags::ThirdPerson && GeneralCameraEffectsSettings.bEnableThirdPersonDefaultCameraShake)
+			if (CurrentViewMode == AlsViewModeTags::FirstPerson)
 			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonSprintCameraShake, false);
 
+				if (GeneralCameraEffectsSettings.bEnableSprintingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonSprintCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonSprintCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
 			}
-			
-			UCameraShakeBase* CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(GeneralCameraEffectsSettings.ThirdPersonDefaultCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
-		}
-		if (CurrentGait == AlsGaitTags::Walking && Velocity > 1.0f)
-		{
+			if (CurrentViewMode == AlsViewModeTags::ThirdPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonSprintCameraShake, false);
 
+				if (GeneralCameraEffectsSettings.bEnableSprintingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonSprintCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonSprintCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
+		}
+	}
+	if (CurrentStance == AlsStanceTags::Crouching)
+	{
+		if (CurrentGait == AlsGaitTags::Walking && !IsPlayerCurrentlyMoving)
+		{
+			if (CurrentViewMode == AlsViewModeTags::FirstPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonCrouchCameraShake, false);
+
+				if (GeneralCameraEffectsSettings.bEnableSprintingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonCrouchCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonCrouchCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
+			if (CurrentViewMode == AlsViewModeTags::ThirdPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonCrouchCameraShake, false);
+
+				if (GeneralCameraEffectsSettings.bEnableSprintingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonCrouchCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonCrouchCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
+		}
+		if (CurrentGait == AlsGaitTags::Walking && IsPlayerCurrentlyMoving)
+		{
+			if (CurrentViewMode == AlsViewModeTags::FirstPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonCrouchWalkCameraShake, false);
+
+				if (GeneralCameraEffectsSettings.bEnableSprintingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonCrouchWalkCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonCrouchWalkCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
+			if (CurrentViewMode == AlsViewModeTags::ThirdPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonCrouchWalkCameraShake, false);
+
+				if (GeneralCameraEffectsSettings.bEnableSprintingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonCrouchWalkCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonCrouchWalkCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
 		}
 		if (CurrentGait == AlsGaitTags::Running)
 		{
+			if (CurrentViewMode == AlsViewModeTags::FirstPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonCrouchRunCameraShake, false);
 
-		}
-		if (CurrentGait == AlsGaitTags::Sprinting)
-		{
+				if (GeneralCameraEffectsSettings.bEnableSprintingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonCrouchRunCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.FirstPersonCrouchRunCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
+			if (CurrentViewMode == AlsViewModeTags::ThirdPerson)
+			{
+				UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StopAllInstancesOfCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonCrouchRunCameraShake, false);
 
+				if (GeneralCameraEffectsSettings.bEnableSprintingCameraShake && IsValid(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonCrouchRunCameraShake))
+				{
+					CurrentCameraShake = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(IALSXTCharacterInterface::Execute_SelectCameraShakeSettings(GetOwner())->CameraShakeSettings.ThirdPersonCrouchRunCameraShake, 1.0f, ECameraShakePlaySpace::CameraLocal, UE::Math::TRotator<double>::ZeroRotator);
+				}
+				OnCameraShakeChanged();
+				return;
+			}
 		}
 	}
-	
-	float Velocity = Character->GetVelocity().Size();
-	float BlurAmount = FMath::GetMappedRangeValueClamped(FVector2D{ 0.0, GeneralCameraEffectsSettings.RadialBlurMaxVelocity }, FVector2D{ 0.0f, GeneralCameraEffectsSettings.RadialBlurMaxWeight }, Velocity);
-	PostProcessComponent->Settings.WeightedBlendables.Array[0].Weight = BlurAmount;
 }
 
 void UALSXTCharacterCameraEffectsComponent::CameraEffectsTrace()
