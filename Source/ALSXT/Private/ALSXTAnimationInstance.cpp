@@ -53,6 +53,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		return;
 	}
 
+	RefreshALSXTPose();
 	Freelooking = ALSXTCharacter->GetDesiredFreelooking();
 	Sex = ALSXTCharacter->GetDesiredSex();
 	DefensiveMode = ALSXTCharacter->GetDesiredDefensiveMode();
@@ -164,6 +165,7 @@ void UALSXTAnimationInstance::RefreshALSXTPose()
 		}
 	};
 
+	ALSXTPoseState.LeanDirection = ALSXTCharacter->GetALSXTPoseState().LeanDirection;
 	ALSXTPoseState.LeanLeftAmount = GetCurveValue(Curves, UALSXTConstants::PoseLeanLeftCurveName());
 	ALSXTPoseState.LeanRightAmount = GetCurveValue(Curves, UALSXTConstants::PoseLeanRightCurveName());
 

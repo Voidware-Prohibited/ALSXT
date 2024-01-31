@@ -51,6 +51,12 @@ namespace AlsLocomotionActionTags
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(FixingMalfunction2)
 }
 
+namespace ALSXTLeanDirectionTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Left)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Right)
+}
+
 namespace ALSXTActionTypeTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Primary)

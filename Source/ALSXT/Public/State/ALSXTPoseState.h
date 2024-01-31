@@ -1,11 +1,15 @@
 #pragma once
 
+#include "NativeGameplayTags.h"
 #include "ALSXTPoseState.generated.h"
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTPoseState
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Lean Direction", AllowPrivateAccess))
+	FGameplayTag LeanDirection {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ClampMax = 1))
 	float LeanLeftAmount{0.0f};

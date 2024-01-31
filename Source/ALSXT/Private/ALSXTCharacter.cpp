@@ -381,6 +381,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	Parameters.Condition = COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FootprintsState, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredLean, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DefensiveModeState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFreelooking, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredSex, Parameters)
@@ -460,6 +461,8 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(RotationModeAction, ETriggerEvent::Triggered, this, &ThisClass::InputRotationMode);
 		EnhancedInput->BindAction(ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::InputViewMode);
 		EnhancedInput->BindAction(SwitchShoulderAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchShoulder);
+		EnhancedInput->BindAction(LeanLeftAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanLeft);
+		EnhancedInput->BindAction(LeanRightAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanRight);
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
 		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleCombatReady);
 		EnhancedInput->BindAction(PrimaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryAction);
@@ -1091,14 +1094,47 @@ void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
 	}
 }
 
-void AALSXTCharacter::InputLeanLeft()
+
+void AALSXTCharacter::InputLeanLeft(const FInputActionValue & ActionValue)
 {
-	// 
+	if (ActionValue.Get<bool>())
+	{
+		if (CanLean())
+		{
+			SetDesiredLean(ALSXTLeanDirectionTags::Left);
+			FALSXTPoseState NewPoseState = GetALSXTPoseState();
+			NewPoseState.LeanDirection = ALSXTLeanDirectionTags::Left;
+			SetALSXTPoseState(NewPoseState);
+		}
+	}
+	else
+	{
+		SetDesiredLean(FGameplayTag::EmptyTag);
+		FALSXTPoseState NewPoseState = GetALSXTPoseState();
+		NewPoseState.LeanDirection = FGameplayTag::EmptyTag;
+		SetALSXTPoseState(NewPoseState);
+	}
 }
 
-void AALSXTCharacter::InputLeanRight()
+void AALSXTCharacter::InputLeanRight(const FInputActionValue& ActionValue)
 {
-	// 
+	if (ActionValue.Get<bool>())
+	{
+		if (CanLean())
+		{
+			SetDesiredLean(ALSXTLeanDirectionTags::Right);
+			FALSXTPoseState NewPoseState = GetALSXTPoseState();
+			NewPoseState.LeanDirection = ALSXTLeanDirectionTags::Right;
+			SetALSXTPoseState(NewPoseState);
+		}
+	}
+	else
+	{
+		SetDesiredLean(FGameplayTag::EmptyTag);
+		FALSXTPoseState NewPoseState = GetALSXTPoseState();
+		NewPoseState.LeanDirection = FGameplayTag::EmptyTag;
+		SetALSXTPoseState(NewPoseState);
+	}
 }
 
 void AALSXTCharacter::InputAcrobatic()
@@ -1200,6 +1236,69 @@ bool AALSXTCharacter::IsFirstPersonEyeFocusActive() const
 		return false;
 	}
 }
+
+// Lean
+
+void AALSXTCharacter::SetDesiredLean(const FGameplayTag& NewLeanTag)
+{
+	if (DesiredLean != NewLeanTag)
+	{
+		DesiredLean = NewLeanTag;
+		const auto PreviousLean{ Lean };
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredLean, this)
+
+		if (GetLocalRole() == ROLE_Authority)
+		{
+			OnLeanChanged(PreviousLean);
+		}
+
+			// if (GetLocalRole() == ROLE_AutonomousProxy)
+			// {
+			// 	ServerSetDesiredLean(NewLeanTag);
+			// 	if (NewLeanTag != ALSXTLeanDirectionTags::Neutral)
+			// 	{
+			// 		if (IsHoldingAimableItem())
+			// 		{
+			// 			SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
+			// 		}
+			// 		else
+			// 		{
+			// 			SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+			// 		}
+			// 		SetDesiredRotationMode(AlsRotationModeTags::Aiming);
+			// 	}
+			// 	else
+			// 	{
+			// 		SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
+			// 	}
+			// }
+			// else if (GetLocalRole() == ROLE_Authority)
+			// {
+			// 	OnLeanChanged(PreviousLean);
+			// }
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredLean_Implementation(const FGameplayTag& NewLeanTag)
+{
+	SetDesiredLean(NewLeanTag);
+}
+
+void AALSXTCharacter::SetLean(const FGameplayTag& NewLeanTag)
+{
+
+	if (Lean != NewLeanTag)
+	{
+		const auto PreviousLean{ Lean };
+
+		Lean = NewLeanTag;
+
+		OnLeanChanged(PreviousLean);
+	}
+}
+
+void AALSXTCharacter::OnLeanChanged_Implementation(const FGameplayTag& PreviousLeanTag) {}
 
 // Freelooking
 

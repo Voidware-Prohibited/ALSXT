@@ -52,6 +52,12 @@ namespace AlsLocomotionActionTags
 	UE_DEFINE_GAMEPLAY_TAG(FixingMalfunction2, TEXT("Als.LocomotionAction.Firearm.Fixing Malfunction 2"))
 }
 
+namespace ALSXTLeanDirectionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Lean Direction.Left"))
+	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Lean Direction.Right"))
+}
+
 namespace ALSXTActionTypeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Primary, TEXT("Als.Action Type.Primary"))

@@ -174,9 +174,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
 	TObjectPtr<UALSXTCharacterMovementComponent> ALSXTCharacterMovement;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
-	FALSXTPoseState ALSXTPoseState;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
@@ -207,6 +204,9 @@ public:
 	void DisableLookAt(const bool Disable);
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess, Transient)
+	FALSXTPoseState ALSXTPoseState;
+
 	// Pose State
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FALSXTPoseState& GetALSXTPoseState() const;
@@ -383,6 +383,14 @@ protected:
 	void OnHeadLookAtStateChanged(const FALSXTHeadLookAtState& PreviousHeadLookAtState);
 
 private:
+	// Sex
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredLean{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Lean{ FGameplayTag::EmptyTag };
+
 	// Sex
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
@@ -807,9 +815,9 @@ private:
 
 	void InputHoldBreath(const FInputActionValue& ActionValue);
 
-	void InputLeanLeft();
+	void InputLeanLeft(const FInputActionValue& ActionValue);
 
-	void InputLeanRight();
+	void InputLeanRight(const FInputActionValue& ActionValue);
 
 	void InputAcrobatic();
 
@@ -1041,6 +1049,9 @@ public:
 	virtual void AIObstacleTrace_Implementation();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool CanLean() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool CanAimDownSights() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
@@ -1067,6 +1078,28 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void StartWallrun();
+
+	// Desired Leaning
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	const FGameplayTag& GetDesiredLean() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	const FGameplayTag& GetLean() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewLeanTag"))
+	void SetDesiredLean(const FGameplayTag& NewLeanTag);
+
+private:
+	void SetLean(const FGameplayTag& NewLeanTag);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetDesiredLean(const FGameplayTag& NewLeanTag);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnLeanChanged(const FGameplayTag& PreviousLeanTag);		
 
 	// Desired Freelooking
 
@@ -1796,6 +1829,16 @@ protected:
 	void OnWeaponObstructionChanged(const FGameplayTag& PreviousWeaponObstructionTag);
 
 };
+
+inline const FGameplayTag& AALSXTCharacter::GetDesiredLean() const
+{
+	return DesiredLean;
+}
+
+inline const FGameplayTag& AALSXTCharacter::GetLean() const
+{
+	return Lean;
+}
 
 inline const FALSXTPoseState& AALSXTCharacter::GetALSXTPoseState() const
 {
