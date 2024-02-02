@@ -204,7 +204,7 @@ public:
 	void DisableLookAt(const bool Disable);
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess, Transient)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess, Transient))
 	FALSXTPoseState ALSXTPoseState;
 
 	// Pose State
