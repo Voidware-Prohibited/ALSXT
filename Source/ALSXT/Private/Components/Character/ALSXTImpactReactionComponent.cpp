@@ -1763,9 +1763,9 @@ void UALSXTImpactReactionComponent::StartBumpReaction(const FGameplayTag& Gait, 
 	FBumpReactionAnimation SelectedBumpReaction = SelectBumpReactionMontage(Gait, Side, Form);
 	UAnimMontage* Montage = SelectedBumpReaction.Montage.Montage;
 
-	if (!ALS_ENSURE(IsValid(Montage)) || !IsBumpReactionAllowedToStart(Montage))
+	if ((!ALS_ENSURE(IsValid(Montage)) || !IsBumpReactionAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Bump Montage Invalid"));
 		return;
 	}
 
@@ -1797,9 +1797,9 @@ void UALSXTImpactReactionComponent::StartCrowdNavigationReaction(const FGameplay
 	FBumpReactionAnimation SelectedCrowdNavigationReaction = SelectCrowdNavigationReactionMontage(IRState.ImpactReactionParameters.CrowdNavigationHit.HitResult.ImpactGait, IRState.ImpactReactionParameters.CrowdNavigationHit.HitResult.ImpactSide, IRState.ImpactReactionParameters.CrowdNavigationHit.HitResult.ImpactForm);
 	UAnimMontage* Montage = SelectedCrowdNavigationReaction.Montage.Montage;
 
-	if (!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage))
+	if ((!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Crowd Navigation Montage Invalid"));
 		return;
 	}
 
@@ -1834,9 +1834,9 @@ void UALSXTImpactReactionComponent::StartImpactReaction(FDoubleHitResult Hit)
 	Particle = GetImpactReactionParticle(Hit);
 	Audio = GetImpactReactionSound(Hit).Sound.Sound;
 
-	if (!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage))
+	if ((!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Impact Reaction Montage Invalid"));
 		return;
 	}
 
@@ -1890,9 +1890,9 @@ void UALSXTImpactReactionComponent::StartAttackReaction(FAttackDoubleHitResult H
 		Montage = SelectedAttackReaction.Montage.Montage;
 		PreviousAttackImpacts.Add(Hit);
 
-		if (!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage))
+		if ((!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack Reaction Montage Invalid"));
 			return;
 		}
 
@@ -1949,9 +1949,9 @@ void UALSXTImpactReactionComponent::StartStabilize(FDoubleHitResult Hit)
 	Montage = SelectedClutchImpactPointReaction.Pose;
 	FALSXTDefensiveModeState DefensiveModeState;
 
-	if (!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage))
+	if ((!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Stabilize Montage Invalid"));
 		return;
 	}
 	FGameplayTag Health = HealthToHealthTag(GetHealth());
@@ -1990,9 +1990,9 @@ void UALSXTImpactReactionComponent::StartClutchImpactPoint(FDoubleHitResult Hit)
 	Montage = SelectedClutchImpactPointReaction.Pose;
 	FALSXTDefensiveModeState DefensiveModeState;
 
-	if (!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage))
+	if ((!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Clutch Impact Point Montage Invalid"));
 		return;
 	}
 	FGameplayTag Health = HealthToHealthTag(GetHealth());
@@ -2036,9 +2036,9 @@ void UALSXTImpactReactionComponent::StartImpactFall(FDoubleHitResult Hit)
 	FActionMontageInfo SelectedAttackFall = SelectImpactFallMontage(Hit);
 	Montage = SelectedAttackFall;
 
-	if (!ALS_ENSURE(IsValid(Montage.Montage)) || !IsAttackFallAllowedToStart(Montage.Montage))
+	if ((!ALS_ENSURE(IsValid(Montage.Montage)) || !IsAttackFallAllowedToStart(Montage.Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Impact Fall Montage Invalid"));
 		return;
 	}
 
@@ -2089,9 +2089,9 @@ void UALSXTImpactReactionComponent::StartImpactFallIdle(FDoubleHitResult Hit)
 	FActionMontageInfo SelectedAttackFall = SelectImpactFallMontage(Hit);
 	Montage = SelectedAttackFall;
 
-	if (!ALS_ENSURE(IsValid(Montage.Montage)) || !IsAttackFallAllowedToStart(Montage.Montage))
+	if ((!ALS_ENSURE(IsValid(Montage.Montage)) || !IsAttackFallAllowedToStart(Montage.Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Impact Fall Idle Montage Invalid"));
 		return;
 	}
 
@@ -2141,9 +2141,9 @@ void UALSXTImpactReactionComponent::StartAttackFall(FAttackDoubleHitResult Hit)
 	FActionMontageInfo SelectedAttackFall = SelectAttackFallMontage(Hit);
 	FActionMontageInfo Montage = SelectedAttackFall;
 
-	if (!ALS_ENSURE(IsValid(Montage.Montage)) || !IsAttackFallAllowedToStart(Montage.Montage))
+	if ((!ALS_ENSURE(IsValid(Montage.Montage)) || !IsAttackFallAllowedToStart(Montage.Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack Fall Montage Invalid"));
 		return;
 	}
 
@@ -2203,9 +2203,9 @@ void UALSXTImpactReactionComponent::StartAttackFallIdle(FAttackDoubleHitResult H
 	// FActionMontageInfo Montage = SelectedAttackFall;
 	UAnimMontage* Montage = NewImpactReactionState.ImpactReactionParameters.AttackFallenAnimations.FallenPose;
 
-	if (!ALS_ENSURE(IsValid(Montage)) || !IsAttackFallAllowedToStart(Montage))
+	if ((!ALS_ENSURE(IsValid(Montage)) || !IsAttackFallAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack Fall Idle Montage Invalid"));
 		return;
 	}
 
@@ -2262,9 +2262,9 @@ void UALSXTImpactReactionComponent::StartBraceForImpact()
 	UAnimSequenceBase* Montage = SelectBraceForImpactPose(Side);
 	FALSXTDefensiveModeState DefensiveModeState;
 
-	if (!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage))
+	if ((!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Brace For Impact Montage Invalid"));
 		return;
 	}
 	
@@ -2291,9 +2291,9 @@ void UALSXTImpactReactionComponent::StartAttackGetUp(FAttackDoubleHitResult Hit)
 		FActionMontageInfo SelectedAttackGetUp = GetImpactReactionState().ImpactReactionParameters.AttackFallenAnimations.GetUpMontages[0];
 		FActionMontageInfo Montage = SelectedAttackGetUp;
 
-		if (!ALS_ENSURE(IsValid(Montage.Montage)))
+		if (!ALS_ENSURE(IsValid(Montage.Montage)) && ImpactReactionSettings.DebugMode)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack Get Up Montage Invalid"));
 			return;
 		}
 		const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
@@ -2343,9 +2343,9 @@ void UALSXTImpactReactionComponent::StartImpactResponse(FDoubleHitResult Hit)
 	FResponseAnimation SelectedImpactResponse = SelectImpactResponseMontage(Hit);
 	Montage = SelectedImpactResponse;
 
-	if (!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsImpactResponseAllowedToStart(Montage.Montage.Montage))
+	if ((!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsImpactResponseAllowedToStart(Montage.Montage.Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Impact Resonse Montage Invalid"));
 		return;
 	}
 	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)) };
@@ -2390,13 +2390,13 @@ void UALSXTImpactReactionComponent::StartAttackResponse(FAttackDoubleHitResult H
 	FResponseAnimation SelectedAttackResponse = SelectAttackResponseMontage(Hit);
 	FResponseAnimation Montage = SelectedAttackResponse;
 
-	if (!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsAttackResponseAllowedToStart(Montage.Montage.Montage))
+	if ((!ALS_ENSURE(IsValid(Montage.Montage.Montage)) || !IsAttackResponseAllowedToStart(Montage.Montage.Montage)) && ImpactReactionSettings.DebugMode)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Montage Invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack Response Montage Invalid"));
 		return;
 	}
 	
-	if (!Hit.DoubleHitResult.OriginHitResult.HitResult.GetActor())
+	if (!Hit.DoubleHitResult.OriginHitResult.HitResult.GetActor() && ImpactReactionSettings.DebugMode)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor Invalid"));
 		return;

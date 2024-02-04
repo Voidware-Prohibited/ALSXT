@@ -1,6 +1,7 @@
 // MIT
 
 #include "Components/Character/ALSXTCombatComponent.h"
+#include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Utility/AlsUtility.h"
@@ -37,7 +38,7 @@ void UALSXTCombatComponent::BeginPlay()
 	Character = Cast<AALSXTCharacter>(GetOwner());
 	AlsCharacter = Cast<AAlsCharacter>(GetOwner());
 
-	auto* EnhancedInput{ Cast<UEnhancedInputComponent>(Character) };
+	UEnhancedInputComponent* EnhancedInput{ Cast<UEnhancedInputComponent>(Character) };
 	if (IsValid(EnhancedInput))
 	{
 		//FSetupPlayerInputComponentDelegate Del = Character->OnSetupPlayerInputComponentUpdated;
@@ -903,14 +904,32 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 	if (IsAttackAllowedToStart(Montage) && Character->GetMesh()->GetAnimInstance()->Montage_Play(Montage, PlayRate))
 	{
 		CombatState.CombatParameters.TargetYawAngle = TargetYawAngle;
-
 		Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
-
 		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::PrimaryAction);
+
+		if (CombatSettings.bEnableMoveToTarget && IsValid(CurrentTarget.HitResult.GetActor()))
+		{
+			float DistanceToTarget = FVector::Dist(CurrentTarget.HitResult.GetActor()->GetActorLocation(), Character->GetActorLocation());
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::SanitizeFloat(DistanceToTarget));
+
+			if ((DistanceToTarget < CombatSettings.MaxInitialLockDistance && DistanceToTarget > 60.0f) && !IsTartgetObstructed() && (Character->GetInputDirection().Length() > 0.01f))
+			{
+				//Get Direction from Target to Player
+				FVector Direction = CurrentTarget.HitResult.GetActor()->GetActorLocation() - Character->GetActorLocation();
+				Direction.Normalize();
+
+				//Calculate the new location depending on how far we are allowed to travel away.
+				FVector NewLocation = CurrentTarget.HitResult.GetActor()->GetActorLocation() + CombatSettings.MaxInitialLockDistance * Direction;
+
+				//vector from our current location to the target which is slightly further away from the target
+				FVector SmoothMoveVector = NewLocation - Character->GetActorLocation();
+				FStepDownResult* StepdownResult{ nullptr };
+				Character->GetCharacterMovement()->MoveSmooth(SmoothMoveVector, 0.25f, StepdownResult);
+			}
+		}
+		
 		// Crouch(); //Hack
-
 		FALSXTCharacterVoiceParameters VoiceParameters = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(GetOwner());
-
 		IALSXTCharacterSoundComponentInterface::Execute_PlayAttackSound(GetOwner(), true, true, true, VoiceParameters.Sex, VoiceParameters.Variant, Character->GetOverlayMode(), CombatParameters.Strength, CombatParameters.AttackType, IALSXTCharacterInterface::Execute_GetStamina(GetOwner()));
 	}
 }
