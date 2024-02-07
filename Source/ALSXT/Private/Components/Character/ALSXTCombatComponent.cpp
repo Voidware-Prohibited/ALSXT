@@ -907,24 +907,36 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 		Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
 		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::PrimaryAction);
 
-		if (CombatSettings.bEnableMoveToTarget && IsValid(CurrentTarget.HitResult.GetActor()))
+		// Check if Player is moving forward or strafing
+		float ForwardSpeed = FVector::DotProduct(Character->GetVelocity(), Character->GetActorForwardVector());
+		float RightSpeed = FVector::DotProduct(Character->GetVelocity(), Character->GetActorRightVector());
+		bool IsPlayerMoving = (ForwardSpeed > 200.0f || ForwardSpeed > 200.0f && ((RightSpeed > 200.0f) || (RightSpeed < 200.0f)));
+
+		if (CombatSettings.bEnableMoveToTarget && IsValid(CurrentTarget.HitResult.GetActor()) && IsPlayerMoving)
 		{
 			float DistanceToTarget = FVector::Dist(CurrentTarget.HitResult.GetActor()->GetActorLocation(), Character->GetActorLocation());
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::SanitizeFloat(DistanceToTarget));
+			
+			if (CombatSettings.DebugMode)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::SanitizeFloat(DistanceToTarget));
+			}	
 
-			if ((DistanceToTarget < CombatSettings.MaxInitialLockDistance && DistanceToTarget > 60.0f) && !IsTartgetObstructed() && (Character->GetInputDirection().Length() > 0.01f))
+			if ((DistanceToTarget < SelectAttackSettings()->MoveToTargetMaxDistance && DistanceToTarget > 60.0f) && !IsTartgetObstructed())
 			{
 				//Get Direction from Target to Player
 				FVector Direction = CurrentTarget.HitResult.GetActor()->GetActorLocation() - Character->GetActorLocation();
 				Direction.Normalize();
 
 				//Calculate the new location depending on how far we are allowed to travel away.
-				FVector NewLocation = CurrentTarget.HitResult.GetActor()->GetActorLocation() + CombatSettings.MaxInitialLockDistance * Direction;
+				FVector NewLocation = CurrentTarget.HitResult.GetActor()->GetActorLocation() + SelectAttackSettings()->MoveToTargetMaxDistance * Direction;
+
+				//Calculate Speed of MoveSmooth based on Min and Max values
+				float MovementSpeed = (DistanceToTarget - 60.0f) / (SelectAttackSettings()->MoveToTargetMaxDistance - 60.0f);
 
 				//vector from our current location to the target which is slightly further away from the target
 				FVector SmoothMoveVector = NewLocation - Character->GetActorLocation();
 				FStepDownResult* StepdownResult{ nullptr };
-				Character->GetCharacterMovement()->MoveSmooth(SmoothMoveVector, 0.25f, StepdownResult);
+				Character->GetCharacterMovement()->MoveSmooth(SmoothMoveVector, MovementSpeed, StepdownResult);
 			}
 		}
 		

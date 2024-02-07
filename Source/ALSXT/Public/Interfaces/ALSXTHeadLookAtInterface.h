@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameplayTagContainer.h"
+#include "Engine/EngineTypes.h"
 #include "Utility/ALSXTStructs.h"
 #include "ALSXTHeadLookAtInterface.generated.h"
 
@@ -19,6 +20,9 @@ UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look 
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   bool CanBeHeadLookedAt();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
+  bool IsInFrontOf(FVector ActorLocation);
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   float GetRating();
