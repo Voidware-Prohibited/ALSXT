@@ -931,7 +931,7 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 				FVector NewLocation = CurrentTarget.HitResult.GetActor()->GetActorLocation() + SelectAttackSettings()->MoveToTargetMaxDistance * Direction;
 
 				//Calculate Speed of MoveSmooth based on Min and Max values
-				float MovementSpeed = (DistanceToTarget - 60.0f) / (SelectAttackSettings()->MoveToTargetMaxDistance - 60.0f);
+				float MovementSpeed = ((DistanceToTarget - 60.0f) / (SelectAttackSettings()->MoveToTargetMaxDistance - 60.0f)) * 3.0f;
 
 				//vector from our current location to the target which is slightly further away from the target
 				FVector SmoothMoveVector = NewLocation - Character->GetActorLocation();
