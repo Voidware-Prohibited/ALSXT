@@ -21,8 +21,8 @@ UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   bool CanBeHeadLookedAt();
 
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
-  bool IsInFrontOf(FVector ActorLocation);
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Head Look At Interface")
+  void IsInFrontOf(bool& IsInFrontOf, FVector LookAtActorLocation) const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   float GetRating();

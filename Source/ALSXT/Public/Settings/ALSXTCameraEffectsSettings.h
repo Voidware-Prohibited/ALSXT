@@ -3,6 +3,7 @@
 #include "Engine/EngineTypes.h"
 #include "Engine/DataAsset.h"
 #include "Camera/CameraShakeBase.h"
+#include "Curves/CurveVector.h"
 #include "ALSXTCameraEffectsSettings.generated.h"
 
 USTRUCT(BlueprintType)

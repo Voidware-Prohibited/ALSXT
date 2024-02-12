@@ -1,6 +1,44 @@
 #pragma once
 
+#include "Engine/DataAsset.h"
 #include "ALSXTAcrobaticActionSettings.generated.h"
+
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UALSXTAcrobaticActionSettings : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
+	bool bAcrobaticActions{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
+	bool bEnableWallJump{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
+	bool bEnableWallRun{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+	TObjectPtr<UAnimMontage> FlipMontage{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+	TObjectPtr<UAnimMontage> BackflipMontage{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+	TObjectPtr<UAnimMontage> WallJumpForwardMontage{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+	TObjectPtr<UAnimMontage> WallJumpLeftAngleMontage{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+	TObjectPtr<UAnimMontage> WallJumpRightAngleMontage{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+	TObjectPtr<UAnimMontage> WallRunLeftMontage{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+	TObjectPtr<UAnimMontage> WallRunRightMontage{ nullptr };
+};
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTGeneralAcrobaticActionSettings

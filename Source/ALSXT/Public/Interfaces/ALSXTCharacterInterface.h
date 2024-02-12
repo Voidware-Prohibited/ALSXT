@@ -14,6 +14,29 @@ class ALSXT_API IALSXTCharacterInterface {
 	GENERATED_BODY()
 
 public:
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  USkeletalMeshComponent* GetCharacterMesh() const;
+  
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterSex() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterStance() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterOverlayMode() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterCombatStance() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterInjury() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  UAlsCameraComponent* GetCharacterCamera() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FRotator GetCharacterControlRotation() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   float GetStamina();

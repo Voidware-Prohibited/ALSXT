@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ALSXTCharacter.h"
 #include "Settings/ALSXTIdleAnimationSettings.h"
 #include "State/ALSXTStatusState.h"
 #include "ALSXTIdleAnimationComponent.generated.h"
@@ -42,31 +41,25 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Parameters", Meta = (AllowPrivateAccess))
-	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
-	TObjectPtr<UAlsCameraComponent> Camera;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTALSXTGeneralIdleAnimationSettings IdleAnimationSettings;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
 	FALSXTStatusState StatusState;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Replicated, Category = "State", Meta = (AllowPrivateAccess))
 	UAnimMontage* CurrentIdleMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Replicated, Category = "State", Meta = (AllowPrivateAccess))
 	float IdleCounterCurrent{ 0.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Replicated, Category = "State", Meta = (AllowPrivateAccess))
 	float CurrentTimeBetweenAnimations{ 0.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Replicated, Category = "State", Meta = (AllowPrivateAccess))
 	float TargetTimeBetweenAnimations{ 0.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Replicated, Category = "State", Meta = (AllowPrivateAccess))
 	float IdleCounterTarget{ 0.0f };
 
 	FTimerHandle IdleCounterTimerHandle;
@@ -76,12 +69,6 @@ public:
 	FTimerHandle CameraRotationTimerHandle;
 	FTimerDelegate CameraRotationTimerDelegate;
 	FVector CameraOffset{ FVector::ZeroVector };
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
-	bool ShouldIdle();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	UALSXTIdleAnimationSettings* SelectIdleSettings();
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	bool IsPlayerIdle();

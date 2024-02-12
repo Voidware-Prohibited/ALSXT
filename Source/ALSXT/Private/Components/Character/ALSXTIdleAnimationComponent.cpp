@@ -3,6 +3,7 @@
 #include "Components/Character/ALSXTIdleAnimationComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTIdleAnimationComponentInterface.h"
 
 // Sets default values for this component's properties
 UALSXTIdleAnimationComponent::UALSXTIdleAnimationComponent()
@@ -34,11 +35,9 @@ void UALSXTIdleAnimationComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Character = Cast<AALSXTCharacter>(GetOwner());
-	// if (Character && Character->GetLocalRole() == ROLE_SimulatedProxy && Character->GetRemoteRole() == ROLE_Authority)
-	if (Character)
+	// if (GetOwner() && GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+	if (GetOwner())
 	{
-		Camera = Character->Camera;
 		StartIdleCounterTimer();
 	}
 }
@@ -48,16 +47,11 @@ void UALSXTIdleAnimationComponent::BeginPlay()
 void UALSXTIdleAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	StatusState = IALSXTCharacterInterface::Execute_GetStatusState(Character);
+	StatusState = IALSXTCharacterInterface::Execute_GetStatusState(GetOwner());
 	if (IsValid(CurrentIdleMontage) && !IsPlayerInputIdle())
 	{
 		StopIdle();
 	}
-}
-
-UALSXTIdleAnimationSettings* UALSXTIdleAnimationComponent::SelectIdleSettings_Implementation()
-{
-	return nullptr;
 }
 
 bool UALSXTIdleAnimationComponent::IsPlayerIdle()
@@ -72,14 +66,14 @@ void UALSXTIdleAnimationComponent::SetPlayerIdle(bool NewIdle)
 
 bool UALSXTIdleAnimationComponent::IsPlayerInputIdle()
 {
-	bool bIsInputIdle = (Character->GetVelocity().Size() == 0.0) && (Character->GetControlRotation() == PreviousControlRotation);
-	PreviousControlRotation = Character->GetControlRotation();
+	bool bIsInputIdle = (GetOwner()->GetVelocity().Size() == 0.0) && (IALSXTCharacterInterface::Execute_GetCharacterControlRotation(GetOwner()) == PreviousControlRotation);
+	PreviousControlRotation = IALSXTCharacterInterface::Execute_GetCharacterControlRotation(GetOwner());
 	return bIsInputIdle;
 }
 
 TArray<FIdleAnimation> UALSXTIdleAnimationComponent::SelectIdleAnimations(const FGameplayTag& Sex, const FGameplayTag& Stance, const FGameplayTag& Overlay, const FGameplayTag& Injury, const FGameplayTag& CombatStance)
 {
-	UALSXTIdleAnimationSettings* Settings = SelectIdleSettings();
+	UALSXTIdleAnimationSettings* Settings = IALSXTIdleAnimationComponentInterface::Execute_SelectIdleSettings(GetOwner());
 	TArray<FIdleAnimation> Animations = Settings->IdleAnimations;
 	FGameplayTagContainer TagsContainer;
 	TArray<FIdleAnimation> SelectedAnimations;
@@ -190,7 +184,7 @@ void UALSXTIdleAnimationComponent::StartIdleCounterTimer()
 
 void UALSXTIdleAnimationComponent::IdleCounterTimer()
 {
-	if (Character->GetRemoteRole() == ROLE_SimulatedProxy)
+	if (GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
 	{
 		return;
 	}
@@ -199,7 +193,7 @@ void UALSXTIdleAnimationComponent::IdleCounterTimer()
 	{
 		IdleCounterCurrent = IdleCounterCurrent + 0.01;
 		
-		if (IdleCounterCurrent >= IdleCounterTarget && IdleAnimationSettings.EligibleStaminaLevels.HasTag(StatusState.CurrentStaminaTag) && ShouldIdle())
+		if (IdleCounterCurrent >= IdleCounterTarget && IdleAnimationSettings.EligibleStaminaLevels.HasTag(StatusState.CurrentStaminaTag) && IALSXTIdleAnimationComponentInterface::Execute_ShouldIdle(GetOwner()))
 		{
 			GetWorld()->GetTimerManager().ClearTimer(DelayBetweenAnimationsTimerHandle);
 			ResetIdleCounterTimer();
@@ -231,7 +225,7 @@ void UALSXTIdleAnimationComponent::StartDelayBetweenAnimationsTimer(float Initia
 
 void UALSXTIdleAnimationComponent::DelayBetweenAnimationsTimer()
 {
-	if (Character->GetRemoteRole() == ROLE_SimulatedProxy)
+	if (GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
 	{
 		return;
 	}
@@ -239,7 +233,7 @@ void UALSXTIdleAnimationComponent::DelayBetweenAnimationsTimer()
 	if (IsPlayerInputIdle())
 	{
 		CurrentTimeBetweenAnimations = CurrentTimeBetweenAnimations + 0.01;
-		if (CurrentTimeBetweenAnimations >= TargetTimeBetweenAnimations && ShouldIdle())
+		if (CurrentTimeBetweenAnimations >= TargetTimeBetweenAnimations && IALSXTIdleAnimationComponentInterface::Execute_ShouldIdle(GetOwner()))
 		{
 			ResetDelayBetweenAnimationsTimer();
 			StartIdle();
@@ -279,12 +273,12 @@ void UALSXTIdleAnimationComponent::ResetCameraRotationTimer()
 void UALSXTIdleAnimationComponent::StartIdle()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "StartIdle");
-	TArray<FIdleAnimation> SelectedAnimations = SelectIdleAnimations(Character->GetDesiredSex(), Character->GetStance(), Character->GetOverlayMode(), ALSXTInjuryTags::None, Character->GetDesiredCombatStance());
+	TArray<FIdleAnimation> SelectedAnimations = SelectIdleAnimations(IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterInjury(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()));
 	SetNewAnimation(GetNewIdleAnimation(SelectedAnimations), 1);
 	float MontageLength {0.0f};
 	if (IsValid(CurrentIdleMontage))
 	{
-		Character->GetMesh()->GetAnimInstance()->Montage_Play(CurrentIdleMontage, 1.0f);
+		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetAnimInstance()->Montage_Play(CurrentIdleMontage, 1.0f);
 		MontageLength = CurrentIdleMontage->GetPlayLength();
 	}
 	GetWorld()->GetTimerManager().ClearTimer(IdleCounterTimerHandle);
@@ -296,7 +290,7 @@ void UALSXTIdleAnimationComponent::StopIdle()
 {
 	if (IsValid(CurrentIdleMontage))
 	{
-		Character->GetMesh()->GetAnimInstance()->Montage_Stop(0.5f, CurrentIdleMontage);
+		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetAnimInstance()->Montage_Stop(0.5f, CurrentIdleMontage);
 		SetPlayerIdle(false);
 	}
 }

@@ -8,6 +8,7 @@
 #include "Components/Mesh/ALSXTPaintableSkeletalMeshComponent.h"
 #include "Components/Mesh/ALSXTPaintableStaticMeshComponent.h"
 #include "Components/Character/ALSXTCharacterCustomizationComponent.h"
+#include "Components/Character/ALSXTIdleAnimationComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "CineCameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -154,7 +155,7 @@ public:
 	TObjectPtr<USceneComponent> PhysicsConstraints;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TObjectPtr<USceneCaptureComponent2D> MeshPaintingSceneCaptureComponent;
+	TObjectPtr<USceneCaptureComponent2D> MeshPaintingSceneCapture;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UBoxComponent> AimAnimationHelperBox;
@@ -168,6 +169,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UPhysicalAnimationComponent* PhysicalAnimation;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	class UALSXTIdleAnimationComponent* IdleAnimation;
+
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
 	TObjectPtr<UALSXTPaintableSkeletalMeshComponent> ALSXTMesh;
@@ -179,6 +183,22 @@ protected:
 	int32 VaultingRootMotionSourceId;
 
 public:
+	virtual USkeletalMeshComponent* GetCharacterMesh_Implementation() const override;
+
+	virtual FGameplayTag GetCharacterSex_Implementation() const override;
+
+	virtual FGameplayTag GetCharacterStance_Implementation() const override;
+
+	virtual FGameplayTag GetCharacterOverlayMode_Implementation() const override;
+
+	virtual FGameplayTag GetCharacterCombatStance_Implementation() const override;
+
+	virtual FGameplayTag GetCharacterInjury_Implementation() const override;
+
+	virtual UAlsCameraComponent* GetCharacterCamera_Implementation() const override;
+
+	virtual FRotator GetCharacterControlRotation_Implementation() const override;
+
 	virtual FALSXTGlobalGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings_Implementation() const override;
 
 	virtual USceneCaptureComponent2D* GetSceneCaptureComponent_Implementation() const override;
@@ -704,9 +724,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputAction> SlideAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
-	TObjectPtr<UInputAction> AcrobaticAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputAction> SwitchTargetLeftAction;

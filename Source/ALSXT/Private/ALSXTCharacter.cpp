@@ -15,6 +15,7 @@
 #include "Net/Core/PushModel/PushModel.h"
 #include "Components/SceneComponent.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
+#include "Components/Character/ALSXTIdleAnimationComponent.h"
 #include "Settings/ALSXTCharacterSettings.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTCombatSettings.h"
@@ -71,12 +72,14 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Head->bCastDynamicShadow = true;
 	Head->bAffectDynamicIndirectLighting = true;
 	Head->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Head->SetLeaderPoseComponent(GetMesh());
 
 	HeadDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Head Dummy Shadow"));
 	HeadDummyShadow->SetupAttachment(BodyParts);
 	HeadDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	HeadDummyShadow->SetHiddenInGame(true);
 	HeadDummyShadow->bCastHiddenShadow = true;
+	HeadDummyShadow->SetLeaderPoseComponent(GetMesh());
 
 	Hair = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Hair"));
 	Hair->SetupAttachment(BodyParts);
@@ -89,12 +92,14 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Hair->bCastDynamicShadow = true;
 	Hair->bAffectDynamicIndirectLighting = true;
 	Hair->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Hair->SetLeaderPoseComponent(GetMesh());
 
 	HairDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hair Dummy Shadow"));
 	HairDummyShadow->SetupAttachment(BodyParts);
 	HairDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	HairDummyShadow->SetHiddenInGame(true);
 	HairDummyShadow->bCastHiddenShadow = true;
+	HairDummyShadow->SetLeaderPoseComponent(GetMesh());
 
 	FacialHair = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Facial Hair"));
 	FacialHair->SetupAttachment(BodyParts);
@@ -107,12 +112,14 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	FacialHair->bCastDynamicShadow = true;
 	FacialHair->bAffectDynamicIndirectLighting = true;
 	FacialHair->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	FacialHair->SetLeaderPoseComponent(GetMesh());
 
 	FacialHairDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Facial Hair Dummy Shadow"));
 	FacialHairDummyShadow->SetupAttachment(BodyParts);
 	FacialHairDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	FacialHairDummyShadow->SetHiddenInGame(true);
 	FacialHairDummyShadow->bCastHiddenShadow = true;
+	FacialHairDummyShadow->SetLeaderPoseComponent(GetMesh());
 
 	Headwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Headwear"));
 	Headwear->SetupAttachment(ClothingSlots);
@@ -125,12 +132,14 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Headwear->bCastDynamicShadow = true;
 	Headwear->bAffectDynamicIndirectLighting = true;
 	Headwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Headwear->SetLeaderPoseComponent(GetMesh());
 
 	HeadwearDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Headwear Dummy Shadow"));
 	HeadwearDummyShadow->SetupAttachment(ClothingSlots);
 	HeadwearDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	HeadwearDummyShadow->SetHiddenInGame(true);
 	HeadwearDummyShadow->bCastHiddenShadow = true;
+	HeadwearDummyShadow->SetLeaderPoseComponent(GetMesh());
 
 	Facewear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Facewear"));
 	Facewear->SetupAttachment(ClothingSlots);
@@ -143,12 +152,14 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Facewear->bCastDynamicShadow = true;
 	Facewear->bAffectDynamicIndirectLighting = true;
 	Facewear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Facewear->SetLeaderPoseComponent(GetMesh());
 
 	FacewearDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Facewear Dummy Shadow"));
 	FacewearDummyShadow->SetupAttachment(ClothingSlots);
 	FacewearDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	FacewearDummyShadow->SetHiddenInGame(true);
 	FacewearDummyShadow->bCastHiddenShadow = true;
+	FacewearDummyShadow->SetLeaderPoseComponent(GetMesh());
 	
 	Eyewear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Eyewear"));
 	Eyewear->SetupAttachment(ClothingSlots);
@@ -161,12 +172,14 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Eyewear->bCastDynamicShadow = true;
 	Eyewear->bAffectDynamicIndirectLighting = true;
 	Eyewear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Eyewear->SetLeaderPoseComponent(GetMesh());
 
 	EyewearDummyShadow = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Eyewear Dummy Shadow"));
 	EyewearDummyShadow->SetupAttachment(ClothingSlots);
 	EyewearDummyShadow->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	EyewearDummyShadow->SetHiddenInGame(true);
 	EyewearDummyShadow->bCastHiddenShadow = true;
+	EyewearDummyShadow->SetLeaderPoseComponent(GetMesh());
 	
 	Earwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Earwear"));
 	Earwear->SetupAttachment(ClothingSlots);
@@ -179,6 +192,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Earwear->bCastDynamicShadow = true;
 	Earwear->bAffectDynamicIndirectLighting = true;
 	Earwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Earwear->SetLeaderPoseComponent(GetMesh());
 	
 	BottomUnderwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Bottom Underwear"));
 	BottomUnderwear->SetupAttachment(ClothingSlots);
@@ -191,6 +205,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	BottomUnderwear->bCastDynamicShadow = true;
 	BottomUnderwear->bAffectDynamicIndirectLighting = true;
 	BottomUnderwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	BottomUnderwear->SetLeaderPoseComponent(GetMesh());
 	
 	TopUnderwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top Underwear"));
 	TopUnderwear->SetupAttachment(ClothingSlots);
@@ -203,6 +218,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	TopUnderwear->bCastDynamicShadow = true;
 	TopUnderwear->bAffectDynamicIndirectLighting = true;
 	TopUnderwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	TopUnderwear->SetLeaderPoseComponent(GetMesh());
 	
 	Bottom = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Bottom"));
 	Bottom->SetupAttachment(ClothingSlots);
@@ -215,6 +231,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Bottom->bCastDynamicShadow = true;
 	Bottom->bAffectDynamicIndirectLighting = true;
 	Bottom->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Bottom->SetLeaderPoseComponent(GetMesh());
 	
 	Top = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top"));
 	Top->SetupAttachment(ClothingSlots);
@@ -227,6 +244,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Top->bCastDynamicShadow = true;
 	Top->bAffectDynamicIndirectLighting = true;
 	Top->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Top->SetLeaderPoseComponent(GetMesh());
 	
 	TopJacket = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top Jacket"));
 	TopJacket->SetupAttachment(ClothingSlots);
@@ -239,6 +257,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	TopJacket->bCastDynamicShadow = true;
 	TopJacket->bAffectDynamicIndirectLighting = true;
 	TopJacket->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	TopJacket->SetLeaderPoseComponent(GetMesh());
 	
 	TopVest = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Top Vest"));
 	TopVest->SetupAttachment(ClothingSlots);
@@ -251,7 +270,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	TopVest->bCastDynamicShadow = true;
 	TopVest->bAffectDynamicIndirectLighting = true;
 	TopVest->PrimaryComponentTick.TickGroup = TG_PrePhysics;
-	TopVest->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	TopVest->SetLeaderPoseComponent(GetMesh());
 	
 	Gloves = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Gloves"));
 	Gloves->SetupAttachment(ClothingSlots);
@@ -264,6 +283,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Gloves->bCastDynamicShadow = true;
 	Gloves->bAffectDynamicIndirectLighting = true;
 	Gloves->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Gloves->SetLeaderPoseComponent(GetMesh());
 	
 	Footwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Footwear"));
 	Footwear->SetupAttachment(ClothingSlots);
@@ -276,6 +296,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Footwear->bCastDynamicShadow = true;
 	Footwear->bAffectDynamicIndirectLighting = true;
 	Footwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Footwear->SetLeaderPoseComponent(GetMesh());
 
 	OverlaySkeletalMesh = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Overlay Skeletal Mesh"));
 	OverlaySkeletalMesh->SetupAttachment(GetMesh());
@@ -302,12 +323,12 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	PhysicsConstraints = CreateDefaultSubobject<USceneComponent>(TEXT("Physics Constraints"));
 	PhysicsConstraints->SetupAttachment(this->RootComponent);
 
-	MeshPaintingSceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Mesh Painting Scene Capture Component"));
-	MeshPaintingSceneCaptureComponent->SetupAttachment(GetMesh());
-	MeshPaintingSceneCaptureComponent->SetRelativeRotation_Direct({ -90.0f, 90.0f, 0.0f });
-	MeshPaintingSceneCaptureComponent->SetRelativeLocation_Direct({ 0.0f, 0.0f, 250.0f });
-	MeshPaintingSceneCaptureComponent->ProjectionType = ECameraProjectionMode::Orthographic;
-	MeshPaintingSceneCaptureComponent->CompositeMode = ESceneCaptureCompositeMode::SCCM_Additive;
+	MeshPaintingSceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Mesh Painting Scene Capture"));
+	MeshPaintingSceneCapture->SetupAttachment(GetMesh());
+	MeshPaintingSceneCapture->SetRelativeRotation_Direct({ -90.0f, 90.0f, 0.0f });
+	MeshPaintingSceneCapture->SetRelativeLocation_Direct({ 0.0f, 0.0f, 250.0f });
+	MeshPaintingSceneCapture->ProjectionType = ECameraProjectionMode::Orthographic;
+	MeshPaintingSceneCapture->CompositeMode = ESceneCaptureCompositeMode::SCCM_Additive;
 
 	AimAnimationHelperBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Aim Animation Helper Box"));
 	AimAnimationHelperBox->SetupAttachment(this->RootComponent);
@@ -321,12 +342,16 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());
 	ALSXTMesh = Cast<UALSXTPaintableSkeletalMeshComponent>(GetMesh());
 
+	CharacterCustomization = CreateDefaultSubobject<UALSXTCharacterCustomizationComponent>(TEXT("Character Customization"));
+	AddOwnedComponent(CharacterCustomization);
+
 	// Add Physical Animation Component
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
 	AddOwnedComponent(PhysicalAnimation);
 
-	CharacterCustomization = CreateDefaultSubobject<UALSXTCharacterCustomizationComponent>(TEXT("Character Customization"));
-	AddOwnedComponent(CharacterCustomization);
+	// Add Idle Animation Component
+	IdleAnimation = CreateDefaultSubobject<UALSXTIdleAnimationComponent>(TEXT("Idle Animation"));
+	AddOwnedComponent(IdleAnimation);
 }
 
 void AALSXTCharacter::Tick(const float DeltaTime)
@@ -494,6 +519,11 @@ void AALSXTCharacter::InputLookMouse(const FInputActionValue& ActionValue)
 {
 	const auto Value{ActionValue.Get<FVector2D>()};
 
+	if (Value.Length() > 0.0)
+	{
+		IdleAnimation->ResetIdleCounterTimer();
+	}
+
 	AddControllerPitchInput(Value.Y * LookUpMouseSensitivity);
 	PreviousLookInput.Y = Value.Y;
 	AddControllerYawInput(Value.X * LookRightMouseSensitivity);
@@ -503,7 +533,10 @@ void AALSXTCharacter::InputLookMouse(const FInputActionValue& ActionValue)
 void AALSXTCharacter::InputLook(const FInputActionValue& ActionValue)
 {
 	const auto Value{ActionValue.Get<FVector2D>()};
-
+	if (Value.Length() > 0.0)
+	{
+		IdleAnimation->ResetIdleCounterTimer();
+	}
 	AddControllerPitchInput(Value.Y * LookUpRate * GetWorld()->GetDeltaSeconds());
 	AddControllerYawInput(Value.X * LookRightRate * GetWorld()->GetDeltaSeconds());
 }
@@ -513,6 +546,12 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 	if (GetDesiredStatus() == ALSXTStatusTags::Normal && bMovementEnabled)
 	{
 		const auto Value{ UAlsMath::ClampMagnitude012D(ActionValue.Get<FVector2D>()) };
+
+		if (Value.Length() > 0.0)
+		{
+			IdleAnimation->ResetIdleCounterTimer();
+		}
+
 		FRotator CapsuleRotation = GetActorRotation();
 		const auto ForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw)) };
 		const auto RightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(ForwardDirection) };
@@ -557,6 +596,7 @@ void AALSXTCharacter::InputWalk()
 
 void AALSXTCharacter::InputCrouch()
 {
+	IdleAnimation->ResetIdleCounterTimer();
 	if (GetDesiredStance() == AlsStanceTags::Standing)
 	{
 		if (CanSlide())
@@ -583,6 +623,7 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 	{
 		if (ActionValue.Get<bool>())
 		{
+			IdleAnimation->ResetIdleCounterTimer();
 			if (StopRagdolling())
 			{
 				return;
@@ -626,6 +667,7 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 		if (ActionValue.Get<bool>())
 		{
 			SetDesiredRotationMode(AlsRotationModeTags::Aiming);
+			IdleAnimation->ResetIdleCounterTimer();
 			if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Ready)
 			{
 				SetDesiredCombatStance(ALSXTCombatStanceTags::Aiming);
@@ -667,6 +709,7 @@ void AALSXTCharacter::InputRagdoll()
 {
 	if (!StopRagdolling())
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		StartRagdolling();
 	}
 }
@@ -676,6 +719,7 @@ void AALSXTCharacter::InputRoll()
 	static constexpr auto PlayRate{ 1.3f };
 	if(CanRoll() && bMovementEnabled)
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		StartRolling(PlayRate);
 	}
 }
@@ -694,6 +738,7 @@ void AALSXTCharacter::InputViewMode()
 	DesiredViewMode == (GetViewMode() == AlsViewModeTags::ThirdPerson ? AlsViewModeTags::FirstPerson : AlsViewModeTags::ThirdPerson);
 	if (CanSetToViewMode(DesiredViewMode)) 
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		SetViewMode(GetViewMode() == AlsViewModeTags::ThirdPerson ? AlsViewModeTags::FirstPerson : AlsViewModeTags::ThirdPerson);
 		OnViewModeChanged(PreviousViewMode);
 	}
@@ -702,6 +747,7 @@ void AALSXTCharacter::InputViewMode()
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AALSXTCharacter::InputSwitchShoulder()
 {
+	IdleAnimation->ResetIdleCounterTimer();
 	Camera->SetRightShoulder(!Camera->IsRightShoulder());
 }
 
@@ -732,6 +778,7 @@ void AALSXTCharacter::InputSwitchGripPosition()
 {
 	if (CanSwitchGripPosition())
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
 	}
 }
@@ -740,6 +787,7 @@ void AALSXTCharacter::InputSwitchForegripPosition()
 {
 	if (CanSwitchForegripPosition())
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		FGameplayTagContainer AvailableForegripPositionsForOvelayObject = GetAvailableForegripPositionsForOvelayObject();
 		TArray<FGameplayTag> AvailableForegripPositionsForOvelayObjectArray;
 		AvailableForegripPositionsForOvelayObject.GetGameplayTagArray(AvailableForegripPositionsForOvelayObjectArray);
@@ -847,7 +895,7 @@ FALSXTGlobalGeneralMeshPaintingSettings AALSXTCharacter::GetGlobalGeneralMeshPai
 
 USceneCaptureComponent2D* AALSXTCharacter::GetSceneCaptureComponent_Implementation() const
 {
-	return MeshPaintingSceneCaptureComponent;
+	return MeshPaintingSceneCapture;
 }
 
 void AALSXTCharacter::GetElementalCondition_Implementation(USceneComponent* Component, FGameplayTag& ElementalCondition) const
@@ -2790,3 +2838,43 @@ void AALSXTCharacter::AIObstacleTrace_Implementation() {}
 void AALSXTCharacter::StartVault_Implementation() {}
 void AALSXTCharacter::StartWallrun_Implementation() {}
 void AALSXTCharacter::OnWeaponReadyPositionChanged_Implementation(const FGameplayTag& PreviousWeaponReadyPositionTag) {}
+
+USkeletalMeshComponent* AALSXTCharacter::GetCharacterMesh_Implementation() const
+{
+	return GetMesh();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterSex_Implementation() const
+{
+	return GetDesiredSex();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterStance_Implementation() const
+{
+	return GetDesiredStance();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterOverlayMode_Implementation() const
+{
+	return GetOverlayMode();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterCombatStance_Implementation() const
+{
+	return GetDesiredCombatStance();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterInjury_Implementation() const
+{
+	return GetDesiredInjury();
+}
+
+UAlsCameraComponent* AALSXTCharacter::GetCharacterCamera_Implementation() const
+{
+	return Camera;
+}
+
+FRotator AALSXTCharacter::GetCharacterControlRotation_Implementation() const
+{
+	return GetControlRotation();
+}

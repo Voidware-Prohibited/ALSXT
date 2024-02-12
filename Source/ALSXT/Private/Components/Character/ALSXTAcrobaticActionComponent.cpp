@@ -1,6 +1,7 @@
 // MIT
 
 #include "Components/Character/ALSXTAcrobaticActionComponent.h"
+#include "Interfaces/ALSXTAcrobaticActionComponentInterface.h"
 #include "Components/CapsuleComponent.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -36,7 +37,7 @@ void UALSXTAcrobaticActionComponent::TickComponent(float DeltaTime, ELevelTick T
 
 void UALSXTAcrobaticActionComponent::TryAcrobaticAction()
 {
-	if (!GeneralAcrobaticActionSettings.bAcrobaticActions || Character->GetLocomotionMode() == AlsLocomotionModeTags::Grounded)
+	if (!GeneralAcrobaticActionSettings.bAcrobaticActions || !IALSXTAcrobaticActionComponentInterface::Execute_GetAcrobaticActionSettings(Character)->bAcrobaticActions || Character->GetLocomotionMode() == AlsLocomotionModeTags::Grounded || Character->GetLocomotionAction() != AlsLocomotionActionTags::Acrobatic)
 	{
 		return;
 	}
@@ -53,11 +54,11 @@ void UALSXTAcrobaticActionComponent::TryAcrobaticAction()
 	{
 		BeginFlip();
 	}
-	else if (AcrobaticActionType == ALSXTAcrobaticActionTypeTags::WallJump)
+	else if (AcrobaticActionType == ALSXTAcrobaticActionTypeTags::WallJump && GeneralAcrobaticActionSettings.bEnableWallJump && IALSXTAcrobaticActionComponentInterface::Execute_GetAcrobaticActionSettings(Character)->bEnableWallJump)
 	{
 		BeginWallJump();
 	}
-	else if (AcrobaticActionType == ALSXTAcrobaticActionTypeTags::WallRun)
+	else if (AcrobaticActionType == ALSXTAcrobaticActionTypeTags::WallRun && GeneralAcrobaticActionSettings.bEnableWallRun && IALSXTAcrobaticActionComponentInterface::Execute_GetAcrobaticActionSettings(Character)->bEnableWallRun)
 	{
 		BeginWallRun();
 	}
@@ -169,15 +170,15 @@ void UALSXTAcrobaticActionComponent::MulticastBeginFlip_Implementation()
 
 	if (Direction < 0.0)
 	{
-		Character->GetMesh()->GetAnimInstance()->Montage_Play(GeneralAcrobaticActionSettings.BackflipMontage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f, false);
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(IALSXTAcrobaticActionComponentInterface::Execute_GetAcrobaticActionSettings(Character)->BackflipMontage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f, false);
 	}	
 	else if (Velocity < GeneralAcrobaticActionSettings.MaximumVelocityForBackflip)
 	{
-		Character->GetMesh()->GetAnimInstance()->Montage_Play(GeneralAcrobaticActionSettings.BackflipMontage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f, false);
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(IALSXTAcrobaticActionComponentInterface::Execute_GetAcrobaticActionSettings(Character)->BackflipMontage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f, false);
 	}
 	else
 	{
-		Character->GetMesh()->GetAnimInstance()->Montage_Play(GeneralAcrobaticActionSettings.FlipMontage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f, false);
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(IALSXTAcrobaticActionComponentInterface::Execute_GetAcrobaticActionSettings(Character)->FlipMontage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f, false);
 	}	
 }
 
