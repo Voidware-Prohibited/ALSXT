@@ -6,8 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "NativeGameplayTags.h"
 #include "Components/AudioComponent.h"
-#include "ALSXTCharacter.h"
-#include "AlsCharacter.h"
 #include "Utility/ALSXTStructs.h"
 #include "Settings/ALSXTCharacterSoundSettings.h"
 #include "Components/AudioComponent.h"
@@ -57,12 +55,6 @@ private:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
-	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
-
-	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
-	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	FALSXTCharacterBreathEffectsSettings BreathParticleSettings;

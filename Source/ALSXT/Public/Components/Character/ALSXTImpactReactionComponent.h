@@ -5,8 +5,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Utility/ALSXTStructs.h"
-#include "ALSXTCharacter.h"
-#include "AlsCharacter.h"
 #include "Animation/AnimInstance.h"
 #include "Chaos/ChaosEngineInterface.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -100,15 +98,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
-	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	UCapsuleComponent* CharacterCapsule{ nullptr };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	UAnimInstance* AnimInstance{ nullptr };
 
-	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 	FALSXTImpactReactionParameters ImpactReactionParameters;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))

@@ -132,7 +132,7 @@ struct ALSXT_API FImpactHistoryEntry
 	AActor* Actor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
-	double Time;
+	double Time {0.0f};
 
 	bool operator==(const FImpactHistoryEntry& other) const
 	{
@@ -806,10 +806,10 @@ struct ALSXT_API FALSXTCharacterVoiceParameters
 	FGameplayTag Variant;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (ClampMin=0.5f, ClampMax=1.5f, AllowPrivateAccess))
-	float Speed;
+	float Speed {1.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (ClampMin = 0.5f, ClampMax = 1.5f, AllowPrivateAccess))
-	float Pitch;
+	float Pitch {1.0f};
 };
 
 USTRUCT(BlueprintType)
@@ -818,10 +818,10 @@ struct ALSXT_API FALSXTCharacterEyeParameters
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
-	FVector EyeColor;
+	FVector EyeColor {FVector(ForceInit)};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
-	FVector EyeColor2;
+	FVector EyeColor2 {FVector(ForceInit)};
 };
 
 USTRUCT(BlueprintType)
@@ -830,10 +830,10 @@ struct ALSXT_API FALSXTCharacterSkinParameters
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
-	FVector SkinColor;
+	FVector SkinColor {FVector(ForceInit)};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
-	FVector SkinColor2;
+	FVector SkinColor2 {FVector(ForceInit)};
 };
 
 USTRUCT(BlueprintType)
@@ -845,10 +845,10 @@ struct ALSXT_API FALSXTCharacterHairParameters
 	FString HairStyleID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
-	FVector HairColor1;
+	FVector HairColor1 {FVector(ForceInit)};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
-	FVector HairColor2;
+	FVector HairColor2 {FVector(ForceInit)};
 };
 
 USTRUCT(BlueprintType)
@@ -860,7 +860,7 @@ struct ALSXT_API FALSXTCharacterMorphParameter
 	FName MorphName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
-	float Value;
+	float Value {0.0f};
 
 	bool operator==(const FALSXTCharacterMorphParameter& other) const
 	{
@@ -1269,7 +1269,7 @@ struct ALSXT_API FALSXTResponseVocalization
 	FGameplayTagContainer Health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	bool Mature;
+	bool Mature {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FALSXTCharacterSound ResponseVocalization;

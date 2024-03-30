@@ -53,12 +53,12 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 	const auto* Character{Cast<AAlsCharacter>(Mesh->GetOwner())};
 	AALSXTCharacter* ALSXTCharacter{Cast<AALSXTCharacter>(Mesh->GetOwner())};
 
-	if (bSkipEffectsWhenInAir && IsValid(ALSXTCharacter) && ALSXTCharacter->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
+	if (bSkipEffectsWhenInAir && IsValid(ALSXTCharacter) && IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(Mesh->GetOwner()) == AlsLocomotionModeTags::InAir)
 	{
 		return;
 	}
 
-	const auto CapsuleScale{IsValid(ALSXTCharacter) ? ALSXTCharacter->GetCapsuleComponent()->GetComponentScale().Z : 1.0f};
+	const auto CapsuleScale{IsValid(ALSXTCharacter) ? IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(Mesh->GetOwner())->GetComponentScale().Z : 1.0f};
 
 	const auto* World{Mesh->GetWorld()};
 	const auto* AnimationInstance{Mesh->GetAnimInstance()};

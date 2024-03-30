@@ -121,7 +121,7 @@ void UALSXTAcrobaticActionComponent::DetermineAcrobaticActionType(FGameplayTag& 
 		return;
 	}
 	
-	if ((ForwardHit & (!RightHit && !LeftHit)) && (Velocity > GeneralAcrobaticActionSettings.MinimumSpeedForWallJump) && CanWallJump())
+	if ((ForwardHit & (!RightHit && !LeftHit)) && (Velocity > GeneralAcrobaticActionSettings.MinimumSpeedForWallJump) && IALSXTAcrobaticActionComponentInterface::Execute_CanWallJump(GetOwner()))
 	{
 		AcrobaticActionType = ALSXTAcrobaticActionTypeTags::WallJump;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Wall Jump");
@@ -129,13 +129,13 @@ void UALSXTAcrobaticActionComponent::DetermineAcrobaticActionType(FGameplayTag& 
 
 	}
 	
-	if ((LeftHit || (LeftHit && ForwardHit)) && (Velocity > GeneralAcrobaticActionSettings.MinimumSpeedForWallRun) && CanWallRun())
+	if ((LeftHit || (LeftHit && ForwardHit)) && (Velocity > GeneralAcrobaticActionSettings.MinimumSpeedForWallRun) && IALSXTAcrobaticActionComponentInterface::Execute_CanWallRun(GetOwner()))
 	{
 		AcrobaticActionType = ALSXTAcrobaticActionTypeTags::WallRunLeft;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Wall Run Left");
 	}
 
-	if ((RightHit || (RightHit && ForwardHit)) && (Velocity > GeneralAcrobaticActionSettings.MinimumSpeedForWallRun) && CanWallRun())
+	if ((RightHit || (RightHit && ForwardHit)) && (Velocity > GeneralAcrobaticActionSettings.MinimumSpeedForWallRun) && IALSXTAcrobaticActionComponentInterface::Execute_CanWallRun(GetOwner()))
 	{
 		AcrobaticActionType = ALSXTAcrobaticActionTypeTags::WallRunRight;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Wall Run Right");

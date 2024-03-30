@@ -46,6 +46,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Parameters")
 	void GetActorPhysicsDamageInfo(FGameplayTag& DamageType, float& PhysicsBaseDamage, float& PhysicsDamageFrequency);
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|State")
+	bool Blocking();
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
 	bool CanReact();
 
@@ -60,6 +63,33 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
 	bool CanReceiveImpulse();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool CanReceiveSpecialAttacks();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool CanReceiveUniqueAttacks();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool CanBeGrappled();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool CanBeThrown();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool CanBeRagdolled();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool CanBeTakenDown();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool CanBeKnockedDown();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool WillDamageKnockDownPlayer(float Damage);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool WillDamageKillPlayer(float Damage);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
 	bool ShouldSpawnParticleActor();
@@ -114,5 +144,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Hooks")
 	void OnActorImpactCollision(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Hooks")
+	FGameplayTag GetCharacterPhysicalAnimationMode();
 	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Hooks")
+	void SetCharacterPhysicalAnimationMode(const FGameplayTag& PhysicalAnimationmode, FName BelowBoneName);
 };

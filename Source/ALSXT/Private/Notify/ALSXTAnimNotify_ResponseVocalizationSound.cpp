@@ -29,14 +29,14 @@ void UALSXTAnimNotify_ResponseVocalizationSound::Notify(USkeletalMeshComponent* 
 	const auto* World{ Mesh->GetWorld() };
 	const auto* Character{ Cast<AAlsCharacter>(Mesh->GetOwner()) };
 	AALSXTCharacter* ALSXTCharacter{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
-	FGameplayTag Status{ IALSXTCharacterInterface::Execute_GetStatus(Mesh->GetOwner()) };
+	FGameplayTag Status{ IALSXTCharacterInterface::Execute_GetCharacterStatus(Mesh->GetOwner()) };
 
 	if (Status == ALSXTStatusTags::Dead)
 	{
 		return;
 	}
 
-	if (IsValid(ALSXTCharacter) && ALSXTCharacter->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
+	if (IsValid(ALSXTCharacter) && IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(Mesh->GetOwner()) == AlsLocomotionModeTags::InAir)
 	{
 		return;
 	}

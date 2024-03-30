@@ -32,7 +32,7 @@ void UALSXTAnimNotify_CharacterBreathEffects::Notify(USkeletalMeshComponent* Mes
 	const auto* World{ Mesh->GetWorld() };
 	if (World->WorldType != EWorldType::EditorPreview)
 	{
-		FGameplayTag Status{ IALSXTCharacterInterface::Execute_GetStatus(Mesh->GetOwner()) };
+		FGameplayTag Status{ IALSXTCharacterInterface::Execute_GetCharacterStatus(Mesh->GetOwner()) };
 		if (Status == ALSXTStatusTags::Dead)
 		{
 			return;

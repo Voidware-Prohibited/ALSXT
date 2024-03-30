@@ -43,7 +43,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 	const auto* Character{ Cast<AAlsCharacter>(Mesh->GetOwner()) };
 	AALSXTCharacter* ALSXTCharacter{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
 
-	if (IsValid(ALSXTCharacter) && ALSXTCharacter->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
+	if (IsValid(ALSXTCharacter) && IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(Mesh->GetOwner()) == AlsLocomotionModeTags::InAir)
 	{
 		return;
 	}

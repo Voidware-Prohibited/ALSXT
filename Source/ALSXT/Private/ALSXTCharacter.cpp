@@ -345,6 +345,12 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	CharacterCustomization = CreateDefaultSubobject<UALSXTCharacterCustomizationComponent>(TEXT("Character Customization"));
 	AddOwnedComponent(CharacterCustomization);
 
+	ImpactReaction = CreateDefaultSubobject<UALSXTImpactReactionComponent>(TEXT("Impact Reaction"));
+	AddOwnedComponent(ImpactReaction);
+
+	CharacterSound = CreateDefaultSubobject<UALSXTCharacterSoundComponent>(TEXT("Character Sound"));
+	AddOwnedComponent(CharacterSound);
+
 	// Add Physical Animation Component
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
 	AddOwnedComponent(PhysicalAnimation);
@@ -491,15 +497,11 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
 		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleCombatReady);
 		EnhancedInput->BindAction(PrimaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryAction);
-		EnhancedInput->BindAction(SecondaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryAction);
-		EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryInteraction);
-		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
+		EnhancedInput->BindAction(SecondaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryAction);	
 		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::InputBlock);
 		EnhancedInput->BindAction(HoldBreathAction, ETriggerEvent::Triggered, this, &ThisClass::InputHoldBreath);
 		EnhancedInput->BindAction(SwitchGripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchGripPosition);
 		EnhancedInput->BindAction(SwitchForegripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchForegripPosition);
-		EnhancedInput->BindAction(SelectEmoteAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectEmote);
-		EnhancedInput->BindAction(SelectGestureAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectGesture);
 		
 		OnSetupPlayerInputComponentUpdated.Broadcast();
 	}
@@ -2175,17 +2177,17 @@ void AALSXTCharacter::AttackCollisionTrace()
 					// Populate Hit
 					// 
 					
+					// Get Attack Physics
+					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
+					{
+						IALSXTCharacterInterface::Execute_GetCombatAttackPhysics(HitActor, HitActorAttackMass, HitActorAttackVelocity);
+					}
+
 					// Call OnActorAttackCollision on CollisionInterface
 					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
 					{
 						IALSXTCollisionInterface::Execute_GetActorVelocity(HitActor, HitActorVelocity);
 						IALSXTCollisionInterface::Execute_GetActorMass(HitActor, HitActorMass);
-					}
-
-					// Get Attack Physics
-					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
-					{
-						IALSXTCharacterInterface::Execute_GetCombatAttackPhysics(HitActor, HitActorAttackMass, HitActorAttackVelocity);
 					}
 
 					// TotalImpactEnergy = 50.0f + (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
@@ -2496,7 +2498,7 @@ void AALSXTCharacter::OnGripPositionChanged_Implementation(const FGameplayTag& P
 
 // ForegripPosition
 
-FName AALSXTCharacter::GetSocketNameForForegripPosition(const FGameplayTag& ForegripPositionTag)
+const FName AALSXTCharacter::GetSocketNameForForegripPosition(const FGameplayTag& ForegripPositionTag) const
 {
 	FForegripPositions ForegripPositions = ALSXTSettings->ForegripPosition.ForegripPositions;
 
@@ -2877,4 +2879,177 @@ UAlsCameraComponent* AALSXTCharacter::GetCharacterCamera_Implementation() const
 FRotator AALSXTCharacter::GetCharacterControlRotation_Implementation() const
 {
 	return GetControlRotation();
+}
+
+
+
+FALSXTPoseState AALSXTCharacter::GetCharacterPoseState_Implementation() const
+{
+	return GetALSXTPoseState();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterLocomotionMode_Implementation() const
+{
+	return GetLocomotionMode();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterGait_Implementation() const
+{
+	return GetDesiredGait();
+}
+
+FALSXTDefensiveModeState AALSXTCharacter::GetCharacterDefensiveModeState_Implementation() const
+{
+	return GetDefensiveModeState();
+}
+
+UCapsuleComponent* AALSXTCharacter::GetCharacterCapsuleComponent_Implementation() const
+{
+	return GetCapsuleComponent();
+}
+
+UAlsCharacterMovementComponent* AALSXTCharacter::GetCharacterMovementComponent_Implementation() const
+{
+	return ALSXTCharacterMovement;
+}
+
+bool AALSXTCharacter::IsBlocking_Implementation() const
+{
+	return IsBlocking();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterLocomotionAction_Implementation() const
+{
+	return GetLocomotionAction();
+}
+
+void AALSXTCharacter::SetCharacterLocomotionAction_Implementation(const FGameplayTag& NewLocomotionAction)
+{
+	SetLocomotionAction(NewLocomotionAction);
+}
+
+void AALSXTCharacter::ResetCharacterDefensiveModeState_Implementation()
+{
+	SetDefensiveMode(ALSXTDefensiveModeTags::None);
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterDefensiveMode_Implementation() const
+{
+	return GetDesiredDefensiveMode();
+}
+
+void AALSXTCharacter::SetCharacterDefensiveMode_Implementation(const FGameplayTag& NewDefensiveMode)
+{
+	SetDefensiveMode(NewDefensiveMode);
+}
+
+void AALSXTCharacter::SetCharacterStatus_Implementation(const FGameplayTag& NewStatus)
+{
+	SetDesiredStatus(NewStatus);
+}
+
+void AALSXTCharacter::SetCharacterDefensiveModeState_Implementation(FALSXTDefensiveModeState NewDefensiveModeState)
+{
+	SetDefensiveModeState(NewDefensiveModeState);
+}
+
+void AALSXTCharacter::SetCharacterMovementModeLocked_Implementation(bool NewLocked)
+{
+	SetMovementModeLocked(NewLocked);
+}
+
+void AALSXTCharacter::SetCharacterStance_Implementation(const FGameplayTag& NewStance)
+{
+	SetDesiredStance(NewStance);
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterFreelooking_Implementation() const
+{
+	return GetDesiredFreelooking();
+}
+
+
+FGameplayTag AALSXTCharacter::GetCharacterGesture_Implementation() const
+{
+	return GetDesiredGesture();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterGestureHand_Implementation() const
+{
+	return GetDesiredGestureHand();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterReloadingType_Implementation() const
+{
+	return GetDesiredReloadingType();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterForegripPosition_Implementation() const
+{
+	return GetDesiredForegripPosition();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterFirearmFingerAction_Implementation() const
+{
+	return GetDesiredFirearmFingerAction();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterFirearmFingerActionHand_Implementation() const
+{
+	return GetDesiredFirearmFingerActionHand();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterWeaponCarryPosition_Implementation() const
+{
+	return GetDesiredWeaponCarryPosition();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterFirearmSightLocation_Implementation() const
+{
+	return GetFirearmSightLocation();
+}
+
+FTransform AALSXTCharacter::GetCharacterCurrentForegripTransform_Implementation() const
+{
+	return GetCurrentForegripTransform();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterVaultType_Implementation() const
+{
+	return GetDesiredVaultType();
+}
+
+FALSXTAimState AALSXTCharacter::GetCharacterAimState_Implementation() const
+{
+	return GetAimState();
+}
+
+FALSXTFreelookState AALSXTCharacter::GetCharacterFreelookState_Implementation() const
+{
+	return GetFreelookState();
+}
+
+FALSXTHeadLookAtState AALSXTCharacter::GetCharacterHeadLookAtState_Implementation() const
+{
+	return GetHeadLookAtState();
+}
+
+bool AALSXTCharacter::DoesCharacterOverlayObjectUseLeftHandIK_Implementation() const
+{
+	return DoesOverlayObjectUseLeftHandIK();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterLocomotionVariant_Implementation() const
+{
+	return GetDesiredLocomotionVariant();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterHoldingBreath_Implementation() const
+{
+	return GetDesiredHoldingBreath();
+}
+
+UALSXTCharacterSettings* AALSXTCharacter::GetCharacterSettings_Implementation() const
+{
+	return ALSXTSettings;
 }

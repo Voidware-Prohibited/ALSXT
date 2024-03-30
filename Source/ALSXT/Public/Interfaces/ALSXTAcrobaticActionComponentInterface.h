@@ -15,4 +15,16 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Acrobatic Action Component Interface")
   UALSXTAcrobaticActionSettings* GetAcrobaticActionSettings();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Acrobatic Action Component Interface")
+  bool CanPerformAcrobaticAction();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Acrobatic Action Component Interface")
+  bool CanFlip();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Acrobatic Action Component Interface")
+  bool CanWallJump();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Acrobatic Action Component Interface")
+  bool CanWallRun();
 };

@@ -15,7 +15,7 @@ class ALSXT_API IALSXTHeadLookAtInterface {
 
 public:
 
-UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   bool CanHeadLookAt();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")

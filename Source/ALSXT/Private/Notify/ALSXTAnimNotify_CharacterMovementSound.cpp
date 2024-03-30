@@ -30,7 +30,7 @@ void UALSXTAnimNotify_CharacterMovementSound::Notify(USkeletalMeshComponent* Mes
 	const auto* Character{ Cast<AAlsCharacter>(Mesh->GetOwner()) };
 	AALSXTCharacter* ALSXTCharacter{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
 
-	if (IsValid(ALSXTCharacter) && ALSXTCharacter->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
+	if (IsValid(ALSXTCharacter) && IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(Mesh->GetOwner()) == AlsLocomotionModeTags::InAir)
 	{
 		return;
 	}

@@ -39,8 +39,11 @@ void UALSXTAnimationInstance::NativeBeginPlay()
 
 	ALS_ENSURE(IsValid(ALSXTSettings));
 	ALS_ENSURE(IsValid(ALSXTCharacter));
-	StaminaThresholdSettings = ALSXTCharacter->ALSXTSettings->StatusSettings.StaminaThresholdSettings;
-	CharacterBreathEffectsSettings = ALSXTCharacter->ALSXTSettings->BreathEffects;
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
+	{
+		StaminaThresholdSettings = IALSXTCharacterInterface::Execute_GetCharacterSettings(GetOwningActor())->StatusSettings.StaminaThresholdSettings;
+		CharacterBreathEffectsSettings = IALSXTCharacterInterface::Execute_GetCharacterSettings(GetOwningActor())->BreathEffects;
+	}
 }
 
 void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
@@ -53,48 +56,47 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		return;
 	}
 
-	RefreshALSXTPose();
-	Freelooking = ALSXTCharacter->GetDesiredFreelooking();
-	Sex = ALSXTCharacter->GetDesiredSex();
-	DefensiveMode = ALSXTCharacter->GetDesiredDefensiveMode();
-	LocomotionVariant = ALSXTCharacter->GetDesiredLocomotionVariant();
-	Injury = ALSXTCharacter->GetDesiredInjury();
-	CombatStance = ALSXTCharacter->GetDesiredCombatStance();
-	WeaponFirearmStance = ALSXTCharacter->GetDesiredWeaponFirearmStance();
-	WeaponReadyPosition = ALSXTCharacter->GetDesiredWeaponReadyPosition();
-	StationaryMode = ALSXTCharacter->GetStationaryMode();
-	HoldingBreath = ALSXTCharacter->GetHoldingBreath();
-	PhysicalAnimationMode = ALSXTCharacter->GetPhysicalAnimationMode();
-	Gesture = ALSXTCharacter->GetGesture();
-	GestureHand = ALSXTCharacter->GetGestureHand();
-	ReloadingType = ALSXTCharacter->GetReloadingType();
-	ForegripPosition = ALSXTCharacter->GetDesiredForegripPosition();
-	FirearmFingerAction = ALSXTCharacter->GetFirearmFingerAction();
-	FirearmFingerActionHand = ALSXTCharacter->GetFirearmFingerActionHand();
-	WeaponCarryPosition = ALSXTCharacter->GetWeaponCarryPosition();
-	FirearmSightLocation = ALSXTCharacter->GetFirearmSightLocation();
-	ForegripTransform = ALSXTCharacter->GetCurrentForegripTransform();
-	VaultType = ALSXTCharacter->GetVaultType();
-	AimState = ALSXTCharacter->GetAimState();
-	FreelookState = ALSXTCharacter->GetFreelookState();
-	HeadLookAtState = ALSXTCharacter->GetHeadLookAtState();
-	DoesOverlayObjectUseLeftHandIK = ALSXTCharacter->DoesOverlayObjectUseLeftHandIK();
-
-	if (UKismetSystemLibrary::DoesImplementInterface(ALSXTCharacter, UALSXTCharacterInterface::StaticClass()))
+	if (!GetOwningActor()->Implements<UALSXTCharacterInterface>())
 	{
-		// FALSXTStatusState NewStatusState;
-		// NewStatusState.CurrentStatus = IALSXTCharacterInterface::Execute_GetStatus(ALSXTCharacter);
-		// NewStatusState.CurrentHealth = IALSXTCharacterInterface::Execute_GetHealth(ALSXTCharacter);
-		// NewStatusState.CurrentStamina = IALSXTCharacterInterface::Execute_GetStamina(ALSXTCharacter);
-		// BreathState.BreathType = IALSXTCharacterInterface::Execute_GetBreathType(ALSXTCharacter);
-		StatusState = IALSXTCharacterInterface::Execute_GetStatusState(ALSXTCharacter);
-		CrowdNavigationPoseState = IALSXTCharacterInterface::Execute_GetCrowdNavigationPoseState(ALSXTCharacter);
-		BumpPoseState = IALSXTCharacterInterface::Execute_GetBumpPoseState(ALSXTCharacter);
+		return;
 	}
 
-	DefensiveModeState = ALSXTCharacter->GetDefensiveModeState();
-	WeaponObstruction = ALSXTCharacter->GetWeaponObstruction();
-	BreathState.HoldingBreath = ALSXTCharacter->GetDesiredHoldingBreath();
+	RefreshALSXTPose();
+	
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
+	{
+		Freelooking = IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor());
+		Sex = IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwningActor());
+		DefensiveMode = IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwningActor());
+		LocomotionVariant = IALSXTCharacterInterface::Execute_GetCharacterLocomotionVariant(GetOwningActor());
+		Injury = IALSXTCharacterInterface::Execute_GetCharacterInjury(GetOwningActor());
+		CombatStance = IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwningActor());
+		WeaponFirearmStance = IALSXTCharacterInterface::Execute_GetCharacterWeaponFirearmStance(GetOwningActor());
+		WeaponReadyPosition = IALSXTCharacterInterface::Execute_GetCharacterWeaponReadyPosition(GetOwningActor());
+		StationaryMode = IALSXTCharacterInterface::Execute_GetCharacterStationaryMode(GetOwningActor());
+		HoldingBreath = IALSXTCharacterInterface::Execute_GetCharacterHoldingBreath(GetOwningActor());
+		PhysicalAnimationMode = IALSXTCharacterInterface::Execute_GetCharacterPhysicalAnimationMode(GetOwningActor());
+		Gesture = IALSXTCharacterInterface::Execute_GetCharacterGesture(GetOwningActor());
+		GestureHand = IALSXTCharacterInterface::Execute_GetCharacterGestureHand(GetOwningActor());
+		ReloadingType = IALSXTCharacterInterface::Execute_GetCharacterReloadingType(GetOwningActor());
+		ForegripPosition = IALSXTCharacterInterface::Execute_GetCharacterForegripPosition(GetOwningActor());
+		FirearmFingerAction = IALSXTCharacterInterface::Execute_GetCharacterFirearmFingerAction(GetOwningActor());
+		FirearmFingerActionHand = IALSXTCharacterInterface::Execute_GetCharacterFirearmFingerActionHand(GetOwningActor());
+		WeaponCarryPosition = IALSXTCharacterInterface::Execute_GetCharacterWeaponCarryPosition(GetOwningActor());
+		FirearmSightLocation = IALSXTCharacterInterface::Execute_GetCharacterFirearmSightLocation(GetOwningActor());
+		ForegripTransform = IALSXTCharacterInterface::Execute_GetCharacterCurrentForegripTransform(GetOwningActor());
+		VaultType = IALSXTCharacterInterface::Execute_GetCharacterVaultType(GetOwningActor());
+		AimState = IALSXTCharacterInterface::Execute_GetCharacterAimState(GetOwningActor());
+		FreelookState = IALSXTCharacterInterface::Execute_GetCharacterFreelookState(GetOwningActor());
+		HeadLookAtState = IALSXTCharacterInterface::Execute_GetCharacterHeadLookAtState(GetOwningActor());
+		DoesOverlayObjectUseLeftHandIK = IALSXTCharacterInterface::Execute_DoesCharacterOverlayObjectUseLeftHandIK(GetOwningActor());
+		StatusState = IALSXTCharacterInterface::Execute_GetStatusState(GetOwningActor());
+		CrowdNavigationPoseState = IALSXTCharacterInterface::Execute_GetCrowdNavigationPoseState(GetOwningActor());
+		BumpPoseState = IALSXTCharacterInterface::Execute_GetBumpPoseState(GetOwningActor());
+		DefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwningActor());
+		WeaponObstruction = IALSXTCharacterInterface::Execute_GetCharacterWeaponObstruction(GetOwningActor());
+		BreathState.HoldingBreath = IALSXTCharacterInterface::Execute_GetCharacterHoldingBreath(GetOwningActor());
+	}
 }
 
 void UALSXTAnimationInstance::NativeThreadSafeUpdateAnimation(const float DeltaTime)
@@ -138,18 +140,39 @@ FAnimInstanceProxy* UALSXTAnimationInstance::CreateAnimInstanceProxy()
 
 bool UALSXTAnimationInstance::IsSpineRotationAllowed()
 {
-	return Super::IsSpineRotationAllowed() && ALSXTCharacter->GetDesiredFreelooking() != ALSXTFreelookingTags::True;
-	//return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
+	{
+		return Super::IsSpineRotationAllowed() && IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor()) != ALSXTFreelookingTags::True;
+		//return ALSXTCharacter->GetRotationMode() == AlsRotationModeTags::Aiming && ALSXTCharacter->GetLocomotionState().bRotationLocked == false;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool UALSXTAnimationInstance::IsRotateInPlaceAllowed()
 {
-	return Super::IsRotateInPlaceAllowed() && ALSXTCharacter->GetDesiredFreelooking() != ALSXTFreelookingTags::True;
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
+	{
+		return Super::IsRotateInPlaceAllowed() && IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor()) != ALSXTFreelookingTags::True;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool UALSXTAnimationInstance::IsTurnInPlaceAllowed()
 {
-	return Super::IsTurnInPlaceAllowed() && ALSXTCharacter->GetDesiredFreelooking() != ALSXTFreelookingTags::True;
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
+	{
+		return Super::IsTurnInPlaceAllowed() && IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor()) != ALSXTFreelookingTags::True;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void UALSXTAnimationInstance::RefreshALSXTPose()
@@ -165,7 +188,11 @@ void UALSXTAnimationInstance::RefreshALSXTPose()
 		}
 	};
 
-	ALSXTPoseState.LeanDirection = ALSXTCharacter->GetALSXTPoseState().LeanDirection;
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
+	{
+		ALSXTPoseState.LeanDirection = IALSXTCharacterInterface::Execute_GetCharacterPoseState(GetOwningActor()).LeanDirection;
+	}
+
 	ALSXTPoseState.LeanLeftAmount = GetCurveValue(Curves, UALSXTConstants::PoseLeanLeftCurveName());
 	ALSXTPoseState.LeanRightAmount = GetCurveValue(Curves, UALSXTConstants::PoseLeanRightCurveName());
 
@@ -194,18 +221,21 @@ void UALSXTAnimationInstance::RefreshALSXTPose()
 
 void UALSXTAnimationInstance::UpdateStatusState()
 {
-	FALSXTStatusState NewStatusState{ IALSXTCharacterInterface::Execute_GetStatusState(ALSXTCharacter) };
-	
-	if (NewStatusState != StatusState)
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
 	{
-		StatusState = NewStatusState;
-		if (StatusState.CurrentStatus == ALSXTStatusTags::Dead)
+		FALSXTStatusState NewStatusState{ IALSXTCharacterInterface::Execute_GetStatusState(GetOwningActor()) };
+
+		if (NewStatusState != StatusState)
 		{
-			BreathState.CurrentBreathRate = 0.0;
-			BreathState.CurrentBreathAlpha = 0.0;
-			BreathState.TargetState.Alpha = 0.0;
-			BreathState.TargetState.Rate = 0.0;
-			BreathState.TargetState.TransitionRate = 1.0;
+			StatusState = NewStatusState;
+			if (StatusState.CurrentStatus == ALSXTStatusTags::Dead)
+			{
+				BreathState.CurrentBreathRate = 0.0;
+				BreathState.CurrentBreathAlpha = 0.0;
+				BreathState.TargetState.Alpha = 0.0;
+				BreathState.TargetState.Rate = 0.0;
+				BreathState.TargetState.TransitionRate = 1.0;
+			}
 		}
 	}
 }
@@ -213,18 +243,28 @@ void UALSXTAnimationInstance::UpdateStatusState()
 void UALSXTAnimationInstance::UpdateBreathState()
 {
 	const float Stamina = StatusState.CurrentStamina;
-	FGameplayTag BreathType = IALSXTCharacterInterface::Execute_GetBreathType(ALSXTCharacter);
-
-	if (ShouldTransitionBreathState())
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
 	{
-		FALSXTTargetBreathState NewTargetState = CalculateTargetBreathState();
-		BreathState.TargetState = NewTargetState;
+		FGameplayTag BreathType = IALSXTCharacterInterface::Execute_GetBreathType(ALSXTCharacter);
+
+		if (ShouldTransitionBreathState())
+		{
+			FALSXTTargetBreathState NewTargetState = CalculateTargetBreathState();
+			BreathState.TargetState = NewTargetState;
+		}
 	}
 }
 
 bool UALSXTAnimationInstance::ShouldUpdateBreathState() const
 {
-	return StatusState.CurrentStamina != IALSXTCharacterInterface::Execute_GetStamina(ALSXTCharacter);
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
+	{
+		return StatusState.CurrentStamina != IALSXTCharacterInterface::Execute_GetStamina(ALSXTCharacter);
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool UALSXTAnimationInstance::ShouldTransitionBreathState()

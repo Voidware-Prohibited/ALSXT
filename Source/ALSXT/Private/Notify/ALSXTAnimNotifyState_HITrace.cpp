@@ -3,7 +3,9 @@
 
 #include "Notify/ALSXTAnimNotifyState_HITrace.h"
 
-#include "ALSXTCharacter.h"
+#include "Utility/ALSXTGameplayTags.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTCombatInterface.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Utility/AlsUtility.h"
 
@@ -24,21 +26,20 @@ void UALSXTAnimNotifyState_HITrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 {
 	Super::NotifyBegin(Mesh, Animation, Duration, EventReference);
 
-	auto* Character{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
-	if (IsValid(Character))
+	if (IsValid(Mesh->GetOwner()) && Mesh->GetOwner()->GetClass()->ImplementsInterface(UALSXTCharacterInterface::StaticClass()) && Mesh->GetOwner()->GetClass()->ImplementsInterface(UALSXTCombatInterface::StaticClass()))
 	{
 		FALSXTCombatAttackTraceSettings TraceSettings;
-		TraceSettings.Overlay = Character->GetOverlayMode();
+		TraceSettings.Overlay = IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(Mesh->GetOwner());
 		TraceSettings.ImpactType = ALSXTImpactTypeTags::Hit;
 		TraceSettings.AttackType = ALSXTAttackMethodTags::Regular;
 		TraceSettings.ImpactForm = ALSXTImpactFormTags::Blunt;
 		TraceSettings.AttackStrength = AttackStrength;
-		bool Found;
+		bool Found {false};
 
-		Character->GetHeldItemTraceLocations(Found, TraceSettings.Start, TraceSettings.End, TraceSettings.Radius);
+		IALSXTCombatInterface::Execute_GetCombatHeldItemTraceLocations(Mesh->GetOwner(), Found, TraceSettings.Start, TraceSettings.End, TraceSettings.Radius);
 		if (Found)
 		{
-			Character->BeginAttackCollisionTrace(TraceSettings);
+			IALSXTCombatInterface::Execute_BeginCombatAttackCollisionTrace(Mesh->GetOwner(), TraceSettings);
 		}
 	}
 }
@@ -48,10 +49,8 @@ void UALSXTAnimNotifyState_HITrace::NotifyEnd(USkeletalMeshComponent* Mesh, UAni
 {
 	Super::NotifyEnd(Mesh, Animation, EventReference);
 
-	auto* Character{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
-
-	if (IsValid(Character))
+	if (IsValid(Mesh->GetOwner()) && Mesh->GetOwner()->GetClass()->ImplementsInterface(UALSXTCharacterInterface::StaticClass()) && Mesh->GetOwner()->GetClass()->ImplementsInterface(UALSXTCombatInterface::StaticClass()))
 	{
-		Character->EndAttackCollisionTrace();
+		IALSXTCombatInterface::Execute_EndCombatAttackCollisionTrace(Mesh->GetOwner());
 	}
 }

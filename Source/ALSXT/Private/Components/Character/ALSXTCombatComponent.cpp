@@ -14,6 +14,7 @@
 #include "Math/Vector.h"
 #include "GameFramework/Character.h"
 #include "ALSXTCharacter.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTTargetLockInterface.h"
 #include "Interfaces/ALSXTCombatInterface.h"
 #include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
@@ -463,7 +464,7 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& ActionType, const FGamepl
 	
 	FGameplayTag NewStance = ALSXTActionStanceTags::Standing;
 
-	if (Character->GetLocomotionMode() == AlsLocomotionModeTags::InAir)
+	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) == AlsLocomotionModeTags::InAir)
 	{
 		NewStance = ALSXTActionStanceTags::InAir;
 	}
@@ -572,7 +573,19 @@ void UALSXTCombatComponent::StartAttack(const FGameplayTag& AttackType, const FG
 	}
 	else
 	{
-		Character->GetCharacterMovement()->FlushServerMoves();
+		IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->FlushServerMoves();
+
+		CombatParameters.BaseDamage = BaseDamage;
+		CombatParameters.PlayRate = PlayRate;
+		CombatParameters.TargetYawAngle = TargetYawAngle;
+		CombatParameters.AttackType = AttackType;
+		CombatParameters.Stance = Stance;
+		CombatParameters.Strength = Strength;
+		CombatParameters.CombatAnimation = Montage.Montage;
+
+		FALSXTCombatState NewCombatState;
+		NewCombatState.CombatParameters = CombatParameters;
+		SetCombatState(NewCombatState);
 
 		ServerStartAttack(Montage.Montage.Montage, PlayRate, StartYawAngle, TargetYawAngle);
 		OnAttackStarted(AttackType, Stance, Strength, BaseDamage);
@@ -622,7 +635,7 @@ void UALSXTCombatComponent::StartSyncedAttack(const FGameplayTag& Overlay, const
 	}
 	else
 	{
-		Character->GetCharacterMovement()->FlushServerMoves();
+		IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->FlushServerMoves();
 
 		StartSyncedAttackImplementation(Montage.SyncedMontage.InstigatorSyncedMontage.Montage, SelectSyncedAttackMontageIndex, PlayRate, StartYawAngle, TargetYawAngle);
 		ServerStartSyncedAttack(Montage.SyncedMontage.InstigatorSyncedMontage.Montage, SelectSyncedAttackMontageIndex, PlayRate, StartYawAngle, TargetYawAngle);
@@ -679,7 +692,7 @@ void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& A
 							AttackMethod = ALSXTAttackMethodTags::Riposte;
 							return;
 						}
-						else if (LastTarget.ConsecutiveHits >= SelectAttackSettings()->ConsecutiveHitsForSpecialAttack)
+						else if (LastTarget.ConsecutiveHits >= IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner())->ConsecutiveHitsForSpecialAttack)
 						{
 							if (CanPerformUniqueAttack())
 							{
@@ -735,7 +748,7 @@ void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& A
 FAttackAnimation UALSXTCombatComponent::SelectAttackMontage_Implementation(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage)
 {
 	FAttackAnimation SelectedAttackAnimation;
-	UALSXTCombatSettings* Settings = SelectAttackSettings();
+	UALSXTCombatSettings* Settings = IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner());
 	TArray<FAttackAnimation> Montages = Settings->AttackAnimations;
 	TArray<FAttackAnimation> FilteredMontages;
 	TArray<FGameplayTag> TagsArray = { AttackType, Stance, Strength };
@@ -802,7 +815,7 @@ FAttackAnimation UALSXTCombatComponent::SelectAttackMontage_Implementation(const
 FSyncedAttackAnimation UALSXTCombatComponent::SelectSyncedAttackMontage_Implementation(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, int& Index)
 {
 	FSyncedAttackAnimation SelectedSyncedAttackAnimation;
-	UALSXTCombatSettings* Settings = SelectAttackSettings();
+	UALSXTCombatSettings* Settings = IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner());
 	TArray<FSyncedAttackAnimation> Montages = Settings->SyncedAttackAnimations;
 	TArray<FSyncedAttackAnimation> FilteredMontages;
 	TArray<FGameplayTag> TagsArray = { AttackType, Stance, Strength };
@@ -876,7 +889,7 @@ FAnticipationPose UALSXTCombatComponent::SelectBlockingkMontage_Implementation(c
 
 FSyncedActionAnimation UALSXTCombatComponent::GetSyncedAttackMontage_Implementation(int32 Index)
 {
-	UALSXTCombatSettings* Settings = SelectAttackSettings();
+	UALSXTCombatSettings* Settings = IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner());
 	TArray<FSyncedAttackAnimation> Montages = Settings->SyncedAttackAnimations;
 	return Montages[Index].SyncedMontage;
 }
@@ -921,28 +934,28 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::SanitizeFloat(DistanceToTarget));
 			}	
 
-			if ((DistanceToTarget < SelectAttackSettings()->MoveToTargetMaxDistance && DistanceToTarget > 60.0f) && !IsTartgetObstructed())
+			if ((DistanceToTarget < IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner())->MoveToTargetMaxDistance && DistanceToTarget > 60.0f) && !IsTartgetObstructed())
 			{
 				//Get Direction from Target to Player
 				FVector Direction = CurrentTarget.HitResult.GetActor()->GetActorLocation() - Character->GetActorLocation();
 				Direction.Normalize();
 
 				//Calculate the new location depending on how far we are allowed to travel away.
-				FVector NewLocation = CurrentTarget.HitResult.GetActor()->GetActorLocation() + SelectAttackSettings()->MoveToTargetMaxDistance * Direction;
+				FVector NewLocation = CurrentTarget.HitResult.GetActor()->GetActorLocation() + IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner())->MoveToTargetMaxDistance * Direction;
 
 				//Calculate Speed of MoveSmooth based on Min and Max values
-				float MovementSpeed = ((DistanceToTarget - 60.0f) / (SelectAttackSettings()->MoveToTargetMaxDistance - 60.0f)) * 3.0f;
+				float MovementSpeed = ((DistanceToTarget - 60.0f) / (IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner())->MoveToTargetMaxDistance - 60.0f)) * 3.0f;
 
 				//vector from our current location to the target which is slightly further away from the target
 				FVector SmoothMoveVector = NewLocation - Character->GetActorLocation();
 				FStepDownResult* StepdownResult{ nullptr };
-				Character->GetCharacterMovement()->MoveSmooth(SmoothMoveVector, MovementSpeed, StepdownResult);
+				IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MoveSmooth(SmoothMoveVector, MovementSpeed, StepdownResult);
 			}
 		}
 		
 		// Crouch(); //Hack
 		FALSXTCharacterVoiceParameters VoiceParameters = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(GetOwner());
-		IALSXTCharacterSoundComponentInterface::Execute_PlayAttackSound(GetOwner(), true, true, true, VoiceParameters.Sex, VoiceParameters.Variant, Character->GetOverlayMode(), CombatParameters.Strength, CombatParameters.AttackType, IALSXTCharacterInterface::Execute_GetStamina(GetOwner()));
+		IALSXTCharacterSoundComponentInterface::Execute_PlayAttackSound(GetOwner(), true, true, true, VoiceParameters.Sex, VoiceParameters.Variant, Character->GetOverlayMode(), CombatState.CombatParameters.Strength, CombatState.CombatParameters.AttackType, IALSXTCharacterInterface::Execute_GetStamina(GetOwner()));
 	}
 }
 
@@ -988,18 +1001,18 @@ void UALSXTCombatComponent::RefreshAttackPhysics(const float DeltaTime)
 
 void UALSXTCombatComponent::StopAttack()
 {
-	if (Character->GetLocalRole() >= ROLE_Authority)
+	if (GetOwner()->GetLocalRole() >= ROLE_Authority)
 	{
 		// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
 	}
 
-	if (Character->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Custom)
+	if (IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MovementMode == EMovementMode::MOVE_Custom)
 	{
-		Character->SetMovementModeLocked(false);
+		IALSXTCharacterInterface::Execute_SetCharacterMovementModeLocked(GetOwner(), false);
 		// Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		OnAttackEnded();
 	}
-	Character->SetMovementModeLocked(false);
+	IALSXTCharacterInterface::Execute_SetCharacterMovementModeLocked(GetOwner(), false);
 }
 
 void UALSXTCombatComponent::OnAttackEnded_Implementation() {}
@@ -1010,7 +1023,7 @@ void UALSXTCombatComponent::ServerStartSyncedAttack_Implementation(UAnimMontage*
 	if (IsAttackAllowedToStart(Montage))
 	{
 		MulticastStartSyncedAttack(Montage, Index, PlayRate, StartYawAngle, TargetYawAngle);
-		Character->ForceNetUpdate();
+		GetOwner()->ForceNetUpdate();
 	}
 }
 
@@ -1027,7 +1040,7 @@ void UALSXTCombatComponent::StartSyncedAttackImplementation(UAnimMontage* Montag
 	{
 		if (UKismetSystemLibrary::DoesImplementInterface(GetCombatState().CombatParameters.Target, UALSXTCombatInterface::StaticClass()))
 		{
-			if (!IALSXTCombatInterface::Execute_Blocking(GetCombatState().CombatParameters.Target))
+			if (!IALSXTCollisionInterface::Execute_Blocking(GetCombatState().CombatParameters.Target))
 			{
 				IALSXTCombatInterface::Execute_AnticipateSyncedAttack(GetCombatState().CombatParameters.Target, Index);
 			}
@@ -1055,7 +1068,7 @@ void UALSXTCombatComponent::RefreshSyncedAttack(const float DeltaTime)
 void UALSXTCombatComponent::RefreshSyncedAttackPhysics(const float DeltaTime)
 {
 	// float Offset = CombatSettings->Combat.RotationOffset;
-	auto ComponentRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
+	auto ComponentRotation{ IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->UpdatedComponent->GetComponentRotation() };
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	auto TargetRotation{ PlayerController->GetControlRotation() };
 	// TargetRotation.Yaw = TargetRotation.Yaw + Offset;
@@ -1081,18 +1094,18 @@ void UALSXTCombatComponent::RefreshSyncedAttackPhysics(const float DeltaTime)
 
 void UALSXTCombatComponent::StopSyncedAttack()
 {
-	if (Character->GetLocalRole() >= ROLE_Authority)
+	if (GetOwner()->GetLocalRole() >= ROLE_Authority)
 	{
 		// Character->GetCharacterMovement()->NetworkSmoothingMode = ENetworkSmoothingMode::Exponential;
 	}
 
-	if (Character->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Custom)
+	if (IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MovementMode == EMovementMode::MOVE_Custom)
 	{
-		Character->SetMovementModeLocked(false);
+		IALSXTCharacterInterface::Execute_SetCharacterMovementModeLocked(GetOwner(), false);
 		// Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		OnSyncedAttackEnded();
 	}
-	Character->SetMovementModeLocked(false);
+	IALSXTCharacterInterface::Execute_SetCharacterMovementModeLocked(GetOwner(), false);
 }
 
 void UALSXTCombatComponent::OnSyncedAttackEnded_Implementation() {}

@@ -8,6 +8,8 @@
 #include "Components/Mesh/ALSXTPaintableSkeletalMeshComponent.h"
 #include "Components/Mesh/ALSXTPaintableStaticMeshComponent.h"
 #include "Components/Character/ALSXTCharacterCustomizationComponent.h"
+#include "Components/Character/ALSXTImpactReactionComponent.h"
+#include "Components/Character/ALSXTCharacterSoundComponent.h"
 #include "Components/Character/ALSXTIdleAnimationComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "CineCameraComponent.h"
@@ -28,11 +30,13 @@
 #include "State/ALSXTSlidingState.h"
 #include "State/ALSXTVaultingState.h"
 #include "Interfaces/ALSXTCharacterCustomizationComponentInterface.h"
+#include "Interfaces/ALSXTTargetLockInterface.h"
 #include "Interfaces/ALSXTCombatInterface.h"
 #include "Interfaces/ALSXTStationaryModeComponentInterface.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
 #include "Interfaces/ALSXTMeshPaintingInterface.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
 #include "Interfaces/ALSXTIdleAnimationComponentInterface.h"
 #include "ALSXTCharacter.generated.h"
 
@@ -48,7 +52,7 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
 
 UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
-class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTCharacterCustomizationComponentInterface, public IALSXTStationaryModeComponentInterface, public IALSXTCollisionInterface, public IALSXTMeshPaintingInterface, public IALSXTCharacterInterface, public IALSXTIdleAnimationComponentInterface
+class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTCharacterCustomizationComponentInterface, public IALSXTStationaryModeComponentInterface, public IALSXTCollisionInterface, public IALSXTCharacterSoundComponentInterface, public IALSXTMeshPaintingInterface, public IALSXTCharacterInterface, public IALSXTIdleAnimationComponentInterface
 {
 	GENERATED_BODY()
 
@@ -159,6 +163,9 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UBoxComponent> AimAnimationHelperBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	class UALSXTImpactReactionComponent* ImpactReaction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	class UALSXTCharacterSoundComponent* CharacterSound;
@@ -277,10 +284,10 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnVaultingStateChanged(const FALSXTVaultingState& PreviousVaultingState);
 
-private:
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Replicated, Meta = (AllowPrivateAccess))
-	bool bMovementEnabled {true};
+	bool bMovementEnabled{ true };
+
+private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess, ShowInnerProperties))
 	TObjectPtr<UALSXTAnimationInstance> XTAnimationInstance;
@@ -330,13 +337,13 @@ public:
 	bool DoesOverlayObjectUseLeftHandIK() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "ForegripPosition"))
-	FName GetSocketNameForForegripPosition(UPARAM(meta = (Categories = "Als.Foregrip Position"))const FGameplayTag& ForegripPosition);
+	const FName GetSocketNameForForegripPosition(UPARAM(meta = (Categories = "Als.Foregrip Position"))const FGameplayTag& ForegripPosition) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	FGameplayTagContainer GetAvailableForegripPositionsForOvelayObject();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	FTransform GetCurrentForegripTransform();
+	FTransform GetCurrentForegripTransform() const;
 
 	// Freelooking
 private:
@@ -650,104 +657,92 @@ private:
 	FGameplayTag WeaponObstruction{FGameplayTag::EmptyTag};
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> LookMouseAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> LookAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> MoveAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SprintAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> WalkAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> CrouchAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> JumpAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> AimAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> RagdollAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> RollAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> RotationModeAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> ViewModeAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SwitchShoulderAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> FreelookAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> ToggleCombatReadyAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> PrimaryActionAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SecondaryActionAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
-	TObjectPtr<UInputAction> PrimaryInteractionAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
-	TObjectPtr<UInputAction> SecondaryInteractionAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> BlockAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> LeanLeftAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> LeanRightAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> HoldBreathAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SlideAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SwitchTargetLeftAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SwitchTargetRightAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> ToggleWeaponReadyPositionAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> ToggleWeaponFirearmStanceAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SwitchGripPositionAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SwitchForegripPositionAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
-	TObjectPtr<UInputAction> SelectEmoteAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (AllowPrivateAccess))
-	TObjectPtr<UInputAction> SelectGestureAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example",
 		Meta = (AllowPrivateAccess, ClampMin = 0, ForceUnits = "x"))
@@ -1845,6 +1840,59 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnWeaponObstructionChanged(const FGameplayTag& PreviousWeaponObstructionTag);
 
+	//Interface Functions
+
+	//Character Camera Effects Component Interface
+	virtual FGameplayTag GetCharacterLocomotionMode_Implementation() const override;
+	
+	virtual FGameplayTag GetCharacterGait_Implementation() const override;
+	
+	virtual FALSXTDefensiveModeState GetCharacterDefensiveModeState_Implementation() const override;
+	
+	virtual UCapsuleComponent* GetCharacterCapsuleComponent_Implementation() const override;
+	
+	virtual UAlsCharacterMovementComponent* GetCharacterMovementComponent_Implementation() const override;
+	
+	virtual bool IsBlocking_Implementation() const override;
+	
+	virtual FGameplayTag GetCharacterLocomotionAction_Implementation() const override;
+	
+	virtual void SetCharacterLocomotionAction_Implementation(const FGameplayTag& NewLocomotionAction) override;
+	
+	virtual void ResetCharacterDefensiveModeState_Implementation() override;
+	
+	virtual FGameplayTag GetCharacterDefensiveMode_Implementation() const override;
+	
+	virtual void SetCharacterDefensiveMode_Implementation(const FGameplayTag& NewDefensiveMode) override;
+
+	virtual void SetCharacterStatus_Implementation(const FGameplayTag& NewStatus) override;
+
+	virtual void SetCharacterDefensiveModeState_Implementation(FALSXTDefensiveModeState NewDefensiveModeState) override;
+
+	virtual void SetCharacterMovementModeLocked_Implementation(bool NewLocked) override;
+	
+	virtual void SetCharacterStance_Implementation(const FGameplayTag& NewStance) override;
+
+	virtual FGameplayTag GetCharacterFreelooking_Implementation() const override;
+
+	virtual FGameplayTag GetCharacterGesture_Implementation() const override;
+	virtual FGameplayTag GetCharacterGestureHand_Implementation() const override;
+	virtual FGameplayTag GetCharacterReloadingType_Implementation() const override;
+	virtual FGameplayTag GetCharacterForegripPosition_Implementation() const override;
+	virtual FGameplayTag GetCharacterFirearmFingerAction_Implementation() const override;
+	virtual FGameplayTag GetCharacterFirearmFingerActionHand_Implementation() const override;
+	virtual FGameplayTag GetCharacterWeaponCarryPosition_Implementation() const override;
+	virtual FGameplayTag GetCharacterFirearmSightLocation_Implementation() const override;
+	virtual FTransform GetCharacterCurrentForegripTransform_Implementation() const override;
+	virtual FGameplayTag GetCharacterVaultType_Implementation() const override;
+	virtual FALSXTPoseState GetCharacterPoseState_Implementation() const override;
+	virtual FALSXTAimState GetCharacterAimState_Implementation() const override;
+	virtual FALSXTFreelookState GetCharacterFreelookState_Implementation() const override;
+	virtual FALSXTHeadLookAtState GetCharacterHeadLookAtState_Implementation() const override;
+	virtual bool DoesCharacterOverlayObjectUseLeftHandIK_Implementation() const override;
+	virtual FGameplayTag GetCharacterLocomotionVariant_Implementation() const override;
+	virtual FGameplayTag GetCharacterHoldingBreath_Implementation() const override;
+	virtual UALSXTCharacterSettings* GetCharacterSettings_Implementation() const override;
 };
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredLean() const

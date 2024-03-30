@@ -40,16 +40,16 @@ void UALSXTSlidingActionComponent::TickComponent(float DeltaTime, ELevelTick Tic
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// if (Character->GetCharacterMovement().CurrentFloor.HitResult.ImpactNormal)
+	// if (IALSXTCharacterInterface::Execute_GetCharacterMovement(GetOwner()).CurrentFloor.HitResult.ImpactNormal)
 	// {
 	// 
 	// }
-	// Character->GetCharacterMovement()->CurrentFloor.HitResult.ImpactNormal.ZAxisVector;
+	// IALSXTCharacterInterface::Execute_GetCharacterMovement(GetOwner())->CurrentFloor.HitResult.ImpactNormal.ZAxisVector;
 }
 
 void UALSXTSlidingActionComponent::TryStartSliding(const float PlayRate)
 {
-	if (Character->GetLocomotionMode() == AlsLocomotionModeTags::Grounded)
+	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == AlsLocomotionModeTags::Grounded)
 	{
 		StartSliding(PlayRate, Character->ALSXTSettings->Sliding.bRotateToInputOnStart && Character->GetLocomotionState().bHasInput
 			? Character->GetLocomotionState().InputYawAngle
@@ -114,7 +114,7 @@ void UALSXTSlidingActionComponent::StartSliding(const float PlayRate, const floa
 	}
 	else
 	{
-		Character->GetCharacterMovement()->FlushServerMoves();
+		IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->FlushServerMoves();
 
 		StartSlidingImplementation(Montage, PlayRate, StartYawAngle, TargetYawAngle);
 		ServerStartSliding(Montage, PlayRate, StartYawAngle, TargetYawAngle);
@@ -181,13 +181,13 @@ void UALSXTSlidingActionComponent::RefreshSlidingPhysics(const float DeltaTime)
 		return;
 	}
 
-	auto TargetRotation{ Character->GetCharacterMovement()->UpdatedComponent->GetComponentRotation() };
+	auto TargetRotation{ IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->UpdatedComponent->GetComponentRotation() };
 
 	if (Character->ALSXTSettings->Sliding.RotationInterpolationSpeed <= 0.0f)
 	{
 		TargetRotation.Yaw = SlidingState.TargetYawAngle;
 
-		Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false, nullptr, ETeleportType::TeleportPhysics);
+		IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false, nullptr, ETeleportType::TeleportPhysics);
 	}
 	else
 	{
@@ -195,6 +195,6 @@ void UALSXTSlidingActionComponent::RefreshSlidingPhysics(const float DeltaTime)
 			SlidingState.TargetYawAngle, DeltaTime,
 			Character->ALSXTSettings->Sliding.RotationInterpolationSpeed);
 
-		Character->GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);
+		IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);
 	}
 }
