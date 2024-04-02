@@ -2900,7 +2900,7 @@ FGameplayTag AALSXTCharacter::GetCharacterGait_Implementation() const
 
 FALSXTDefensiveModeState AALSXTCharacter::GetCharacterDefensiveModeState_Implementation() const
 {
-	return GetDefensiveModeState();
+	return DefensiveModeState;
 }
 
 UCapsuleComponent* AALSXTCharacter::GetCharacterCapsuleComponent_Implementation() const
@@ -2935,7 +2935,7 @@ void AALSXTCharacter::ResetCharacterDefensiveModeState_Implementation()
 
 FGameplayTag AALSXTCharacter::GetCharacterDefensiveMode_Implementation() const
 {
-	return GetDesiredDefensiveMode();
+	return DesiredDefensiveMode;
 }
 
 void AALSXTCharacter::SetCharacterDefensiveMode_Implementation(const FGameplayTag& NewDefensiveMode)

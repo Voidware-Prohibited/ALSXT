@@ -194,7 +194,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTa
 					//OnVocalization(NewBreathSound);
 				}
 			}
-			if (BreathParticleSettings.VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
+			if (IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("SelectNewBreathParticles"));
 				CurrentBreathParticles = SelectBreathParticles(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner()), StaminaToUse);
@@ -239,7 +239,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTa
 					OnVocalization.Broadcast(NewBreathSound);
 				}
 			}
-			if (BreathParticleSettings.VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
+			if (IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
 			{
 				if (CurrentBreathParticles.IsValidIndex(0))
 				{
@@ -1015,7 +1015,7 @@ bool UALSXTCharacterSoundComponent::ShouldPlayBreathSound()
 		// {
 		// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ShouldPlayBreathSound:true");
 		// }
-		return !IsPaused && BreathParticleSettings.AudibleBreathStaminaLevels.HasTag(ConvertStaminaToStaminaTag(Stamina));
+		return !IsPaused && IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).AudibleBreathStaminaLevels.HasTag(ConvertStaminaToStaminaTag(Stamina));
 		// return !IsPaused && Stamina < StaminaOptimalThreshold;
 	}
 	else
@@ -1738,7 +1738,7 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 			// OnVocalization(NewVocalizationSound);
 			OnVocalization.Broadcast(NewVocalizationSound);
 
-			if (BreathParticleSettings.VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
+			if (IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("SelectNewBreathParticles"));
 				FGameplayTag NewStaminaTag{ ConvertStaminaToStaminaTag(IALSXTCharacterInterface::Execute_GetStamina(GetOwner())) };

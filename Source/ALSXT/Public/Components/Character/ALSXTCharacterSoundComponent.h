@@ -71,16 +71,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTag CurrentBreathType{ ALSXTBreathTypeTags::Regular };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
 	UAudioComponent* CharacterMovementSoundMixer{ nullptr };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
 	UAudioComponent* VocalizationMixerAudioComponent{ nullptr };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
 	UAudioComponent* WeaponMovementAudioComponent{ nullptr };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
 	UAudioComponent* WeaponActionAudioComponent{ nullptr };
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
