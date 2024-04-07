@@ -2,6 +2,7 @@
 
 
 #include "Components/PlayerController/ALSXTPlayerViewportEffectsComponent.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTControllerVFXInterface.h"
 #include "Engine/Scene.h"
 #include "Math/UnrealMathUtility.h"
@@ -37,7 +38,7 @@ void UALSXTPlayerViewportEffectsComponent::BeginPlay()
 			CameraManager = PlayerController->PlayerCameraManager;
 		}
 		
-		Character = IALSXTControllerVFXInterface::Execute_GetCharacter(GetOwner());
+		Character = IALSXTCharacterInterface::Execute_GetCharacter(GetOwner());
 		if (IsValid(Character))
 		{
 			Camera = IALSXTControllerVFXInterface::Execute_GetCamera(GetOwner());

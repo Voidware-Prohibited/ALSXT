@@ -9,6 +9,7 @@
 #include "Utility/ALSXTStructs.h"
 #include "Settings/ALSXTCharacterSoundSettings.h"
 #include "Components/AudioComponent.h"
+#include "Notifies/AlsAnimNotify_FootstepEffects.h"
 #include "ALSXTCharacterSoundComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVocalizationSignature, FSound, Vocalization);

@@ -31,6 +31,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "State/ALSXTFootstepState.h"
 
 AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UALSXTPaintableSkeletalMeshComponent>(AAlsCharacter::MeshComponentName).SetDefaultSubobjectClass<UALSXTCharacterMovementComponent>(AAlsCharacter::CharacterMovementComponentName))
@@ -1047,7 +1048,29 @@ void AALSXTCharacter::OnReplicate_VaultingState(const FALSXTVaultingState& Previ
 void AALSXTCharacter::OnVaultingStateChanged_Implementation(const FALSXTVaultingState& PreviousVaultingState) {}
 
 // Footprints State
-void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
+void AALSXTCharacter::ClientSetFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
+{
+	if (HasAuthority())
+	{
+		ServerSetFootprintsState(Foot, NewFootprintsState);
+	}
+	else
+	{
+		MulticastSetFootprintsState(Foot, NewFootprintsState);
+	}
+}
+
+void AALSXTCharacter::ResetFootSaturationTimeline_Implementation(const EAlsFootBone& Foot)
+{
+	GetFootTimeline(Foot)->SetPlaybackPosition(0.0, false, false);
+}
+
+void AALSXTCharacter::MulticastSetFootprintsState_Implementation(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
+{
+	SetFootprintsState(Foot, NewFootprintsState);
+}
+
+void AALSXTCharacter::SetFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
 {
 	const auto PreviousFootprintsState{ FootprintsState };
 
@@ -1061,13 +1084,13 @@ void AALSXTCharacter::SetFootprintsState(const EALSXTFootBone& Foot, const FALSX
 	}
 }
 
-void AALSXTCharacter::ServerSetFootprintsState_Implementation(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
+void AALSXTCharacter::ServerSetFootprintsState_Implementation(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
 {
-	SetFootprintsState(Foot, NewFootprintsState);
+	MulticastSetFootprintsState(Foot, NewFootprintsState);
 }
 
 
-void AALSXTCharacter::ServerProcessNewFootprintsState_Implementation(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
+void AALSXTCharacter::ServerProcessNewFootprintsState_Implementation(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
 {
 	ProcessNewFootprintsState(Foot, NewFootprintsState);
 }
@@ -2841,6 +2864,21 @@ void AALSXTCharacter::StartVault_Implementation() {}
 void AALSXTCharacter::StartWallrun_Implementation() {}
 void AALSXTCharacter::OnWeaponReadyPositionChanged_Implementation(const FGameplayTag& PreviousWeaponReadyPositionTag) {}
 
+AALSXTCharacter* AALSXTCharacter::GetCharacter_Implementation()
+{
+	return this;
+}
+
+UALSXTAnimationInstance* AALSXTCharacter::GetCharacterAnimInstance_Implementation() const
+{
+	return Cast<UALSXTAnimationInstance>(GetMesh()->GetAnimInstance());
+}
+
+UALSXTCharacterSettings* AALSXTCharacter::GetCharacterSettings_Implementation() const
+{
+	return ALSXTSettings;
+}
+
 USkeletalMeshComponent* AALSXTCharacter::GetCharacterMesh_Implementation() const
 {
 	return GetMesh();
@@ -3049,7 +3087,12 @@ FGameplayTag AALSXTCharacter::GetCharacterHoldingBreath_Implementation() const
 	return GetDesiredHoldingBreath();
 }
 
-UALSXTCharacterSettings* AALSXTCharacter::GetCharacterSettings_Implementation() const
+FALSXTFootprintsState AALSXTCharacter::GetCharacterFootprintsState_Implementation() const
 {
-	return ALSXTSettings;
+	return GetFootprintsState();
+}
+
+FALSXTFootwearDetails AALSXTCharacter::GetCharacterFootwearDetails_Implementation() const
+{
+	return GetFootwearDetails();
 }

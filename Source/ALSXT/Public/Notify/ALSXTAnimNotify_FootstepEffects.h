@@ -6,6 +6,7 @@
 #include "Engine/EngineTypes.h"
 #include "Settings/ALSXTFootstepEffectSettings.h"
 #include "State/ALSXTFootstepState.h"
+#include "Notifies/AlsAnimNotify_FootstepEffects.h"
 #include "ALSXTAnimNotify_FootstepEffects.generated.h"
 
 class USoundBase;
@@ -237,7 +238,7 @@ public:
 	float SoundPitchMultiplier{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	EALSXTFootBone FootBone {EALSXTFootBone::Left};
+	EAlsFootBone FootBone {EAlsFootBone::Left};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
 	bool bSkipEffectsWhenInAir;
@@ -258,7 +259,7 @@ public:
 	bool bSpawnParticleSystem{ true };
 
 	UFUNCTION(BlueprintCallable, Category = "Settings", Meta = (AutoCreateRefTerm = "NewALSXTFootstepEffectsSettings"))
-	void SetFootstepEffectsSettings(UALSXTFootstepEffectsSettings* NewALSXTFootstepEffectsSettings, float NewSoundVolumeMultiplier, float NewSoundPitchMultiplier, EALSXTFootBone NewFootBone, bool bNewSkipEffectsWhenInAir, bool bNewSpawnSound, EALSXTFootstepSoundType NewFootstepSoundType, bool bNewIgnoreFootstepSoundBlockCurve, bool bNewSpawnDecal, bool bNewSpawnParticleSystem);
+	void SetFootstepEffectsSettings(UALSXTFootstepEffectsSettings* NewALSXTFootstepEffectsSettings, float NewSoundVolumeMultiplier, float NewSoundPitchMultiplier, EAlsFootBone NewFootBone, bool bNewSkipEffectsWhenInAir, bool bNewSpawnSound, EALSXTFootstepSoundType NewFootstepSoundType, bool bNewIgnoreFootstepSoundBlockCurve, bool bNewSpawnDecal, bool bNewSpawnParticleSystem);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	FHitResult HitResult;

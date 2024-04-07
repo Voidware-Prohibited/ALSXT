@@ -3,6 +3,7 @@
 #include "NativeGameplayTags.h"
 #include "Chaos/ChaosEngineInterface.h"
 #include "Settings/ALSXTCameraEffectsSettings.h"
+#include "State/ALSXTFootstepState.h"
 #include "AlsCharacterMovementComponent.h"
 #include "ALSXTCharacterInterface.generated.h"
 
@@ -16,7 +17,13 @@ class ALSXT_API IALSXTCharacterInterface {
 
 public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  AALSXTCharacter* GetCharacter();
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   USkeletalMeshComponent* GetCharacterMesh() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  UALSXTAnimationInstance* GetCharacterAnimInstance() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterLocomotionMode() const;
@@ -26,6 +33,12 @@ public:
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FALSXTDefensiveModeState GetCharacterDefensiveModeState() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FALSXTFootprintsState GetCharacterFootprintsState() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FALSXTFootwearDetails GetCharacterFootwearDetails() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   UCapsuleComponent* GetCharacterCapsuleComponent() const;

@@ -7,6 +7,7 @@
 #include "ALSXTAnimationInstance.h"
 #include "ALSXTCharacter.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
 #include "NiagaraFunctionLibrary.h"
 
 // ReSharper disable once CppUnusedIncludeDirective
@@ -35,9 +36,11 @@ void UALSXTAnimNotify_CharacterBreathEffects::Notify(USkeletalMeshComponent* Mes
 		FGameplayTag Status{ IALSXTCharacterInterface::Execute_GetCharacterStatus(Mesh->GetOwner()) };
 		if (Status == ALSXTStatusTags::Dead)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Dead");
 			return;
 		}
-		IALSXTCharacterInterface::Execute_CharacterBreathEffects(Mesh->GetOwner(), StaminaOverride);
+		// IALSXTCharacterInterface::Execute_CharacterBreathEffects(Mesh->GetOwner(), StaminaOverride);
+		IALSXTCharacterSoundComponentInterface::Execute_PlayBreathEffects(Mesh->GetOwner(), StaminaOverride);
 	}
 	else
 	{

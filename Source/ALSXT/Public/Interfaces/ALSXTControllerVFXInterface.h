@@ -16,8 +16,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Character")
     APlayerController* GetPlayerController();
 
-    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Character")
-    AALSXTCharacter* GetCharacter();
+    // UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Character")
+    // AALSXTCharacter* GetCharacter();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller VFX|Character")
     APlayerCameraManager* GetPlayerCameraManager();

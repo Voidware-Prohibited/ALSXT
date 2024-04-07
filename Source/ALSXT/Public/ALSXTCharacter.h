@@ -38,6 +38,8 @@
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
 #include "Interfaces/ALSXTIdleAnimationComponentInterface.h"
+#include "Notifies/AlsAnimNotify_FootstepEffects.h"
+#include "State/ALSXTFootstepState.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
@@ -190,8 +192,6 @@ protected:
 	int32 VaultingRootMotionSourceId;
 
 public:
-	virtual USkeletalMeshComponent* GetCharacterMesh_Implementation() const override;
-
 	virtual FGameplayTag GetCharacterSex_Implementation() const override;
 
 	virtual FGameplayTag GetCharacterStance_Implementation() const override;
@@ -264,7 +264,7 @@ public:
 	void ServerProcessNewALSXTPoseState(const FALSXTPoseState& NewALSXTPoseState);
 
 	// Vaulting State
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|State|Vaulting", Meta = (AllowPrivateAccess))
 	FALSXTVaultingState VaultingState;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
@@ -318,6 +318,33 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootprintsState", Meta = (AllowPrivateAccess))
 	FALSXTFootprintsState FootprintsState;
+
+protected:
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Als Character|Footstep State", Meta = (AutoCreateRefTerm = "Foot"))
+	void ClientSetFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Settings|Als Character|Footstep State", Meta = (AutoCreateRefTerm = "Foot"))
+	void MulticastSetFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings|Als Character|Footstep State", Meta = (ForceAsFunction, AutoCreateRefTerm = "Foot"))
+	void UpdateFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintStatePhase& Target, const float& Alpha);
+
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings|Als Character|Footstep State", Meta = (ForceAsFunction, AutoCreateRefTerm = "Foot"))
+	void SetFootprintNewSurface(const FALSXTFootprintsState& UpdatedTargetState, const FALSXTFootprintsState& NewFootprintsState, const EAlsFootBone& Foot);
+
+protected:
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|State|Footstep", Meta = (AutoCreateRefTerm = "Foot"))
+	void StartFootSaturation(const EAlsFootBone& Foot, const FALSXTFootprintStatePhase& TargetState);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Settings|Als Character|Footstep State", Meta = (AutoCreateRefTerm = "Foot"))
+	void ResetFootSaturationTimeline(const EAlsFootBone& Foot);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|State|Footstep", Meta = (AutoCreateRefTerm = "Foot"))
+	UTimelineComponent* GetFootTimeline(const EAlsFootBone& Foot);
 
 	// Aim State
 
@@ -1039,17 +1066,17 @@ public:
 	const FALSXTFootprintsState& GetFootprintsState() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
-	void SetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
+	void SetFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFootprintsState"))
-	FALSXTFootprintsState ProcessNewFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
+	FALSXTFootprintsState ProcessNewFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
-	UFUNCTION(Server, Unreliable)
-	void ServerProcessNewFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
+	UFUNCTION(Server, Reliable)
+	void ServerProcessNewFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
 private:
-	UFUNCTION(Server, Unreliable)
-	void ServerSetFootprintsState(const EALSXTFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
+	UFUNCTION(Server, Reliable)
+	void ServerSetFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
 	UFUNCTION()
 	void OnReplicate_FootprintsState(const FALSXTFootprintsState& PreviousFootprintsState);
@@ -1856,43 +1883,52 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnWeaponObstructionChanged(const FGameplayTag& PreviousWeaponObstructionTag);
 
-	//Interface Functions
+	// INTERFACE FUNCTIONS
 
-	//Character Camera Effects Component Interface
-	virtual FGameplayTag GetCharacterLocomotionMode_Implementation() const override;
-	
-	virtual FGameplayTag GetCharacterGait_Implementation() const override;
-	
-	virtual FALSXTDefensiveModeState GetCharacterDefensiveModeState_Implementation() const override;
-	
+	// Core Interface Functions
+	virtual AALSXTCharacter* GetCharacter_Implementation() override;
+	virtual UALSXTAnimationInstance* GetCharacterAnimInstance_Implementation() const override;
+	virtual UALSXTCharacterSettings* GetCharacterSettings_Implementation() const override;
+
+	// Component Interface Functions
+	virtual USkeletalMeshComponent* GetCharacterMesh_Implementation() const override;
 	virtual UCapsuleComponent* GetCharacterCapsuleComponent_Implementation() const override;
-	
 	virtual UAlsCharacterMovementComponent* GetCharacterMovementComponent_Implementation() const override;
-	
-	virtual bool IsBlocking_Implementation() const override;
-	
-	virtual FGameplayTag GetCharacterLocomotionAction_Implementation() const override;
-	
-	virtual void SetCharacterLocomotionAction_Implementation(const FGameplayTag& NewLocomotionAction) override;
-	
-	virtual void ResetCharacterDefensiveModeState_Implementation() override;
-	
-	virtual FGameplayTag GetCharacterDefensiveMode_Implementation() const override;
-	
-	virtual void SetCharacterDefensiveMode_Implementation(const FGameplayTag& NewDefensiveMode) override;
 
+	// Footprint Interface Functions
+	virtual FALSXTFootprintsState GetCharacterFootprintsState_Implementation() const override;
+	virtual FALSXTFootwearDetails GetCharacterFootwearDetails_Implementation() const override;
+
+	// State Interface Functions
 	virtual void SetCharacterStatus_Implementation(const FGameplayTag& NewStatus) override;
-
-	virtual void SetCharacterDefensiveModeState_Implementation(FALSXTDefensiveModeState NewDefensiveModeState) override;
-
 	virtual void SetCharacterMovementModeLocked_Implementation(bool NewLocked) override;
-	
 	virtual void SetCharacterStance_Implementation(const FGameplayTag& NewStance) override;
+	virtual FGameplayTag GetCharacterGait_Implementation() const override;
+	virtual FGameplayTag GetCharacterLocomotionMode_Implementation() const override;
+	virtual FGameplayTag GetCharacterLocomotionAction_Implementation() const override;		
+	virtual void SetCharacterLocomotionAction_Implementation(const FGameplayTag& NewLocomotionAction) override;
+	virtual FALSXTPoseState GetCharacterPoseState_Implementation() const override;
+	virtual FGameplayTag GetCharacterLocomotionVariant_Implementation() const override;
+	virtual FGameplayTag GetCharacterVaultType_Implementation() const override;
 
+	// Freelooking Interface Functions
 	virtual FGameplayTag GetCharacterFreelooking_Implementation() const override;
+	virtual FALSXTFreelookState GetCharacterFreelookState_Implementation() const override;
+	virtual FALSXTHeadLookAtState GetCharacterHeadLookAtState_Implementation() const override;
+	
+	// Defensive Mode Interface Functions
+	virtual FGameplayTag GetCharacterDefensiveMode_Implementation() const override;
+	virtual bool IsBlocking_Implementation() const override;	
+	virtual void SetCharacterDefensiveMode_Implementation(const FGameplayTag& NewDefensiveMode) override;
+	virtual FALSXTDefensiveModeState GetCharacterDefensiveModeState_Implementation() const override;
+	virtual void SetCharacterDefensiveModeState_Implementation(FALSXTDefensiveModeState NewDefensiveModeState) override;
+	virtual void ResetCharacterDefensiveModeState_Implementation() override;
 
+	// Gesture Interface Functions
 	virtual FGameplayTag GetCharacterGesture_Implementation() const override;
 	virtual FGameplayTag GetCharacterGestureHand_Implementation() const override;
+
+	// Held Item Interface Functions
 	virtual FGameplayTag GetCharacterReloadingType_Implementation() const override;
 	virtual FGameplayTag GetCharacterForegripPosition_Implementation() const override;
 	virtual FGameplayTag GetCharacterFirearmFingerAction_Implementation() const override;
@@ -1900,15 +1936,9 @@ protected:
 	virtual FGameplayTag GetCharacterWeaponCarryPosition_Implementation() const override;
 	virtual FGameplayTag GetCharacterFirearmSightLocation_Implementation() const override;
 	virtual FTransform GetCharacterCurrentForegripTransform_Implementation() const override;
-	virtual FGameplayTag GetCharacterVaultType_Implementation() const override;
-	virtual FALSXTPoseState GetCharacterPoseState_Implementation() const override;
 	virtual FALSXTAimState GetCharacterAimState_Implementation() const override;
-	virtual FALSXTFreelookState GetCharacterFreelookState_Implementation() const override;
-	virtual FALSXTHeadLookAtState GetCharacterHeadLookAtState_Implementation() const override;
 	virtual bool DoesCharacterOverlayObjectUseLeftHandIK_Implementation() const override;
-	virtual FGameplayTag GetCharacterLocomotionVariant_Implementation() const override;
 	virtual FGameplayTag GetCharacterHoldingBreath_Implementation() const override;
-	virtual UALSXTCharacterSettings* GetCharacterSettings_Implementation() const override;
 };
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredLean() const
