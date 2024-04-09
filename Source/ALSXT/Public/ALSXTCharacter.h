@@ -1074,9 +1074,11 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerProcessNewFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
 
-private:
-	UFUNCTION(Server, Reliable)
+protected:
+	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void ServerSetFootprintsState(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState);
+
+private:
 
 	UFUNCTION()
 	void OnReplicate_FootprintsState(const FALSXTFootprintsState& PreviousFootprintsState);

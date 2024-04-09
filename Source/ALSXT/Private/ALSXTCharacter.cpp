@@ -1077,11 +1077,6 @@ void AALSXTCharacter::SetFootprintsState(const EAlsFootBone& Foot, const FALSXTF
 	FootprintsState = NewFootprintsState;
 
 	OnFootprintsStateChanged(PreviousFootprintsState);
-
-	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
-	{
-		ServerSetFootprintsState(Foot, NewFootprintsState);
-	}
 }
 
 void AALSXTCharacter::ServerSetFootprintsState_Implementation(const EAlsFootBone& Foot, const FALSXTFootprintsState& NewFootprintsState)
