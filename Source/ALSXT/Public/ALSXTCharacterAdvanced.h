@@ -77,6 +77,8 @@ private:
 	void InputAcrobaticAction(const FInputActionValue& ActionValue);
 
 protected:
+	void OnDesiredAimingChanged_Implementation(bool bPreviousDesiredAiming) override;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
 	bool CanPerformAcrobaticAction() const;
 	

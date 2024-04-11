@@ -21,6 +21,27 @@ public:
   UALSXTCombatSettings* SelectCombatSettings();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  FGameplayTagContainer GetTargetableOverlayModes();
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+  bool CanDashToTarget();
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+  bool CanAttack();
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+  bool CanGrapple();
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+  bool CanThrow();  
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+  bool CanPerformTakedown();
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+  bool CanPerformUniqueAttack();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   bool Attacking();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")

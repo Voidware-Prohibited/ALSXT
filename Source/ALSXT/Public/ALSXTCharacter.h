@@ -371,11 +371,10 @@ private:
 	UFUNCTION()
 	void OnReplicate_AimState(const FALSXTAimState& PreviousAimState);
 
-protected:
+public:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnAimStateChanged(const FALSXTAimState& PreviousAimState);
 
-public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character")
 	bool DoesOverlayObjectUseLeftHandIK() const;
 
@@ -452,7 +451,6 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnHeadLookAtStateChanged(const FALSXTHeadLookAtState& PreviousHeadLookAtState);
 
-private:
 	// Sex
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))

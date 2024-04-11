@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "ALSXTCharacter.h"
 #include "Settings/ALSXTAcrobaticActionSettings.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 #include "ALSXTAcrobaticActionComponent.generated.h"
 
 
@@ -22,27 +23,18 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	TObjectPtr<UALSXTAcrobaticActionSettings> Settings;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
-	AALSXTCharacter* Character {Cast<AALSXTCharacter>(GetOwner())};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTGeneralAcrobaticActionSettings GeneralAcrobaticActionSettings;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanPerformAcrobaticAction();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanFlip();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanWallJump();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanWallRun();
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void TryAcrobaticAction();

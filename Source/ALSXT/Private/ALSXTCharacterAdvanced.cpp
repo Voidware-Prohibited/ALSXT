@@ -46,6 +46,21 @@ void AALSXTCharacterAdvanced::SetupPlayerInputComponent(UInputComponent* Input)
 	}
 }
 
+void AALSXTCharacterAdvanced::OnDesiredAimingChanged_Implementation(bool bPreviousDesiredAiming)
+{
+	if (bDesiredAiming)
+	{
+		if (Execute_GetTargetableOverlayModes(this).HasTag(OverlayMode) && (DesiredCombatStance.MatchesTag(ALSXTCombatStanceTags::Aiming) || DesiredCombatStance.MatchesTag(ALSXTCombatStanceTags::Ready)))
+		{
+			Combat->GetClosestTarget();
+		}
+	}
+	else
+	{
+		Combat->DisengageAllTargets();
+	}
+}
+
 void AALSXTCharacterAdvanced::InputAcrobaticAction(const FInputActionValue& ActionValue)
 {
 	if (CanPerformAcrobaticAction() && bMovementEnabled && GetLocomotionAction() != AlsLocomotionActionTags::Acrobatic)

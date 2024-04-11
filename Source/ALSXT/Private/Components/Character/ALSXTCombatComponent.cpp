@@ -36,8 +36,7 @@ void UALSXTCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Character = Cast<AALSXTCharacter>(GetOwner());
-	AlsCharacter = Cast<AAlsCharacter>(GetOwner());
+	Character = IALSXTCharacterInterface::Execute_GetCharacter(GetOwner());
 
 	UEnhancedInputComponent* EnhancedInput{ Cast<UEnhancedInputComponent>(Character) };
 	if (IsValid(EnhancedInput))
@@ -81,7 +80,7 @@ float UALSXTCombatComponent::GetAngle(FVector Target)
 
 bool UALSXTCombatComponent::IsTartgetObstructed()
 {
-	FVector CharLoc = Character->GetActorLocation();
+	FVector CharLoc = GetOwner()->GetActorLocation();
 	TArray<FHitResult> OutHits;
 
 	FCollisionObjectQueryParams ObjectQueryParameters;
@@ -116,10 +115,9 @@ bool UALSXTCombatComponent::IsTartgetObstructed()
 
 void UALSXTCombatComponent::TryTraceForTargets()
 {
-	TArray<FGameplayTag> TargetableOverlayModes;
-	GetTargetableOverlayModes(TargetableOverlayModes);
+	FGameplayTagContainer TargetableOverlayModes = IALSXTCombatInterface::Execute_GetTargetableOverlayModes(GetOwner());
 
-	if (Character && TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming() && IsValid(CurrentTarget.HitResult.GetActor()))
+	if (Character && TargetableOverlayModes.HasTag(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner())) && Character->IsDesiredAiming() && IsValid(CurrentTarget.HitResult.GetActor()))
 	{
 		if (Character->GetDistanceTo(CurrentTarget.HitResult.GetActor()) < CombatSettings.MaxInitialLockDistance)
 		{			
@@ -132,6 +130,7 @@ void UALSXTCombatComponent::TryTraceForTargets()
 				}
 				else
 				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Obstructed");
 					DisengageAllTargets();
 					OnTargetObstructed();
 				}
@@ -154,8 +153,8 @@ void UALSXTCombatComponent::TryTraceForTargets()
 void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targets)
 {
 	FRotator ControlRotation = Character->GetControlRotation();
-	FVector CharLoc = Character->GetActorLocation();
-	FVector ForwardVector = Character->GetActorForwardVector();
+	FVector CharLoc = GetOwner()->GetActorLocation();
+	FVector ForwardVector = GetOwner()->GetActorForwardVector();
 	FVector CameraLocation = Character->Camera->GetFirstPersonCameraLocation();
 	FVector StartLocation = ForwardVector * 150 + CameraLocation;
 	FVector EndLocation = ForwardVector * 200 + StartLocation;
@@ -181,11 +180,11 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 	{
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.GetActor()->GetClass()->ImplementsInterface(UALSXTTargetLockInterface::StaticClass()) && Hit.GetActor() != Character && Character->GetDistanceTo(Hit.GetActor()) < CombatSettings.MaxLockDistance)
+			if (Hit.GetActor()->GetClass()->ImplementsInterface(UALSXTTargetLockInterface::StaticClass()) && Hit.GetActor() != GetOwner() && GetOwner()->GetDistanceTo(Hit.GetActor()) < CombatSettings.MaxLockDistance)
 			{
 				FTargetHitResultEntry HitResultEntry;
 				HitResultEntry.Valid = true;
-				HitResultEntry.DistanceFromPlayer = FVector::Distance(Character->GetActorLocation(), Hit.Location);
+				HitResultEntry.DistanceFromPlayer = FVector::Distance(GetOwner()->GetActorLocation(), Hit.Location);
 				HitResultEntry.AngleFromCenter = GetAngle(Hit.Location);
 				HitResultEntry.HitResult = Hit;
 				Targets.Add(HitResultEntry);
@@ -199,14 +198,13 @@ void UALSXTCombatComponent::GetClosestTarget()
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
-	TArray<FGameplayTag> TargetableOverlayModes;
-	GetTargetableOverlayModes(TargetableOverlayModes);
+	FGameplayTagContainer TargetableOverlayModes = IALSXTCombatInterface::Execute_GetTargetableOverlayModes(GetOwner());
 
-	if (TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming())
+	if (TargetableOverlayModes.HasTag(Character->GetOverlayMode()) && Character->IsDesiredAiming())
 	{
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.HitResult.GetActor() != Character)
+			if (Hit.HitResult.GetActor() != GetOwner())
 			{
 				FTargetHitResultEntry HitResultEntry;
 				HitResultEntry.Valid = true;
@@ -250,7 +248,8 @@ void UALSXTCombatComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTar
 	CurrentTarget = NewTarget;
 	OnNewTarget(NewTarget);
 	USkeletalMeshComponent* HitMesh;
-	AALSXTCharacter* ALSXTChar = Cast<AALSXTCharacter>(CurrentTarget.HitResult.GetActor());
+	AALSXTCharacter* ALSXTChar = IALSXTCharacterInterface::Execute_GetCharacter(CurrentTarget.HitResult.GetActor());
+	
 
 	if (ALSXTChar)
 	{
@@ -309,10 +308,9 @@ void UALSXTCombatComponent::GetTargetLeft()
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
-	TArray<FGameplayTag> TargetableOverlayModes;
-	GetTargetableOverlayModes(TargetableOverlayModes);
+	FGameplayTagContainer TargetableOverlayModes = IALSXTCombatInterface::Execute_GetTargetableOverlayModes(GetOwner());
 
-	if (TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming())
+	if (TargetableOverlayModes.HasTag(Character->GetOverlayMode()) && Character->IsDesiredAiming())
 	{
 		for (auto& Hit : OutHits)
 		{
@@ -340,10 +338,9 @@ void UALSXTCombatComponent::GetTargetRight()
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
-	TArray<FGameplayTag> TargetableOverlayModes;
-	GetTargetableOverlayModes(TargetableOverlayModes);
+	FGameplayTagContainer TargetableOverlayModes = IALSXTCombatInterface::Execute_GetTargetableOverlayModes(GetOwner());
 
-	if (TargetableOverlayModes.Contains(Character->GetOverlayMode()) && Character->IsDesiredAiming())
+	if (TargetableOverlayModes.HasTag(Character->GetOverlayMode()) && Character->IsDesiredAiming())
 	{
 		for (auto& Hit : OutHits)
 		{
@@ -518,7 +515,7 @@ void UALSXTCombatComponent::SetupInputComponent(UEnhancedInputComponent* PlayerI
 
 void UALSXTCombatComponent::InputPrimaryAction()
 {
-	if ((AlsCharacter->GetOverlayMode() == AlsOverlayModeTags::Default) && ((Character->GetCombatStance() == ALSXTCombatStanceTags::Ready) || (Character->GetCombatStance() == ALSXTCombatStanceTags::Aiming)) && CanAttack())
+	if ((Character->GetOverlayMode() == AlsOverlayModeTags::Default) && ((Character->GetCombatStance() == ALSXTCombatStanceTags::Ready) || (Character->GetCombatStance() == ALSXTCombatStanceTags::Aiming)) && IALSXTCombatInterface::Execute_CanAttack(GetOwner()))
 	{
 		Attack(ALSXTActionTypeTags::Primary, ALSXTAttackTypeTags::RightFist, ALSXTActionStrengthTags::Medium, 0.10f, 1.3f);
 	}
@@ -643,11 +640,6 @@ void UALSXTCombatComponent::StartSyncedAttack(const FGameplayTag& Overlay, const
 	}
 }
 
-UALSXTCombatSettings* UALSXTCombatComponent::SelectAttackSettings_Implementation()
-{
-	return nullptr;
-}
-
 void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& AttackMethod, const FGameplayTag& ActionType, const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage, const AActor* Target)
 {
 	if (UKismetSystemLibrary::DoesImplementInterface(GetCombatState().CombatParameters.Target, UALSXTCombatInterface::StaticClass()))
@@ -655,14 +647,14 @@ void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& A
 		if (ActionType == ALSXTActionTypeTags::Secondary)
 		{
 			// if (IALSXTCombatInterface::Execute_CanBeTakenDown(GetCombatState().CombatParameters.Target) && CanPerformTakedown())
-			if (CanPerformTakedown())
+			if (IALSXTCombatInterface::Execute_CanPerformTakedown(GetOwner()))
 			{
 				AttackMethod = ALSXTAttackMethodTags::TakeDown;
 				return;
 			}
-			else if (CanGrapple())
+			else if (IALSXTCombatInterface::Execute_CanGrapple(GetOwner()))
 			{
-				if (CanThrow())
+				if (IALSXTCombatInterface::Execute_CanThrow(GetOwner()))
 				{
 					AttackMethod = ALSXTAttackMethodTags::Throw;
 					return;
@@ -694,19 +686,19 @@ void UALSXTCombatComponent::DetermineAttackMethod_Implementation(FGameplayTag& A
 						}
 						else if (LastTarget.ConsecutiveHits >= IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner())->ConsecutiveHitsForSpecialAttack)
 						{
-							if (CanPerformUniqueAttack())
+							if (IALSXTCombatInterface::Execute_CanPerformUniqueAttack(GetOwner()))
 							{
 								AttackMethod = ALSXTAttackMethodTags::Unique;
 								return;
 							}
-							else if (CanPerformTakedown())
+							else if (IALSXTCombatInterface::Execute_CanPerformTakedown(GetOwner()))
 							{
 								AttackMethod = ALSXTAttackMethodTags::TakeDown;
 								return;
 							}
-							else if (CanGrapple())
+							else if (IALSXTCombatInterface::Execute_CanGrapple(GetOwner()))
 							{
-								if (CanThrow())
+								if (IALSXTCombatInterface::Execute_CanThrow(GetOwner()))
 								{
 									AttackMethod = ALSXTAttackMethodTags::Throw;
 									return;
@@ -918,7 +910,7 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 	{
 		CombatState.CombatParameters.TargetYawAngle = TargetYawAngle;
 		Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
-		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::PrimaryAction);
+		Character->SetLocomotionAction(AlsLocomotionActionTags::PrimaryAction);
 
 		// Check if Player is moving forward or strafing
 		float ForwardSpeed = FVector::DotProduct(Character->GetVelocity(), Character->GetActorForwardVector());
@@ -1047,7 +1039,7 @@ void UALSXTCombatComponent::StartSyncedAttackImplementation(UAnimMontage* Montag
 		}
 		CombatState.CombatParameters.TargetYawAngle = TargetYawAngle;
 		Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
-		AlsCharacter->SetLocomotionAction(AlsLocomotionActionTags::PrimaryAction);
+		Character->SetLocomotionAction(AlsLocomotionActionTags::PrimaryAction);
 		// Crouch(); //Hack
 	}
 }

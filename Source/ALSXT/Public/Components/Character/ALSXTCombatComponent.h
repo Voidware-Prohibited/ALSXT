@@ -80,9 +80,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	float GetAngle(FVector Target);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanTarget();
-
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void TryTraceForTargets();
 
@@ -213,9 +210,6 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
 	FSyncedActionAnimation GetSyncedAttackMontage(int32 Index);
-
-	UFUNCTION(BlueprintNativeEvent, Category = "Parameters")
-	UALSXTCombatSettings* SelectAttackSettings();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnAttackStarted(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float& BaseDamage);
