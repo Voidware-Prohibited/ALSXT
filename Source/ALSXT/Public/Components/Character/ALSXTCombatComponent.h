@@ -68,15 +68,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FALSXTGeneralCombatSettings CombatSettings;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Target Lock")
-	void GetTargetableOverlayModes(TArray<FGameplayTag>& TargetableOverlayModes) const;
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
-	float GetHealth();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
-	float GetStamina();
-
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	float GetAngle(FVector Target);
 
@@ -98,9 +89,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void SetCurrentTarget(const FTargetHitResultEntry& NewTarget);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Target Lock")
-	void OnNewTarget(const FTargetHitResultEntry& NewTarget);
-
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void ClearCurrentTarget();
 
@@ -114,46 +102,10 @@ public:
 	void GetTargetRight();
 
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
-	void RotatePlayerToTarget(FTargetHitResultEntry Target);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool IsDashToTargetEnabled();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanDashToTarget();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldDashToTarget();
+	void RotatePlayerToTarget(FTargetHitResultEntry Target);	
 
 	UFUNCTION(BlueprintCallable, Category = "Target Lock")
 	void DashToTarget();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanAttack();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanGrapple();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanBeGrappled();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanThrow();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanBeThrown();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanPerformTakedown();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanBeTakenDown();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanBeKnockedDown();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool CanPerformUniqueAttack();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTCombatState CombatState;

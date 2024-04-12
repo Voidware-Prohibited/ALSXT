@@ -23,8 +23,14 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   FGameplayTagContainer GetTargetableOverlayModes();
 
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Target Lock")
+  void OnNewTarget(const FTargetHitResultEntry& NewTarget);
+
   UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
   bool CanDashToTarget();
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
+  bool ShouldDashToTarget();
 
   UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
   bool CanAttack();
