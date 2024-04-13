@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/Mesh/ALSXTPaintableSkeletalMeshComponent.h"
 #include "ALSXTCharacterCustomizationComponent.generated.h"
 
 
@@ -23,4 +24,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	TArray<UALSXTPaintableSkeletalMeshComponent*> GetAllComponents();
+	
+	TArray<UALSXTPaintableSkeletalMeshComponent*> GetHighlightableComponents();
 };

@@ -24,6 +24,9 @@ public:
   FALSXTCharacterMorphParameters GetAllCustomMorphTargets();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Customization Component Interface")
+  TArray<UALSXTPaintableSkeletalMeshComponent*> GetHighlightableComponents();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Customization Component Interface")
   void SetEquipmentMorphTarget(FALSXTCharacterMorphParameter MorphTarget);
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Customization Component Interface")

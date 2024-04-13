@@ -254,7 +254,7 @@ void UALSXTCombatComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTar
 	if (ALSXTChar)
 	{
 		HitMesh = ALSXTChar->GetMesh();
-		TArray<UMaterialInterface*> CharMaterials = HitMesh->GetMaterials();
+		TArray<UMaterialInterface*> CharMaterials = HitMesh->GetMaterials();	
 
 		if (CharMaterials[0])
 		{
@@ -266,6 +266,11 @@ void UALSXTCombatComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTar
 				TargetDynamicMaterials.Add(CharDynMaterial);
 			}
 		}
+		UMaterialInterface* HeadMaterial = ALSXTChar->Head->GetMaterial(0);
+		UMaterialInstanceDynamic* HeadDynMaterial = ALSXTChar->Head->CreateAndSetMaterialInstanceDynamic(0);
+		HeadDynMaterial->SetScalarParameterValue(CombatSettings.HighlightMaterialParameterName, 1.0f);
+		ALSXTChar->Head->SetMaterial(0, HeadDynMaterial);
+		TargetDynamicMaterials.Add(HeadDynMaterial);
 	}	
 }
 
