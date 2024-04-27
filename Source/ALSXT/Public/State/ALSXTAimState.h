@@ -14,7 +14,19 @@ struct ALSXT_API FALSXTAimState
 		FVector OriginPoint{ EForceInit::ForceInit };
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FTransform OriginTransform{ ENoInit::NoInit };
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector TargetPoint{ EForceInit::ForceInit };
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FTransform TargetTransform{ ENoInit::NoInit };
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FTransform OpticTransform{ ENoInit::NoInit };
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FTransform FrontSightTransform{ ENoInit::NoInit };
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector BarrelPoint{ EForceInit::ForceInit };

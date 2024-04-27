@@ -25,6 +25,42 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// UFUNCTION(BlueprintCallable, Category = "Character Customization")
+	// const bool DoesComponentHaveMorphTarget(UALSXTPaintableSkeletalMeshComponent Component, FName MorphTargetName);
+	// 
+	// UFUNCTION(BlueprintCallable, Category = "Character Customization")
+	// const bool IsMorphTargetAdded(UALSXTPaintableSkeletalMeshComponent Component, FName MorphTargetName);
+	// 
+	// UFUNCTION(BlueprintCallable, Category = "Character Customization")
+	// void SetCustomizationMorphTarget(FALSXTCharacterMorphParameter MorphTargetName);
+	// 
+	// UFUNCTION(BlueprintCallable, Category = "Character Customization")
+	// void SetCustomizationMorphTarget(FALSXTCharacterMorphParameter MorphTargetName);
+	// 
+	// UFUNCTION(BlueprintCallable, Category = "Character Customization")
+	// float GetCustomizationMorphTarget(FName MorphTargetName);
+	// 
+	// UFUNCTION(BlueprintCallable, Category = "Character Customization")
+	// FALSXTCharacterMorphParameters GetAllCustomMorphTargets();
+	// 
+	// UFUNCTION(BlueprintCallable, Category = "Character Customization")
+	// void ResetAllCustomMorphTargets();
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	FALSXTCharacterMorphParameters CharacterMorphParameters;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Hair;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<USkeletalMeshComponent> HairDummyShadow;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UALSXTPaintableSkeletalMeshComponent> FacialHair;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<USkeletalMeshComponent> FacialHairDummyShadow;
+
 	TArray<UALSXTPaintableSkeletalMeshComponent*> GetAllComponents();
 	
 	TArray<UALSXTPaintableSkeletalMeshComponent*> GetHighlightableComponents();

@@ -405,7 +405,10 @@ void UALSXTCharacterCameraEffectsComponent::AddSuppression(float NewMagnitude, f
 	{
 		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(SuppressionBlendableIndex))
 		{
-			PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.RadialBlurMaxWeight);
+			float EffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.RadialBlurMaxWeight);
+			PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight = EffectAmount;
+			CurrentSuppressionAmount = EffectAmount;
+
 			BeginFadeOutSuppression(1.0f, RecoveryDelay);
 		}		
 	}
@@ -414,6 +417,7 @@ void UALSXTCharacterCameraEffectsComponent::AddSuppression(float NewMagnitude, f
 void UALSXTCharacterCameraEffectsComponent::ResetSuppression()
 {
 	PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight = 0.0f;
+	CurrentSuppressionAmount = 0.0f;
 }
 
 void UALSXTCharacterCameraEffectsComponent::BeginFadeOutSuppression(float NewRecoveryScale, float NewRecoveryDelay)
@@ -428,6 +432,10 @@ void UALSXTCharacterCameraEffectsComponent::FadeOutSuppression()
 	{
 		PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight - 0.001 * RecoveryScale), 0.0f, 1.0);
 
+		float FadeOutEffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight - 0.001 * RecoveryScale), 0.0f, 1.0);
+		PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight = FadeOutEffectAmount;
+		CurrentSuppressionAmount = FadeOutEffectAmount;
+
 		if (PostProcessComponent->Settings.WeightedBlendables.Array[SuppressionBlendableIndex].Weight <= 0.0)
 		{
 			Character->GetWorld()->GetTimerManager().ClearTimer(SuppressionFadeOutTimer);
@@ -441,7 +449,10 @@ void UALSXTCharacterCameraEffectsComponent::AddBlindnessEffect(float NewMagnitud
 	{
 		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(BlindnessEffectBlendableIndex))
 		{
-			PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.BlindnessEffectMaxWeight);
+			float EffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.BlindnessEffectMaxWeight);
+			PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight = EffectAmount;
+			CurrentBlindnessEffectAmount = EffectAmount;
+
 			BeginFadeOutBlindnessEffect(1.0f, RecoveryDelay);
 		}
 	}
@@ -450,6 +461,7 @@ void UALSXTCharacterCameraEffectsComponent::AddBlindnessEffect(float NewMagnitud
 void UALSXTCharacterCameraEffectsComponent::ResetBlindnessEffect()
 {
 	PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight = 0.0f;
+	CurrentDamageEffectAmount = 0.0f;
 }
 
 void UALSXTCharacterCameraEffectsComponent::BeginFadeOutBlindnessEffect(float NewRecoveryScale, float NewRecoveryDelay)
@@ -462,7 +474,9 @@ void UALSXTCharacterCameraEffectsComponent::FadeOutBlindnessEffect()
 {
 	if (IsValid(PostProcessComponent))
 	{
-		PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight - 0.001 * BlindnessEffectRecoveryScale), 0.0f, 1.0);
+		float FadeOutEffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight - 0.001 * BlindnessEffectRecoveryScale), 0.0f, 1.0);
+		PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight = FadeOutEffectAmount;
+		CurrentBlindnessEffectAmount = FadeOutEffectAmount;
 
 		if (PostProcessComponent->Settings.WeightedBlendables.Array[BlindnessEffectBlendableIndex].Weight <= 0.0)
 		{
@@ -477,7 +491,10 @@ void UALSXTCharacterCameraEffectsComponent::AddDamageEffect(float NewMagnitude, 
 	{
 		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(DamageEffectBlendableIndex))
 		{
-			PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.DamageEffectMaxWeight);
+			float EffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.DamageEffectMaxWeight);
+			PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight = EffectAmount;
+			CurrentDamageEffectAmount = EffectAmount;
+
 			BeginFadeOutDamageEffect(1.0f, RecoveryDelay);
 		}
 	}
@@ -488,6 +505,7 @@ void UALSXTCharacterCameraEffectsComponent::ResetDamageEffect()
 	if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(DamageEffectBlendableIndex))
 	{
 		PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight = 0.0f;
+		CurrentDamageEffectAmount = 0.0f;
 	}
 }
 
@@ -501,7 +519,9 @@ void UALSXTCharacterCameraEffectsComponent::FadeOutDamageEffect()
 {
 	if (IsValid(PostProcessComponent))
 	{
-		PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight - 0.001 * DamageEffectRecoveryScale), 0.0f, 1.0);
+		float FadeOutEffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight - 0.001 * DamageEffectRecoveryScale), 0.0f, 1.0);
+		PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight = FadeOutEffectAmount;
+		CurrentDamageEffectAmount = FadeOutEffectAmount;
 
 		if (PostProcessComponent->Settings.WeightedBlendables.Array[DamageEffectBlendableIndex].Weight <= 0.0)
 		{
@@ -516,7 +536,10 @@ void UALSXTCharacterCameraEffectsComponent::AddConcussionEffect(float NewMagnitu
 	{
 		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(ConcussionEffectBlendableIndex))
 		{
-			PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.ConcussionEffectMaxWeight);
+			float EffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.ConcussionEffectMaxWeight);
+			PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight = EffectAmount;
+			CurrentConcussionEffectAmount = EffectAmount;
+
 			BeginFadeOutConcussionEffect(1.0f, RecoveryDelay);
 		}
 	}
@@ -525,6 +548,7 @@ void UALSXTCharacterCameraEffectsComponent::AddConcussionEffect(float NewMagnitu
 void UALSXTCharacterCameraEffectsComponent::ResetConcussionEffect()
 {
 	PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight = 0.0f;
+	CurrentConcussionEffectAmount = 0.0f;
 }
 
 void UALSXTCharacterCameraEffectsComponent::BeginFadeOutConcussionEffect(float NewRecoveryScale, float NewRecoveryDelay)
@@ -537,7 +561,9 @@ void UALSXTCharacterCameraEffectsComponent::FadeOutConcussionEffect()
 {
 	if (IsValid(PostProcessComponent))
 	{
-		PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight - 0.001 * ConcussionEffectRecoveryScale), 0.0f, 1.0);
+		float FadeOutEffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight - 0.001 * ConcussionEffectRecoveryScale), 0.0f, 1.0);
+		PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight = FadeOutEffectAmount;
+		CurrentConcussionEffectAmount = FadeOutEffectAmount;
 
 		if (PostProcessComponent->Settings.WeightedBlendables.Array[ConcussionEffectBlendableIndex].Weight <= 0.0)
 		{
@@ -552,7 +578,10 @@ void UALSXTCharacterCameraEffectsComponent::AddDrunkEffect(float NewMagnitude, f
 	{
 		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(DrunkEffectBlendableIndex))
 		{
-			PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.DrunkEffectMaxWeight);
+			float EffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.DrunkEffectMaxWeight);
+			PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight = EffectAmount;
+			CurrentDrunkEffectAmount = EffectAmount;
+
 			BeginFadeOutDrunkEffect(1.0f, RecoveryDelay);
 		}
 	}
@@ -563,6 +592,7 @@ void UALSXTCharacterCameraEffectsComponent::ResetDrunkEffect()
 	if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(DrunkEffectBlendableIndex))
 	{
 		PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight = 0.0f;
+		CurrentDrunkEffectAmount = 0.0f;
 	}
 }
 
@@ -576,7 +606,9 @@ void UALSXTCharacterCameraEffectsComponent::FadeOutDrunkEffect()
 {
 	if (IsValid(PostProcessComponent))
 	{
-		PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight - 0.001 * DrunkEffectRecoveryScale), 0.0f, 1.0);
+		float FadeOutEffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight - 0.001 * DrunkEffectRecoveryScale), 0.0f, 1.0);
+		PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight = FadeOutEffectAmount;
+		CurrentDrunkEffectAmount = FadeOutEffectAmount;
 
 		if (PostProcessComponent->Settings.WeightedBlendables.Array[DrunkEffectBlendableIndex].Weight <= 0.0)
 		{
@@ -591,7 +623,9 @@ void UALSXTCharacterCameraEffectsComponent::AddHighEffect(float NewMagnitude, fl
 	{
 		if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(HighEffectBlendableIndex))
 		{
-			PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.HighEffectMaxWeight);
+			float EffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight + NewMagnitude), 0.0, GeneralCameraEffectsSettings.HighEffectMaxWeight);
+			PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight = EffectAmount;
+			CurrentHighEffectAmount = EffectAmount;
 			BeginFadeOutHighEffect(1.0f, RecoveryDelay);
 		}
 	}
@@ -602,6 +636,7 @@ void UALSXTCharacterCameraEffectsComponent::ResetHighEffect()
 	if (IsValid(PostProcessComponent) && PostProcessComponent->Settings.WeightedBlendables.Array.IsValidIndex(HighEffectBlendableIndex))
 	{
 		PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight = 0.0f;
+		CurrentHighEffectAmount = 0.0f;
 	}
 }
 
@@ -615,7 +650,9 @@ void UALSXTCharacterCameraEffectsComponent::FadeOutHighEffect()
 {
 	if (IsValid(PostProcessComponent))
 	{
-		PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight - 0.001 * HighEffectRecoveryScale), 0.0f, 1.0);
+		float FadeOutEffectAmount = FMath::Clamp((PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight - 0.001 * HighEffectRecoveryScale), 0.0f, 1.0);
+		PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight = FadeOutEffectAmount;
+		CurrentHighEffectAmount = FadeOutEffectAmount;
 
 		if (PostProcessComponent->Settings.WeightedBlendables.Array[HighEffectBlendableIndex].Weight <= 0.0)
 		{
@@ -629,6 +666,7 @@ void UALSXTCharacterCameraEffectsComponent::SetRadialBlur()
 	float Velocity = Character->GetVelocity().Size();
 	float BlurAmount = FMath::GetMappedRangeValueClamped(FVector2D{ 0.0, GeneralCameraEffectsSettings.RadialBlurMaxVelocity }, FVector2D{ 0.0f, GeneralCameraEffectsSettings.RadialBlurMaxWeight }, Velocity);
 	PostProcessComponent->Settings.WeightedBlendables.Array[0].Weight = BlurAmount;
+	CurrentRadialBlurAmount = BlurAmount;
 }
 
 void UALSXTCharacterCameraEffectsComponent::SetDepthOfField()

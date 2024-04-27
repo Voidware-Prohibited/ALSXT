@@ -41,9 +41,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FAlsGeneralTurnInPlaceSettings TurnInPlace;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	bool Param;
-
 public:
 	UALSXTAnimationInstanceSettings();
 

@@ -32,6 +32,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "State/ALSXTFootstepState.h"
+#include "ALSXTCameraAnimationInstance.h"
 
 AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UALSXTPaintableSkeletalMeshComponent>(AAlsCharacter::MeshComponentName).SetDefaultSubobjectClass<UALSXTCharacterMovementComponent>(AAlsCharacter::CharacterMovementComponentName))
@@ -460,6 +461,10 @@ void AALSXTCharacter::BeginPlay()
 
 	FreelookTimerDelegate.BindUFunction(this, "AttackCollisionTrace");
 	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace", AttackTraceSettings);
+
+	// IALSXTCharacterInterface::Execute_GetCharacterCameraAnimationInstance(this)->OnFirstPersonOverrideChanged.AddUnique(OnFirstPersonOverrideChangedDelegate);
+	// IALSXTCharacterInterface::Execute_GetCharacterCameraAnimationInstance(this)->FOnFirstPersonOverrideChanged.BindRaw()
+
 }
 
 void AALSXTCharacter::CalcCamera(const float DeltaTime, FMinimalViewInfo& ViewInfo)
@@ -497,8 +502,8 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(LeanRightAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanRight);
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
 		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleCombatReady);
-		EnhancedInput->BindAction(PrimaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryAction);
-		EnhancedInput->BindAction(SecondaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryAction);	
+		EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryInteraction);
+		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
 		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::InputBlock);
 		EnhancedInput->BindAction(HoldBreathAction, ETriggerEvent::Triggered, this, &ThisClass::InputHoldBreath);
 		EnhancedInput->BindAction(SwitchGripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchGripPosition);
@@ -1205,19 +1210,14 @@ void AALSXTCharacter::InputLeanRight(const FInputActionValue& ActionValue)
 	}
 }
 
-void AALSXTCharacter::InputAcrobatic()
+bool AALSXTCharacter::CanPerformPrimaryInteraction_Implementation() const
 {
-	// 
+	return true;
 }
 
-void AALSXTCharacter::InputSwitchTargetLeft()
+bool AALSXTCharacter::CanPerformSecondaryInteraction_Implementation() const
 {
-	// 
-}
-
-void AALSXTCharacter::InputSwitchTargetRight()
-{
-	// 
+	return true;
 }
 
 void AALSXTCharacter::InputToggleWeaponFirearmStance()
@@ -1228,36 +1228,6 @@ void AALSXTCharacter::InputToggleWeaponFirearmStance()
 void AALSXTCharacter::InputToggleWeaponReadyPosition()
 {
 	// 
-}
-
-void AALSXTCharacter::InputReload()
-{
-	// 
-}
-
-void AALSXTCharacter::InputReloadWithRetention()
-{
-	// 
-}
-
-bool AALSXTCharacter::CanPerformPrimaryAction_Implementation() const
-{
-	return true;
-}
-
-bool AALSXTCharacter::CanPerformSecondaryAction_Implementation() const
-{
-	return true;
-}
-
-bool AALSXTCharacter::CanPerformPrimaryInteraction_Implementation() const
-{
-	return true;
-}
-
-bool AALSXTCharacter::CanPerformSecondaryInteraction_Implementation() const
-{
-	return true;
 }
 
 void AALSXTCharacter::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalLocation)
@@ -2907,6 +2877,11 @@ FGameplayTag AALSXTCharacter::GetCharacterInjury_Implementation() const
 UAlsCameraComponent* AALSXTCharacter::GetCharacterCamera_Implementation() const
 {
 	return Camera;
+}
+
+UALSXTCameraAnimationInstance* AALSXTCharacter::GetCharacterCameraAnimationInstance_Implementation() const
+{
+	return Cast<UALSXTCameraAnimationInstance>(Camera->GetAnimInstance());
 }
 
 FRotator AALSXTCharacter::GetCharacterControlRotation_Implementation() const

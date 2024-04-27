@@ -191,6 +191,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
 
+	void OnFirstPersonOverrideChanged(float FirstPersonOverride);
+
 public:
 	virtual FGameplayTag GetCharacterSex_Implementation() const override;
 
@@ -203,6 +205,8 @@ public:
 	virtual FGameplayTag GetCharacterInjury_Implementation() const override;
 
 	virtual UAlsCameraComponent* GetCharacterCamera_Implementation() const override;
+
+	virtual UALSXTCameraAnimationInstance* GetCharacterCameraAnimationInstance_Implementation() const override;
 
 	virtual FRotator GetCharacterControlRotation_Implementation() const override;
 
@@ -744,13 +748,13 @@ public:
 	TObjectPtr<UInputAction> FreelookAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
+	TObjectPtr<UInputAction> PrimaryInteractionAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
+	TObjectPtr<UInputAction> SecondaryInteractionAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> ToggleCombatReadyAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> PrimaryActionAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> SecondaryActionAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> BlockAction;
@@ -766,12 +770,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SlideAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> SwitchTargetLeftAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> SwitchTargetRightAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> ToggleWeaponReadyPositionAction;
@@ -837,6 +835,12 @@ public:
 public:
 	void InputBlock(const FInputActionValue& ActionValue);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
+	void InputPrimaryInteraction();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
+	void InputSecondaryInteraction();
+
 private:
 	void InputLookMouse(const FInputActionValue& ActionValue);
 
@@ -872,19 +876,9 @@ private:
 
 	void InputLeanRight(const FInputActionValue& ActionValue);
 
-	void InputAcrobatic();
-
-	void InputSwitchTargetLeft();
-
-	void InputSwitchTargetRight();
-
 	void InputToggleWeaponFirearmStance();
 
 	void InputToggleWeaponReadyPosition();
-
-	void InputReload();
-
-	void InputReloadWithRetention();
 
 	void InputSwitchGripPosition();
 
@@ -894,34 +888,15 @@ private:
 
 	void InputSelectGesture(const FInputActionValue& ActionValue);
 
-public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
-	void InputPrimaryAction();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
-	void InputSecondaryAction();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
-	void InputPrimaryInteraction();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
-	void InputSecondaryInteraction();
-
 protected:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
-	bool CanPerformPrimaryAction() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
-	bool CanPerformSecondaryAction() const;
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	void OnViewModeChanged(const FGameplayTag& PreviousViewModeTag);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
 	bool CanPerformPrimaryInteraction() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
 	bool CanPerformSecondaryInteraction() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	void OnViewModeChanged(const FGameplayTag& PreviousViewModeTag);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")

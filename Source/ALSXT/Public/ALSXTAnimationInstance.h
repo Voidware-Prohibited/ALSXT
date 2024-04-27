@@ -151,7 +151,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	bool DoesOverlayObjectUseLeftHandIK{ false };
 
-private:
+protected:
 	void RefreshALSXTPose();
 
 public:

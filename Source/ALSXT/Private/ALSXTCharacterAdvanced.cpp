@@ -37,6 +37,10 @@ void AALSXTCharacterAdvanced::SetupPlayerInputComponent(UInputComponent* Input)
 	if (IsValid(EnhancedInput))
 	{
 		EnhancedInput->BindAction(AcrobaticAction, ETriggerEvent::Triggered, this, &ThisClass::InputAcrobaticAction);
+		EnhancedInput->BindAction(PrimaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryAction);
+		EnhancedInput->BindAction(SecondaryActionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryAction);
+		EnhancedInput->BindAction(SwitchTargetLeftAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchTargetLeft);
+		EnhancedInput->BindAction(SwitchTargetRightAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchTargetRight);
 		// EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryInteraction);
 		// EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
 		// EnhancedInput->BindAction(SelectEmoteAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectEmote);
@@ -61,12 +65,46 @@ void AALSXTCharacterAdvanced::OnDesiredAimingChanged_Implementation(bool bPrevio
 	}
 }
 
+bool AALSXTCharacterAdvanced::CanPerformPrimaryAction_Implementation() const
+{
+	return true;
+}
+
+bool AALSXTCharacterAdvanced::CanPerformSecondaryAction_Implementation() const
+{
+	return true;
+}
+
+// Input Actions
+
+// Acrobatic Action Component
 void AALSXTCharacterAdvanced::InputAcrobaticAction(const FInputActionValue& ActionValue)
 {
 	if (CanPerformAcrobaticAction() && bMovementEnabled && GetLocomotionAction() != AlsLocomotionActionTags::Acrobatic)
 	{
 		AcrobaticActions->TryAcrobaticAction();
 	}
+}
+
+void AALSXTCharacterAdvanced::InputReload()
+{
+	// 
+}
+
+void AALSXTCharacterAdvanced::InputReloadWithRetention()
+{
+	// 
+}
+
+//Combat Component
+void AALSXTCharacterAdvanced::InputSwitchTargetLeft()
+{
+	Combat->GetTargetLeft();
+}
+
+void AALSXTCharacterAdvanced::InputSwitchTargetRight()
+{
+	Combat->GetTargetRight();
 }
 
 // Interface Functions

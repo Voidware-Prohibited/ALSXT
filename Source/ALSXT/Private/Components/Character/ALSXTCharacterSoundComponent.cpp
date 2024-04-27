@@ -3,6 +3,7 @@
 #include "Components/Character/ALSXTCharacterSoundComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Utility/ALSXTStructs.h"
+#include "Settings/ALSXTCharacterSoundSettings.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
 #include "NiagaraFunctionLibrary.h"

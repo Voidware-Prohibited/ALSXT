@@ -1,5 +1,4 @@
 #include "ALSXTAnimationInstanceProxy.h"
-
 #include "ALSXTAnimationInstance.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ALSXTAnimationInstanceProxy)

@@ -2,6 +2,7 @@
 
 
 #include "Components/Character/ALSXTCharacterEquipmentComponent.h"
+#include "Components/Mesh/ALSXTPaintableSkeletalMeshComponent.h"
 
 // Sets default values for this component's properties
 UALSXTCharacterEquipmentComponent::UALSXTCharacterEquipmentComponent()
@@ -32,3 +33,23 @@ void UALSXTCharacterEquipmentComponent::TickComponent(float DeltaTime, ELevelTic
 	// ...
 }
 
+TArray<UALSXTPaintableSkeletalMeshComponent*> UALSXTCharacterEquipmentComponent::GetAllComponents()
+{
+	TArray<UALSXTPaintableSkeletalMeshComponent*> AllComponents;
+	return AllComponents;
+}
+
+TArray<UALSXTPaintableSkeletalMeshComponent*> UALSXTCharacterEquipmentComponent::GetHighlightableComponents()
+{
+	TArray<UALSXTPaintableSkeletalMeshComponent*> AllComponents{ GetAllComponents() };
+	TArray<UALSXTPaintableSkeletalMeshComponent*> HighlightableComponents;
+
+	for (UALSXTPaintableSkeletalMeshComponent* Component : AllComponents)
+	{
+		if (IsValid(Component))
+		{
+			HighlightableComponents.Add(Component);
+		}
+	}
+	return HighlightableComponents;
+}

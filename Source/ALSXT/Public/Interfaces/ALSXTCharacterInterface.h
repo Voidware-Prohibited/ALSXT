@@ -3,6 +3,11 @@
 #include "NativeGameplayTags.h"
 #include "Chaos/ChaosEngineInterface.h"
 #include "Settings/ALSXTCameraEffectsSettings.h"
+#include "State/ALSXTPoseState.h"
+#include "State/ALSXTHeadLookAtState.h"
+#include "State/ALSXTFreelookState.h"
+#include "State/ALSXTAimState.h"
+#include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTFootstepState.h"
 #include "AlsCharacterMovementComponent.h"
 #include "ALSXTCharacterInterface.generated.h"
@@ -163,6 +168,9 @@ public:
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   UAlsCameraComponent* GetCharacterCamera() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  UALSXTCameraAnimationInstance* GetCharacterCameraAnimationInstance() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FRotator GetCharacterControlRotation() const;

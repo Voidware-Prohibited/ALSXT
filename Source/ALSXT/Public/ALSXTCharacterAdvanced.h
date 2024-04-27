@@ -31,19 +31,25 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* Input) override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> PrimaryInteractionAction;
+	TObjectPtr<UInputAction> PrimaryActionAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> SecondaryInteractionAction;
+	TObjectPtr<UInputAction> SecondaryActionAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> AcrobaticAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SelectEmoteAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SelectGestureAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
+	TObjectPtr<UInputAction> SwitchTargetLeftAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
+	TObjectPtr<UInputAction> SwitchTargetRightAction;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UALSXTCombatComponent* Combat;
@@ -76,10 +82,36 @@ public:
 private:
 	void InputAcrobaticAction(const FInputActionValue& ActionValue);
 
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
+	void InputPrimaryAction();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
+	void InputSecondaryAction();
+
+private:
+
+	void InputSwitchTargetLeft();
+
+	void InputSwitchTargetRight();
+
+	void InputReload();
+
+	void InputReloadWithRetention();
+
 protected:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
+	bool CanPerformPrimaryAction() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
+	bool CanPerformSecondaryAction() const;
+
 	void OnDesiredAimingChanged_Implementation(bool bPreviousDesiredAiming) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
 	bool CanPerformAcrobaticAction() const;
+
+	// void UpdateADSTransforms() const;
 	
 };
