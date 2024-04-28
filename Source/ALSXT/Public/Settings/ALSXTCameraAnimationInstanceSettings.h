@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/EngineTypes.h"
+#include "Curves/CurveVector.h"
 #include "ALSXTCameraAnimationInstanceSettings.generated.h"
 
 UCLASS(Blueprintable, BlueprintType)

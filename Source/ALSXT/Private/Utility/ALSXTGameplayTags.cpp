@@ -188,6 +188,10 @@ namespace ALSXTHoldingBreathTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(False, TEXT("Als.Holding Breath.False"))
 	UE_DEFINE_GAMEPLAY_TAG(True, TEXT("Als.Holding Breath.True"))
+	UE_DEFINE_GAMEPLAY_TAG(Released, TEXT("Als.Holding Breath.Released"))
+	UE_DEFINE_GAMEPLAY_TAG(Exhausted, TEXT("Als.Holding Breath.Exhausted"))
+	UE_DEFINE_GAMEPLAY_TAG(Gasping, TEXT("Als.Holding Breath.Gasping"))
+	UE_DEFINE_GAMEPLAY_TAG(Coughing, TEXT("Als.Holding Breath.Coughing"))
 }
 
 namespace ALSXTCursorLocationTags

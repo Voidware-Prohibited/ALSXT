@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/Mesh/ALSXTPaintableSkeletalMeshComponent.h"
 #include "Settings/ALSXTClothingSettings.h"
 #include "ALSXTCharacterEquipmentComponent.generated.h"
 

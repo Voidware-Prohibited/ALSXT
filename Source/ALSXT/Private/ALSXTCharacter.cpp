@@ -779,6 +779,15 @@ void AALSXTCharacter::InputHoldBreath(const FInputActionValue& ActionValue)
 	if (CanHoldBreath())
 	{
 		SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
+
+		if (ActionValue.Get<bool>())
+		{
+			SetDesiredHoldingBreath(ALSXTHoldingBreathTags::True);
+		}
+		else
+		{
+			SetDesiredHoldingBreath(ALSXTHoldingBreathTags::False);
+		}
 	}
 }
 

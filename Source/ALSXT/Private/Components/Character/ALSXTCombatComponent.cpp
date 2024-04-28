@@ -485,7 +485,11 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& ActionType, const FGamepl
 	AActor* PotentialAttackTarget = TraceForPotentialAttackTarget(100.0f);
 	FALSXTCombatState CurrentCombatState = GetCombatState();
 	CurrentCombatState.CombatParameters.Target = PotentialAttackTarget;
-	SetCombatState(CurrentCombatState);
+	CurrentCombatState.CombatParameters.Form = ALSXTImpactFormTags::Blunt;
+	CurrentCombatState.CombatParameters.AttackType = AttackType;
+	CurrentCombatState.CombatParameters.Strength = Strength;
+	CurrentCombatState.CombatParameters.BaseDamage = BaseDamage;
+	CurrentCombatState.CombatParameters.PlayRate = PlayRate;
 	FGameplayTag AttackMethod;
 	if (IsValid(PotentialAttackTarget))
 	{
@@ -508,6 +512,8 @@ void UALSXTCombatComponent::Attack(const FGameplayTag& ActionType, const FGamepl
 			? Character->GetLocomotionState().InputYawAngle
 			: UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(Character->GetActorRotation().Yaw)), 0);
 	}
+	CurrentCombatState.CombatParameters.AttackMethod = AttackMethod;
+	SetCombatState(CurrentCombatState);
 }
 
 void UALSXTCombatComponent::SetupInputComponent(UEnhancedInputComponent* PlayerInputComponent)

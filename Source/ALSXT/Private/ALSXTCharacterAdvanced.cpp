@@ -107,6 +107,27 @@ void AALSXTCharacterAdvanced::InputSwitchTargetRight()
 	Combat->GetTargetRight();
 }
 
+void AALSXTCharacterAdvanced::BeginHoldBreathTimer()
+{
+	if (ALSXTSettings->Freelook.bEnableFreelook)
+	{
+		GetWorld()->GetTimerManager().SetTimer(HoldBreathTimerHandle, HoldBreathTimerDelegate, 0.1f, true);
+	}
+}
+
+void AALSXTCharacterAdvanced::HoldBreathTimer()
+{
+
+}
+
+void AALSXTCharacterAdvanced::EndHoldBreathTimer()
+{
+	// Clear Attack Trace Timer
+	// FALSXTFreelookState EmptyState;
+	// SetFreelookState(EmptyState);
+	GetWorld()->GetTimerManager().ClearTimer(HoldBreathTimerHandle);
+}
+
 // Interface Functions
 
 //Camera Effects Component Interface

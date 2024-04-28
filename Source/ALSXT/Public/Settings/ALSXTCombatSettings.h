@@ -15,19 +15,22 @@ struct ALSXT_API FALSXTCombatParameters
 	FGameplayTag AttackType{FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FGameplayTag Strength{FGameplayTag::EmptyTag};
+	FGameplayTag AttackMethod {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FGameplayTag Stance{FGameplayTag::EmptyTag};
+	FGameplayTag Strength {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FGameplayTag Form{FGameplayTag::EmptyTag};
+	FGameplayTag Stance {FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag Form {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FActionMontageInfo CombatAnimation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
-	float BaseDamage{ 0.0f };
+	float BaseDamage {0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	AActor* Target {nullptr};

@@ -119,6 +119,19 @@ private:
 	void InputReloadWithRetention();
 
 protected:
+	FTimerHandle HoldBreathTimerHandle;	// Timer Handle for Hold Breath
+	FTimerDelegate HoldBreathTimerDelegate; // Delegate to bind function with parameters
+
+	// Hold Breath
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void BeginHoldBreathTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void HoldBreathTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void EndHoldBreathTimer();
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
 	bool CanPerformPrimaryAction() const;
 

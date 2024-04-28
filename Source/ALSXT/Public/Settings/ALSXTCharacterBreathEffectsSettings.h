@@ -32,4 +32,8 @@ struct ALSXT_API FALSXTCharacterBreathEffectsSettings
 	/* Breath Particles for All Vocalizations */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray< FALSXTBreathParticle> BreathParticles;
+
+	/* Range of Breath Rate to calculate with Stamina after releasing Hold Breath */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1), Category = "Holding Breath")
+	FVector2D ReleaseStartRateRange{ 0.33f, 2.0f };
 };
