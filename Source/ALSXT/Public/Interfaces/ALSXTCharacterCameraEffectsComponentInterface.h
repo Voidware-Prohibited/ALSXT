@@ -30,10 +30,7 @@ public:
   void ResetRadialBlurEffect();
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Camera Effects Component Interface|Focus")
-  void SetFocusEffect(bool Focus);
-
-  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Camera Effects Component Interface|Focus")
-  void ResetFocusEffect();
+  void SetFocusEffect(bool NewFocus);
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Camera Effects Component Interface|Drunken")
   void AddDrunkEffect(float Magnitude, float Length, float FadeInLength, float FadeOutLength);

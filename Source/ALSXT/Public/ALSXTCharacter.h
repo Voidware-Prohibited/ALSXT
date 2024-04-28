@@ -191,8 +191,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
 
-	void OnFirstPersonOverrideChanged(float FirstPersonOverride);
-
 public:
 	virtual FGameplayTag GetCharacterSex_Implementation() const override;
 
@@ -238,6 +236,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TMap<FGameplayTag, TSubclassOf<UAnimInstance>> OverlayAnimationInstanceClasses;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	bool bUseGunBoneForOverlayObjects {false};
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Overlay", Meta = (ForceAsFunction))
 	void RefreshOverlayLinkedAnimationLayer();
 
@@ -253,6 +254,9 @@ protected:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess, Transient))
 	FALSXTPoseState ALSXTPoseState;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character", Meta = (ForceAsFunction))
+	void OnFirstPersonOverrideChanged(const float& FirstPersonOverride);
 
 	// Pose State
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")

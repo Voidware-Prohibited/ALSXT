@@ -1230,6 +1230,11 @@ void AALSXTCharacter::InputToggleWeaponReadyPosition()
 	// 
 }
 
+void AALSXTCharacter::OnFirstPersonOverrideChanged_Implementation(const float& FirstPersonOverride)
+{
+	//
+}
+
 void AALSXTCharacter::DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DebugDisplay, float& Unused, float& VerticalLocation)
 {
 	if (Camera->IsActive())

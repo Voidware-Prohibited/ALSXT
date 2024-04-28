@@ -77,8 +77,20 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	float CurrentHighEffectAmount{ 0.0f };
 
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	float CurrentDeathEffectAmount{ 0.0f };
+
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void UpdateCameraShake();
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void SetRadialBlur(float Amount);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void ResetRadialBlur();
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void SetFocusEffect(bool NewFocus);
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void AddDrunkEffect(float NewMagnitude, float RecoveryDelay);
@@ -203,6 +215,6 @@ private:
 
 	void Initialize();
 	void CameraEffectsTrace();
-	void SetRadialBlur();
+	void UpdateRadialBlur();
 	void SetDepthOfField();
 };

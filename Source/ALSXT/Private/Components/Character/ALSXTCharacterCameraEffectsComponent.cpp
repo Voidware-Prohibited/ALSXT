@@ -80,7 +80,7 @@ void UALSXTCharacterCameraEffectsComponent::BeginPlay()
 				const FWeightedBlendable RadialBlurBlend {0.0f, GeneralCameraEffectsSettings.RadialBlurMaterial};
 				PostProcessComponent->Settings.WeightedBlendables.Array.Add(RadialBlurBlend);
 				RadialBlurBlendableIndex = PostProcessComponent->Settings.WeightedBlendables.Array.Num() - 1;
-				GetWorld()->GetTimerManager().SetTimer(RadialBlurTimer, this, &UALSXTCharacterCameraEffectsComponent::SetRadialBlur, 0.01f, true);
+				GetWorld()->GetTimerManager().SetTimer(RadialBlurTimer, this, &UALSXTCharacterCameraEffectsComponent::UpdateRadialBlur, 0.01f, true);
 			}
 
 			if (GeneralCameraEffectsSettings.bEnableDrunkEffect)
@@ -349,6 +349,35 @@ void UALSXTCharacterCameraEffectsComponent::UpdateCameraShake()
 				return;
 			}
 		}
+	}
+}
+
+void UALSXTCharacterCameraEffectsComponent::SetRadialBlur(float Amount)
+{
+	// SetRadialBlur(0.0f);
+
+	float BlurAmount = FMath::GetMappedRangeValueClamped(FVector2D{ 0.0, GeneralCameraEffectsSettings.RadialBlurMaxVelocity }, FVector2D{ 0.0f, GeneralCameraEffectsSettings.RadialBlurMaxWeight }, Amount);
+	PostProcessComponent->Settings.WeightedBlendables.Array[0].Weight = Amount;
+	CurrentRadialBlurAmount = Amount;
+}
+
+void UALSXTCharacterCameraEffectsComponent::ResetRadialBlur()
+{
+	PostProcessComponent->Settings.WeightedBlendables.Array[0].Weight = 0.0f;
+	CurrentRadialBlurAmount = 0.0f;
+}
+
+void UALSXTCharacterCameraEffectsComponent::SetFocusEffect(bool NewFocus)
+{
+	if (NewFocus)
+	{
+		PostProcessComponent->Settings.VignetteIntensity = 0.5f;
+		PostProcessComponent->Settings.WeightedBlendables.Array[0].Weight = 0.25f;
+	}
+	else
+	{
+		PostProcessComponent->Settings.VignetteIntensity = 0.0f;
+		PostProcessComponent->Settings.WeightedBlendables.Array[0].Weight = 0.0f;
 	}
 }
 
@@ -661,7 +690,7 @@ void UALSXTCharacterCameraEffectsComponent::FadeOutHighEffect()
 	}
 }
 
-void UALSXTCharacterCameraEffectsComponent::SetRadialBlur()
+void UALSXTCharacterCameraEffectsComponent::UpdateRadialBlur()
 {
 	float Velocity = Character->GetVelocity().Size();
 	float BlurAmount = FMath::GetMappedRangeValueClamped(FVector2D{ 0.0, GeneralCameraEffectsSettings.RadialBlurMaxVelocity }, FVector2D{ 0.0f, GeneralCameraEffectsSettings.RadialBlurMaxWeight }, Velocity);

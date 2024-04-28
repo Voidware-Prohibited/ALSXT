@@ -68,15 +68,33 @@ public:
 
 	//Character Camera Effects Component Interface
 	UAlsCameraComponent* GetCameraComponent_Implementation() const override;
-
 	UALSXTCharacterCameraEffectsComponent* GetCameraEffectsComponent_Implementation() const override;
+	void SetRadialBlurEffect_Implementation(float Amount) override;
+	void ResetRadialBlurEffect_Implementation() override;
+	void SetFocusEffect_Implementation(bool NewFocus) override;
+	void AddDrunkEffect_Implementation(float Magnitude, float Length, float FadeInLength, float FadeOutLength) override;
+	void ResetDrunkEffect_Implementation() override;
+	void AddHighEffect_Implementation(float Magnitude, float Length, float FadeInLength, float FadeOutLength) override;
+	void ResetHighEffect_Implementation() override;
+	void AddSuppressionEffect_Implementation(float Magnitude, float PostDelay) override;
+	void ResetSuppressionEffect_Implementation() override;
+	void AddBlindnessEffect_Implementation(float Magnitude, float Length, float FadeOutLength) override;
+	void ResetBlindnessEffect_Implementation() override;
+	void AddProjectileFlyByEffect_Implementation(USoundBase* Sound, FVector Location, FRotator Rotation) override;
+	void AddConcussionEffect_Implementation(float Magnitude, float Length, float FadeInLength, float FadeOutLength) override;
+	void ResetConcussionEffect_Implementation() override;
+	void AddDamageEffect_Implementation(float Damage, const FGameplayTag& DamageType, const FHitResult& HitResult, float PostDelay) override;
+	void ResetDamageEffect_Implementation() override;
+	void AddNearDeathEffect_Implementation(float Damage, const FGameplayTag& DamageType) override;
+	void ResetNearDeathEffect_Implementation() override;
+	void AddDeathEffect_Implementation(float Damage, const FGameplayTag& DamageType, const FHitResult& HitResult, float PostDelay) override;
+	void ResetDeathEffect_Implementation() override;
 
 	//Head Look At Interface
 	void IsInFrontOf_Implementation(bool& IsInFrontOf, FVector LookAtActorLocation) const override;
 
 	// Combat Interface
 	void BeginCombatAttackCollisionTrace_Implementation(FALSXTCombatAttackTraceSettings TraceSettings) override;
-
 	void EndCombatAttackCollisionTrace_Implementation() override;
 
 private:

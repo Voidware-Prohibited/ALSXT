@@ -1520,7 +1520,7 @@ void UALSXTCharacterSoundComponent::PlayAttackSound(bool MovementSound, bool Acc
 
 void UALSXTCharacterSoundComponent::PlayDamageSound(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage)
 {
-	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
+	UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
 	FGameplayTag Weight = IALSXTCharacterInterface::Execute_GetWeightTag(GetOwner());
 	FGameplayTag Type = ALSXTCharacterMovementSoundTags::Impact;
 	FMotionSounds MotionSounds;
@@ -1612,7 +1612,7 @@ void UALSXTCharacterSoundComponent::PlayDeathSound(const FGameplayTag& Sex, cons
 {
 	FGameplayTag Weight = IALSXTCharacterInterface::Execute_GetWeightTag(GetOwner());
 	FGameplayTag Type = ALSXTCharacterMovementSoundTags::Impact;
-	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
+	UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
 	FMotionSounds MotionSounds;
 
 	// MOVEMENT
@@ -1701,7 +1701,7 @@ void UALSXTCharacterSoundComponent::PlayDeathSound(const FGameplayTag& Sex, cons
 
 void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 {
-	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
+	UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
 	
 	if (GetWorld()->WorldType == EWorldType::EditorPreview)
 	{
@@ -1867,7 +1867,7 @@ void UALSXTCharacterSoundComponent::SpawnAudioComponent(UAudioComponent* AudioCo
 	}
 	else
 	{
-		AudioComponent = UGameplayStatics::SpawnSoundAtLocation(Cast<AALSXTCharacter>(GetOwner())->GetWorld(), Sound, Location, Rotation, Volume, 1.0f);
+		AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetOwner()->GetWorld(), Sound, Location, Rotation, Volume, 1.0f);
 	}
 }
 

@@ -51,6 +51,11 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		return;
 	}
 
+	if (!Mesh->GetOwner()->Implements<UALSXTCharacterInterface>())
+	{
+		return;
+	}
+
 	const auto* Character{Cast<AAlsCharacter>(Mesh->GetOwner())};
 	AALSXTCharacter* ALSXTCharacter{ IALSXTCharacterInterface::Execute_GetCharacter(Mesh->GetOwner()) };
 

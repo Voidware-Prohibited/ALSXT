@@ -120,6 +120,106 @@ UALSXTCharacterCameraEffectsComponent* AALSXTCharacterAdvanced::GetCameraEffects
 	return CameraEffects;
 }
 
+void AALSXTCharacterAdvanced::SetRadialBlurEffect_Implementation(float Amount)
+{
+	CameraEffects->SetRadialBlur(Amount);
+}
+
+void AALSXTCharacterAdvanced::ResetRadialBlurEffect_Implementation()
+{
+	CameraEffects->ResetRadialBlur();
+}
+
+void AALSXTCharacterAdvanced::SetFocusEffect_Implementation(bool NewFocus)
+{
+	CameraEffects->SetFocusEffect(NewFocus);
+}
+
+void AALSXTCharacterAdvanced::AddDrunkEffect_Implementation(float Magnitude, float Length, float FadeInLength, float FadeOutLength)
+{
+	CameraEffects->AddDrunkEffect(Magnitude, Length);
+}
+
+void AALSXTCharacterAdvanced::ResetDrunkEffect_Implementation()
+{
+	CameraEffects->ResetDrunkEffect();
+}
+
+void AALSXTCharacterAdvanced::AddHighEffect_Implementation(float Magnitude, float Length, float FadeInLength, float FadeOutLength)
+{
+	CameraEffects->AddHighEffect(Magnitude, Length);
+}
+
+void AALSXTCharacterAdvanced::ResetHighEffect_Implementation()
+{
+	CameraEffects->ResetHighEffect();
+}
+
+void AALSXTCharacterAdvanced::AddSuppressionEffect_Implementation(float Magnitude, float PostDelay)
+{
+	CameraEffects->AddSuppression(Magnitude, PostDelay);
+}
+
+void AALSXTCharacterAdvanced::ResetSuppressionEffect_Implementation()
+{
+	CameraEffects->ResetSuppression();
+}
+
+void AALSXTCharacterAdvanced::AddBlindnessEffect_Implementation(float Magnitude, float Length, float FadeOutLength)
+{
+	CameraEffects->AddBlindnessEffect(Magnitude, Length);
+}
+
+void AALSXTCharacterAdvanced::ResetBlindnessEffect_Implementation()
+{
+	CameraEffects->ResetBlindnessEffect();
+}
+
+void AALSXTCharacterAdvanced::AddProjectileFlyByEffect_Implementation(USoundBase* Sound, FVector Location, FRotator Rotation)
+{
+	//
+}
+
+void AALSXTCharacterAdvanced::AddConcussionEffect_Implementation(float Magnitude, float Length, float FadeInLength, float FadeOutLength)
+{
+	CameraEffects->AddConcussionEffect(Magnitude, Length);
+}
+
+void AALSXTCharacterAdvanced::ResetConcussionEffect_Implementation()
+{
+	CameraEffects->ResetConcussionEffect();
+}
+
+void AALSXTCharacterAdvanced::AddDamageEffect_Implementation(float Damage, const FGameplayTag& DamageType, const FHitResult& HitResult, float PostDelay)
+{
+	CameraEffects->AddDamageEffect(Damage, PostDelay);
+}
+
+void AALSXTCharacterAdvanced::ResetDamageEffect_Implementation()
+{
+	CameraEffects->ResetDamageEffect();
+}
+
+void AALSXTCharacterAdvanced::AddNearDeathEffect_Implementation(float Damage, const FGameplayTag& DamageType)
+{
+	//
+}
+
+void AALSXTCharacterAdvanced::ResetNearDeathEffect_Implementation()
+{
+	//
+}
+
+void AALSXTCharacterAdvanced::AddDeathEffect_Implementation(float Damage, const FGameplayTag& DamageType, const FHitResult& HitResult, float PostDelay)
+{
+	//
+}
+
+void AALSXTCharacterAdvanced::ResetDeathEffect_Implementation()
+{
+	//
+}
+
 //Head Look At Interface
 void AALSXTCharacterAdvanced::IsInFrontOf_Implementation(bool& IsInFrontOf, FVector LookAtActorLocation) const
 {
