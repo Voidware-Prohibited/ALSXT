@@ -57,6 +57,7 @@ void AALSXTCharacter::StartSliding(const float PlayRate, const float TargetYawAn
 	if (GetLocalRole() >= ROLE_Authority)
 	{
 		MulticastStartSliding(Montage, PlayRate, StartYawAngle, TargetYawAngle);
+		// OnSlidingStarted();
 	}
 	else
 	{
@@ -64,7 +65,7 @@ void AALSXTCharacter::StartSliding(const float PlayRate, const float TargetYawAn
 
 		StartSlidingImplementation(Montage, PlayRate, StartYawAngle, TargetYawAngle);
 		ServerStartSliding(Montage, PlayRate, StartYawAngle, TargetYawAngle);
-		OnSlidingStarted();
+		// OnSlidingStarted();
 	}
 }
 
@@ -99,6 +100,7 @@ void AALSXTCharacter::StartSlidingImplementation(UAnimMontage* Montage, const fl
 		RefreshRotationInstant(StartYawAngle);
 
 		SetLocomotionAction(AlsLocomotionActionTags::Sliding);
+		OnSlidingStarted();
 		// Crouch(); //Hack
 	}
 }
@@ -732,7 +734,22 @@ FVaultAnimation AALSXTCharacter::SelectVaultingMontage_Implementation(const FGam
 	return SelectedVaultingAnimation;
 }
 
-void AALSXTCharacter::OnVaultingStarted_Implementation(const FALSXTVaultingParameters& Parameters) {}
+void AALSXTCharacter::OnVaultingStarted_Implementation(const FALSXTVaultingParameters& Parameters) 
+{
+	FGameplayTag SexTag{ FGameplayTag::EmptyTag };
+	FGameplayTag VoiceVariantTag{ FGameplayTag::EmptyTag };
+	FGameplayTag TypeTag{ FGameplayTag::EmptyTag };
+	float VoiceSpeed;
+	float VoicePitch;
+	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
+
+	if (Parameters.VaultingType == ALSXTVaultTypeTags::Low)
+	{
+		ClearOverlayObject();
+	}
+
+	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Vaulting, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
+}
 
 void AALSXTCharacter::RefreshVaulting()
 {

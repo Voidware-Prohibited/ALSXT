@@ -187,7 +187,14 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
 	TObjectPtr<UALSXTCharacterMovementComponent> ALSXTCharacterMovement;
-	
+
+	virtual void OnOverlayModeChanged_Implementation(const FGameplayTag& PreviousOverlayMode) override;
+	virtual void OnJumped_Implementation() override;
+	virtual void OnMantlingStarted_Implementation(const FAlsMantlingParameters& Parameters) override;
+	virtual void OnMantlingEnded_Implementation() override;
+	virtual void OnRagdollingStarted_Implementation() override;
+	virtual void OnRagdollingEnded_Implementation() override;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
 
@@ -256,7 +263,7 @@ public:
 	FALSXTPoseState ALSXTPoseState;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character", Meta = (ForceAsFunction))
-	void OnFirstPersonOverrideChanged(const float& FirstPersonOverride);
+	void OnFirstPersonOverrideChanged(float FirstPersonOverride);
 
 	// Pose State
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
@@ -584,6 +591,9 @@ protected:
 
 	FTimerHandle FreelookTimerHandle;	// Timer Handle for Attack Trace
 	FTimerDelegate FreelookTimerDelegate; // Delegate to bind function with parameters
+
+	FTimerHandle FallingTimerHandle;	// Timer Handle for Falling
+	FTimerDelegate FallingTimerDelegate; // Delegate to bind function with parameters
 
 	// Attack Trace Settings
 
@@ -1064,7 +1074,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnFootprintsStateChanged(const FALSXTFootprintsState& PreviousFootprintsState);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnSlidingStarted();
 
 public:
@@ -1889,6 +1899,15 @@ protected:
 	virtual FALSXTPoseState GetCharacterPoseState_Implementation() const override;
 	virtual FGameplayTag GetCharacterLocomotionVariant_Implementation() const override;
 	virtual FGameplayTag GetCharacterVaultType_Implementation() const override;
+
+	// Character Sound Component Interface Functions
+	virtual void PlayBreathEffects_Implementation(const FGameplayTag& StaminaOverride);
+
+	virtual void PlayActionSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& SoundSex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const float Stamina) override;
+
+	virtual void PlayAttackSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& SoundSex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float Stamina) override;
+
+	virtual void PlayDamageSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& SoundSex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Attack Method"))const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage) override;
 
 	// Freelooking Interface Functions
 	virtual FGameplayTag GetCharacterFreelooking_Implementation() const override;

@@ -27,7 +27,6 @@ class ALSXT_API AALSXTCharacterAdvanced : public AALSXTCharacter, public IALSXTC
 
 public:
 	AALSXTCharacterAdvanced(const FObjectInitializer& ObjectInitializer);
-
 	virtual void SetupPlayerInputComponent(UInputComponent* Input) override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
@@ -66,6 +65,55 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UALSXTCharacterCameraEffectsComponent* CameraEffects;
 
+private:
+	void InputAcrobaticAction(const FInputActionValue& ActionValue);
+
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
+	void InputPrimaryAction();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
+	void InputSecondaryAction();
+
+private:
+
+	void InputSwitchTargetLeft();
+	void InputSwitchTargetRight();
+	void InputReload();
+	void InputReloadWithRetention();
+
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
+	bool CanPerformPrimaryAction() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
+	bool CanPerformSecondaryAction() const;
+
+	void OnDesiredAimingChanged_Implementation(bool bPreviousDesiredAiming) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
+	bool CanPerformAcrobaticAction() const;
+
+	// Timers
+
+	FTimerHandle HoldBreathTimerHandle;	// Timer Handle for Hold Breath
+	FTimerDelegate HoldBreathTimerDelegate; // Delegate to bind function with parameters
+
+	// Hold Breath
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void BeginHoldBreathTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void HoldBreathTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void EndHoldBreathTimer();
+
+	// void UpdateADSTransforms() const;
+
+// Interfaces
+public:
 	//Character Camera Effects Component Interface
 	UAlsCameraComponent* GetCameraComponent_Implementation() const override;
 	UALSXTCharacterCameraEffectsComponent* GetCameraEffectsComponent_Implementation() const override;
@@ -96,53 +144,4 @@ public:
 	// Combat Interface
 	void BeginCombatAttackCollisionTrace_Implementation(FALSXTCombatAttackTraceSettings TraceSettings) override;
 	void EndCombatAttackCollisionTrace_Implementation() override;
-
-private:
-	void InputAcrobaticAction(const FInputActionValue& ActionValue);
-
-public:
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
-	void InputPrimaryAction();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
-	void InputSecondaryAction();
-
-private:
-
-	void InputSwitchTargetLeft();
-
-	void InputSwitchTargetRight();
-
-	void InputReload();
-
-	void InputReloadWithRetention();
-
-protected:
-	FTimerHandle HoldBreathTimerHandle;	// Timer Handle for Hold Breath
-	FTimerDelegate HoldBreathTimerDelegate; // Delegate to bind function with parameters
-
-	// Hold Breath
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	void BeginHoldBreathTimer();
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	void HoldBreathTimer();
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	void EndHoldBreathTimer();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
-	bool CanPerformPrimaryAction() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
-	bool CanPerformSecondaryAction() const;
-
-	void OnDesiredAimingChanged_Implementation(bool bPreviousDesiredAiming) override;
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
-	bool CanPerformAcrobaticAction() const;
-
-	// void UpdateADSTransforms() const;
-	
 };

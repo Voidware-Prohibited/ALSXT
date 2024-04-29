@@ -462,8 +462,8 @@ void AALSXTCharacter::BeginPlay()
 	FreelookTimerDelegate.BindUFunction(this, "AttackCollisionTrace");
 	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace", AttackTraceSettings);
 
-	// IALSXTCharacterInterface::Execute_GetCharacterCameraAnimationInstance(this)->OnFirstPersonOverrideChanged.AddUnique(OnFirstPersonOverrideChangedDelegate);
-	// IALSXTCharacterInterface::Execute_GetCharacterCameraAnimationInstance(this)->FOnFirstPersonOverrideChanged.BindRaw()
+	RefreshOverlayObject();
+	IALSXTCharacterInterface::Execute_GetCharacterCameraAnimationInstance(this)->OnFirstPersonOverrideChanged.AddDynamic(this, &AALSXTCharacter::OnFirstPersonOverrideChanged);
 
 }
 
@@ -900,6 +900,84 @@ void AALSXTCharacter::Crouch(const bool bClientSimulation)
 	SetDesiredStance(AlsStanceTags::Crouching);
 }
 
+void AALSXTCharacter::OnOverlayModeChanged_Implementation(const FGameplayTag& PreviousOverlayMode)
+{
+	// Super::OnOverlayModeChanged(PreviousOverlayMode);
+	RefreshOverlayLinkedAnimationLayer();
+	RefreshOverlayObject();
+}
+
+void AALSXTCharacter::OnJumped_Implementation()
+{
+	FGameplayTag SexTag {FGameplayTag::EmptyTag};
+	FGameplayTag VoiceVariantTag {FGameplayTag::EmptyTag};
+	float VoiceSpeed;
+	float VoicePitch;
+	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
+	// IALSXTCharacterInterface::Execute_GetStamina(this);
+
+	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Jumping, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
+
+}
+
+void AALSXTCharacter::OnMantlingStarted_Implementation(const FAlsMantlingParameters& Parameters)
+{
+	FGameplayTag SexTag{ FGameplayTag::EmptyTag };
+	FGameplayTag VoiceVariantTag{ FGameplayTag::EmptyTag };
+	FGameplayTag TypeTag{ FGameplayTag::EmptyTag };
+	float VoiceSpeed;
+	float VoicePitch;
+	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
+
+	if (Parameters.MantlingType == EAlsMantlingType::Low)
+	{
+		TypeTag = ALSXTCharacterMovementSoundTags::MantlingLow;
+		ClearOverlayObject();
+	}
+	else
+	{
+		TypeTag = ALSXTCharacterMovementSoundTags::MantlingHigh;
+	}
+
+	CharacterSound->PlayActionSound(true, true, true, TypeTag, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
+}
+
+void AALSXTCharacter::OnMantlingEnded_Implementation()
+{
+	ClearOverlayObject();
+}
+
+void AALSXTCharacter::OnRagdollingStarted_Implementation()
+{
+	FGameplayTag SexTag{ FGameplayTag::EmptyTag };
+	FGameplayTag VoiceVariantTag{ FGameplayTag::EmptyTag };
+	FGameplayTag TypeTag{ FGameplayTag::EmptyTag };
+	float VoiceSpeed;
+	float VoicePitch;
+	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
+
+	RefreshOverlayObject();
+
+	CharacterSound->PlayDamageSound(true, true, true, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTAttackMethodTags::Regular, ALSXTActionStrengthTags::Medium, ALSXTImpactFormTags::Blunt, IALSXTCharacterInterface::Execute_GetStamina(this));
+}
+
+void AALSXTCharacter::OnRagdollingEnded_Implementation()
+{
+	RefreshOverlayObject();
+}
+
+void AALSXTCharacter::OnSlidingStarted_Implementation()
+{
+	FGameplayTag SexTag{ FGameplayTag::EmptyTag };
+	FGameplayTag VoiceVariantTag{ FGameplayTag::EmptyTag };
+	FGameplayTag TypeTag{ FGameplayTag::EmptyTag };
+	float VoiceSpeed;
+	float VoicePitch;
+	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
+
+	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Sliding, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
+}
+
 bool AALSXTCharacter::IsAimingDownSights_Implementation() const
 {
 	return (IsDesiredAiming() && CanAimDownSights() && (GetViewMode() == AlsViewModeTags::FirstPerson) && (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral));
@@ -1239,7 +1317,7 @@ void AALSXTCharacter::InputToggleWeaponReadyPosition()
 	// 
 }
 
-void AALSXTCharacter::OnFirstPersonOverrideChanged_Implementation(const float& FirstPersonOverride)
+void AALSXTCharacter::OnFirstPersonOverrideChanged_Implementation(float FirstPersonOverride)
 {
 	//
 }
@@ -1422,7 +1500,10 @@ void AALSXTCharacter::SetFreelooking(const FGameplayTag& NewFreelookingTag)
 	}
 }
 
-void AALSXTCharacter::OnFreelookingChanged_Implementation(const FGameplayTag& PreviousFreelookingTag) {}
+void AALSXTCharacter::OnFreelookingChanged_Implementation(const FGameplayTag& PreviousFreelookingTag) 
+{
+	
+}
 
 // Sex
 
@@ -3079,4 +3160,25 @@ FALSXTFootprintsState AALSXTCharacter::GetCharacterFootprintsState_Implementatio
 FALSXTFootwearDetails AALSXTCharacter::GetCharacterFootwearDetails_Implementation() const
 {
 	return GetFootwearDetails();
+}
+
+// Character Sound Component Interface Functions
+void AALSXTCharacter::PlayBreathEffects_Implementation(const FGameplayTag& StaminaOverride)
+{
+	CharacterSound->PlayCharacterBreathEffects(StaminaOverride);
+}
+
+void AALSXTCharacter::PlayActionSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
+{
+	CharacterSound->PlayActionSound(MovementSound, AccentSound, WeaponSound, Type, SoundSex, Variant, Overlay, Strength, Stamina);
+}
+
+void AALSXTCharacter::PlayAttackSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float Stamina)
+{
+	CharacterSound->PlayAttackSound(MovementSound, AccentSound, WeaponSound, SoundSex, Variant, Overlay, Strength, AttackMode, Stamina);
+}
+
+void AALSXTCharacter::PlayDamageSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage)
+{
+	CharacterSound->PlayDamageSound(MovementSound, AccentSound, WeaponSound, SoundSex, Variant, Overlay, AttackMethod, Strength, AttackForm, Damage);
 }

@@ -149,7 +149,9 @@ void UALSXTCharacterCameraEffectsComponent::Initialize()
 	}
 	else
 	{
-		TraceStartPoint = IALSXTCharacterInterface::Execute_GetCameraLocationOld(GetOwner());
+		// TraceStartPoint = IALSXTCharacterInterface::Execute_GetCameraLocationOld(GetOwner());
+
+		TraceStartPoint = IALSXTCharacterCameraEffectsComponentInterface::Execute_GetPlayerCameraManager(GetOwner())->GetCameraLocation();
 	}
 }
 

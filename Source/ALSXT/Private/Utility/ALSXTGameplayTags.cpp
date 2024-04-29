@@ -627,6 +627,7 @@ namespace ALSXTCharacterMovementSoundTags
 	UE_DEFINE_GAMEPLAY_TAG(Crouch, FName{ TEXTVIEW("Als.Character Movement Sound.Crouch") })
 	UE_DEFINE_GAMEPLAY_TAG(Uncrouch, FName{ TEXTVIEW("Als.Character Movement Sound.Uncrouch") })
 	UE_DEFINE_GAMEPLAY_TAG(GettingUp, FName{ TEXTVIEW("Als.Character Movement Sound.Getting Up") })
+	UE_DEFINE_GAMEPLAY_TAG(Sliding, FName{ TEXTVIEW("Als.Character Movement Sound.Sliding") })
 	UE_DEFINE_GAMEPLAY_TAG(Equip, FName{ TEXTVIEW("Als.Character Movement Sound.Equip") })
 	UE_DEFINE_GAMEPLAY_TAG(Unequip, FName{ TEXTVIEW("Als.Character Movement Sound.Unequip") })
 	UE_DEFINE_GAMEPLAY_TAG(ChangeCombatStance, FName{ TEXTVIEW("Als.Character Movement Sound.Change Combat Stance") })

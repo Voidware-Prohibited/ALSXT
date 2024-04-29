@@ -180,6 +180,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	void PlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
 
+	UFUNCTION(Server, Unreliable)
+	void ServerPlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayBreathSound();
 	
