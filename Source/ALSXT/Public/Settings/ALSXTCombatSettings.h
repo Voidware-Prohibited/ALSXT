@@ -60,6 +60,12 @@ class ALSXT_API UALSXTCombatSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
+	FGameplayTagContainer TargetableOverlayModes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Method"))
+	FGameplayTagContainer EnabledAttackMethods;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{AttackStrengths} {AttackStances} {AttackType}", AllowPrivateAccess))
 	TArray<FAttackAnimation> AttackAnimations;
 
@@ -83,6 +89,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target Lock", Meta = (Units = "cm", AllowPrivateAccess))
 	float MoveToTargetMaxDistance { 900.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake", Meta = (AllowPrivateAccess))
+	float MoveToTargetSpeedScale{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
+	bool bEnableCameraShake{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake", Meta = (AllowPrivateAccess))
+	float CameraShakeScale{ 1.0f };
 
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float AttackHeight) const;
@@ -140,6 +155,9 @@ struct ALSXT_API FALSXTGeneralCombatSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
 	bool bEnableCombat{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Method"))
+	FGameplayTagContainer EnabledAttackMethods;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Features", Meta = (AllowPrivateAccess))
 	bool bEnableAttacks{ true };

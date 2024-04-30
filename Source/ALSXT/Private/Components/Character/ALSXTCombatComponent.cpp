@@ -198,9 +198,10 @@ void UALSXTCombatComponent::GetClosestTarget()
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
+	AALSXTCharacter* ALSXTChar = IALSXTCharacterInterface::Execute_GetCharacter(GetOwner());
 	FGameplayTagContainer TargetableOverlayModes = IALSXTCombatInterface::Execute_GetTargetableOverlayModes(GetOwner());
 
-	if (TargetableOverlayModes.HasTag(Character->GetOverlayMode()) && Character->IsDesiredAiming())
+	if (TargetableOverlayModes.HasTag(ALSXTChar->GetOverlayMode()) && ALSXTChar->IsDesiredAiming())
 	{
 		for (auto& Hit : OutHits)
 		{
@@ -313,14 +314,24 @@ void UALSXTCombatComponent::GetTargetLeft()
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
+	AALSXTCharacter* ALSXTChar = IALSXTCharacterInterface::Execute_GetCharacter(GetOwner());
 	FGameplayTagContainer TargetableOverlayModes = IALSXTCombatInterface::Execute_GetTargetableOverlayModes(GetOwner());
-
-	if (TargetableOverlayModes.HasTag(Character->GetOverlayMode()) && Character->IsDesiredAiming())
+	// 
+	// // IALSXTCharacterInterface::GetCharacter(this)->IsDesiredAiming();
+	// IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner())
+	// 
+	if (TargetableOverlayModes.HasTag(ALSXTChar->GetOverlayMode()) && ALSXTChar->IsDesiredAiming())
 	{
+		if (OutHits.Num() == 0 || OutHits.Num() == 1 && OutHits[0].HitResult.GetActor() == CurrentTarget.HitResult.GetActor())
+		{
+			return;
+		}
+		
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (Hit.AngleFromCenter < CurrentTarget.AngleFromCenter))
+			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && Hit.HitResult.GetActor() != GetOwner() && (Hit.AngleFromCenter < CurrentTarget.AngleFromCenter))
 			{
+				
 				if (!FoundHit.Valid)
 				{
 					FoundHit = Hit;
@@ -334,7 +345,10 @@ void UALSXTCombatComponent::GetTargetLeft()
 				}
 			}
 		}
-		SetCurrentTarget(FoundHit);
+		if (FoundHit.Valid && FoundHit.HitResult.GetActor())
+		{
+			SetCurrentTarget(FoundHit);
+		}
 	}
 }
 
@@ -343,13 +357,19 @@ void UALSXTCombatComponent::GetTargetRight()
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
+	AALSXTCharacter* ALSXTChar = IALSXTCharacterInterface::Execute_GetCharacter(GetOwner());
 	FGameplayTagContainer TargetableOverlayModes = IALSXTCombatInterface::Execute_GetTargetableOverlayModes(GetOwner());
-
-	if (TargetableOverlayModes.HasTag(Character->GetOverlayMode()) && Character->IsDesiredAiming())
+	
+	if (TargetableOverlayModes.HasTag(ALSXTChar->GetOverlayMode()) && ALSXTChar->IsDesiredAiming())
 	{
+		if (OutHits.Num() == 0 || OutHits.Num() == 1 && OutHits[0].HitResult.GetActor() == CurrentTarget.HitResult.GetActor())
+		{
+			return;
+		}
+		
 		for (auto& Hit : OutHits)
 		{
-			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (Hit.AngleFromCenter > CurrentTarget.AngleFromCenter))
+			if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && Hit.HitResult.GetActor() != GetOwner() && (Hit.AngleFromCenter > CurrentTarget.AngleFromCenter))
 			{
 				if (!FoundHit.Valid)
 				{
@@ -364,7 +384,10 @@ void UALSXTCombatComponent::GetTargetRight()
 				}
 			}
 		}
-		SetCurrentTarget(FoundHit);
+		if (FoundHit.Valid && FoundHit.HitResult.GetActor())
+		{
+			SetCurrentTarget(FoundHit);
+		}
 	}
 }
 

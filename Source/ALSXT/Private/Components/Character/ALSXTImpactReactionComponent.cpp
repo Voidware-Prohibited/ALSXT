@@ -1797,7 +1797,7 @@ void UALSXTImpactReactionComponent::StartCrowdNavigationReaction(const FGameplay
 	FBumpReactionAnimation SelectedCrowdNavigationReaction = SelectCrowdNavigationReactionMontage(IRState.ImpactReactionParameters.CrowdNavigationHit.HitResult.ImpactGait, IRState.ImpactReactionParameters.CrowdNavigationHit.HitResult.ImpactSide, IRState.ImpactReactionParameters.CrowdNavigationHit.HitResult.ImpactForm);
 	UAnimMontage* Montage = SelectedCrowdNavigationReaction.Montage.Montage;
 
-	if ((!ALS_ENSURE(IsValid(Montage)) || !IsImpactReactionAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
+	if ((!IsValid(Montage) || !IsImpactReactionAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Crowd Navigation Montage Invalid"));
 		return;
