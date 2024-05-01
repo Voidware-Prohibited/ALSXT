@@ -1763,7 +1763,7 @@ void UALSXTImpactReactionComponent::StartBumpReaction(const FGameplayTag& Gait, 
 	FBumpReactionAnimation SelectedBumpReaction = SelectBumpReactionMontage(Gait, Side, Form);
 	UAnimMontage* Montage = SelectedBumpReaction.Montage.Montage;
 
-	if ((!ALS_ENSURE(IsValid(Montage)) || !IsBumpReactionAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
+	if ((!(IsValid(Montage) || !IsBumpReactionAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Bump Montage Invalid"));
 		return;
