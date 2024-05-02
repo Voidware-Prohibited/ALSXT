@@ -334,12 +334,22 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 
 	AimAnimationHelperBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Aim Animation Helper Box"));
 	AimAnimationHelperBox->SetupAttachment(this->RootComponent);
-	AimAnimationHelperBox->SetBoxExtent(FVector(0.1f, 32.0f, 360.0f), true);
+	AimAnimationHelperBox->SetBoxExtent(FVector(0.1f, 32.0f, 280.0f), true);
 	AimAnimationHelperBox->SetCollisionObjectType(ECC_Visibility);
 	AimAnimationHelperBox->SetGenerateOverlapEvents(true);
 	AimAnimationHelperBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	AimAnimationHelperBox->SetCollisionResponseToChannel(ECC_Camera, ECR_Overlap);
 	AimAnimationHelperBox->bEditableWhenInherited = false;
+
+	AimAnimationHelperCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Aim Animation Helper Capsule"));
+	AimAnimationHelperCapsule->SetupAttachment(this->GetMesh(), "head");
+	AimAnimationHelperCapsule->SetCapsuleSize(9.0, 18.0, true);
+	AimAnimationHelperCapsule->AddLocalOffset({ 4.0f, 4.0f, 0.0f });
+	AimAnimationHelperCapsule->SetCollisionObjectType(ECC_Visibility);
+	AimAnimationHelperCapsule->SetGenerateOverlapEvents(true);
+	AimAnimationHelperCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
+	AimAnimationHelperCapsule->SetCollisionResponseToChannel(ECC_Camera, ECR_Overlap);
+	AimAnimationHelperCapsule->bEditableWhenInherited = false;
 
 	ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());
 	ALSXTMesh = Cast<UALSXTPaintableSkeletalMeshComponent>(GetMesh());
@@ -506,6 +516,9 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
 		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::InputBlock);
 		EnhancedInput->BindAction(HoldBreathAction, ETriggerEvent::Triggered, this, &ThisClass::InputHoldBreath);
+
+		EnhancedInput->BindAction(SwitchWeaponReadyPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchWeaponReadyPosition);
+
 		EnhancedInput->BindAction(SwitchGripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchGripPosition);
 		EnhancedInput->BindAction(SwitchForegripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchForegripPosition);
 		
@@ -796,20 +809,52 @@ void AALSXTCharacter::InputSwitchGripPosition()
 	if (CanSwitchGripPosition())
 	{
 		IdleAnimation->ResetIdleCounterTimer();
-		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
+		FGameplayTagContainer AvailableGripPositions = GetAvailableGripPositions();
+		TArray<FGameplayTag> AvailableGripPositionsArray;
+		AvailableGripPositions.GetGameplayTagArray(AvailableGripPositionsArray);
+		if (AvailableGripPositions.IsEmpty() || AvailableGripPositions.Num() == 1 && AvailableGripPositionsArray[0] == GetDesiredGripPosition())
+		{
+			return;
+		}
+		int LastIndex = AvailableGripPositionsArray.Num() - 1;
+		int CurrentIndex = AvailableGripPositionsArray.IndexOfByKey(GetDesiredGripPosition());
+		int NextIndex;
+		if ((CurrentIndex + 1) > LastIndex)
+		{
+			NextIndex = 0;
+		}
+		else
+		{
+			NextIndex = CurrentIndex + 1;
+		}
+
+		SetDesiredGripPosition(AvailableGripPositionsArray[NextIndex]);
 	}
 }
+
+// void AALSXTCharacter::InputSwitchGripPosition()
+// {
+// 	if (CanSwitchGripPosition())
+// 	{
+// 		IdleAnimation->ResetIdleCounterTimer();
+// 		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
+// 	}
+// }
 
 void AALSXTCharacter::InputSwitchForegripPosition()
 {
 	if (CanSwitchForegripPosition())
 	{
 		IdleAnimation->ResetIdleCounterTimer();
-		FGameplayTagContainer AvailableForegripPositionsForOvelayObject = GetAvailableForegripPositionsForOvelayObject();
-		TArray<FGameplayTag> AvailableForegripPositionsForOvelayObjectArray;
-		AvailableForegripPositionsForOvelayObject.GetGameplayTagArray(AvailableForegripPositionsForOvelayObjectArray);
-		int LastIndex = AvailableForegripPositionsForOvelayObjectArray.Num() - 1;
-		int CurrentIndex = AvailableForegripPositionsForOvelayObjectArray.IndexOfByKey(GetDesiredForegripPosition());
+		FGameplayTagContainer AvailableForegripPositions = GetAvailableForegripPositions();
+		TArray<FGameplayTag> AvailableForegripPositionsArray;
+		AvailableForegripPositions.GetGameplayTagArray(AvailableForegripPositionsArray);
+		if (AvailableForegripPositions.IsEmpty() || AvailableForegripPositions.Num() == 1 && AvailableForegripPositionsArray[0] == GetDesiredGripPosition())
+		{
+			return;
+		}
+		int LastIndex = AvailableForegripPositionsArray.Num() - 1;
+		int CurrentIndex = AvailableForegripPositionsArray.IndexOfByKey(GetDesiredForegripPosition());
 		int NextIndex;
 		if ((CurrentIndex + 1) > LastIndex)
 		{
@@ -820,7 +865,7 @@ void AALSXTCharacter::InputSwitchForegripPosition()
 			NextIndex = CurrentIndex + 1;
 		}
 		
-		SetDesiredForegripPosition(AvailableForegripPositionsForOvelayObjectArray[NextIndex]);
+		SetDesiredForegripPosition(AvailableForegripPositionsArray[NextIndex]);
 	}
 }
 
@@ -1307,14 +1352,59 @@ bool AALSXTCharacter::CanPerformSecondaryInteraction_Implementation() const
 	return true;
 }
 
-void AALSXTCharacter::InputToggleWeaponFirearmStance()
+void AALSXTCharacter::InputSwitchWeaponFirearmStance()
 {
-	// 
+	if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral)
+	{
+		return;
+	}
+	else
+	{
+		FGameplayTagContainer AvailableStances = GetAvailableFirearmStances();
+		TArray<FGameplayTag> AvailableStancesArray;
+		AvailableStances.GetGameplayTagArray(AvailableStancesArray);
+		if (AvailableStances.Num() <= 0 || AvailableStances.Num() == 1 && AvailableStancesArray[0] == GetDesiredWeaponFirearmStance())
+		{
+			return;
+		}
+		int CurrentIndex = AvailableStancesArray.IndexOfByKey(GetDesiredWeaponFirearmStance());
+		int NextIndex;
+		if ((CurrentIndex + 1) > (AvailableStancesArray.Num() - 1))
+		{
+			NextIndex = 0;
+		}
+		else
+		{
+			NextIndex = CurrentIndex + 1;
+		}
+		SetDesiredWeaponFirearmStance(AvailableStancesArray[NextIndex]);
+	}
 }
 
-void AALSXTCharacter::InputToggleWeaponReadyPosition()
+void AALSXTCharacter::InputSwitchWeaponReadyPosition()
 {
-	// 
+	TArray<FGameplayTag> AvailablePositions;
+	// TArray<FGameplayTag> AvailablePositions = (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral) ? {ALSXTWeaponReadyPositionTags::PatrolReady, ALSXTWeaponReadyPositionTags::HighReady, ALSXTWeaponReadyPositionTags::LowReady, ALSXTWeaponReadyPositionTags::Hidden } : { ALSXTWeaponReadyPositionTags::Ready, ALSXTWeaponReadyPositionTags::Retention, ALSXTWeaponReadyPositionTags::Hip, ALSXTWeaponReadyPositionTags::PatrolReady, ALSXTWeaponReadyPositionTags::HighReady, ALSXTWeaponReadyPositionTags::LowReady, ALSXTWeaponReadyPositionTags::Hidden };
+	if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral)
+	{
+		AvailablePositions = {ALSXTWeaponReadyPositionTags::PatrolReady, ALSXTWeaponReadyPositionTags::HighReady, ALSXTWeaponReadyPositionTags::LowReady, ALSXTWeaponReadyPositionTags::Hidden };
+	}
+	else
+	{
+		AvailablePositions = { ALSXTWeaponReadyPositionTags::Ready, ALSXTWeaponReadyPositionTags::Retention, ALSXTWeaponReadyPositionTags::Hip, ALSXTWeaponReadyPositionTags::PatrolReady, ALSXTWeaponReadyPositionTags::HighReady, ALSXTWeaponReadyPositionTags::LowReady, ALSXTWeaponReadyPositionTags::Hidden };
+	}
+	int CurrentIndex = AvailablePositions.IndexOfByKey(GetDesiredWeaponReadyPosition());
+	int NextIndex = (CurrentIndex + 1) > (AvailablePositions.Num() - 1) ? 0 : CurrentIndex + 1;
+
+	// if ((CurrentIndex + 1) > (AvailablePositions.Num() - 1))
+	// {
+	// 	NextIndex = 0;
+	// }
+	// else
+	// {
+	// 	NextIndex = CurrentIndex + 1;
+	// }
+	SetDesiredWeaponReadyPosition(AvailablePositions[NextIndex]);
 }
 
 void AALSXTCharacter::OnFirstPersonOverrideChanged_Implementation(float FirstPersonOverride)
@@ -2586,6 +2676,36 @@ const FName AALSXTCharacter::GetSocketNameForForegripPosition(const FGameplayTag
 	FForegripPositions ForegripPositions = ALSXTSettings->ForegripPosition.ForegripPositions;
 
 	if (ForegripPositionTag == ALSXTForegripPositionTags::Default)
+	{
+		return ForegripPositions.Default.SocketName;
+	}
+	if (ForegripPositionTag == ALSXTForegripPositionTags::MagazineWell)
+	{
+		return ForegripPositions.MagazineWell.SocketName;
+	}
+	if (ForegripPositionTag == ALSXTForegripPositionTags::VerticalGrip)
+	{
+		return ForegripPositions.Vertical.SocketName;
+	}
+	if (ForegripPositionTag == ALSXTForegripPositionTags::AngledForeGrip)
+	{
+		return ForegripPositions.Angled.SocketName;
+	}
+	if (ForegripPositionTag == ALSXTForegripPositionTags::TopHorizontalGrip)
+	{
+		return ForegripPositions.Top.SocketName;
+	}
+	else
+	{
+		return ForegripPositions.Default.SocketName;
+	}
+}
+
+const FName AALSXTCharacter::GetSocketNameForGripPosition(const FGameplayTag& ForegripPositionTag) const
+{
+	FForegripPositions ForegripPositions = ALSXTSettings->ForegripPosition.ForegripPositions;
+
+	if (ForegripPositionTag == ALSXTGripPositionTags::Default)
 	{
 		return ForegripPositions.Default.SocketName;
 	}

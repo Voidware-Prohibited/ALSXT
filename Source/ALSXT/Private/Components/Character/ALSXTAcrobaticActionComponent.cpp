@@ -37,7 +37,6 @@ void UALSXTAcrobaticActionComponent::TryAcrobaticAction()
 {
 	if (!GeneralAcrobaticActionSettings.bAcrobaticActions || !Settings->bAcrobaticActions || IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) == AlsLocomotionModeTags::Grounded || IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == AlsLocomotionActionTags::Acrobatic)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("First"));
 		return;
 	}
 
@@ -107,7 +106,7 @@ void UALSXTAcrobaticActionComponent::DetermineAcrobaticActionType(FGameplayTag& 
 
 	if (DownwardHit)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "DownwardHit");
+		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "DownwardHit");
 	}
 	
 	if (HasEnoughSpaceForFlip && (!ForwardHit && !LeftHit && !RightHit) || Velocity < GeneralAcrobaticActionSettings.MinimumSpeedForWallJump)
@@ -175,17 +174,17 @@ void UALSXTAcrobaticActionComponent::MulticastBeginFlip_Implementation()
 
 		if (Direction < 0.0)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Back"));
+			// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Back"));
 			IALSXTCharacterInterface::Execute_GetCharacterAnimInstance(GetOwner())->Montage_Play(Settings->BackflipMontage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f, false);
 		}
 		else if (Velocity < GeneralAcrobaticActionSettings.MaximumVelocityForBackflip)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Back"));
+			// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Back"));
 			IALSXTCharacterInterface::Execute_GetCharacterAnimInstance(GetOwner())->Montage_Play(Settings->BackflipMontage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f, false);
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Front"));
+			// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Front"));
 			IALSXTCharacterInterface::Execute_GetCharacterAnimInstance(GetOwner())->Montage_Play(Settings->FlipMontage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f, false);
 		}
 	}

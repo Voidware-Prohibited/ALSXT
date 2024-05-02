@@ -410,7 +410,6 @@ namespace ALSXTWeaponFirearmStanceTags
 	UE_DEFINE_GAMEPLAY_TAG(Regular, TEXT("Als.Weapon Firearm Stance.Regular"))
 	UE_DEFINE_GAMEPLAY_TAG(PatrolReady, TEXT("Als.Weapon Firearm Stance.Canted Left"))
 	UE_DEFINE_GAMEPLAY_TAG(LowReady, TEXT("Als.Weapon Firearm Stance.Canted Right"))
-	UE_DEFINE_GAMEPLAY_TAG(HighReady, TEXT("Als.Weapon Firearm Stance.Underbarrel"))
 }
 
 namespace ALSXTWeaponCarryPositionTags

@@ -166,6 +166,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UBoxComponent> AimAnimationHelperBox;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UCapsuleComponent> AimAnimationHelperCapsule;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	class UALSXTImpactReactionComponent* ImpactReaction;
 
@@ -390,6 +393,32 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnAimStateChanged(const FALSXTAimState& PreviousAimState);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	FGameplayTagContainer GetHeldItemInfo();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	FGameplayTagContainer GetAvailableCombatStances();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	FGameplayTagContainer GetAvailableWeaponCarryPositions();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	FGameplayTagContainer GetAvailableWeaponReadyPositions();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	FGameplayTagContainer GetAvailableFirearmStances();
+
+	// Grip
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	FGameplayTagContainer GetAvailableGripPositions();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	FTransform GetCurrentGripTransform() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "ForegripPosition"))
+	const FName GetSocketNameForGripPosition(UPARAM(meta = (Categories = "Als.Foregrip Position"))const FGameplayTag& ForegripPosition) const;
+
+	// Foregrip
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character")
 	bool DoesOverlayObjectUseLeftHandIK() const;
 
@@ -397,7 +426,7 @@ public:
 	const FName GetSocketNameForForegripPosition(UPARAM(meta = (Categories = "Als.Foregrip Position"))const FGameplayTag& ForegripPosition) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	FGameplayTagContainer GetAvailableForegripPositionsForOvelayObject();
+	FGameplayTagContainer GetAvailableForegripPositions();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	FTransform GetCurrentForegripTransform() const;
@@ -786,10 +815,10 @@ public:
 	TObjectPtr<UInputAction> SlideAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> ToggleWeaponReadyPositionAction;
+	TObjectPtr<UInputAction> SwitchWeaponReadyPositionAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> ToggleWeaponFirearmStanceAction;
+	TObjectPtr<UInputAction> SwitcWeaponFirearmStanceAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SwitchGripPositionAction;
@@ -890,9 +919,9 @@ private:
 
 	void InputLeanRight(const FInputActionValue& ActionValue);
 
-	void InputToggleWeaponFirearmStance();
+	void InputSwitchWeaponFirearmStance();
 
-	void InputToggleWeaponReadyPosition();
+	void InputSwitchWeaponReadyPosition();
 
 	void InputSwitchGripPosition();
 
