@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Settings/ALSXTCharacterSoundSettings.h"
 #include "Components/Mesh/ALSXTPaintableSkeletalMeshComponent.h"
 #include "ALSXTCharacterCustomizationComponent.generated.h"
 
@@ -45,6 +46,9 @@ public:
 	// 
 	// UFUNCTION(BlueprintCallable, Category = "Character Customization")
 	// void ResetAllCustomMorphTargets();
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	FALSXTCharacterVoiceParameters VoiceParameters;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	FALSXTCharacterMorphParameters CharacterMorphParameters;

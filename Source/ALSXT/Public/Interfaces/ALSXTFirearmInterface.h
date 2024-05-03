@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Settings/ALSXTFirearmSettings.h"
 #include "ALSXTFirearmInterface.generated.h"
 
 UINTERFACE(Blueprintable)
@@ -13,5 +14,17 @@ class ALSXT_API IALSXTFirearmInterface {
 public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Firearm Interface")
-  void GetCurrentWeaponSight(FTransform& CurrentTransform, float& CurrentFOV, bool& Attachment);
+  FALSXTFirearmAimState GetFirearmAimState();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Firearm Interface")
+  UALSXTFirearmRecoilAsset* GetFirearmRecoilInfo();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Firearm Interface")
+  TArray<FALSXTMuzzleFlash> GetFirearmMuzzleFlashes();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Firearm Interface")
+  TArray <FALSXTFirearmDischargeSound> GetFirearmDischargeSounds();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Firearm Interface")
+  TArray <FALSXTFirearmActionSound> GetFirearmActionSounds();
 };

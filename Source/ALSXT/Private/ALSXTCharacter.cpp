@@ -21,6 +21,7 @@
 #include "Settings/ALSXTCombatSettings.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTHeldItemInterface.h"
 #include "Curves/CurveVector.h"
 #include "RootMotionSources/ALSXTRootMotionSource_Vaulting.h"
 #include "Utility/AlsConstants.h"
@@ -343,7 +344,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 
 	AimAnimationHelperCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Aim Animation Helper Capsule"));
 	AimAnimationHelperCapsule->SetupAttachment(this->GetMesh(), "head");
-	AimAnimationHelperCapsule->SetCapsuleSize(9.0, 18.0, true);
+	AimAnimationHelperCapsule->SetCapsuleSize(14.0, 9.0, true);
 	AimAnimationHelperCapsule->AddLocalOffset({ 4.0f, 4.0f, 0.0f });
 	AimAnimationHelperCapsule->SetCollisionObjectType(ECC_Visibility);
 	AimAnimationHelperCapsule->SetGenerateOverlapEvents(true);
@@ -1108,16 +1109,6 @@ void AALSXTCharacter::ResetPaintOnAllComponents_Implementation() const
 	
 }
 
-// UALSXTCharacterSoundSettings* AALSXTCharacter::SelectCharacterSoundSettings_Implementation() const
-// {
-// 
-// }
-// 
-// UALSXTWeaponSoundSettings* AALSXTCharacter::SelectWeaponSoundSettings_Implementation() const
-// {
-// 
-// }
-
 // ALSXT Pose State
 void AALSXTCharacter::SetALSXTPoseState(const FALSXTPoseState& NewALSXTPoseState)
 {
@@ -1510,6 +1501,7 @@ void AALSXTCharacter::SetLean(const FGameplayTag& NewLeanTag)
 
 	if (Lean != NewLeanTag)
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		const auto PreviousLean{ Lean };
 
 		Lean = NewLeanTag;
@@ -1531,6 +1523,7 @@ void AALSXTCharacter::IsFreelooking(bool& bIsFreelooking, bool& bIsFreelookingIn
 
 void AALSXTCharacter::ActivateFreelooking()
 {
+	IdleAnimation->ResetIdleCounterTimer();
 	//PreviousYaw = GetViewState().Rotation.Yaw;
 	PreviousYaw = FMath::GetMappedRangeValueClamped(FVector2D(0, 359.998993), FVector2D(0.0, 1.0), GetControlRotation().Yaw);
 	//FMath::GetMappedRangeValueClamped(FVector2D(-90,90), FVector2D(0,1), GetViewState().Rotation.Pitch)
@@ -1754,6 +1747,7 @@ void AALSXTCharacter::SetCombatStance(const FGameplayTag& NewCombatStanceTag)
 
 	if (CombatStance != NewCombatStanceTag)
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		const auto PreviousCombatStance{ CombatStance };
 
 		CombatStance = NewCombatStanceTag;
@@ -1791,6 +1785,7 @@ void AALSXTCharacter::SetWeaponFirearmStance(const FGameplayTag& NewWeaponFirear
 
 	if (WeaponFirearmStance != NewWeaponFirearmStanceTag)
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		const auto PreviousWeaponFirearmStance{ WeaponFirearmStance };
 
 		WeaponFirearmStance = NewWeaponFirearmStanceTag;
@@ -1828,6 +1823,7 @@ void AALSXTCharacter::SetWeaponReadyPosition(const FGameplayTag& NewWeaponReadyP
 
 	if (WeaponReadyPosition != NewWeaponReadyPositionTag)
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		const auto PreviousWeaponReadyPosition{ WeaponReadyPosition };
 
 		WeaponReadyPosition = NewWeaponReadyPositionTag;
@@ -1886,6 +1882,7 @@ void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 {
 	if (DefensiveMode != NewDefensiveModeTag)
 	{
+		IdleAnimation->ResetIdleCounterTimer();
 		const auto PreviousDefensiveMode{ DefensiveMode };
 
 		DefensiveMode = NewDefensiveModeTag;
@@ -3255,11 +3252,6 @@ FALSXTFreelookState AALSXTCharacter::GetCharacterFreelookState_Implementation() 
 FALSXTHeadLookAtState AALSXTCharacter::GetCharacterHeadLookAtState_Implementation() const
 {
 	return GetHeadLookAtState();
-}
-
-bool AALSXTCharacter::DoesCharacterOverlayObjectUseLeftHandIK_Implementation() const
-{
-	return DoesOverlayObjectUseLeftHandIK();
 }
 
 FGameplayTag AALSXTCharacter::GetCharacterLocomotionVariant_Implementation() const

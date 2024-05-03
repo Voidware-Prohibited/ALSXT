@@ -29,19 +29,19 @@ struct ALSXT_API FALSXTAimState
 		FVector OriginPoint{ EForceInit::ForceInit };
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FTransform OriginTransform{ ENoInit::NoInit };
+		FTransform OriginTransform;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FTransform OriginOffset{ ENoInit::NoInit };
+		FTransform OriginOffset;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FTransform GripTransform{ ENoInit::NoInit };
+		FTransform GripTransform;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FName GripSocketName;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FTransform ForegripTransform{ ENoInit::NoInit };
+		FTransform ForegripTransform;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FName ForegripSocketName;
@@ -53,16 +53,16 @@ struct ALSXT_API FALSXTAimState
 		FVector TargetPoint{ EForceInit::ForceInit };
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FTransform TargetTransform{ ENoInit::NoInit };
+		FTransform TargetTransform;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FTransform OpticTransform{ ENoInit::NoInit };
+		FTransform OpticTransform;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FName OpticSocketName;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FTransform FrontSightTransform{ ENoInit::NoInit };
+		FTransform FrontSightTransform;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FName FrontSightSocketName;

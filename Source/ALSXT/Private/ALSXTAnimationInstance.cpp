@@ -5,6 +5,7 @@
 #include "ALSXTCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTHeldItemInterface.h"
 #include "Utility/ALSXTConstants.h"
 #include "ALS/Public/Utility/AlsMacros.h"
 #include "Math/UnrealMathUtility.h"
@@ -89,13 +90,13 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		AimState = IALSXTCharacterInterface::Execute_GetCharacterAimState(GetOwningActor());
 		FreelookState = IALSXTCharacterInterface::Execute_GetCharacterFreelookState(GetOwningActor());
 		HeadLookAtState = IALSXTCharacterInterface::Execute_GetCharacterHeadLookAtState(GetOwningActor());
-		DoesOverlayObjectUseLeftHandIK = IALSXTCharacterInterface::Execute_DoesCharacterOverlayObjectUseLeftHandIK(GetOwningActor());
 		StatusState = IALSXTCharacterInterface::Execute_GetStatusState(GetOwningActor());
 		CrowdNavigationPoseState = IALSXTCharacterInterface::Execute_GetCrowdNavigationPoseState(GetOwningActor());
 		BumpPoseState = IALSXTCharacterInterface::Execute_GetBumpPoseState(GetOwningActor());
 		DefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwningActor());
 		WeaponObstruction = IALSXTCharacterInterface::Execute_GetCharacterWeaponObstruction(GetOwningActor());
 		BreathState.HoldingBreath = IALSXTCharacterInterface::Execute_GetCharacterHoldingBreath(GetOwningActor());
+		DoesOverlayObjectUseLeftHandIK = IALSXTCharacterInterface::Execute_GetHeldItemSettings(GetOwningActor()).UsesLeftHandIK;
 	}
 }
 

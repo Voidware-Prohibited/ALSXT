@@ -618,7 +618,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag Focus{ALSXTFocusedTags::False};
 
-	FTimerHandle FreelookTimerHandle;	// Timer Handle for Attack Trace
+	FTimerHandle FreelookTimerHandle;	// Timer Handle for Freelook Trace
 	FTimerDelegate FreelookTimerDelegate; // Delegate to bind function with parameters
 
 	FTimerHandle FallingTimerHandle;	// Timer Handle for Falling
@@ -1964,7 +1964,6 @@ protected:
 	virtual FGameplayTag GetCharacterFirearmSightLocation_Implementation() const override;
 	virtual FTransform GetCharacterCurrentForegripTransform_Implementation() const override;
 	virtual FALSXTAimState GetCharacterAimState_Implementation() const override;
-	virtual bool DoesCharacterOverlayObjectUseLeftHandIK_Implementation() const override;
 	virtual FGameplayTag GetCharacterHoldingBreath_Implementation() const override;
 };
 

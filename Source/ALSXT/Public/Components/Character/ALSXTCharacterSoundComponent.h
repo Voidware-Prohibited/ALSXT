@@ -63,9 +63,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	FALSXTCharacterBreathEffectsSettings BreathParticleSettings;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (Categories = "Als.Voice Variant", AllowPrivateAccess))
-	FGameplayTag VoiceVariant {ALSXTVoiceVariantTags::Default};
-
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	float CurrentStamina {1.0f};
 

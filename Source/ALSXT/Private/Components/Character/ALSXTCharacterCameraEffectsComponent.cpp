@@ -389,10 +389,10 @@ void UALSXTCharacterCameraEffectsComponent::CameraEffectsTrace()
 	{
 		return;
 	}
-	
-	FVector CameraLocation = IALSXTCharacterInterface::Execute_GetCameraLocationOld(GetOwner());
-	FRotator CameraRotation = IALSXTCharacterInterface::Execute_GetCameraRotationOld(GetOwner());
-	FGameplayTag ViewMode = Character->GetViewMode();
+	FMinimalViewInfo ViewInfo;
+	IALSXTCharacterInterface::Execute_GetCharacterCamera(GetOwner())->GetViewInfo(ViewInfo);
+	FVector CameraLocation = ViewInfo.Location;
+	FRotator CameraRotation = ViewInfo.Rotation;
 	FGameplayTag CombatStance = Character->GetDesiredCombatStance();
 	FVector ThirdPersonTraceStartPoint = Character->GetMesh()->GetSocketLocation("head");
 	FVector FirstPersonTraceStartPoint = CameraLocation;

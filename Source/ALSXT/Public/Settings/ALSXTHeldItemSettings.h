@@ -1,7 +1,23 @@
 #pragma once
 
 #include "Utility/ALSXTStructs.h"
+#include "Animation/AnimSequence.h"
 #include "ALSXTHeldItemSettings.generated.h"
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTItemSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag Type {FGameplayTag::EmptyTag};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Mass{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	bool Physics{ false };
+};
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTHeldItemSettings
@@ -9,7 +25,10 @@ struct ALSXT_API FALSXTHeldItemSettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Overlay;
+	FALSXTItemSettings ItemSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag Overlay {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTagContainer AvailableCombatStances;
@@ -27,14 +46,13 @@ struct ALSXT_API FALSXTHeldItemSettings
 	FGameplayTagContainer AvailableGripPositions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
-	bool UseLeftHandIK {false};
+	bool UsesLeftHandIK {false};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
-	FName AttackTraceStartSocket;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	bool CanAttack{ false };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
-	FName AttackTraceEndSocket;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	bool PhysicsWhenHeld{ false };
 };
 
 USTRUCT(BlueprintType)
@@ -111,6 +129,12 @@ struct ALSXT_API FHeldItemAttackMontage
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
 	float BaseStaminaCost{ 0.0f };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
+	FName AttackTraceStartSocket;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
+	FName AttackTraceEndSocket;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	FHeldItemMontage Montage;
 
@@ -118,4 +142,57 @@ struct ALSXT_API FHeldItemAttackMontage
 	{
 		return (other.Montage == Montage);
 	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FHeldItemGrip
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
+	FGameplayTag Type{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	TObjectPtr<UAnimSequence> Pose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
+	FName HandSocketName{ "Grip" };
+
+	bool operator==(const FHeldItemGrip& other) const
+	{
+		return (other.Pose == Pose);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTHeldItemGripState
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FHeldItemGrip Grip;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attachment")
+	FName AttachmentSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attachment")
+	FTransform GripTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parent")
+	FGameplayTag GripPosition{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Foregrip Position", TitleProperty = "{Position}", AllowPrivateAccess), Category = "Parent")
+	FGameplayTag ComponentPosition;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTHeldItemGripStates
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTHeldItemGripState Grip;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTHeldItemGripState Foregrip;
 };

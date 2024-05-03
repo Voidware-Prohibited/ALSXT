@@ -3,6 +3,8 @@
 #include "NativeGameplayTags.h"
 #include "Chaos/ChaosEngineInterface.h"
 #include "Settings/ALSXTCameraEffectsSettings.h"
+#include "Settings/ALSXTHeldItemSettings.h"
+#include "Settings/ALSXTFirearmSettings.h"
 #include "State/ALSXTPoseState.h"
 #include "State/ALSXTHeadLookAtState.h"
 #include "State/ALSXTFreelookState.h"
@@ -102,6 +104,27 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterGestureHand() const;
 
+
+  // Held Item
+
+  // Get which Modes, Positions and Stances are available for the Held Item
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
+  FALSXTHeldItemSettings GetHeldItemSettings();
+
+  // Get the current Transform, Socket Names and Positions for the Held Item
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
+  FALSXTHeldItemGripStates GetHeldItemGripStates();
+
+  // Firearm
+
+  // Get the current Sight Transforms and Socket Names for the Held Item
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Firearm")
+  FALSXTFirearmAimState GetFirearmAimState();
+
+  // Get the current Recoil Info for the Held Item
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Firearm")
+  UALSXTFirearmRecoilAsset* GetFirearmRecoilInfo();
+
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterReloadingType() const;
 
@@ -136,9 +159,6 @@ public:
   FALSXTHeadLookAtState GetCharacterHeadLookAtState() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
-  bool DoesCharacterOverlayObjectUseLeftHandIK() const;
-
-  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterLocomotionVariant() const;
 
   UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALSXTCharacter Interface")
@@ -146,7 +166,6 @@ public:
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   UALSXTCharacterSettings* GetCharacterSettings() const;
-
   
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterSex() const;
@@ -201,12 +220,6 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   UALSXTCameraShakeSettings* SelectCameraShakeSettings();
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  FVector GetCameraLocationOld();
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  FRotator GetCameraRotationOld();
 	
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void GetCombatAttackPhysics(float& Mass, float& Velocity);
