@@ -4,6 +4,7 @@
 #include "ALSXTBlueprintFunctionLibrary.h"
 #include "GameFramework/PlayerController.h"
 #include "Interfaces/ALSXTControllerRenderInterface.h"
+#include "Utility/ALSXTGameplayTags.h"
 
 FQuat UALSXTBlueprintFunctionLibrary::ConvertEulerToQuaternion(FRotator CurrentRotation)
 {
@@ -80,4 +81,29 @@ bool UALSXTBlueprintFunctionLibrary::GetAdjustedRenderMatrix(const UMeshComponen
 		}
 	}
 	return false;
+}
+
+void UALSXTBlueprintFunctionLibrary::GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side)
+{
+	float DotProduct{ Hit.OriginHitResult.HitResult.GetActor()->GetDotProductTo(Hit.HitResult.HitResult.GetActor()) };
+
+	// 1 is face to face, 0 is side,, -1 is behind
+
+	FVector CrossProduct{ FVector::CrossProduct(Hit.HitResult.Impulse, Hit.HitResult.Impulse) };
+	Side = ALSXTImpactSideTags::Left;
+}
+
+void UALSXTBlueprintFunctionLibrary::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength)
+{
+	float HitMass = Hit.HitResult.Mass;
+	FVector HitVelocity = Hit.HitResult.Velocity;
+	FVector HitMomentum = HitMass * HitVelocity;
+
+	float SelfMass = Hit.OriginHitResult.Mass;
+	FVector SelfVelocity = Hit.OriginHitResult.Velocity;
+	FVector SelfMomentum = SelfMass * SelfVelocity;
+
+	FVector MomemtumSum = HitMomentum + SelfMomentum;
+
+	Strength = ALSXTActionStrengthTags::Light;
 }

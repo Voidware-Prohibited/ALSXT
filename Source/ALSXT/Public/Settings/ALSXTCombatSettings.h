@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utility/ALSXTStructs.h"
+#include "Utility/ALSXTGameplayTags.h"
 #include "Utility/ALSXTCombatStructs.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
@@ -62,6 +63,9 @@ class ALSXT_API UALSXTCombatSettings : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
 	FGameplayTagContainer TargetableOverlayModes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Status"))
+	FGameplayTagContainer TargetableCharacterStatuses {ALSXTStatusTags::Normal};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Attack Method"))
 	FGameplayTagContainer EnabledAttackMethods;

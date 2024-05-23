@@ -47,7 +47,7 @@ void UALSXTImpactReactionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Character = Cast<AALSXTCharacter>(GetOwner());
+	// AALSXTCharacter Character = Cast<AALSXTCharacter>(GetOwner());
 	// AlsCharacter = Cast<AAlsCharacter>(GetOwner());
 	if (GetOwner())
 	{
@@ -55,6 +55,8 @@ void UALSXTImpactReactionComponent::BeginPlay()
 	}
 	CrowdNavigationVelocityTimerDelegate.BindUFunction(this, "CrowdNavigationVelocityTimer");
 	BumpVelocityTimerDelegate.BindUFunction(this, "BumpVelocityTimer");
+
+	AnticipationTimerDelegate.BindUFunction(this, "AnticipationTimer");
 
 	ImpactFallingTimerDelegate.BindUFunction(this, "ImpactFallingTimer");
 	AttackFallingTimerDelegate.BindUFunction(this, "AttackFallingTimer");
@@ -101,6 +103,22 @@ void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, A
 		
 		}
 	}
+}
+
+void UALSXTImpactReactionComponent::OnRagdollingStarted()
+{
+	FDoubleHitResult LastImpact = GetLastImpact();
+	FAttackDoubleHitResult LastAttackImpact = GetLastAttackImpact();
+
+	if (LastAttackImpact.DoubleHitResult.DateTime >= LastImpact.DateTime)
+	{
+		StartAttackFall(LastAttackImpact);
+	}
+	else
+	{
+		StartImpactFall(LastImpact);
+	}
+
 }
 
 bool UALSXTImpactReactionComponent::GetImpactFallLocation(FVector& Location, FDoubleHitResult Hit)
@@ -363,7 +381,11 @@ void UALSXTImpactReactionComponent::StartImpactFallingTimer()
 
 void UALSXTImpactReactionComponent::ImpactFallingTimer()
 {
-	//..
+	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) == AlsLocomotionModeTags::Grounded)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ImpactFallenTimerHandle);
+	}
+
 	FVector CharVel = GetOwner()->GetVelocity();
 	float CharVelLength = CharVel.Length();
 	const auto* Capsule{ IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(GetOwner()) };
@@ -417,7 +439,11 @@ void UALSXTImpactReactionComponent::StartAttackFallingTimer()
 
 void UALSXTImpactReactionComponent::AttackFallingTimer()
 {
-	//..
+	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) == AlsLocomotionModeTags::Grounded)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(AttackFallenTimerHandle);
+	}
+
 	FVector CharVel = GetOwner()->GetVelocity();
 	float CharVelLength = CharVel.Length();
 	const auto* Capsule{ IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(GetOwner()) };
@@ -620,6 +646,76 @@ void UALSXTImpactReactionComponent::AttackFallenTimer()
 			// ServerGetUp();
 		}
 	}
+}
+
+
+void UALSXTImpactReactionComponent::StartAnticipationTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(AnticipationTimerHandle, AnticipationTimerDelegate, 0.1f, true);
+}
+
+void UALSXTImpactReactionComponent::AnticipationTimer()
+{
+	FRotator ControlRotation = Cast<APawn>(GetOwner())->GetControlRotation();
+	FVector CharLoc = GetOwner()->GetActorLocation();
+	FVector ForwardVector = GetOwner()->GetActorForwardVector();
+	//FVector CameraLocation = Character->Camera->GetFirstPersonCameraLocation();
+	FVector StartLocation = ForwardVector * 150 + GetOwner()->GetActorLocation();
+	FVector EndLocation = ForwardVector * 200 + StartLocation;
+	FVector CenterLocation = (StartLocation - EndLocation) / 8 + StartLocation;
+	FCollisionShape CollisionShape = FCollisionShape::MakeBox(ImpactReactionSettings.AnticipationAreaHalfSize);
+	TArray<FHitResult> OutHits;
+	bool Debug = true;
+	
+	// Display Debug Shape
+	if (ImpactReactionSettings.DebugMode)
+	{
+		DrawDebugBox(GetWorld(), CenterLocation, ImpactReactionSettings.AnticipationAreaHalfSize, ControlRotation.Quaternion(), FColor::Yellow, false, 0.5f, 100, 2);
+	}
+	
+	FCollisionObjectQueryParams ObjectQueryParameters;
+	for (const auto ObjectType : ImpactReactionSettings.ImpactTraceObjectTypes)
+	{
+		ObjectQueryParameters.AddObjectTypesToQuery(UCollisionProfile::Get()->ConvertToCollisionChannel(false, ObjectType));
+	}
+	
+	bool isHit = GetWorld()->SweepMultiByObjectType(OutHits, StartLocation, EndLocation, ControlRotation.Quaternion(), ObjectQueryParameters, CollisionShape);
+	
+	if (isHit)
+	{
+		for (auto& Hit : OutHits)
+		{
+			if (Hit.GetActor() != GetOwner())
+			{
+				FTargetHitResultEntry HitResultEntry;
+				HitResultEntry.Valid = true;
+				HitResultEntry.DistanceFromPlayer = FVector::Distance(GetOwner()->GetActorLocation(), Hit.Location);
+				// HitResultEntry.AngleFromCenter = GetOwner()->GetAngle(Hit.Location);
+				HitResultEntry.HitResult = Hit;
+				//Targets.Add(HitResultEntry);
+			}
+		}
+	}
+}
+
+void UALSXTImpactReactionComponent::StopAnticipationTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(AnticipationTimerHandle);
+}
+
+void UALSXTImpactReactionComponent::StartFallingAnticipationTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(FallingAnticipationTimerHandle, FallingAnticipationTimerDelegate, 0.1f, true);
+}
+
+void UALSXTImpactReactionComponent::FallingAnticipationTimer()
+{
+
+}
+
+void UALSXTImpactReactionComponent::StopFallingAnticipationTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(FallingAnticipationTimerHandle);
 }
 
 void UALSXTImpactReactionComponent::OnCrowdNavigationReactionBlendOut(UAnimMontage* Montage, bool bInterrupted)

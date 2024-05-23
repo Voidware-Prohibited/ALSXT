@@ -13,24 +13,27 @@ class ALSXT_API IALSXTHeldItemInterface {
 
 public:
 
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Held Item Interface")
+  bool IsHoldingItem() const;
+  
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Held Item Interface")
+  bool IsHoldingAimableItem() const;
+	
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Held Item Interface")
-  FALSXTHeldItemSettings GetHeldItemSettings();
+  FALSXTHeldItemSettings GetHeldItemSettings() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Held Item Interface")
-  FHeldItemGrip GetHeldItemGrip();
+  FHeldItemGrip GetHeldItemGrip() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Held Item Interface")
-  FHeldItemGrip GetHeldItemForegrip();
+  FHeldItemGrip GetHeldItemForegrip() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Held Item Interface")
-  TArray<FHeldItemEquipMontage> GetHeldItemEquipMontages(const FGameplayTag& Type);
+  TArray<FHeldItemEquipMontage> GetHeldItemEquipMontages(const FGameplayTag& Type) const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Held Item Interface")
-  TArray<FHeldItemActionMontage> GetHeldItemActionMontages(const FGameplayTag& Type);
+  TArray<FHeldItemActionMontage> GetHeldItemActionMontages(const FGameplayTag& Type) const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Held Item Interface")
-  TArray<FHeldItemAttackMontage> GetHeldItemAttackMontages(const FGameplayTag& Type, const FGameplayTag& Strength);
-
-  // UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Held Item Interface")
-  // void GetHeldItemAttackDamageInfo(const FGameplayTag& HeldItemAttackType, const FGameplayTag& HeldItemAttackStrength, float& BaseDamage, FGameplayTag& ImpactForm, FGameplayTag& DamageType) const;
+  TArray<FHeldItemAttackMontage> GetHeldItemAttackMontages(const FGameplayTag& Type, const FGameplayTag& Strength) const;
 };

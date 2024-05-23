@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "ALSXTAnimationInstance.h"
+#include "ALSXTCharacterAdvanced.h"
 #include "ALSXTAdvancedLinkedAnimationInstance.h"
+#include "Settings/ALSXTFirearmSettings.h"
 #include "ALSXTAdvancedAnimationInstance.generated.h"
 
-/**
- * 
- */
+class UALSXTAdvancedLinkedAnimationInstance;
+class AALSXTCharacterAdvanced;
+
 UCLASS()
 class ALSXT_API UALSXTAdvancedAnimationInstance : public UALSXTAnimationInstance
 {
@@ -18,8 +20,17 @@ class ALSXT_API UALSXTAdvancedAnimationInstance : public UALSXTAnimationInstance
 	friend UALSXTAdvancedLinkedAnimationInstance;
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	TObjectPtr<AALSXTCharacterAdvanced> ALSXTCharacterAdvanced;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UALSXTAdvancedAnimationInstanceSettings> ALSXTAdvancedSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FALSXTFirearmAimState FirearmAimState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FALSXTRecoilState RecoilState;
 
 private:
 	void RefreshALSXTPose();

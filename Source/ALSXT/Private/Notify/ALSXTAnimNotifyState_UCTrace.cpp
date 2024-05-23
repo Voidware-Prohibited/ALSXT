@@ -25,23 +25,31 @@ void UALSXTAnimNotifyState_UCTrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 	const float Duration, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyBegin(Mesh, Animation, Duration, EventReference);
-
-	if (IsValid(Mesh->GetOwner()) && Mesh->GetOwner()->Implements<UALSXTCharacterInterface>() && Mesh->GetOwner()->Implements<UALSXTCombatInterface>())
+	const auto* World{ Mesh->GetWorld() };
+	if (World->WorldType != EWorldType::EditorPreview)
 	{
-		
-		TraceSettings.Overlay = IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(Mesh->GetOwner());
-		TraceSettings.ImpactType = ALSXTImpactTypeTags::Hit;
-		TraceSettings.AttackType = UnarmedAttackType;
-		TraceSettings.ImpactForm = ALSXTImpactFormTags::Blunt;
-		TraceSettings.AttackStrength = AttackStrength;
+		if (IsValid(Mesh->GetOwner()))
+		{
+			TraceSettings.ImpactType = ALSXTImpactTypeTags::Hit;
+			TraceSettings.AttackType = UnarmedAttackType;
+			TraceSettings.ImpactForm = ALSXTImpactFormTags::Blunt;
+			TraceSettings.AttackStrength = AttackStrength;
+			if (Mesh->GetOwner()->Implements<UALSXTCharacterInterface>())
+			{
+				TraceSettings.Overlay = IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(Mesh->GetOwner());
+			}
+			if (Mesh->GetOwner()->Implements<UALSXTCombatInterface>())
+			{
+				IALSXTCombatInterface::Execute_GetCombatUnarmedTraceLocations(Mesh->GetOwner(), UnarmedAttackType, TraceSettings.Start, TraceSettings.End, TraceSettings.Radius);
+				FString DebugMsg;
+				IALSXTCombatInterface::Execute_BeginCombatAttackCollisionTrace(Mesh->GetOwner(), TraceSettings);
+			}
 
-		IALSXTCombatInterface::Execute_GetCombatUnarmedTraceLocations(Mesh->GetOwner(), UnarmedAttackType, TraceSettings.Start, TraceSettings.End, TraceSettings.Radius);
-		FString DebugMsg;
-		IALSXTCombatInterface::Execute_BeginCombatAttackCollisionTrace(Mesh->GetOwner(), TraceSettings);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Invalid")));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Invalid")));
+		}
 	}
 }
 
@@ -50,8 +58,15 @@ void UALSXTAnimNotifyState_UCTrace::NotifyEnd(USkeletalMeshComponent* Mesh, UAni
 {
 	Super::NotifyEnd(Mesh, Animation, EventReference);
 
-	if (IsValid(Mesh->GetOwner()) && Mesh->GetOwner()->Implements<UALSXTCharacterInterface>() && Mesh->GetOwner()->Implements<UALSXTCombatInterface>())
+	const auto* World{ Mesh->GetWorld() };
+	if (World->WorldType != EWorldType::EditorPreview)
 	{
-		IALSXTCombatInterface::Execute_EndCombatAttackCollisionTrace(Mesh->GetOwner());
-	}	
+		if (IsValid(Mesh->GetOwner()))
+		{
+			if (Mesh->GetOwner()->Implements<UALSXTCombatInterface>())
+			{
+				IALSXTCombatInterface::Execute_EndCombatAttackCollisionTrace(Mesh->GetOwner());
+			}
+		}
+	}
 }

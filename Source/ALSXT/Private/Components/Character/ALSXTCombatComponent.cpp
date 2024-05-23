@@ -16,8 +16,10 @@
 #include "ALSXTCharacter.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTTargetLockInterface.h"
+#include "Interfaces/ALSXTHeldItemInterface.h"
 #include "Interfaces/ALSXTCombatInterface.h"
 #include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
+#include "ALSXTBlueprintFunctionLibrary.h"
 
 // Sets default values for this component's properties
 UALSXTCombatComponent::UALSXTCombatComponent()
@@ -29,7 +31,6 @@ UALSXTCombatComponent::UALSXTCombatComponent()
 
 	// ...
 }
-
 
 // Called when the game starts
 void UALSXTCombatComponent::BeginPlay()
@@ -45,8 +46,8 @@ void UALSXTCombatComponent::BeginPlay()
 		//Del.AddUniqueDynamic(this, &UALSXTCombatComponent::SetupInputComponent(EnhancedInput));
 	}
 	TargetTraceTimerDelegate.BindUFunction(this, "TryTraceForTargets");
+	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace");
 }
-
 
 // Called every frame
 void UALSXTCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -58,7 +59,7 @@ void UALSXTCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 float UALSXTCombatComponent::GetAngle(FVector Target)
 {
 	float resultAngleInRadians = 0.0f;
-	FVector PlayerLocation = Character->GetActorLocation();
+	FVector PlayerLocation = GetOwner()->GetActorLocation();
 	PlayerLocation.Normalize();
 	Target.Normalize();
 
@@ -92,7 +93,7 @@ bool UALSXTCombatComponent::IsTartgetObstructed()
 	CollisionQueryParameters.AddIgnoredActor(GetOwner());
 	CollisionQueryParameters.AddIgnoredActor(CurrentTarget.HitResult.GetActor());
 
-	if (GetWorld()->LineTraceMultiByObjectType(OutHits, CharLoc, CurrentTarget.HitResult.GetActor()->GetActorLocation(), ObjectQueryParameters, CollisionQueryParameters))
+	if (GetOwner()->GetWorld()->LineTraceMultiByObjectType(OutHits, CharLoc, CurrentTarget.HitResult.GetActor()->GetActorLocation(), ObjectQueryParameters, CollisionQueryParameters))
 	{
 		bool ValidObstruction = false;
 		for (FHitResult Hit : OutHits)
@@ -152,10 +153,10 @@ void UALSXTCombatComponent::TryTraceForTargets()
 
 void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targets)
 {
-	FRotator ControlRotation = Character->GetControlRotation();
+	FRotator ControlRotation = Cast<ACharacter>(GetOwner())->GetControlRotation();
 	FVector CharLoc = GetOwner()->GetActorLocation();
 	FVector ForwardVector = GetOwner()->GetActorForwardVector();
-	FVector CameraLocation = Character->Camera->GetFirstPersonCameraLocation();
+	FVector CameraLocation = IALSXTCharacterInterface::Execute_GetCharacterCamera(GetOwner())->GetFirstPersonCameraLocation();
 	FVector StartLocation = ForwardVector * 150 + CameraLocation;
 	FVector EndLocation = ForwardVector * 200 + StartLocation;
 	FVector CenterLocation = (StartLocation - EndLocation) / 8 + StartLocation;
@@ -165,7 +166,7 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 	// Display Debug Shape
 	if (CombatSettings.DebugMode)
 	{
-		DrawDebugBox(GetWorld(), CenterLocation, CombatSettings.TraceAreaHalfSize, ControlRotation.Quaternion(), FColor::Yellow, false, CombatSettings.DebugDuration, 100, 2);
+		DrawDebugBox(GetOwner()->GetWorld(), CenterLocation, CombatSettings.TraceAreaHalfSize, ControlRotation.Quaternion(), FColor::Yellow, false, CombatSettings.DebugDuration, 100, 2);
 	}
 
 	FCollisionObjectQueryParams ObjectQueryParameters;
@@ -174,7 +175,7 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 		ObjectQueryParameters.AddObjectTypesToQuery(UCollisionProfile::Get()->ConvertToCollisionChannel(false, ObjectType));
 	}
 
-	bool isHit = GetWorld()->SweepMultiByObjectType(OutHits, StartLocation, EndLocation, ControlRotation.Quaternion(), ObjectQueryParameters, CollisionShape);
+	bool isHit = GetOwner()->GetWorld()->SweepMultiByObjectType(OutHits, StartLocation, EndLocation, ControlRotation.Quaternion(), ObjectQueryParameters, CollisionShape);
 
 	if (isHit)
 	{
@@ -212,7 +213,8 @@ void UALSXTCombatComponent::GetClosestTarget()
 				HitResultEntry.DistanceFromPlayer = Hit.DistanceFromPlayer;
 				HitResultEntry.AngleFromCenter = Hit.AngleFromCenter;
 				HitResultEntry.HitResult = Hit.HitResult;
-				if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && (HitResultEntry.DistanceFromPlayer < CurrentTarget.DistanceFromPlayer))
+				
+				if (Hit.HitResult.GetActor() != CurrentTarget.HitResult.GetActor() && IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner())->TargetableCharacterStatuses.HasTag(IALSXTCharacterInterface::Execute_GetCharacterStatus(Hit.HitResult.GetActor())) && (HitResultEntry.DistanceFromPlayer < CurrentTarget.DistanceFromPlayer))
 				{
 					if (!FoundHit.Valid)
 					{
@@ -434,7 +436,6 @@ void UALSXTCombatComponent::ServerSetCombatState_Implementation(const FALSXTComb
 	SetCombatState(NewCombatState);
 }
 
-
 void UALSXTCombatComponent::ServerProcessNewCombatState_Implementation(const FALSXTCombatState& NewCombatState)
 {
 	ProcessNewCombatState(NewCombatState);
@@ -452,15 +453,17 @@ void UALSXTCombatComponent::OnCombatStateChanged_Implementation(const FALSXTComb
 AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 {
 	TArray<FHitResult> OutHits;
-	FVector SweepStart = Character->GetActorLocation();
-	FVector SweepEnd = Character->GetActorLocation() + (Character->GetActorForwardVector() * Distance);
+	FVector SweepStart = GetOwner()->GetActorLocation();
+	FVector SweepEnd = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * Distance;
 	FCollisionShape MyColSphere = FCollisionShape::MakeSphere(50.0f);
 	TArray<AActor*> InitialIgnoredActors;
 	TArray<AActor*> OriginTraceIgnoredActors;
 	InitialIgnoredActors.Add(Character);	// Add Self to Initial Trace Ignored Actors
 	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
 	AttackTraceObjectTypes = CombatSettings.AttackTraceObjectTypes;
-	bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), SweepStart, SweepEnd, 50, CombatSettings.AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, OutHits, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
+	EDrawDebugTrace::Type ShowDebugTrace;	
+	CombatSettings.DebugMode ? ShowDebugTrace = EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
+	bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), SweepStart, SweepEnd, 50, CombatSettings.AttackTraceObjectTypes, false, InitialIgnoredActors, ShowDebugTrace, OutHits, true, FLinearColor::White, FLinearColor::Blue, 0.0f);
 
 	if (isHit)
 	{
@@ -478,6 +481,153 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 		}
 	}
 	return nullptr;
+}
+
+void UALSXTCombatComponent::BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings)
+{
+	CurrentAttackTraceSettings = TraceSettings;
+	GetWorld()->GetTimerManager().SetTimer(AttackTraceTimerHandle, AttackTraceTimerDelegate, 0.001f, true);
+}
+
+void UALSXTCombatComponent::AttackCollisionTrace()
+{
+	if (!UKismetSystemLibrary::DoesImplementInterface(GetOwner(), UALSXTCombatInterface::StaticClass()))
+	{
+		return;
+	}
+
+	// Setup Initial Trace
+	IALSXTCombatInterface::Execute_GetCombatUnarmedTraceLocations(GetOwner(), CurrentAttackTraceSettings.AttackType, CurrentAttackTraceSettings.Start, CurrentAttackTraceSettings.End, CurrentAttackTraceSettings.Radius);
+	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes = CombatSettings.AttackTraceObjectTypes;
+	TArray<AActor*> InitialIgnoredActors;
+	TArray<AActor*> OriginTraceIgnoredActors;
+	TArray<FHitResult> HitResults;
+	InitialIgnoredActors.Add(GetOwner());	// Add Self to Initial Trace Ignored Actors
+	EDrawDebugTrace::Type ShowDebugTrace;
+	CombatSettings.DebugMode ? ShowDebugTrace = EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
+
+	// Initial Trace
+	bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetOwner()->GetWorld(), CurrentAttackTraceSettings.Start, CurrentAttackTraceSettings.End, CurrentAttackTraceSettings.Radius, AttackTraceObjectTypes, false, InitialIgnoredActors, ShowDebugTrace, HitResults, true, FLinearColor::Green, FLinearColor::Yellow, 0.0f);
+	if (isHit)
+	{
+		// Loop through HitResults Array
+		for (auto& HitResult : HitResults)
+		{
+			// Check if not in AttackedActors Array
+			if (!AttackTraceLastHitActors.Contains(HitResult.GetActor()))
+			{
+				AttackTraceLastHitActors.AddUnique(HitResult.GetActor());
+				// Declare Local Vars
+				FAttackDoubleHitResult CurrentHitResult;
+				FGameplayTag ImpactLoc;
+				FGameplayTag ImpactStrength;
+				// FGameplayTag ImpactSide;
+				FGameplayTag ImpactForm;
+				AActor* HitActor = HitResult.GetActor();
+				FString HitActorname;
+				FVector HitActorVelocity{ FVector::ZeroVector };
+				float HitActorMass{ 0.0f };
+				float HitActorAttackVelocity{ 0.0f };
+				float HitActorAttackMass{ 0.0f };
+
+				// Populate Hit
+				CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
+				CurrentHitResult.Type = CurrentAttackTraceSettings.AttackType;
+				CurrentHitResult.Strength = CurrentAttackTraceSettings.AttackStrength;
+				CurrentHitResult.DoubleHitResult.HitResult.ImpactStrength = CurrentAttackTraceSettings.AttackStrength;
+				HitActor = CurrentHitResult.DoubleHitResult.HitResult.HitResult.GetActor();
+				HitActorname = HitActor->GetName();
+
+				// Physics
+				if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
+				{
+					IALSXTCharacterInterface::Execute_GetCombatAttackPhysics(HitActor, HitActorAttackMass, HitActorAttackVelocity);
+				}
+				else
+				{
+					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
+					{
+						IALSXTCollisionInterface::Execute_GetActorVelocity(HitActor, HitActorVelocity);
+						IALSXTCollisionInterface::Execute_GetActorMass(HitActor, HitActorMass);
+					}
+				}
+				// TotalImpactEnergy = 50.0f + (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
+				FVector TotalImpactEnergy = (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
+				FVector HitDirection = HitResult.ImpactPoint - GetOwner()->GetActorLocation();
+				HitDirection.Normalize();
+				CurrentHitResult.DoubleHitResult.HitResult.Direction = HitDirection;
+				CurrentHitResult.DoubleHitResult.HitResult.Impulse = HitResult.Normal * TotalImpactEnergy;
+
+				// Impact Location
+				if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
+				{
+					IALSXTCollisionInterface::Execute_GetLocationFromBoneName(HitActor, CurrentHitResult.DoubleHitResult.HitResult.HitResult.BoneName, ImpactLoc);
+				}
+				CurrentHitResult.DoubleHitResult.HitResult.ImpactLocation = ImpactLoc;
+				// CurrentHitResult.DoubleHitResult.HitResult.ImpactSide = ImpactSide;
+
+				// Setup Origin Trace
+				FHitResult OriginHitResult;
+				OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
+
+				// Perform Origin Hit Trace to get PhysMat etc for ImpactLocation
+				bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetOwner()->GetWorld(), HitResult.Location, HitResult.TraceStart, CurrentAttackTraceSettings.Radius, AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Yellow, 4.0f);
+				if (isOriginHit)
+				{
+					// Populate Origin Hit
+					CurrentHitResult.DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
+					UALSXTBlueprintFunctionLibrary::GetSideFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactSide);
+					UALSXTBlueprintFunctionLibrary::GetStrengthFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.Strength);
+					CurrentHitResult.DoubleHitResult.HitResult.ImpactStrength = CurrentAttackTraceSettings.AttackStrength;
+					FString OriginHitActorname = OriginHitResult.GetActor()->GetName();
+
+					// Populate Values based if Holding Item
+					if (IALSXTHeldItemInterface::Execute_IsHoldingItem(GetOwner()))
+					{
+						IALSXTCombatInterface::Execute_GetCombatHeldItemAttackDamageInfo(GetOwner(), CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.HitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
+					}
+					else
+					{
+						IALSXTCombatInterface::Execute_GetCombatUnarmedAttackDamageInfo(GetOwner(), CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.HitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
+					}
+					// GetFormFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactForm);
+					// CurrentHitResult.DoubleHitResult.ImpactForm = 		
+				}
+
+				//	If implements Character Interface call AttackReaction on CharacterInterface
+				if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
+				{
+					IALSXTCharacterInterface::Execute_AttackReaction(HitActor, CurrentHitResult);
+				}
+				else
+				{
+					// Else If implements Collision Interface call OnActorAttackCollision on CollisionInterface
+					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
+					{
+						// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, HitActorname);
+						IALSXTCollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
+					}
+				}
+
+				// Play Effects for Attacker 
+				IALSXTCombatInterface::Execute_OnAttackCollision(GetOwner(), CurrentHitResult);
+			}
+		}
+	}
+}
+
+void UALSXTCombatComponent::EndAttackCollisionTrace()
+{
+	// Clear Attack Trace Timer
+	GetWorld()->GetTimerManager().ClearTimer(AttackTraceTimerHandle);
+
+	// Reset Attack Trace Settings
+	CurrentAttackTraceSettings.Start = { 0.0f, 0.0f, 0.0f };
+	CurrentAttackTraceSettings.End = { 0.0f, 0.0f, 0.0f };
+	CurrentAttackTraceSettings.Radius = { 0.0f };
+
+	// Empty AttackTraceLastHitActors Array
+	AttackTraceLastHitActors.Empty();
 }
 
 void UALSXTCombatComponent::Attack(const FGameplayTag& ActionType, const FGameplayTag& AttackType, const FGameplayTag& Strength, const float BaseDamage, const float PlayRate)
@@ -619,7 +769,8 @@ void UALSXTCombatComponent::StartAttack(const FGameplayTag& AttackType, const FG
 		SetCombatState(NewCombatState);
 
 		ServerStartAttack(Montage.Montage.Montage, PlayRate, StartYawAngle, TargetYawAngle);
-		OnAttackStarted(AttackType, Stance, Strength, BaseDamage);
+		// OnAttackStarted(AttackType, Stance, Strength, BaseDamage);
+		OnAttackStartedDelegate.Broadcast(AttackType, Stance, Strength, BaseDamage);
 	}
 }
 
@@ -1036,12 +1187,11 @@ void UALSXTCombatComponent::StopAttack()
 	{
 		IALSXTCharacterInterface::Execute_SetCharacterMovementModeLocked(GetOwner(), false);
 		// Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		OnAttackEnded();
+		// OnAttackEnded();
+		OnAttackEndedDelegate.Broadcast();
 	}
 	IALSXTCharacterInterface::Execute_SetCharacterMovementModeLocked(GetOwner(), false);
 }
-
-void UALSXTCombatComponent::OnAttackEnded_Implementation() {}
 
 void UALSXTCombatComponent::ServerStartSyncedAttack_Implementation(UAnimMontage* Montage, int32 Index, const float PlayRate,
 	const float StartYawAngle, const float TargetYawAngle)

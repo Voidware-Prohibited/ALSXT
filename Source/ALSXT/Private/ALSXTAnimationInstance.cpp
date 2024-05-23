@@ -87,6 +87,8 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		FirearmSightLocation = IALSXTCharacterInterface::Execute_GetCharacterFirearmSightLocation(GetOwningActor());
 		ForegripTransform = IALSXTCharacterInterface::Execute_GetCharacterCurrentForegripTransform(GetOwningActor());
 		VaultType = IALSXTCharacterInterface::Execute_GetCharacterVaultType(GetOwningActor());
+		HeldItemSettings = IALSXTCharacterInterface::Execute_GetHeldItemSettings(GetOwningActor());
+		HeldItemState = IALSXTCharacterInterface::Execute_GetHeldItemState(GetOwningActor());
 		AimState = IALSXTCharacterInterface::Execute_GetCharacterAimState(GetOwningActor());
 		FreelookState = IALSXTCharacterInterface::Execute_GetCharacterFreelookState(GetOwningActor());
 		HeadLookAtState = IALSXTCharacterInterface::Execute_GetCharacterHeadLookAtState(GetOwningActor());

@@ -12,6 +12,17 @@
 #include "State/ALSXTCombatState.h"
 #include "ALSXTCombatComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNewTargetSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashToTargetStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashToTargetEndedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAttackStartedSignature, FGameplayTag, AttackType, FGameplayTag, Stance, FGameplayTag, Strength, float, BaseDamage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttackCollisionSignature, FAttackDoubleHitResult, Hit);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackMissedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackBlockedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackParrySignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackRiposteSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackEndedSignature);
+
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ALSXT_API UALSXTCombatComponent : public UActorComponent
 {
@@ -35,6 +46,40 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input", Meta = (AllowPrivateAccess))
 	TObjectPtr<UInputAction> BlockAction;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnNewTargetSignature OnNewTarget;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnDashToTargetStartedSignature OnDashToTargetStarted;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnDashToTargetEndedSignature OnDashToTargetEnded;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttackStartedSignature OnAttackStartedDelegate;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnAttackCollisionSignature OnAttackCollisionDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttackEndedSignature OnAttackEndedDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttackMissedSignature OnAttackMissed;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttackBlockedSignature OnAttackBlocked;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttackParrySignature OnAttackParry;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttackRiposteSignature OnAttackRiposte;
+
+	// void OnAttackStarted(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float BaseDamage);
+	// void OnAttackCollision(FAttackDoubleHitResult Hit);
+	// void OnAttackEnded();
 
 
 	virtual void InputPrimaryAction();
@@ -62,7 +107,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	UAlsCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target Lock", Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Target Lock", Meta = (AllowPrivateAccess))
 	FTargetHitResultEntry CurrentTarget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
@@ -164,9 +209,6 @@ protected:
 	FSyncedActionAnimation GetSyncedAttackMontage(int32 Index);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnAttackStarted(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float& BaseDamage);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnSyncedAttackStarted(const FGameplayTag& AttackType, const FGameplayTag& Stance, const FGameplayTag& Strength, const float& BaseDamage);
 
 	// Desired Attack
@@ -180,6 +222,43 @@ private:
 
 	FTimerHandle TargetTraceTimerHandle;
 	FTimerDelegate TargetTraceTimerDelegate;
+
+	// Move To Target Timer
+	FTimerHandle MoveToTargetTimerHandle;	// Timer Handle for MoveToTarget
+	FTimerDelegate MoveToTargetTimerDelegate; // Delegate to bind function with parameters
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
+	FALSXTCombatAttackTraceSettings CurrentAttackTraceSettings;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
+	TArray<AActor*> AttackTraceLastHitActors;
+
+private:
+
+	void BeginMoveToTarget();
+	void UpdateMoveToTarget();
+	void StopMoveToTarget();
+
+	// Attack Trace Timer
+	FTimerHandle AttackTraceTimerHandle;	// Timer Handle for Attack Trace
+	FTimerDelegate AttackTraceTimerDelegate; // Delegate to bind function with parameters
+
+public:
+	// Attack Collision Trace
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void AttackCollisionTrace();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void EndAttackCollisionTrace();
+
+private:
+
+	// UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	// void OnAttackCollision(FAttackDoubleHitResult Hit);
 
 	TArray<UMaterialInstanceDynamic*> TargetDynamicMaterials;
 
@@ -231,9 +310,6 @@ public:
 	void StopSyncedAttack();
 
 protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "Hooks")
-	void OnAttackEnded();
-
 	UFUNCTION(BlueprintNativeEvent, Category = "Hooks")
 	void OnSyncedAttackEnded();
 };

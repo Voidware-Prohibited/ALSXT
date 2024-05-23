@@ -11,6 +11,7 @@
 #include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTBumpPoseState.h"
 #include "State/ALSXTHeadLookAtState.h"
+#include "Settings/ALSXTHeldItemSettings.h"
 #include "ALSXTCharacter.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
@@ -69,6 +70,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTBreathState BreathState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTHeldItemSettings HeldItemSettings;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTHeldItemState HeldItemState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTAimState AimState;

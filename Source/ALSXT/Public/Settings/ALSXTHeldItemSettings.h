@@ -5,6 +5,16 @@
 #include "ALSXTHeldItemSettings.generated.h"
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTGeneralHeldItemSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Firearm", Meta = (AllowPrivateAccess))
+	FName GripSocketName{ "Grip" };
+
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTItemSettings
 {
 	GENERATED_BODY()
@@ -47,6 +57,9 @@ struct ALSXT_API FALSXTHeldItemSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	bool UsesLeftHandIK {false};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	bool UsesRecoil{ false };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	bool CanAttack{ false };
@@ -183,6 +196,11 @@ struct ALSXT_API FALSXTHeldItemGripState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Foregrip Position", TitleProperty = "{Position}", AllowPrivateAccess), Category = "Parent")
 	FGameplayTag ComponentPosition;
+
+	bool operator==(const FALSXTHeldItemGripState& other) const
+	{
+		return (other.Grip == Grip) && (other.AttachmentSocketName == AttachmentSocketName);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -195,4 +213,35 @@ struct ALSXT_API FALSXTHeldItemGripStates
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FALSXTHeldItemGripState Foregrip;
+
+	bool operator==(const FALSXTHeldItemGripStates& other) const
+	{
+		return (other.Grip == Grip) && (other.Foregrip == Foregrip);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTHeldItemState
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTHeldItemGripStates GripState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag FingerPosition;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag FingerAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag WeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag WeaponAttack;
+
+	bool operator==(const FALSXTHeldItemState& other) const
+	{
+		return (other.GripState == GripState) && (other.FingerPosition == FingerPosition) && (other.FingerAction == FingerAction) && (other.WeaponAction == WeaponAction) && (other.WeaponAttack == WeaponAttack);
+	}
 };

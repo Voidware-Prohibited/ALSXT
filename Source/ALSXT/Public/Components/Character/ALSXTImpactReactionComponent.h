@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Utility/ALSXTStructs.h"
 #include "Animation/AnimInstance.h"
+#include "Components/CapsuleComponent.h"
 #include "Chaos/ChaosEngineInterface.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "NiagaraSystem.h"
@@ -18,6 +19,8 @@
 #include "Components/TimelineComponent.h"
 #include "ALSXTImpactReactionComponent.generated.h"
 
+class AALSXTCharacter;
+
 UCLASS(Blueprintable, ClassGroup=(Physics), meta=(BlueprintSpawnableComponent) )
 class ALSXT_API UALSXTImpactReactionComponent : public UActorComponent
 {
@@ -28,6 +31,9 @@ public:
 	UALSXTImpactReactionComponent();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	void OnRagdollingStarted();
 
 protected:
 	virtual void BeginPlay() override;
@@ -86,13 +92,29 @@ protected:
 
 	void StartImpactFallenTimer(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
-	void ImpactFallenTimer();
-
 	void StartAttackFallenTimer(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void ImpactFallenTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void AttackFallenTimer();
+
+
+
+	void StartAnticipationTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void AnticipationTimer();
+
+	void StopAnticipationTimer();
+
+	void StartFallingAnticipationTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void FallingAnticipationTimer();
+
+	void StopFallingAnticipationTimer();
 
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -399,6 +421,12 @@ private:
 	float TimeSinceLastRecovery;
 	FTimerHandle TimeSinceLastResponseTimerHandle;
 	float TimeSinceLastResponse;
+
+	FTimerHandle AnticipationTimerHandle;	// Timer Handle for Freelook Trace
+	FTimerDelegate AnticipationTimerDelegate; // Delegate to bind function with parameters
+
+	FTimerHandle FallingAnticipationTimerHandle;	// Timer Handle for Falling
+	FTimerDelegate FallingAnticipationTimerDelegate; // Delegate to bind function with parameters
 
 	FTimerHandle CrowdNavigationVelocityTimerHandle;
 	FTimerDelegate CrowdNavigationVelocityTimerDelegate;

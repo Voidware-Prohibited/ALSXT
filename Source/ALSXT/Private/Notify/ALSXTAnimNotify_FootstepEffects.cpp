@@ -45,6 +45,11 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 	const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(Mesh, Animation, EventReference);
+	const auto* World{ Mesh->GetWorld() };
+	if (World->WorldType == EWorldType::EditorPreview)
+	{
+		return;
+	}
 
 	if (!IsValid(Mesh) || !ALS_ENSURE(IsValid(FootstepEffectsSettings)))
 	{
@@ -64,9 +69,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		return;
 	}
 
-	const auto CapsuleScale{IsValid(ALSXTCharacter) ? IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(Mesh->GetOwner())->GetComponentScale().Z : 1.0f};
-
-	const auto* World{Mesh->GetWorld()};
+	const auto CapsuleScale{IsValid(ALSXTCharacter) ? IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(Mesh->GetOwner())->GetComponentScale().Z : 1.0f};	
 	const auto* AnimationInstance{Mesh->GetAnimInstance()};
 	const auto* ALSXTAnimationInstance{ IALSXTCharacterInterface::Execute_GetCharacterAnimInstance(Mesh->GetOwner()) };
 	// IALSXTCharacterInterface::Execute_GetCharacterAnimationInstance(Mesh->GetOwner());

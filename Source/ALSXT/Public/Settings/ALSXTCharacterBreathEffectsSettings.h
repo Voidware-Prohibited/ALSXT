@@ -33,7 +33,15 @@ struct ALSXT_API FALSXTCharacterBreathEffectsSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray< FALSXTBreathParticle> BreathParticles;
 
-	/* Range of Breath Rate to calculate with Stamina after releasing Hold Breath */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1), Category = "Holding Breath")
+	/* Default Holding Breath Duration before any Modifiers */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 30), Category = "Holding Breath")
+	float BaseHoldingBreathTimerDuration{ 3.0f };
+
+	/* Default Stamina Cost for Exausting the Holding Breath Timer before any Modifiers */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 30), Category = "Holding Breath")
+	float BaseBreathExhaustedStaminaCost{ 10.0f };
+
+	/* Range of Breath Rate to calculate with Stamina after releasing Hold Breath in relation to the Holding Breath Timer */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 30), Category = "Holding Breath")
 	FVector2D ReleaseStartRateRange{ 0.33f, 2.0f };
 };

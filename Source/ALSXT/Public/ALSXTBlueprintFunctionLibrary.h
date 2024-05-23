@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Utility/ALSXTStructs.h"
 #include "ALSXTBlueprintFunctionLibrary.generated.h"
 
 /**
@@ -19,4 +20,10 @@ public:
 	static FQuat ConvertEulerToQuaternion(FRotator CurrentRotation);
 
 	static bool GetAdjustedRenderMatrix(const UMeshComponent* Component, APlayerController* PlayerController, float DesiredFOV, FMatrix& AdjustedRenderMatrix);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Side From Hit", Keywords = "hit, side"), Category = "ALS|Als Character")
+	static void GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Side From Hit", Keywords = "hit, strength"), Category = "ALS|Als Character")
+	static void GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength);
 };

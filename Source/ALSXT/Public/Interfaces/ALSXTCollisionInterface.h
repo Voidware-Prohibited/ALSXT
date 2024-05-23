@@ -16,38 +16,58 @@ class ALSXT_API IALSXTCollisionInterface {
 
 public:
 
+	// Settings
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Settings")
 	UALSXTImpactReactionSettings* SelectImpactReactionSettings();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Settings")
 	UALSXTElementalInteractionSettings* SelectElementalInteractionSettings();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Collision Interface|Conversions")
+	void GetFormFromHit(FDoubleHitResult Hit, FGameplayTag& Form);
 	
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Parameters")
+	// Physics
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Physics")
 	void GetActorMass(float& Mass);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Parameters")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Physics")
 	void GetActorVelocity(FVector& Velocity);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Parameters")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Physics")
+	FGameplayTag GetCharacterPhysicalAnimationMode();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Physics")
+	void SetCharacterPhysicalAnimationMode(const FGameplayTag& PhysicalAnimationmode, FName BelowBoneName);
+
+	// Defensive Mode
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Defensive Mode")
+	bool Blocking();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Defensive Mode")
 	void GetActorThreatPoint(FVector& ThreatPoint);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Collision Interface|Parameters")
+	// Impact Reaction
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Collision Interface|Impact Reaction")
 	UPARAM(meta = (Categories = "Als.Impact Form")) FGameplayTag GetCurrentBumpForm();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Parameters")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Impact Reaction")
 	FALSXTImpactReactionState GetImpactReactionState();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Parameters")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Impact Reaction")
 	void GetAnticipationInfo(FGameplayTag& Velocity, FGameplayTag& Form, FVector& AnticipationPoint);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Collision Interface|Impact Reaction")
+	void GetLocationFromBoneName(FName Hit, FGameplayTag& Location);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Impact Reaction")
 	void GetActorPhysicsStates(FGameplayTag& PhysicalMaterial, const TArray<FGameplayTag>& PhysicalStates);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Parameters")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Impact Reaction")
 	void GetActorPhysicsDamageInfo(FGameplayTag& DamageType, float& PhysicsBaseDamage, float& PhysicsDamageFrequency);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|State")
-	bool Blocking();
+	// Criteria
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
 	bool CanReact();
@@ -84,12 +104,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
 	bool CanBeKnockedDown();
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
-	bool WillDamageKnockDownPlayer(float Damage);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
-	bool WillDamageKillPlayer(float Damage);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
 	bool ShouldSpawnParticleActor();
@@ -133,21 +147,25 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
 	bool ShouldPerformDefensiveReaction();
 
+	// Damage
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool WillDamageKnockDownPlayer(float Damage);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool WillDamageKillPlayer(float Damage);
+
+	// Events
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Events")
 	void PerformSurfaceInteraction(const FGameplayTag& PhysicalMaterial);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Events")
 	void ActorBumpCollision(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Hooks")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Events")
 	void OnActorAttackCollision(FAttackDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Hooks")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Events")
 	void OnActorImpactCollision(FDoubleHitResult Hit);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Hooks")
-	FGameplayTag GetCharacterPhysicalAnimationMode();
-	
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Hooks")
-	void SetCharacterPhysicalAnimationMode(const FGameplayTag& PhysicalAnimationmode, FName BelowBoneName);
 };

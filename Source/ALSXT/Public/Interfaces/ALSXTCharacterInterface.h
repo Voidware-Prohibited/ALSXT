@@ -107,19 +107,19 @@ public:
 
   // Held Item
 
+  // Get which current Modes, Positions and Stances for the Held Item
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
+  FALSXTHeldItemState GetHeldItemState() const;
+  
   // Get which Modes, Positions and Stances are available for the Held Item
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
-  FALSXTHeldItemSettings GetHeldItemSettings();
+  FALSXTHeldItemSettings GetHeldItemSettings() const;
 
   // Get the current Transform, Socket Names and Positions for the Held Item
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
-  FALSXTHeldItemGripStates GetHeldItemGripStates();
+  FALSXTHeldItemGripStates GetHeldItemGripStates() const;
 
   // Firearm
-
-  // Get the current Sight Transforms and Socket Names for the Held Item
-  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Firearm")
-  FALSXTFirearmAimState GetFirearmAimState();
 
   // Get the current Recoil Info for the Held Item
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Firearm")

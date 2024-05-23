@@ -14,11 +14,14 @@ class ALSXT_API IALSXTCombatInterface {
 	GENERATED_BODY()
 
 public:
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
   FALSXTGeneralCombatSettings GetGeneralCombatSettings();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   UALSXTCombatSettings* SelectCombatSettings();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  FALSXTCombatAttackTraceSettings GetCombatAttackTraceSettings();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   FGameplayTagContainer GetTargetableOverlayModes();
@@ -56,11 +59,25 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   FALSXTCombatState GetCombatState();
 
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
-  void GetCombatUnarmedTraceLocations(FGameplayTag UnarmedAttackType, FVector& Start, FVector& End, float& Radius);
+
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Held Item Interface")
+  void GetHeldItemTraceLocations(bool& Found, FVector& Start, FVector& End, float& Radius) const;
+
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+  void GetCombatUnarmedAttackDamageInfo(const FGameplayTag& UnarmedAttackType, const FGameplayTag& UnarmedAttackStrength, float& BaseDamage, FGameplayTag& ImpactForm, FGameplayTag& DamageType) const;
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+  void GetCombatHeldItemAttackDamageInfo(const FGameplayTag& HeldItemAttackType, const FGameplayTag& HeldItemAttackStrength, float& BaseDamage, FGameplayTag& ImpactForm, FGameplayTag& DamageType) const;
+
+
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
-  void GetCombatHeldItemTraceLocations(bool& Found, FVector& Start, FVector& End, float& Radius);
+  void GetCombatUnarmedTraceLocations(FGameplayTag UnarmedAttackType, FVector& Start, FVector& End, float& Radius) const;
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  void GetCombatHeldItemTraceLocations(bool& Found, FVector& Start, FVector& End, float& Radius) const;
 
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
   void BeginCombatAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings);
@@ -76,4 +93,14 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   void StopAttack();
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+  void GetUnarmedTraceLocations(const FGameplayTag& UnarmedAttackType, FVector& Start, FVector& End, float& Radius) const;
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+  float GetAttackBaseStaminaCost(UPARAM(meta = (Categories = "Als.Attack Method")) const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength")) const FGameplayTag& ActionStrength) const;
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+  void OnAttackCollision(FAttackDoubleHitResult Hit);
+
 };

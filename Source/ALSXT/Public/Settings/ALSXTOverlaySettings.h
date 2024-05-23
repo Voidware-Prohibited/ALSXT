@@ -11,6 +11,9 @@ struct ALSXT_API FALSXTOverlaySettings
 	TMap<FGameplayTag, TSubclassOf<UAnimInstance>> OverlayAnimationInstanceClasses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTagContainer AimableOverlayModes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bUseGunBoneForOverlayObjects {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

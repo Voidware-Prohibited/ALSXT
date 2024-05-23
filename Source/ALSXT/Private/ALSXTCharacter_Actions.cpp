@@ -101,6 +101,7 @@ void AALSXTCharacter::StartSlidingImplementation(UAnimMontage* Montage, const fl
 
 		SetLocomotionAction(AlsLocomotionActionTags::Sliding);
 		OnSlidingStarted();
+		GetMesh()->AddImpulse(GetActorForwardVector() * 2);
 		// Crouch(); //Hack
 	}
 }

@@ -38,31 +38,34 @@
 AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UALSXTPaintableSkeletalMeshComponent>(AAlsCharacter::MeshComponentName).SetDefaultSubobjectClass<UALSXTCharacterMovementComponent>(AAlsCharacter::CharacterMovementComponentName))
 {
-	BodyParts = CreateDefaultSubobject<USceneComponent>(TEXT("Body Parts"));
-	BodyParts->SetupAttachment(GetMesh());
+	// Setup Components
 	
+	// Containers
+
+	BodyParts = CreateDefaultSubobject<USceneComponent>(TEXT("Body Parts"));
+	BodyParts->SetupAttachment(GetMesh());	
 	ClothingSlots = CreateDefaultSubobject<USceneComponent>(TEXT("Clothing Slots"));
 	ClothingSlots->SetupAttachment(GetMesh());
 
+	// Cameras
+
+	// Default ALS Camera
 	Camera = CreateDefaultSubobject<UAlsCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(GetMesh());
 	Camera->SetRelativeRotation_Direct({0.0f, 90.0f, 0.0f});
 
-	BodyCamera = CreateDefaultSubobject<UCineCameraComponent>(TEXT("Body Camera"));
-	BodyCamera->SetupAttachment(GetMesh(), FName("spine_03"));
-	BodyCamera->SetRelativeRotation_Direct({ 0.0f, 90.0f, -90.0f });
-	BodyCamera->SetRelativeLocation_Direct({ 0.0f, 20.72f, 0.0f });
-
+	// TODO Move to Advanced or TV
 	KillerCameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Killer Camera Spring Arm"));
 	KillerCameraSpringArm->SetupAttachment(GetMesh());
 	KillerCameraSpringArm->SetRelativeRotation_Direct({ 10.0f, 300.0f, 0.0f });
 	KillerCameraSpringArm->SetRelativeLocation_Direct({ 0.0f, 0.0f, 122.0f });
 	KillerCameraSpringArm->TargetArmLength = 250.0;
-
 	KillerCamera = CreateDefaultSubobject<UCineCameraComponent>(TEXT("Killer Camera"));
 	KillerCamera->SetupAttachment(KillerCameraSpringArm);
 	KillerCamera->SetRelativeRotation_Direct({ 0.0f, 0.0f, 0.0f });
 	KillerCamera->SetRelativeLocation_Direct({ -250.0f, 0.0f, 0.0f });
+
+	// Body Mesh Components
 
 	Head = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Head"));
 	Head->SetupAttachment(BodyParts);
@@ -123,6 +126,8 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	FacialHairDummyShadow->SetHiddenInGame(true);
 	FacialHairDummyShadow->bCastHiddenShadow = true;
 	FacialHairDummyShadow->SetLeaderPoseComponent(GetMesh());
+
+	// Equipment Mesh Components
 
 	Headwear = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Headwear"));
 	Headwear->SetupAttachment(ClothingSlots);
@@ -301,6 +306,8 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	Footwear->PrimaryComponentTick.TickGroup = TG_PrePhysics;
 	Footwear->SetLeaderPoseComponent(GetMesh());
 
+	// Overlay Objects
+
 	OverlaySkeletalMesh = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Overlay Skeletal Mesh"));
 	OverlaySkeletalMesh->SetupAttachment(GetMesh());
 	OverlaySkeletalMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
@@ -333,28 +340,11 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	MeshPaintingSceneCapture->ProjectionType = ECameraProjectionMode::Orthographic;
 	MeshPaintingSceneCapture->CompositeMode = ESceneCaptureCompositeMode::SCCM_Additive;
 
-	AimAnimationHelperBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Aim Animation Helper Box"));
-	AimAnimationHelperBox->SetupAttachment(this->RootComponent);
-	AimAnimationHelperBox->SetBoxExtent(FVector(0.1f, 32.0f, 280.0f), true);
-	AimAnimationHelperBox->SetCollisionObjectType(ECC_Visibility);
-	AimAnimationHelperBox->SetGenerateOverlapEvents(true);
-	AimAnimationHelperBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	AimAnimationHelperBox->SetCollisionResponseToChannel(ECC_Camera, ECR_Overlap);
-	AimAnimationHelperBox->bEditableWhenInherited = false;
-
-	AimAnimationHelperCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Aim Animation Helper Capsule"));
-	AimAnimationHelperCapsule->SetupAttachment(this->GetMesh(), "head");
-	AimAnimationHelperCapsule->SetCapsuleSize(14.0, 9.0, true);
-	AimAnimationHelperCapsule->AddLocalOffset({ 4.0f, 4.0f, 0.0f });
-	AimAnimationHelperCapsule->SetCollisionObjectType(ECC_Visibility);
-	AimAnimationHelperCapsule->SetGenerateOverlapEvents(true);
-	AimAnimationHelperCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
-	AimAnimationHelperCapsule->SetCollisionResponseToChannel(ECC_Camera, ECR_Overlap);
-	AimAnimationHelperCapsule->bEditableWhenInherited = false;
-
 	ALSXTCharacterMovement = Cast<UALSXTCharacterMovementComponent>(GetCharacterMovement());
 	ALSXTMesh = Cast<UALSXTPaintableSkeletalMeshComponent>(GetMesh());
 
+	// Code Components
+	
 	CharacterCustomization = CreateDefaultSubobject<UALSXTCharacterCustomizationComponent>(TEXT("Character Customization"));
 	AddOwnedComponent(CharacterCustomization);
 
@@ -364,13 +354,13 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	CharacterSound = CreateDefaultSubobject<UALSXTCharacterSoundComponent>(TEXT("Character Sound"));
 	AddOwnedComponent(CharacterSound);
 
-	// Add Physical Animation Component
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
 	AddOwnedComponent(PhysicalAnimation);
 
-	// Add Idle Animation Component
 	IdleAnimation = CreateDefaultSubobject<UALSXTIdleAnimationComponent>(TEXT("Idle Animation"));
 	AddOwnedComponent(IdleAnimation);
+
+	OnRagdollingStartedDelegate.BindUFunction(ImpactReaction, "OnRagdollingStarted");
 }
 
 void AALSXTCharacter::Tick(const float DeltaTime)
@@ -438,18 +428,11 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStatus, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFocus, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHoldingBreath, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredStationaryMode, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredPhysicalAnimationMode, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGesture, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGestureHand, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGripPosition, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredForegripPosition, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerAction, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerActionHand, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponCarryPosition, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmSightLocation, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredVaultType, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponObstruction, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PreviousLookInput, Parameters)
@@ -470,8 +453,7 @@ void AALSXTCharacter::BeginPlay()
 	SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 	GetMesh()->SetEnablePhysicsBlending(true);
 
-	FreelookTimerDelegate.BindUFunction(this, "AttackCollisionTrace");
-	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace", AttackTraceSettings);
+	// FreelookTimerDelegate.BindUFunction(this, "AttackCollisionTrace");
 
 	RefreshOverlayObject();
 	IALSXTCharacterInterface::Execute_GetCharacterCameraAnimationInstance(this)->OnFirstPersonOverrideChanged.AddDynamic(this, &AALSXTCharacter::OnFirstPersonOverrideChanged);
@@ -516,10 +498,7 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryInteraction);
 		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
 		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::InputBlock);
-		EnhancedInput->BindAction(HoldBreathAction, ETriggerEvent::Triggered, this, &ThisClass::InputHoldBreath);
-
 		EnhancedInput->BindAction(SwitchWeaponReadyPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchWeaponReadyPosition);
-
 		EnhancedInput->BindAction(SwitchGripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchGripPosition);
 		EnhancedInput->BindAction(SwitchForegripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchForegripPosition);
 		
@@ -694,7 +673,7 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 			{
 				SetDesiredCombatStance(ALSXTCombatStanceTags::Aiming);
 			}
-			if (IsHoldingAimableItem()) {
+			if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this)) {
 				if (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral)
 				{
 					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Aiming);
@@ -708,7 +687,7 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 			{
 				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
 			}
-			if (IsHoldingAimableItem()) {
+			if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this)) {
 				if (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral)
 				{
 					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
@@ -788,23 +767,6 @@ void AALSXTCharacter::InputFreelook(const FInputActionValue& ActionValue)
 	}
 }
 
-void AALSXTCharacter::InputHoldBreath(const FInputActionValue& ActionValue)
-{
-	if (CanHoldBreath())
-	{
-		SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
-
-		if (ActionValue.Get<bool>())
-		{
-			SetDesiredHoldingBreath(ALSXTHoldingBreathTags::True);
-		}
-		else
-		{
-			SetDesiredHoldingBreath(ALSXTHoldingBreathTags::False);
-		}
-	}
-}
-
 void AALSXTCharacter::InputSwitchGripPosition()
 {
 	if (CanSwitchGripPosition())
@@ -838,7 +800,6 @@ void AALSXTCharacter::InputSwitchGripPosition()
 // 	if (CanSwitchGripPosition())
 // 	{
 // 		IdleAnimation->ResetIdleCounterTimer();
-// 		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
 // 	}
 // }
 
@@ -867,22 +828,6 @@ void AALSXTCharacter::InputSwitchForegripPosition()
 		}
 		
 		SetDesiredForegripPosition(AvailableForegripPositionsArray[NextIndex]);
-	}
-}
-
-void AALSXTCharacter::InputSelectEmote(const FInputActionValue& ActionValue)
-{
-	if (CanSelectEmote())
-	{
-		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
-	}
-}
-
-void AALSXTCharacter::InputSelectGesture(const FInputActionValue& ActionValue)
-{
-	if (CanSelectGesture())
-	{
-		// SetDesiredHoldingBreath(ActionValue.Get<bool>() ? ALSXTHoldingBreathTags::True : ALSXTHoldingBreathTags::False);
 	}
 }
 
@@ -1005,6 +950,20 @@ void AALSXTCharacter::OnRagdollingStarted_Implementation()
 	RefreshOverlayObject();
 
 	CharacterSound->PlayDamageSound(true, true, true, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTAttackMethodTags::Regular, ALSXTActionStrengthTags::Medium, ALSXTImpactFormTags::Blunt, IALSXTCharacterInterface::Execute_GetStamina(this));
+	FDoubleHitResult LastImpact = ImpactReaction->GetLastImpact();
+	FAttackDoubleHitResult LastAttackImpact = ImpactReaction->GetLastAttackImpact();
+
+	if (LastAttackImpact.DoubleHitResult.DateTime >= LastImpact.DateTime)
+	{
+		// ImpactReaction->ServerStartAttackFall(LastAttackImpact.DoubleHitResult, )
+	}
+	else
+	{
+		// ImpactReaction->StartImpactFallenTimer(LastImpact);
+	}
+
+	// LastAttackImpact.DoubleHitResult
+	//ImpactReaction->MulticastStartImpactFall()
 }
 
 void AALSXTCharacter::OnRagdollingEnded_Implementation()
@@ -1022,6 +981,18 @@ void AALSXTCharacter::OnSlidingStarted_Implementation()
 	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
 
 	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Sliding, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
+}
+
+bool AALSXTCharacter::IsHoldingItem_Implementation() const
+{
+	return (IsValid(OverlaySkeletalMesh) || IsValid(OverlayStaticMesh));
+}
+
+bool AALSXTCharacter::IsHoldingAimableItem_Implementation() const
+{
+	
+	return IALSXTHeldItemInterface::Execute_IsHoldingItem(this) && ALSXTSettings->OverlaySettings.AimableOverlayModes.HasTagExact(OverlayMode);
+	// return (IsDesiredAiming() && CanAimDownSights() && (GetViewMode() == AlsViewModeTags::FirstPerson) && (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral));
 }
 
 bool AALSXTCharacter::IsAimingDownSights_Implementation() const
@@ -1234,7 +1205,7 @@ void AALSXTCharacter::InputToggleCombatReady()
 			if (CanBecomeCombatReady())
 			{
 				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
-				if (IsHoldingAimableItem())
+				if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this))
 				{
 					if (GetRotationMode() != AlsRotationModeTags::Aiming)
 					{
@@ -1421,7 +1392,7 @@ bool AALSXTCharacter::IsFirstPersonEyeFocusActive() const
 	{
 		if (IsDesiredAiming()) 
 		{
-			if (IsHoldingAimableItem()) 
+			if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this))
 			{
 				if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral)
 				{
@@ -1715,7 +1686,7 @@ void AALSXTCharacter::SetDesiredCombatStance(const FGameplayTag& NewCombatStance
 				ServerSetDesiredCombatStance(NewCombatStanceTag);
 				if (NewCombatStanceTag != ALSXTCombatStanceTags::Neutral)
 				{
-					if (IsHoldingAimableItem())
+					if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this))
 					{
 						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
 					}
@@ -2202,9 +2173,9 @@ void AALSXTCharacter::SetFocus(const FGameplayTag& NewFocusTag)
 
 void AALSXTCharacter::OnFocusChanged_Implementation(const FGameplayTag& PreviousFocusTag) {}
 
-// Attack Collision Trace}
+// Attack Hit
 
-void AALSXTCharacter::OnAttackHit_Implementation(FAttackDoubleHitResult Hit)
+void AALSXTCharacter::OnActorAttackCollision_Implementation(FAttackDoubleHitResult Hit)
 {
 	TSubclassOf<UCameraShakeBase> CameraShakeClass;
 	float Scale;
@@ -2213,33 +2184,6 @@ void AALSXTCharacter::OnAttackHit_Implementation(FAttackDoubleHitResult Hit)
 	{
 		UGameplayStatics::GetPlayerController(this, 0)->ClientStartCameraShake(CameraShakeClass, Scale);
 	}
-}
-
-void AALSXTCharacter::GetLocationFromBoneName_Implementation(FName Hit, FGameplayTag& Location) {}
-
-void AALSXTCharacter::GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side)
-{
-	float DotProduct { this->GetDotProductTo(Hit.OriginHitResult.HitResult.GetActor()) };
-
-	// 1 is face to face, 0 is side,, -1 is behind
-
-	FVector CrossProduct{ FVector::CrossProduct(Hit.HitResult.Impulse, Hit.HitResult.Impulse) };
-	Side = ALSXTImpactSideTags::Left;
-}
-
-void AALSXTCharacter::GetStrengthFromHit(FDoubleHitResult Hit, FGameplayTag& Strength)
-{
-	float HitMass = Hit.HitResult.Mass;
-	FVector HitVelocity = Hit.HitResult.Velocity;
-	FVector HitMomentum = HitMass * HitVelocity;
-
-	float SelfMass = Hit.OriginHitResult.Mass;
-	FVector SelfVelocity = Hit.OriginHitResult.Velocity;
-	FVector SelfMomentum = SelfMass * SelfVelocity;
-
-	FVector MomemtumSum = HitMomentum + SelfMomentum;
-
-	Strength = ALSXTActionStrengthTags::Light;
 }
 
 void AALSXTCharacter::BeginFreelookTimer()
@@ -2294,188 +2238,6 @@ void AALSXTCharacter::EndFreelookTimer()
 	SetFreelookState(EmptyState);
 	GetWorld()->GetTimerManager().ClearTimer(FreelookTimerHandle);
 }
-
-void AALSXTCharacter::BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings)
-{
-	AttackTraceSettings = TraceSettings;
-	GetWorld()->GetTimerManager().SetTimer(AttackTraceTimerHandle, AttackTraceTimerDelegate, 0.1f, true);
-}
-
-void AALSXTCharacter::AttackCollisionTrace()
-{
-		// Update AttackTraceSettings
-		GetUnarmedTraceLocations(AttackTraceSettings.AttackType, AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius);
-
-		// Declare Local Vars
-		TArray<AActor*> InitialIgnoredActors;
-		TArray<AActor*> OriginTraceIgnoredActors;
-		TArray<FHitResult> HitResults;
-		InitialIgnoredActors.Add(this);	// Add Self to Initial Trace Ignored Actors
-
-		FALSXTGeneralCombatSettings GeneralCombatSettings = IALSXTCombatInterface::Execute_GetGeneralCombatSettings(this);
-		TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
-		AttackTraceObjectTypes = GeneralCombatSettings.AttackTraceObjectTypes;
-
-		// Initial Trace
-		bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), AttackTraceSettings.Start, AttackTraceSettings.End, AttackTraceSettings.Radius, AttackTraceObjectTypes, false, InitialIgnoredActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 0.0f);
-
-		if (isHit)
-		{
-			// Loop through HitResults Array
-			for (auto& HitResult : HitResults)
-			{
-				// Check if not in AttackedActors Array
-				if (!AttackTraceLastHitActors.Contains(HitResult.GetActor()))
-				{
-					// Add to AttackedActors Array
-					AttackTraceLastHitActors.AddUnique(HitResult.GetActor());
-
-					// Declare Local Vars
-					FAttackDoubleHitResult CurrentHitResult;
-					FGameplayTag ImpactLoc;
-					FGameplayTag ImpactStrength;
-					FGameplayTag ImpactSide;
-					FGameplayTag ImpactForm;
-					AActor* HitActor = HitResult.GetActor();
-					FString HitActorname;
-					FVector HitActorVelocity { FVector::ZeroVector };
-					float HitActorMass { 0.0f };
-					float HitActorAttackVelocity { 0.0f };
-					float HitActorAttackMass { 0.0f };
-					FVector TotalImpactEnergy { FVector::ZeroVector };
-
-					// Populate Hit
-					// 
-					
-					// Get Attack Physics
-					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
-					{
-						IALSXTCharacterInterface::Execute_GetCombatAttackPhysics(HitActor, HitActorAttackMass, HitActorAttackVelocity);
-					}
-
-					// Call OnActorAttackCollision on CollisionInterface
-					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
-					{
-						IALSXTCollisionInterface::Execute_GetActorVelocity(HitActor, HitActorVelocity);
-						IALSXTCollisionInterface::Execute_GetActorMass(HitActor, HitActorMass);
-					}
-
-					// TotalImpactEnergy = 50.0f + (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
-					TotalImpactEnergy = (HitActorVelocity * HitActorMass) + (HitActorAttackVelocity * HitActorAttackMass);
-					// FMath::Square(TossSpeed)
-
-					FVector HitDirection = HitResult.ImpactPoint - GetActorLocation();
-					HitDirection.Normalize();
-					CurrentHitResult.DoubleHitResult.HitResult.Direction = HitDirection;
-					CurrentHitResult.DoubleHitResult.HitResult.Impulse = HitResult.Normal * TotalImpactEnergy;
-					CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
-					GetLocationFromBoneName(CurrentHitResult.DoubleHitResult.HitResult.HitResult.BoneName, ImpactLoc);
-					CurrentHitResult.DoubleHitResult.HitResult.ImpactLocation = ImpactLoc;
-					CurrentHitResult.Type = AttackTraceSettings.AttackType;				
-					CurrentHitResult.DoubleHitResult.HitResult.ImpactSide = ImpactSide;
-					CurrentHitResult.Strength = AttackTraceSettings.AttackStrength;
-					CurrentHitResult.DoubleHitResult.HitResult.ImpactStrength = AttackTraceSettings.AttackStrength;					
-					HitActor = CurrentHitResult.DoubleHitResult.HitResult.HitResult.GetActor();
-					HitActorname = HitActor->GetName();
-
-
-					// Setup Origin Trace
-					FHitResult OriginHitResult;
-					OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
-
-					// Perform Origin Trace
-					bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), HitResult.Location, AttackTraceSettings.Start, AttackTraceSettings.Radius, AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Red, 4.0f);
-
-					// Perform Origin Hit Trace to get PhysMat etc for ImpactLocation
-					if (isOriginHit)
-					{
-						// Populate Origin Hit
-						CurrentHitResult.DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
-					
-						// Populate Values based if Holding Item
-						if (IsHoldingItem())
-						{
-							GetHeldItemAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.HitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
-						}
-						else
-						{
-							GetUnarmedAttackDamageInfo(CurrentHitResult.Type, CurrentHitResult.Strength, CurrentHitResult.BaseDamage, CurrentHitResult.DoubleHitResult.HitResult.ImpactForm, CurrentHitResult.DoubleHitResult.HitResult.DamageType);
-						}
-						FString OriginHitActorname = OriginHitResult.GetActor()->GetName();
-						CurrentHitResult.DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
-
-						GetFormFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactForm);
-						GetSideFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactSide);
-						GetStrengthFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.Strength);
-						CurrentHitResult.DoubleHitResult.HitResult.ImpactStrength = CurrentHitResult.Strength;
-					}
-					// Call OnActorAttackCollision on CollisionInterface
-					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
-					{
-						IALSXTCharacterInterface::Execute_AttackReaction(HitActor, CurrentHitResult);
-					}
-					// Call OnActorAttackCollision on CollisionInterface
-					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
-					{
-						// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, HitActorname);
-						IALSXTCollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
-					}
-					OnAttackHit(CurrentHitResult);
-				}
-			}
-		}
-}
-
-void AALSXTCharacter::EndAttackCollisionTrace()
-{
-	// Clear Attack Trace Timer
-	GetWorld()->GetTimerManager().ClearTimer(AttackTraceTimerHandle);
-
-	// Reset Attack Trace Settings
-	AttackTraceSettings.Start = { 0.0f, 0.0f, 0.0f };
-	AttackTraceSettings.End = { 0.0f, 0.0f, 0.0f };
-	AttackTraceSettings.Radius = { 0.0f };
-
-	// Empty AttackTraceLastHitActors Array
-	AttackTraceLastHitActors.Empty();
-}
-
-// HoldingBreath
-
-void AALSXTCharacter::SetDesiredHoldingBreath(const FGameplayTag& NewHoldingBreathTag)
-{
-	if (DesiredHoldingBreath != NewHoldingBreathTag)
-	{
-		DesiredHoldingBreath = NewHoldingBreathTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredHoldingBreath, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredHoldingBreath(NewHoldingBreathTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredHoldingBreath_Implementation(const FGameplayTag& NewHoldingBreathTag)
-{
-	SetDesiredHoldingBreath(NewHoldingBreathTag);
-}
-
-void AALSXTCharacter::SetHoldingBreath(const FGameplayTag& NewHoldingBreathTag)
-{
-
-	if (HoldingBreath != NewHoldingBreathTag)
-	{
-		const auto PreviousHoldingBreath{ HoldingBreath };
-
-		HoldingBreath = NewHoldingBreathTag;
-
-		OnHoldingBreathChanged(PreviousHoldingBreath);
-	}
-}
-
-void AALSXTCharacter::OnHoldingBreathChanged_Implementation(const FGameplayTag& PreviousHoldingBreathTag) {}
 
 // PhysicalAnimationMode
 
@@ -2554,80 +2316,6 @@ void AALSXTCharacter::SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAn
 }
 
 void AALSXTCharacter::OnPhysicalAnimationModeChanged_Implementation(const FGameplayTag& PreviousPhysicalAnimationModeTag) {}
-
-// Gesture
-
-void AALSXTCharacter::SetDesiredGesture(const FGameplayTag& NewGestureTag)
-{
-	if (DesiredGesture != NewGestureTag)
-	{
-		DesiredGesture = NewGestureTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredGesture, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredGesture(NewGestureTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredGesture_Implementation(const FGameplayTag& NewGestureTag)
-{
-	SetDesiredGesture(NewGestureTag);
-}
-
-void AALSXTCharacter::SetGesture(const FGameplayTag& NewGestureTag)
-{
-
-	if (Gesture != NewGestureTag)
-	{
-		const auto PreviousGesture{ Gesture };
-
-		Gesture = NewGestureTag;
-
-		OnGestureChanged(PreviousGesture);
-	}
-}
-
-void AALSXTCharacter::OnGestureChanged_Implementation(const FGameplayTag& PreviousGestureTag) {}
-
-// GestureHand
-
-void AALSXTCharacter::SetDesiredGestureHand(const FGameplayTag& NewGestureHandTag)
-{
-	if (DesiredGestureHand != NewGestureHandTag)
-	{
-		DesiredGestureHand = NewGestureHandTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredGestureHand, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredGestureHand(NewGestureHandTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredGestureHand_Implementation(const FGameplayTag& NewGestureHandTag)
-{
-	SetDesiredGestureHand(NewGestureHandTag);
-}
-
-void AALSXTCharacter::SetGestureHand(const FGameplayTag& NewGestureHandTag)
-{
-
-	if (GestureHand != NewGestureHandTag)
-	{
-		const auto PreviousGestureHand{ GestureHand };
-
-		GestureHand = NewGestureHandTag;
-
-		OnGestureHandChanged(PreviousGestureHand);
-	}
-}
-
-void AALSXTCharacter::OnGestureHandChanged_Implementation(const FGameplayTag& PreviousGestureHandTag) {}
 
 // GripPosition
 
@@ -2763,116 +2451,6 @@ void AALSXTCharacter::SetForegripPosition(const FGameplayTag& NewForegripPositio
 
 void AALSXTCharacter::OnForegripPositionChanged_Implementation(const FGameplayTag& PreviousForegripPositionTag) {}
 
-// ReloadingType
-
-void AALSXTCharacter::SetDesiredReloadingType(const FGameplayTag& NewReloadingTypeTag)
-{
-	if (DesiredReloadingType != NewReloadingTypeTag)
-	{
-		DesiredReloadingType = NewReloadingTypeTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredReloadingType, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredReloadingType(NewReloadingTypeTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredReloadingType_Implementation(const FGameplayTag& NewReloadingTypeTag)
-{
-	SetDesiredReloadingType(NewReloadingTypeTag);
-}
-
-void AALSXTCharacter::SetReloadingType(const FGameplayTag& NewReloadingTypeTag)
-{
-
-	if (ReloadingType != NewReloadingTypeTag)
-	{
-		const auto PreviousReloadingType{ ReloadingType };
-
-		ReloadingType = NewReloadingTypeTag;
-
-		OnReloadingTypeChanged(PreviousReloadingType);
-	}
-}
-
-void AALSXTCharacter::OnReloadingTypeChanged_Implementation(const FGameplayTag& PreviousReloadingTypeTag) {}
-
-// FirearmFingerAction
-
-void AALSXTCharacter::SetDesiredFirearmFingerAction(const FGameplayTag& NewFirearmFingerActionTag)
-{
-	if (DesiredFirearmFingerAction != NewFirearmFingerActionTag)
-	{
-		DesiredFirearmFingerAction = NewFirearmFingerActionTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredFirearmFingerAction, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredFirearmFingerAction(NewFirearmFingerActionTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredFirearmFingerAction_Implementation(const FGameplayTag& NewFirearmFingerActionTag)
-{
-	SetDesiredFirearmFingerAction(NewFirearmFingerActionTag);
-}
-
-void AALSXTCharacter::SetFirearmFingerAction(const FGameplayTag& NewFirearmFingerActionTag)
-{
-
-	if (FirearmFingerAction != NewFirearmFingerActionTag)
-	{
-		const auto PreviousFirearmFingerAction{ FirearmFingerAction };
-
-		FirearmFingerAction = NewFirearmFingerActionTag;
-
-		OnFirearmFingerActionChanged(PreviousFirearmFingerAction);
-	}
-}
-
-void AALSXTCharacter::OnFirearmFingerActionChanged_Implementation(const FGameplayTag& PreviousFirearmFingerActionTag) {}
-
-// FirearmFingerActionHand
-
-void AALSXTCharacter::SetDesiredFirearmFingerActionHand(const FGameplayTag& NewFirearmFingerActionHandTag)
-{
-	if (DesiredFirearmFingerActionHand != NewFirearmFingerActionHandTag)
-	{
-		DesiredFirearmFingerActionHand = NewFirearmFingerActionHandTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredFirearmFingerActionHand, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredFirearmFingerActionHand(NewFirearmFingerActionHandTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredFirearmFingerActionHand_Implementation(const FGameplayTag& NewFirearmFingerActionHandTag)
-{
-	SetDesiredFirearmFingerActionHand(NewFirearmFingerActionHandTag);
-}
-
-void AALSXTCharacter::SetFirearmFingerActionHand(const FGameplayTag& NewFirearmFingerActionHandTag)
-{
-
-	if (FirearmFingerActionHand != NewFirearmFingerActionHandTag)
-	{
-		const auto PreviousFirearmFingerActionHand{ FirearmFingerActionHand };
-
-		FirearmFingerActionHand = NewFirearmFingerActionHandTag;
-
-		OnFirearmFingerActionHandChanged(PreviousFirearmFingerActionHand);
-	}
-}
-
-void AALSXTCharacter::OnFirearmFingerActionHandChanged_Implementation(const FGameplayTag& PreviousFirearmFingerActionHandTag) {}
 
 // WeaponCarryPosition
 
@@ -2910,43 +2488,6 @@ void AALSXTCharacter::SetWeaponCarryPosition(const FGameplayTag& NewWeaponCarryP
 }
 
 void AALSXTCharacter::OnWeaponCarryPositionChanged_Implementation(const FGameplayTag& PreviousWeaponCarryPositionTag) {}
-
-// FirearmSightLocation
-
-void AALSXTCharacter::SetDesiredFirearmSightLocation(const FGameplayTag& NewFirearmSightLocationTag)
-{
-	if (DesiredFirearmSightLocation != NewFirearmSightLocationTag)
-	{
-		DesiredFirearmSightLocation = NewFirearmSightLocationTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredFirearmSightLocation, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredFirearmSightLocation(NewFirearmSightLocationTag);
-			}
-	}
-}
-
-void AALSXTCharacter::ServerSetDesiredFirearmSightLocation_Implementation(const FGameplayTag& NewFirearmSightLocationTag)
-{
-	SetDesiredFirearmSightLocation(NewFirearmSightLocationTag);
-}
-
-void AALSXTCharacter::SetFirearmSightLocation(const FGameplayTag& NewFirearmSightLocationTag)
-{
-
-	if (FirearmSightLocation != NewFirearmSightLocationTag)
-	{
-		const auto PreviousFirearmSightLocation{ FirearmSightLocation };
-
-		FirearmSightLocation = NewFirearmSightLocationTag;
-
-		OnFirearmSightLocationChanged(PreviousFirearmSightLocation);
-	}
-}
-
-void AALSXTCharacter::OnFirearmSightLocationChanged_Implementation(const FGameplayTag& PreviousFirearmSightLocationTag) {}
 
 // VaultType
 
@@ -3189,44 +2730,16 @@ FGameplayTag AALSXTCharacter::GetCharacterFreelooking_Implementation() const
 }
 
 
-FGameplayTag AALSXTCharacter::GetCharacterGesture_Implementation() const
-{
-	return GetDesiredGesture();
-}
 
-FGameplayTag AALSXTCharacter::GetCharacterGestureHand_Implementation() const
-{
-	return GetDesiredGestureHand();
-}
-
-FGameplayTag AALSXTCharacter::GetCharacterReloadingType_Implementation() const
-{
-	return GetDesiredReloadingType();
-}
 
 FGameplayTag AALSXTCharacter::GetCharacterForegripPosition_Implementation() const
 {
 	return GetDesiredForegripPosition();
 }
 
-FGameplayTag AALSXTCharacter::GetCharacterFirearmFingerAction_Implementation() const
-{
-	return GetDesiredFirearmFingerAction();
-}
-
-FGameplayTag AALSXTCharacter::GetCharacterFirearmFingerActionHand_Implementation() const
-{
-	return GetDesiredFirearmFingerActionHand();
-}
-
 FGameplayTag AALSXTCharacter::GetCharacterWeaponCarryPosition_Implementation() const
 {
 	return GetDesiredWeaponCarryPosition();
-}
-
-FGameplayTag AALSXTCharacter::GetCharacterFirearmSightLocation_Implementation() const
-{
-	return GetFirearmSightLocation();
 }
 
 FTransform AALSXTCharacter::GetCharacterCurrentForegripTransform_Implementation() const
@@ -3259,11 +2772,6 @@ FGameplayTag AALSXTCharacter::GetCharacterLocomotionVariant_Implementation() con
 	return GetDesiredLocomotionVariant();
 }
 
-FGameplayTag AALSXTCharacter::GetCharacterHoldingBreath_Implementation() const
-{
-	return GetDesiredHoldingBreath();
-}
-
 FALSXTFootprintsState AALSXTCharacter::GetCharacterFootprintsState_Implementation() const
 {
 	return GetFootprintsState();
@@ -3278,16 +2786,12 @@ FALSXTFootwearDetails AALSXTCharacter::GetCharacterFootwearDetails_Implementatio
 void AALSXTCharacter::PlayBreathEffects_Implementation(const FGameplayTag& StaminaOverride)
 {
 	CharacterSound->PlayCharacterBreathEffects(StaminaOverride);
+	CharacterSound->ServerPlayCharacterBreathEffects(StaminaOverride);
 }
 
 void AALSXTCharacter::PlayActionSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
 {
 	CharacterSound->PlayActionSound(MovementSound, AccentSound, WeaponSound, Type, SoundSex, Variant, Overlay, Strength, Stamina);
-}
-
-void AALSXTCharacter::PlayAttackSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float Stamina)
-{
-	CharacterSound->PlayAttackSound(MovementSound, AccentSound, WeaponSound, SoundSex, Variant, Overlay, Strength, AttackMode, Stamina);
 }
 
 void AALSXTCharacter::PlayDamageSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage)
