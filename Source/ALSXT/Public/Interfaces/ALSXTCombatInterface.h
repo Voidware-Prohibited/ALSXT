@@ -20,7 +20,7 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
   UALSXTCombatSettings* SelectCombatSettings();
 
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
   FALSXTCombatAttackTraceSettings GetCombatAttackTraceSettings();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Combat")

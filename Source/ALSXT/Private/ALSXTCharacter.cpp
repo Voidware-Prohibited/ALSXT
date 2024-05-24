@@ -395,7 +395,6 @@ void AALSXTCharacter::NotifyControllerChanged()
 		NewPlayer->InputYawScale_DEPRECATED = 1.0f;
 		NewPlayer->InputPitchScale_DEPRECATED = 1.0f;
 		NewPlayer->InputRollScale_DEPRECATED = 1.0f;
-
 		auto* EnhancedInputSubsystem{ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(NewPlayer->GetLocalPlayer())};
 		if (IsValid(EnhancedInputSubsystem))
 		{
@@ -412,7 +411,6 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	FDoRepLifetimeParams Parameters;
 	Parameters.bIsPushBased = true;
-
 	Parameters.Condition = COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FootprintsState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredLean, Parameters)
@@ -440,7 +438,6 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, HeadLookAtState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, AimState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, bMovementEnabled, Parameters)
-
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
 }
 
@@ -452,9 +449,7 @@ void AALSXTCharacter::BeginPlay()
 	PhysicalAnimation->SetSkeletalMeshComponent(GetMesh());
 	SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
 	GetMesh()->SetEnablePhysicsBlending(true);
-
-	// FreelookTimerDelegate.BindUFunction(this, "AttackCollisionTrace");
-
+	// FreelookTimerDelegate.BindUFunction(this, "FreelookTimer");
 	RefreshOverlayObject();
 	IALSXTCharacterInterface::Execute_GetCharacterCameraAnimationInstance(this)->OnFirstPersonOverrideChanged.AddDynamic(this, &AALSXTCharacter::OnFirstPersonOverrideChanged);
 
@@ -2233,7 +2228,7 @@ void AALSXTCharacter::FreelookTimer()
 
 void AALSXTCharacter::EndFreelookTimer()
 {
-	// Clear Attack Trace Timer
+	// Clear Freelook Trace Timer
 	FALSXTFreelookState EmptyState;
 	SetFreelookState(EmptyState);
 	GetWorld()->GetTimerManager().ClearTimer(FreelookTimerHandle);

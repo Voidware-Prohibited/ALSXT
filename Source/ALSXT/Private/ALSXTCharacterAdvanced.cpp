@@ -13,6 +13,7 @@
 #include "Components/Character/ALSXTGestureComponent.h"
 #include "Math/Vector.h"
 #include "ALSXTBlueprintFunctionLibrary.h"
+#include "Engine/World.h"
 
 AALSXTCharacterAdvanced::AALSXTCharacterAdvanced(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -36,6 +37,19 @@ AALSXTCharacterAdvanced::AALSXTCharacterAdvanced(const FObjectInitializer& Objec
 	
 	CameraEffects = CreateDefaultSubobject<UALSXTCharacterCameraEffectsComponent>(TEXT("Camera Effects"));
 	AddOwnedComponent(CameraEffects);
+}
+
+void AALSXTCharacterAdvanced::Tick(const float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (bDesiredAiming && IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this))
+	{
+		FTransform NewTransform;
+		FALSXTAimState NewAimState = GetAimState();
+		NewAimState.CurrentCameraTargetRelativeTransform = NewTransform;
+		SetAimState(NewAimState);
+	}
 }
 
 void AALSXTCharacterAdvanced::BeginPlay()
@@ -71,10 +85,14 @@ FTransform AALSXTCharacterAdvanced::GetADSRelativeTransform_Implementation() con
 	NewTransform.SetLocation(UKismetMathLibrary::InverseTransformDirection(GetCapsuleComponent()->GetComponentTransform(), AimState.CurrentCameraTargetTransform.GetLocation()));
 	NewTransform.SetRotation(UKismetMathLibrary::InverseTransformRotation(GetCapsuleComponent()->GetComponentTransform(), AimState.CurrentCameraTargetTransform.GetRotation().Rotator()).Quaternion());
 	return NewTransform;
+}
 
-	// NewTransform.SetLocation(UKismetMathLibrary::InverseTransformRotation(GetCapsuleComponent()->GetComponentTransform(), AimState.CurrentCameraTargetTransform.GetLocation()));
-	// return NewTransform;
-
+FRotator AALSXTCharacterAdvanced::CalculateRecoilControlRotation_Implementation(FRotator AdditiveControlRotation) const
+{
+	FRotator CurrentControlRotation = GetWorld()->GetFirstPlayerController()->GetControlRotation();
+	FRotator NewControlRotation = CurrentControlRotation + AdditiveControlRotation;
+	GetWorld()->GetFirstPlayerController()->SetControlRotation(NewControlRotation);
+	return NewControlRotation;
 }
 
 void AALSXTCharacterAdvanced::CalcADSCamera(FMinimalViewInfo& ViewInfo)
@@ -608,6 +626,11 @@ void AALSXTCharacterAdvanced::IsInFrontOf_Implementation(bool& IsInFrontOf, FVec
 FALSXTGeneralCombatSettings AALSXTCharacterAdvanced::GetGeneralCombatSettings_Implementation()
 {
 	return ALSXTAdvancedSettings->Combat;
+}
+
+FALSXTCombatAttackTraceSettings AALSXTCharacterAdvanced::GetCombatAttackTraceSettings_Implementation()
+{
+	return Combat->CurrentAttackTraceSettings;
 }
 
 void AALSXTCharacterAdvanced::BeginCombatAttackCollisionTrace_Implementation(FALSXTCombatAttackTraceSettings TraceSettings)

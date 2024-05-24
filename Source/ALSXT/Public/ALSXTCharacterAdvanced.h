@@ -28,6 +28,8 @@ class ALSXT_API AALSXTCharacterAdvanced : public AALSXTCharacter, public IALSXTC
 public:
 	AALSXTCharacterAdvanced(const FObjectInitializer& ObjectInitializer);
 
+	virtual void Tick(float DeltaTime) override;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Advanced", Meta = (AllowPrivateAccess))
 	TObjectPtr<UALSXTCharacterAdvancedSettings> ALSXTAdvancedSettings;
 
@@ -85,6 +87,9 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "State|Aim")
 	FTransform GetADSRelativeTransform() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "State|Aim")
+	FRotator CalculateRecoilControlRotation(FRotator AdditiveControlRotation) const;
 
 private:
 	void InputHoldBreath(const FInputActionValue& ActionValue);
@@ -414,6 +419,7 @@ public:
 
 	// Combat Interface
 	FALSXTGeneralCombatSettings GetGeneralCombatSettings_Implementation() override;
+	FALSXTCombatAttackTraceSettings GetCombatAttackTraceSettings_Implementation() override;
 	void BeginCombatAttackCollisionTrace_Implementation(FALSXTCombatAttackTraceSettings TraceSettings) override;
 	void EndCombatAttackCollisionTrace_Implementation() override;
 

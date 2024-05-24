@@ -461,7 +461,7 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 	InitialIgnoredActors.Add(Character);	// Add Self to Initial Trace Ignored Actors
 	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes;
 	AttackTraceObjectTypes = CombatSettings.AttackTraceObjectTypes;
-	EDrawDebugTrace::Type ShowDebugTrace;	
+	EDrawDebugTrace::Type ShowDebugTrace {EDrawDebugTrace::None};	
 	CombatSettings.DebugMode ? ShowDebugTrace = EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
 	bool isHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), SweepStart, SweepEnd, 50, CombatSettings.AttackTraceObjectTypes, false, InitialIgnoredActors, ShowDebugTrace, OutHits, true, FLinearColor::White, FLinearColor::Blue, 0.0f);
 
@@ -503,7 +503,7 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 	TArray<AActor*> OriginTraceIgnoredActors;
 	TArray<FHitResult> HitResults;
 	InitialIgnoredActors.Add(GetOwner());	// Add Self to Initial Trace Ignored Actors
-	EDrawDebugTrace::Type ShowDebugTrace;
+	EDrawDebugTrace::Type ShowDebugTrace {EDrawDebugTrace::None};
 	CombatSettings.DebugMode ? ShowDebugTrace = EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
 
 	// Initial Trace
@@ -571,7 +571,8 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 				OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
 
 				// Perform Origin Hit Trace to get PhysMat etc for ImpactLocation
-				bool isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetOwner()->GetWorld(), HitResult.Location, HitResult.TraceStart, CurrentAttackTraceSettings.Radius, AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Yellow, 4.0f);
+				bool isOriginHit {false};
+				isOriginHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetOwner()->GetWorld(), HitResult.Location, HitResult.TraceStart, CurrentAttackTraceSettings.Radius, AttackTraceObjectTypes, false, OriginTraceIgnoredActors, EDrawDebugTrace::None, OriginHitResult, true, FLinearColor::Green, FLinearColor::Yellow, 4.0f);
 				if (isOriginHit)
 				{
 					// Populate Origin Hit
