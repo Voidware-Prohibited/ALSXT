@@ -76,7 +76,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		WeaponReadyPosition = IALSXTCharacterInterface::Execute_GetCharacterWeaponReadyPosition(GetOwningActor());
 		StationaryMode = IALSXTCharacterInterface::Execute_GetCharacterStationaryMode(GetOwningActor());
 		HoldingBreath = IALSXTCharacterInterface::Execute_GetCharacterHoldingBreath(GetOwningActor());
-		PhysicalAnimationMode = IALSXTCharacterInterface::Execute_GetCharacterPhysicalAnimationMode(GetOwningActor());
+		
 		Gesture = IALSXTCharacterInterface::Execute_GetCharacterGesture(GetOwningActor());
 		GestureHand = IALSXTCharacterInterface::Execute_GetCharacterGestureHand(GetOwningActor());
 		ReloadingType = IALSXTCharacterInterface::Execute_GetCharacterReloadingType(GetOwningActor());
@@ -87,8 +87,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		FirearmSightLocation = IALSXTCharacterInterface::Execute_GetCharacterFirearmSightLocation(GetOwningActor());
 		ForegripTransform = IALSXTCharacterInterface::Execute_GetCharacterCurrentForegripTransform(GetOwningActor());
 		VaultType = IALSXTCharacterInterface::Execute_GetCharacterVaultType(GetOwningActor());
-		HeldItemSettings = IALSXTCharacterInterface::Execute_GetHeldItemSettings(GetOwningActor());
-		HeldItemState = IALSXTCharacterInterface::Execute_GetHeldItemState(GetOwningActor());
+		
 		AimState = IALSXTCharacterInterface::Execute_GetCharacterAimState(GetOwningActor());
 		FreelookState = IALSXTCharacterInterface::Execute_GetCharacterFreelookState(GetOwningActor());
 		HeadLookAtState = IALSXTCharacterInterface::Execute_GetCharacterHeadLookAtState(GetOwningActor());
@@ -98,7 +97,19 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		DefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwningActor());
 		WeaponObstruction = IALSXTCharacterInterface::Execute_GetCharacterWeaponObstruction(GetOwningActor());
 		BreathState.HoldingBreath = IALSXTCharacterInterface::Execute_GetCharacterHoldingBreath(GetOwningActor());
-		DoesOverlayObjectUseLeftHandIK = IALSXTCharacterInterface::Execute_GetHeldItemSettings(GetOwningActor()).UsesLeftHandIK;
+		
+	}
+
+	if (GetOwningActor()->Implements<UALSXTCollisionInterface>())
+	{
+		PhysicalAnimationMode = IALSXTCollisionInterface::Execute_GetCharacterPhysicalAnimationMode(GetOwningActor());
+	}
+
+	if (GetOwningActor()->Implements<UALSXTHeldItemInterface>())
+	{
+		HeldItemSettings = IALSXTHeldItemInterface::Execute_GetHeldItemSettings(GetOwningActor());
+		HeldItemState = IALSXTHeldItemInterface::Execute_GetHeldItemState(GetOwningActor());
+		DoesOverlayObjectUseLeftHandIK = IALSXTHeldItemInterface::Execute_GetHeldItemSettings(GetOwningActor()).UsesLeftHandIK;
 	}
 }
 

@@ -595,19 +595,9 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 					// CurrentHitResult.DoubleHitResult.ImpactForm = 		
 				}
 
-				//	If implements Character Interface call AttackReaction on CharacterInterface
-				if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
+				if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
 				{
-					IALSXTCharacterInterface::Execute_AttackReaction(HitActor, CurrentHitResult);
-				}
-				else
-				{
-					// Else If implements Collision Interface call OnActorAttackCollision on CollisionInterface
-					if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
-					{
-						// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, HitActorname);
-						IALSXTCollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
-					}
+					IALSXTCollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
 				}
 
 				// Play Effects for Attacker 

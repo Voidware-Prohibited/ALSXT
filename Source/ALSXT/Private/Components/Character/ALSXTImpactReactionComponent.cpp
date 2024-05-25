@@ -107,18 +107,47 @@ void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, A
 
 void UALSXTImpactReactionComponent::OnRagdollingStarted()
 {
-	FDoubleHitResult LastImpact = GetLastImpact();
-	FAttackDoubleHitResult LastAttackImpact = GetLastAttackImpact();
-
-	if (LastAttackImpact.DoubleHitResult.DateTime >= LastImpact.DateTime)
+	if (PreviousImpacts.IsEmpty() && PreviousAttackImpacts.IsEmpty())
 	{
-		StartAttackFall(LastAttackImpact);
+		return;
 	}
 	else
 	{
-		StartImpactFall(LastImpact);
-	}
+		FDoubleHitResult LastImpact;
+		FAttackDoubleHitResult LastAttackImpact;
 
+		if (!PreviousAttackImpacts.IsEmpty())
+		{
+			LastAttackImpact = GetLastAttackImpact();
+
+			if (!PreviousImpacts.IsEmpty())
+			{
+				if (LastAttackImpact.DoubleHitResult.DateTime >= LastImpact.DateTime)
+				{
+					StartAttackFall(LastAttackImpact);
+					return;
+				}
+				else
+				{
+					StartImpactFall(LastImpact);
+					return;
+				}
+			}
+			else
+			{
+				StartAttackFall(LastAttackImpact);
+				return;
+			}
+		}
+
+		if (!PreviousAttackImpacts.IsEmpty())
+		{
+			LastImpact = GetLastImpact();
+			StartImpactFall(LastImpact);
+			return;
+
+		}
+	}	
 }
 
 bool UALSXTImpactReactionComponent::GetImpactFallLocation(FVector& Location, FDoubleHitResult Hit)

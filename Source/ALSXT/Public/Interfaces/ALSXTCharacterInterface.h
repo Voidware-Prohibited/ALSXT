@@ -95,8 +95,8 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterHoldingBreath() const;
 
-  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
-  FGameplayTag GetCharacterPhysicalAnimationMode() const;
+  // UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  // FGameplayTag GetCharacterPhysicalAnimationMode() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterGesture() const;
@@ -108,16 +108,16 @@ public:
   // Held Item
 
   // Get which current Modes, Positions and Stances for the Held Item
-  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
-  FALSXTHeldItemState GetHeldItemState() const;
+  // UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
+  // FALSXTHeldItemState GetHeldItemState() const;
   
   // Get which Modes, Positions and Stances are available for the Held Item
-  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
-  FALSXTHeldItemSettings GetHeldItemSettings() const;
+  // UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
+  // FALSXTHeldItemSettings GetHeldItemSettings() const;
 
   // Get the current Transform, Socket Names and Positions for the Held Item
-  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
-  FALSXTHeldItemGripStates GetHeldItemGripStates() const;
+  // UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
+  // FALSXTHeldItemGripStates GetHeldItemGripStates() const;
 
   // Firearm
 
@@ -225,9 +225,6 @@ public:
   void GetCombatAttackPhysics(float& Mass, float& Velocity);
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  void GetVoiceInfo(const FGameplayTag& Sex, const FGameplayTag& VoiceVariant, float& Speed, float& Pitch);
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   FALSXTClothingState GetClothingState();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
@@ -268,9 +265,6 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
   void AnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  void AttackReaction(FAttackDoubleHitResult Hit);
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void GetImpactFallLocation(FVector& Location, FDoubleHitResult Hit);

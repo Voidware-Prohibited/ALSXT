@@ -737,19 +737,14 @@ FVaultAnimation AALSXTCharacter::SelectVaultingMontage_Implementation(const FGam
 
 void AALSXTCharacter::OnVaultingStarted_Implementation(const FALSXTVaultingParameters& Parameters) 
 {
-	FGameplayTag SexTag{ FGameplayTag::EmptyTag };
-	FGameplayTag VoiceVariantTag{ FGameplayTag::EmptyTag };
-	FGameplayTag TypeTag{ FGameplayTag::EmptyTag };
-	float VoiceSpeed;
-	float VoicePitch;
-	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
 
 	if (Parameters.VaultingType == ALSXTVaultTypeTags::Low)
 	{
 		ClearOverlayObject();
 	}
 
-	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Vaulting, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
+	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Vaulting, CharacterVoiceParams.Sex, CharacterVoiceParams.Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
 }
 
 void AALSXTCharacter::RefreshVaulting()

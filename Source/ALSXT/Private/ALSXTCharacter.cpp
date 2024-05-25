@@ -895,25 +895,15 @@ void AALSXTCharacter::OnOverlayModeChanged_Implementation(const FGameplayTag& Pr
 
 void AALSXTCharacter::OnJumped_Implementation()
 {
-	FGameplayTag SexTag {FGameplayTag::EmptyTag};
-	FGameplayTag VoiceVariantTag {FGameplayTag::EmptyTag};
-	float VoiceSpeed;
-	float VoicePitch;
-	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
-	// IALSXTCharacterInterface::Execute_GetStamina(this);
-
-	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Jumping, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
+	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Jumping, CharacterVoiceParams.Sex, CharacterVoiceParams.Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
 
 }
 
 void AALSXTCharacter::OnMantlingStarted_Implementation(const FAlsMantlingParameters& Parameters)
 {
-	FGameplayTag SexTag{ FGameplayTag::EmptyTag };
-	FGameplayTag VoiceVariantTag{ FGameplayTag::EmptyTag };
 	FGameplayTag TypeTag{ FGameplayTag::EmptyTag };
-	float VoiceSpeed;
-	float VoicePitch;
-	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
 
 	if (Parameters.MantlingType == EAlsMantlingType::Low)
 	{
@@ -925,7 +915,7 @@ void AALSXTCharacter::OnMantlingStarted_Implementation(const FAlsMantlingParamet
 		TypeTag = ALSXTCharacterMovementSoundTags::MantlingHigh;
 	}
 
-	CharacterSound->PlayActionSound(true, true, true, TypeTag, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
+	CharacterSound->PlayActionSound(true, true, true, TypeTag, CharacterVoiceParams.Sex, CharacterVoiceParams.Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
 }
 
 void AALSXTCharacter::OnMantlingEnded_Implementation()
@@ -935,30 +925,9 @@ void AALSXTCharacter::OnMantlingEnded_Implementation()
 
 void AALSXTCharacter::OnRagdollingStarted_Implementation()
 {
-	FGameplayTag SexTag{ FGameplayTag::EmptyTag };
-	FGameplayTag VoiceVariantTag{ FGameplayTag::EmptyTag };
-	FGameplayTag TypeTag{ FGameplayTag::EmptyTag };
-	float VoiceSpeed;
-	float VoicePitch;
-	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
-
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
 	RefreshOverlayObject();
-
-	CharacterSound->PlayDamageSound(true, true, true, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTAttackMethodTags::Regular, ALSXTActionStrengthTags::Medium, ALSXTImpactFormTags::Blunt, IALSXTCharacterInterface::Execute_GetStamina(this));
-	FDoubleHitResult LastImpact = ImpactReaction->GetLastImpact();
-	FAttackDoubleHitResult LastAttackImpact = ImpactReaction->GetLastAttackImpact();
-
-	if (LastAttackImpact.DoubleHitResult.DateTime >= LastImpact.DateTime)
-	{
-		// ImpactReaction->ServerStartAttackFall(LastAttackImpact.DoubleHitResult, )
-	}
-	else
-	{
-		// ImpactReaction->StartImpactFallenTimer(LastImpact);
-	}
-
-	// LastAttackImpact.DoubleHitResult
-	//ImpactReaction->MulticastStartImpactFall()
+	CharacterSound->PlayDamageSound(true, true, true, CharacterVoiceParams.Sex, CharacterVoiceParams.Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTAttackMethodTags::Regular, ALSXTActionStrengthTags::Medium, ALSXTImpactFormTags::Blunt, IALSXTCharacterInterface::Execute_GetStamina(this));
 }
 
 void AALSXTCharacter::OnRagdollingEnded_Implementation()
@@ -968,14 +937,8 @@ void AALSXTCharacter::OnRagdollingEnded_Implementation()
 
 void AALSXTCharacter::OnSlidingStarted_Implementation()
 {
-	FGameplayTag SexTag{ FGameplayTag::EmptyTag };
-	FGameplayTag VoiceVariantTag{ FGameplayTag::EmptyTag };
-	FGameplayTag TypeTag{ FGameplayTag::EmptyTag };
-	float VoiceSpeed;
-	float VoicePitch;
-	IALSXTCharacterInterface::Execute_GetVoiceInfo(this, SexTag, VoiceVariantTag, VoiceSpeed, VoicePitch);
-
-	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Sliding, SexTag, VoiceVariantTag, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
+	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Sliding, CharacterVoiceParams.Sex, CharacterVoiceParams.Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
 }
 
 bool AALSXTCharacter::IsHoldingItem_Implementation() const

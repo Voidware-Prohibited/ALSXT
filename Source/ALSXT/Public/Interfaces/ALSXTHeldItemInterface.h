@@ -22,6 +22,14 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Held Item Interface")
   FALSXTHeldItemSettings GetHeldItemSettings() const;
 
+  // Get which current Modes, Positions and Stances for the Held Item
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
+  FALSXTHeldItemState GetHeldItemState() const;
+
+  // Get the current Transform, Socket Names and Positions for the Held Item
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
+  FALSXTHeldItemGripStates GetHeldItemGripStates() const;
+
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Held Item Interface")
   FHeldItemGrip GetHeldItemGrip() const;
 

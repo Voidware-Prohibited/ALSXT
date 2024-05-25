@@ -23,7 +23,7 @@ struct ALSXT_API FALSXTAimState
 		FVector CurrentTarget{ EForceInit::ForceInit };
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-		float CurrentFOV;
+		float CurrentFOV {90.0f};
 	
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
 		FRotator ControlRotation { EForceInit::ForceInit };
