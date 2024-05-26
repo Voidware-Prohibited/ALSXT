@@ -95,29 +95,11 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterHoldingBreath() const;
 
-  // UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
-  // FGameplayTag GetCharacterPhysicalAnimationMode() const;
-
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterGesture() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterGestureHand() const;
-
-
-  // Held Item
-
-  // Get which current Modes, Positions and Stances for the Held Item
-  // UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
-  // FALSXTHeldItemState GetHeldItemState() const;
-  
-  // Get which Modes, Positions and Stances are available for the Held Item
-  // UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
-  // FALSXTHeldItemSettings GetHeldItemSettings() const;
-
-  // Get the current Transform, Socket Names and Positions for the Held Item
-  // UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
-  // FALSXTHeldItemGripStates GetHeldItemGripStates() const;
 
   // Firearm
 
@@ -245,29 +227,11 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FALSXTPoseState GetCharacterPoseState() const;
 
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  FALSXTBumpPoseState GetCrowdNavigationPoseState();
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  FALSXTBumpPoseState GetBumpPoseState();
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  void BumpReaction(FDoubleHitResult Hit, FGameplayTag Gait, FGameplayTag Side, FGameplayTag Form);
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  void CrowdNavigationReaction(FGameplayTag Gait, FDoubleHitResult Hit, FGameplayTag Side, FGameplayTag Form);
-
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
   UPARAM(meta = (Categories = "Als.Gait")) FGameplayTag GetGait();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
   UPARAM(meta = (Categories = "Als.Combat Stance")) FGameplayTag GetCombatStance();
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
-  void AnticipationReaction(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form, FVector AnticipationPoint);
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  void GetImpactFallLocation(FVector& Location, FDoubleHitResult Hit);
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void TryGetUp();

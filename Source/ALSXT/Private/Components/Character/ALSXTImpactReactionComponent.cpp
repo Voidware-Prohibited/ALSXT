@@ -1200,7 +1200,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 							NewImpactReactionState.ImpactReactionParameters.CrowdNavigationHit = DoubleHitResult;
 							NewImpactReactionState.ImpactReactionParameters.ImpactType = ALSXTImpactTypeTags::CrowdNavigation;
 							SetImpactReactionState(NewImpactReactionState);
-							IALSXTCharacterInterface::Execute_CrowdNavigationReaction(HitResult.GetActor(), IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), DoubleHitResult, SideTag, FormTag);
+							IALSXTCollisionInterface::Execute_CrowdNavigationReaction(HitResult.GetActor(), IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), DoubleHitResult, SideTag, FormTag);
 						}
 						else
 						{
