@@ -21,6 +21,7 @@
 #include "Engine/GameEngine.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Math/UnrealMathUtility.h"
+#include "Utility/AlsDebugUtility.h"
 
 FString UALSXTAnimNotify_FootstepEffects::GetNotifyName_Implementation() const
 {
@@ -112,7 +113,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 #if ENABLE_DRAW_DEBUG
 		if (bDisplayDebug)
 		{
-			UAlsUtility::DrawDebugLineTraceSingle(World, Hit.TraceStart, Hit.TraceEnd, Hit.bBlockingHit,
+			UAlsDebugUtility::DrawLineTraceSingle(World, Hit.TraceStart, Hit.TraceEnd, Hit.bBlockingHit,
 				Hit, { 0.333333f, 0.0f, 0.0f }, FLinearColor::Red, 10.0f);
 		}
 #endif
@@ -161,7 +162,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 	if (bDisplayDebug)
 	{
 		DrawDebugCoordinateSystem(World, FootstepLocation, FootstepRotation.Rotator(),
-			25.0f, false, 10.0f, 0, UAlsUtility::DrawLineThickness);
+			25.0f, false, 10.0f, 0, UAlsDebugUtility::DrawLineThickness);
 	}
 #endif
 

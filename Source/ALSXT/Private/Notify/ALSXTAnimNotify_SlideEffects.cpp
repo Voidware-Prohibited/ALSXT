@@ -21,6 +21,7 @@
 #include "Utility/AlsMacros.h"
 #include "Utility/AlsMath.h"
 #include "Utility/AlsUtility.h"
+#include "Utility/AlsDebugUtility.h"
 
 // ReSharper disable once CppUnusedIncludeDirective
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ALSXTAnimNotify_SlideEffects)
@@ -71,7 +72,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 	TEnumAsByte<EPhysicalSurface> HitSurface;
 
 #if ENABLE_DRAW_DEBUG
-	const auto bDisplayDebug{ UAlsUtility::ShouldDisplayDebugForActor(Mesh->GetOwner(), UAlsConstants::TracesDebugDisplayName()) };
+	const auto bDisplayDebug{ UAlsDebugUtility::ShouldDisplayDebugForActor(Mesh->GetOwner(), UAlsConstants::TracesDebugDisplayName()) };
 #endif
 
 	FCollisionQueryParams QueryParameters{ ANSI_TO_TCHAR(__FUNCTION__), true, Mesh->GetOwner() };
@@ -93,7 +94,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 #if ENABLE_DRAW_DEBUG
 		if (bDisplayDebug)
 		{
-			UAlsUtility::DrawDebugLineTraceSingle(World, Hit.TraceStart, Hit.TraceEnd, Hit.bBlockingHit,
+			UAlsDebugUtility::DrawLineTraceSingle(World, Hit.TraceStart, Hit.TraceEnd, Hit.bBlockingHit,
 				Hit, { 0.333333f, 0.0f, 0.0f }, FLinearColor::Red, 10.0f);
 		}
 #endif
@@ -143,7 +144,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 	if (bDisplayDebug)
 	{
 		DrawDebugCoordinateSystem(World, FootstepLocation, FootstepRotation.Rotator(),
-			25.0f, false, 10.0f, 0, UAlsUtility::DrawLineThickness);
+			25.0f, false, 10.0f, 0, UAlsDebugUtility::DrawLineThickness);
 	}
 #endif
 

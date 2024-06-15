@@ -19,6 +19,10 @@
 #include "Utility/AlsMath.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Utility/AlsUtility.h"
+#include "Utility/AlsDebugUtility.h"
+#include "Utility/AlsVector.h"
+#include "Utility/AlsRotation.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void AALSXTCharacter::TryStartSliding(const float PlayRate)
 {
@@ -97,7 +101,7 @@ void AALSXTCharacter::StartSlidingImplementation(UAnimMontage* Montage, const fl
 	{
 		SlidingState.TargetYawAngle = TargetYawAngle;
 
-		RefreshRotationInstant(StartYawAngle);
+		SetRotationInstant(StartYawAngle);
 
 		SetLocomotionAction(AlsLocomotionActionTags::Sliding);
 		OnSlidingStarted();
@@ -135,7 +139,7 @@ void AALSXTCharacter::RefreshSlidingPhysics(const float DeltaTime)
 	}
 	else
 	{
-		TargetRotation.Yaw = UAlsMath::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
+		TargetRotation.Yaw = UAlsRotation::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
 			SlidingState.TargetYawAngle, DeltaTime,
 			ALSXTSettings->Sliding.RotationInterpolationSpeed);
 
@@ -177,7 +181,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	const auto TraceCapsuleRadius{ CapsuleRadius - 1.0f };
 	const auto LedgeHeightDelta{ UE_REAL_TO_FLOAT((TraceSettings.LedgeHeight.GetMax() - TraceSettings.LedgeHeight.GetMin()) * CapsuleScale) };
 #if ENABLE_DRAW_DEBUG
-	const auto bDisplayDebug{ UAlsUtility::ShouldDisplayDebugForActor(this, UAlsConstants::MantlingDebugDisplayName()) };
+	const auto bDisplayDebug{ UAlsDebugUtility::ShouldDisplayDebugForActor(this, UAlsConstants::MantlingDebugDisplayName()) };
 #endif
 
 	// FORWARD TRACE
@@ -210,7 +214,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	}
 
 	const auto ForwardTraceDirection{
-		UAlsMath::AngleToDirectionXY(
+		UAlsVector::AngleToDirectionXY(
 			ActorYawAngle + FMath::ClampAngle(ForwardTraceDeltaAngle, -ALSXTSettings->Vaulting.MaxReachAngle, ALSXTSettings->Vaulting.MaxReachAngle))
 	};
 
@@ -254,7 +258,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 #if ENABLE_DRAW_DEBUG
 		if (bDisplayDebug)
 		{
-			UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
+			UAlsDebugUtility::DrawSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
 			                                                    ForwardTraceCapsuleHalfHeight, false, ForwardTraceHit, {0.0f, 0.25f, 1.0f},
 			                                                    {0.0f, 0.75f, 1.0f}, TraceSettings.bDrawFailedTraces ? 5.0f : 0.0f);
 		}
@@ -285,7 +289,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 #if ENABLE_DRAW_DEBUG
 		if (bDisplayDebug)
 		{
-			UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, DepthEndLocation, TraceCapsuleRadius,
+			UAlsDebugUtility::DrawSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, DepthEndLocation, TraceCapsuleRadius,
 				ForwardTraceCapsuleHalfHeight, false, DepthTraceHit, FLinearColor::Yellow,
 				{ 0.0f, 0.75f, 1.0f }, TraceSettings.bDrawFailedTraces ? 5.0f : 5.0f);
 		}
@@ -297,7 +301,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 #if ENABLE_DRAW_DEBUG
 	if (bDisplayDebug)
 	{
-		UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, DepthEndLocation, TraceCapsuleRadius,
+		UAlsDebugUtility::DrawSweepSingleCapsuleAlternative(GetWorld(), DepthStartLocation, DepthEndLocation, TraceCapsuleRadius,
 			ForwardTraceCapsuleHalfHeight, false, DepthTraceHit, FLinearColor::Yellow,
 			{ 0.0f, 0.75f, 1.0f }, TraceSettings.bDrawFailedTraces ? 5.0f : 5.0f);
 	}
@@ -353,11 +357,11 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 #if ENABLE_DRAW_DEBUG
 		if (bDisplayDebug)
 		{
-			UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
+			UAlsDebugUtility::DrawSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
 			                                                    ForwardTraceCapsuleHalfHeight, true, ForwardTraceHit, {0.0f, 0.25f, 1.0f},
 			                                                    {0.0f, 0.75f, 1.0f}, TraceSettings.bDrawFailedTraces ? 5.0f : 0.0f);
 
-			UAlsUtility::DrawDebugSweepSingleSphere(GetWorld(), DownwardTraceStart, DownwardTraceEnd, TraceCapsuleRadius,
+			UAlsDebugUtility::DrawSweepSingleSphere(GetWorld(), DownwardTraceStart, DownwardTraceEnd, TraceCapsuleRadius,
 			                                        false, DownwardTraceHit, {0.25f, 0.0f, 1.0f}, {0.75f, 0.0f, 1.0f},
 			                                        TraceSettings.bDrawFailedTraces ? 7.5f : 0.0f);
 		}
@@ -378,11 +382,11 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 #if ENABLE_DRAW_DEBUG
 	if (bDisplayDebug)
 	{
-		UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
+		UAlsDebugUtility::DrawSweepSingleCapsuleAlternative(GetWorld(), ForwardTraceStart, ForwardTraceEnd, TraceCapsuleRadius,
 		                                                    ForwardTraceCapsuleHalfHeight, true, ForwardTraceHit,
 		                                                    {0.0f, 0.25f, 1.0f}, {0.0f, 0.75f, 1.0f}, 5.0f);
 
-		UAlsUtility::DrawDebugSweepSingleSphere(GetWorld(), DownwardTraceStart, DownwardTraceEnd,
+		UAlsDebugUtility::DrawSweepSingleSphere(GetWorld(), DownwardTraceStart, DownwardTraceEnd,
 		                                        TraceCapsuleRadius, true, DownwardTraceHit,
 		                                        {0.25f, 0.0f, 1.0f}, {0.75f, 0.0f, 1.0f}, 7.5f);
 	}

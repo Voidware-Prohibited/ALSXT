@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Settings/ALSXTCharacterSettings.h"
 #include "Utility/AlsMacros.h"
+#include "Utility/AlsRotation.h"
 
 // Sets default values for this component's properties
 UALSXTSlidingActionComponent::UALSXTSlidingActionComponent()
@@ -191,7 +192,7 @@ void UALSXTSlidingActionComponent::RefreshSlidingPhysics(const float DeltaTime)
 	}
 	else
 	{
-		TargetRotation.Yaw = UAlsMath::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
+		TargetRotation.Yaw = UAlsRotation::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
 			SlidingState.TargetYawAngle, DeltaTime,
 			Character->ALSXTSettings->Sliding.RotationInterpolationSpeed);
 

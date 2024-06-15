@@ -27,6 +27,7 @@
 #include "Utility/AlsConstants.h"
 #include "Utility/AlsMacros.h"
 #include "Utility/AlsUtility.h"
+#include "Utility/AlsVector.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Utility/ALSXTStructs.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -541,7 +542,7 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 {
 	if (GetDesiredStatus() == ALSXTStatusTags::Normal && bMovementEnabled)
 	{
-		const auto Value{ UAlsMath::ClampMagnitude012D(ActionValue.Get<FVector2D>()) };
+		const auto Value{ UAlsVector::ClampMagnitude012D(ActionValue.Get<FVector2D>()) };
 
 		if (Value.Length() > 0.0)
 		{
@@ -549,10 +550,10 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 		}
 
 		FRotator CapsuleRotation = GetActorRotation();
-		const auto ForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw)) };
-		const auto RightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(ForwardDirection) };
-		const auto CharForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(CapsuleRotation.Yaw)) };
-		const auto CharRightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(CharForwardDirection) };
+		const auto ForwardDirection{ UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw)) };
+		const auto RightDirection{ UAlsVector::PerpendicularCounterClockwiseXY(ForwardDirection) };
+		const auto CharForwardDirection{ UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(CapsuleRotation.Yaw)) };
+		const auto CharRightDirection{ UAlsVector::PerpendicularCounterClockwiseXY(CharForwardDirection) };
 
 		if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
 		{
@@ -857,7 +858,7 @@ void AALSXTCharacter::ApplyDesiredStance()
 
 void AALSXTCharacter::ALSXTRefreshRotationInstant(const float TargetYawAngle, const ETeleportType Teleport)
 {
-	RefreshRotationInstant(TargetYawAngle, Teleport);
+	SetRotationInstant(TargetYawAngle, Teleport);
 }
 
 void AALSXTCharacter::SetMovementModeLocked(bool bNewMovementModeLocked)

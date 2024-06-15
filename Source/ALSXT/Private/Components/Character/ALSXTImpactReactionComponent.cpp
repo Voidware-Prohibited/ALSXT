@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Math/RandomStream.h"
 #include "Utility/AlsMacros.h"
+#include "Utility/AlsRotation.h"
 #include "InputActionValue.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTCombatInterface.h"
@@ -5156,7 +5157,7 @@ void UALSXTImpactReactionComponent::RefreshImpactReactionPhysics(const float Del
 	}
 	else
 	{
-		TargetRotation.Yaw = UAlsMath::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
+		TargetRotation.Yaw = UAlsRotation::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
 			ImpactReactionState.ImpactReactionParameters.TargetYawAngle, DeltaTime,
 			ImpactReactionSettings.RotationInterpolationSpeed);
 
