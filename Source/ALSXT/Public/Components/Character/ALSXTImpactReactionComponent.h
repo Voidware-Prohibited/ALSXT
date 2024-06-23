@@ -59,6 +59,13 @@ protected:
 
 	float GetAttackFallenMinimumTime(FAttackDoubleHitResult Hit);
 
+	void StartDefensiveTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void DefensiveTimer();
+
+	void StopDefensiveTimer();
+
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void CrowdNavigationVelocityTimer();
 
@@ -135,6 +142,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	TArray<FAttackDoubleHitResult> PreviousAttackImpacts;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	FGameplayTag DefensiveMode;
 
 	void ObstacleTrace();
 
@@ -421,6 +431,9 @@ private:
 	float TimeSinceLastRecovery;
 	FTimerHandle TimeSinceLastResponseTimerHandle;
 	float TimeSinceLastResponse;
+
+	FTimerHandle DefensiveTimerHandle;	// Timer Handle for Freelook Trace
+	FTimerDelegate DefensiveTimerDelegate; // Delegate to bind function with parameters
 
 	FTimerHandle AnticipationTimerHandle;	// Timer Handle for Freelook Trace
 	FTimerDelegate AnticipationTimerDelegate; // Delegate to bind function with parameters

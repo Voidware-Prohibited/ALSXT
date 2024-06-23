@@ -98,6 +98,15 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 	FCollisionQueryParams QueryParameters{ ANSI_TO_TCHAR(__FUNCTION__), true, Mesh->GetOwner() };
 	QueryParameters.bReturnPhysicalMaterial = true;
 
+	// if (FootstepEffectsSettings->EnableVertexPaintTrace)
+	// {
+	// 
+	// }
+	// else
+	// {
+	// 
+	// }
+
 	if (World->LineTraceSingleByChannel(Hit, FootTransform.GetLocation(),
 		FootTransform.GetLocation() - FootZAxis *
 		(FootstepEffectsSettings->SurfaceTraceDistance * CapsuleScale),

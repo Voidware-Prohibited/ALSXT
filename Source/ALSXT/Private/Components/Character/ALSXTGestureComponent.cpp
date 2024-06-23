@@ -19,7 +19,7 @@ void UALSXTGestureComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Character = Cast<AALSXTCharacter>(GetOwner());
+	Character = IALSXTCharacterInterface::Execute_GetCharacter(GetOwner());
 	AlsCharacter = Cast<AAlsCharacter>(GetOwner());
 	
 }
@@ -33,3 +33,40 @@ void UALSXTGestureComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// ...
 }
 
+// Gesture
+
+void UALSXTGestureComponent::AddDesiredGesture(const FGameplayTag& Gesture, const FGameplayTag& GestureHand)
+{
+	if (CanGesture())
+	{
+		if (Character->GetLocalRole() == ROLE_AutonomousProxy)
+		{
+			ServerAddDesiredGesture(Gesture, GestureHand);
+		}
+	}
+}
+
+void UALSXTGestureComponent::ServerAddDesiredGesture_Implementation(const FGameplayTag& Gesture, const FGameplayTag& GestureHand)
+{
+	AddDesiredGesture(Gesture, GestureHand);
+}
+
+void UALSXTGestureComponent::AddGesture(const FGameplayTag& Gesture, const FGameplayTag& GestureHand)
+{
+	if (IsValid(GestureSettings) && CanGesture())
+	{
+		FALSXTGestureMontages* FoundMontages = GestureSettings->Gestures.Find(Gesture);
+		if (GestureHand == ALSXTHandTags::Left && IsValid(FoundMontages->LeftMontage))
+		{
+			Character->GetMesh()->GetAnimInstance()->Montage_Play(FoundMontages->LeftMontage);
+			OnGesture(Gesture, GestureHand);
+		}
+		if (GestureHand == ALSXTHandTags::Right && IsValid(FoundMontages->RightMontage))
+		{
+			Character->GetMesh()->GetAnimInstance()->Montage_Play(FoundMontages->RightMontage);
+			OnGesture(Gesture, GestureHand);
+		}
+	}
+}
+
+void UALSXTGestureComponent::OnGesture_Implementation(const FGameplayTag& Gesture, const FGameplayTag& GestureHand) {}

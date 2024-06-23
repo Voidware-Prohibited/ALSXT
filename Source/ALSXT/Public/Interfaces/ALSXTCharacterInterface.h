@@ -11,6 +11,7 @@
 #include "State/ALSXTAimState.h"
 #include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTFootstepState.h"
+#include "State/ALSXTBreathState.h"
 #include "AlsCharacterMovementComponent.h"
 #include "ALSXTCharacterInterface.generated.h"
 
@@ -37,6 +38,21 @@ public:
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterGait() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterLean() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterEmote() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterEmote(const FGameplayTag& NewEmote);
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void GetCharacterGesture(FGameplayTag& NewGesture, FGameplayTag& NewGestureHand) const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterGesture(const FGameplayTag& NewGesture, const FGameplayTag& NewGestureHand);
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FALSXTDefensiveModeState GetCharacterDefensiveModeState() const;
@@ -95,12 +111,6 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterHoldingBreath() const;
 
-  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
-  FGameplayTag GetCharacterGesture() const;
-
-  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
-  FGameplayTag GetCharacterGestureHand() const;
-
   // Firearm
 
   // Get the current Recoil Info for the Held Item
@@ -143,6 +153,12 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterLocomotionVariant() const;
 
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterLocomotionVariant(const FGameplayTag& NewLocomotionVariant);
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetViewportMask(const FGameplayTag& EquipmentSlot, const UMaterialInterface* NewViewportMask);
+
   UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterWeaponObstruction() const;
 
@@ -166,6 +182,9 @@ public:
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterInjury() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterInjury(const FGameplayTag& NewInjury);
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   UAlsCameraComponent* GetCharacterCamera() const;
@@ -223,6 +242,9 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Movement", Meta = (AutoCreateRefTerm = "Type, Weight"))
   void PlayCharacterMovementSound(bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FALSXTBreathState GetCharacterBreathState() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FALSXTPoseState GetCharacterPoseState() const;

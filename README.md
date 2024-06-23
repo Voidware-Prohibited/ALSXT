@@ -41,25 +41,40 @@ _[Contibutors](#Contributions) and PRs are welcome_.
 
 **Features**
 
+ALSXT
+
 - Expanded Character States (Combat Stance, Sex, Variant, Weapon Ready Position)
 - Sliding Locomotion Action (with Sound, Decal and Particle Support)
 - Expanded Footprints System (Independent foot states, Saturation, Material Transfer, Vertex Paint Support(Static Mesh only, In Progress))
+- Customization Component _In Progress_
+- Paintable Skeletal Mesh Component _In Progress_
 - Combat Component _In Progress_
 - Impact Reactions (Blending reaction animations with Physical Animation) _In Progress_
 - Character Sound Component_In Progress_
 - Idle Animation Component _In Progress_
-- Paintable Skeletal Mesh Component _In Progress_
 - Vaulting _In Progress_
+- Physical Animation _In Progress_
+- Sound Component _In Progress_
+- Idle Animation Component
+- Gesture _In Progress_
+- Emotes _In Progress_
+- Basic Stats Component (Stamina and Health to demonstate the functionality of various components)
+
+ALSXT Advanced
+
+- Combat
+- ADS
+- Procedural Recoil
+- Reloading
 - Camera FX Component _In Progress_
 - Acrobatic Actions (Flipping, Wallrunning etc) _In Progress_
-- Basic Stats Component (Stamina and Health to demonstate the functionality of various components)
+
 
 **Planned Features**
 - New Skeletal Mesh and Clothing set with Morph Targets/Shape Keys
-- Clothing Component (Clothing States, Paintable)
-- Gestures
-- Emotes
 - Stationary Modes (Sitting etc)
+- Prone Stance
+- Ladder Climbing Custom Movement Mode
 
 **Dependencies**
 
@@ -120,6 +135,14 @@ Original content and code in this repository is under the MIT license. Any git s
 - Angled Foregrip from [M4 - Stealth and Grenadier Configurations](https://sketchfab.com/3d-models/m4-stealth-and-grenadier-configurations-e530c3225f094a04ba33273c6ebb3d1c) by [LunarEclipse](https://sketchfab.com/e.hackett.03) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate and retexture model
 
 - Bushnell 1x22x33 from [low-poly Sight set](https://sketchfab.com/3d-models/low-poly-sight-set-2cdf0f52f1254ad3bc387bbd7e8d6223) by [D.U.](https://sketchfab.com/D.U.) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate and retexture model
+
+- [Pita bush](https://sketchfab.com/3d-models/pita-bush-f2313748d4a54c11af3eba587dd3a703) by [SCADL & Co](https://sketchfab.com/scadl) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/)
+
+- PaperTarget from [Shooting Target Set](https://sketchfab.com/3d-models/shooting-target-set-ba8282fc05e044a187f556ef14c3ee26) by [HippoStance](https://sketchfab.com/hippostance) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate model
+
+- [motorcycle HELMET](https://sketchfab.com/3d-models/motorcycle-helmet-1d489db9cdc24161a7537926a20bb17b) by [djengala](https://sketchfab.com/djengala) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified Materials for apperance
+
+- [Draft](https://sketchfab.com/3d-models/draft-12e6d0ea1da049afaf3fee3c517ed64d) by [Iv.An.](https://sketchfab.com/iv.an) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified Materials for apperance
 
 # Special Thanks
 

@@ -1,6 +1,17 @@
 #include "Utility/ALSXTGameplayTags.h"
 #include "Utility/AlsGameplayTags.h"
 
+namespace AlsLocomotionModeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Ladder, TEXT("Als.LocomotionMode.Ladder"))
+	UE_DEFINE_GAMEPLAY_TAG(Swimming, TEXT("Als.LocomotionMode.Swimming"))
+}
+
+namespace AlsStanceTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Prone, TEXT("Als.Stance.Prone"))
+}
+
 namespace AlsOverlayModeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(AxeOneHanded, TEXT("Als.OverlayMode.Axe One Handed"))
@@ -349,7 +360,10 @@ namespace ALSXTDamageTypeTags
 namespace ALSXTLocomotionVariantTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Default, TEXT("Als.Locomotion Variant.Default"))
-	UE_DEFINE_GAMEPLAY_TAG(Exaggerated, TEXT("Als.Locomotion Variant.Exaggerated"))
+	UE_DEFINE_GAMEPLAY_TAG(Masculine, TEXT("Als.Locomotion Variant.Masculine"))
+	UE_DEFINE_GAMEPLAY_TAG(Feminine, TEXT("Als.Locomotion Variant.Feminine"))	
+	UE_DEFINE_GAMEPLAY_TAG(Drunk, TEXT("Als.Locomotion Variant.Drunk"))
+	UE_DEFINE_GAMEPLAY_TAG(Catwalk, TEXT("Als.Locomotion Variant.Catwalk"))
 	UE_DEFINE_GAMEPLAY_TAG(Style01, TEXT("Als.Locomotion Variant.Style01"))
 	UE_DEFINE_GAMEPLAY_TAG(Style02, TEXT("Als.Locomotion Variant.Style02"))
 	UE_DEFINE_GAMEPLAY_TAG(Style03, TEXT("Als.Locomotion Variant.Style03"))

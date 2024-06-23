@@ -38,6 +38,12 @@ private:
 	UPROPERTY(EditAnywhere, Transient, Setter = SetMeshPaintingSettingsMap, BlueprintSetter = SetMeshPaintingSettingsMap, Getter = GetMeshPaintingSettingsMap, BlueprintGetter = GetMeshPaintingSettingsMap, Category = Mesh)
 	TObjectPtr <UALSXTMeshPaintingSettingsMap> MeshPaintingSettingsMap;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UMaterialInterface* ViewportMask;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FSlateColor ViewportMaskColor;
+
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeSkeletalMeshMaterialSignature OnChangeMeshMaterial;

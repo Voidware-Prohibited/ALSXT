@@ -9,8 +9,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "AlsCameraComponent.h"
 #include "Components/Character/ALSXTCharacterCameraEffectsComponent.h"
-#include "Components/Character/ALSXTEmoteComponent.h"
-#include "Components/Character/ALSXTGestureComponent.h"
 #include "Math/Vector.h"
 #include "ALSXTBlueprintFunctionLibrary.h"
 #include "Engine/World.h"
@@ -28,12 +26,6 @@ AALSXTCharacterAdvanced::AALSXTCharacterAdvanced(const FObjectInitializer& Objec
 
 	AcrobaticActions = CreateDefaultSubobject<UALSXTAcrobaticActionComponent>(TEXT("Acrobatic Actions"));
 	AddOwnedComponent(AcrobaticActions);
-
-	Emotes = CreateDefaultSubobject<UALSXTEmoteComponent>(TEXT("Emotes"));
-	AddOwnedComponent(Emotes);
-
-	Gestures = CreateDefaultSubobject<UALSXTGestureComponent>(TEXT("Gestures"));
-	AddOwnedComponent(Gestures);
 	
 	CameraEffects = CreateDefaultSubobject<UALSXTCharacterCameraEffectsComponent>(TEXT("Camera Effects"));
 	AddOwnedComponent(CameraEffects);
@@ -72,8 +64,6 @@ void AALSXTCharacterAdvanced::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SwitchTargetRightAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchTargetRight);
 		// EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryInteraction);
 		// EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
-		EnhancedInput->BindAction(SelectEmoteAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectEmote);
-		EnhancedInput->BindAction(SelectGestureAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectGesture);
 
 		OnSetupPlayerInputComponentUpdated.Broadcast();
 	}
@@ -114,86 +104,10 @@ void AALSXTCharacterAdvanced::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 
 	Parameters.Condition = COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredHoldingBreath, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGesture, Parameters)
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGestureHand, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReloadingType, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerAction, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFirearmFingerActionHand, Parameters)
 }
-
-// Gesture
-
-void AALSXTCharacterAdvanced::SetDesiredGesture(const FGameplayTag& NewGestureTag)
-{
-	if (DesiredGesture != NewGestureTag)
-	{
-		DesiredGesture = NewGestureTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredGesture, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredGesture(NewGestureTag);
-			}
-	}
-}
-
-void AALSXTCharacterAdvanced::ServerSetDesiredGesture_Implementation(const FGameplayTag& NewGestureTag)
-{
-	SetDesiredGesture(NewGestureTag);
-}
-
-void AALSXTCharacterAdvanced::SetGesture(const FGameplayTag& NewGestureTag)
-{
-
-	if (Gesture != NewGestureTag)
-	{
-		const auto PreviousGesture{ Gesture };
-
-		Gesture = NewGestureTag;
-
-		OnGestureChanged(PreviousGesture);
-	}
-}
-
-void AALSXTCharacterAdvanced::OnGestureChanged_Implementation(const FGameplayTag& PreviousGestureTag) {}
-
-// GestureHand
-
-void AALSXTCharacterAdvanced::SetDesiredGestureHand(const FGameplayTag& NewGestureHandTag)
-{
-	if (DesiredGestureHand != NewGestureHandTag)
-	{
-		DesiredGestureHand = NewGestureHandTag;
-
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredGestureHand, this)
-
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredGestureHand(NewGestureHandTag);
-			}
-	}
-}
-
-void AALSXTCharacterAdvanced::ServerSetDesiredGestureHand_Implementation(const FGameplayTag& NewGestureHandTag)
-{
-	SetDesiredGestureHand(NewGestureHandTag);
-}
-
-void AALSXTCharacterAdvanced::SetGestureHand(const FGameplayTag& NewGestureHandTag)
-{
-
-	if (GestureHand != NewGestureHandTag)
-	{
-		const auto PreviousGestureHand{ GestureHand };
-
-		GestureHand = NewGestureHandTag;
-
-		OnGestureHandChanged(PreviousGestureHand);
-	}
-}
-
-void AALSXTCharacterAdvanced::OnGestureHandChanged_Implementation(const FGameplayTag& PreviousGestureHandTag) {}
 
 // ReloadingType
 
@@ -374,24 +288,6 @@ bool AALSXTCharacterAdvanced::CanPerformSecondaryAction_Implementation() const
 	return true;
 }
 
-// Input Actions
-
-void AALSXTCharacterAdvanced::InputSelectEmote(const FInputActionValue& ActionValue)
-{
-	if (CanSelectEmote())
-	{
-		// 
-	}
-}
-
-void AALSXTCharacterAdvanced::InputSelectGesture(const FInputActionValue& ActionValue)
-{
-	if (CanSelectGesture())
-	{
-		//
-	}
-}
-
 // Acrobatic Action Component
 void AALSXTCharacterAdvanced::InputAcrobaticAction(const FInputActionValue& ActionValue)
 {
@@ -439,17 +335,36 @@ void AALSXTCharacterAdvanced::InputSwitchTargetRight()
 	Combat->GetTargetRight();
 }
 
+float AALSXTCharacterAdvanced::CalculateHoldBreathTimer()
+{
+	return BreathState.MaxHoldBreathTime * IALSXTCharacterInterface::Execute_GetStamina(this);
+
+	// FALSXTBreathState NewBreathState = BreathState;
+	// NewBreathState.MaxHoldBreathTime = NewBreathState;
+}
+
 void AALSXTCharacterAdvanced::BeginHoldBreathTimer()
 {
 	if (ALSXTSettings->Freelook.bEnableFreelook)
 	{
+		FALSXTBreathState NewBreathState = GetBreathState();
+		NewBreathState.HoldingBreath = ALSXTHoldingBreathTags::True;
+		NewBreathState.CurrentMaxHoldBreathTime = CalculateHoldBreathTimer();
+		SetBreathState(NewBreathState);
 		GetWorld()->GetTimerManager().SetTimer(HoldBreathTimerHandle, HoldBreathTimerDelegate, 0.1f, true);
 	}
 }
 
 void AALSXTCharacterAdvanced::HoldBreathTimer()
 {
+	FALSXTBreathState NewBreathState = GetBreathState();
+	NewBreathState.CurrentHoldBreathTime = NewBreathState.CurrentHoldBreathTime + 0.01f;
+	SetBreathState(NewBreathState);
 
+	if (BreathState.CurrentHoldBreathTime >= BreathState.CurrentMaxHoldBreathTime)
+	{
+		EndHoldBreathTimer();
+	}
 }
 
 void AALSXTCharacterAdvanced::EndHoldBreathTimer()
@@ -457,6 +372,29 @@ void AALSXTCharacterAdvanced::EndHoldBreathTimer()
 	// Clear Attack Trace Timer
 	// FALSXTFreelookState EmptyState;
 	// SetFreelookState(EmptyState);
+	FALSXTBreathState NewBreathState = GetBreathState();
+	FGameplayTag ReleaseBreathMode;
+	float RemainingBreath = NewBreathState.CurrentMaxHoldBreathTime - NewBreathState.CurrentHoldBreathTime;	
+
+	if (RemainingBreath <= (NewBreathState.CurrentMaxHoldBreathTime * 0.1))
+	{
+		ReleaseBreathMode = ALSXTHoldingBreathTags::Exhausted;
+	}
+
+	if ((RemainingBreath >= (NewBreathState.CurrentMaxHoldBreathTime * 0.1)) && (RemainingBreath <= (NewBreathState.CurrentMaxHoldBreathTime * 0.6)))
+	{
+		ReleaseBreathMode = ALSXTHoldingBreathTags::Gasping;
+	}
+
+	if (RemainingBreath >= (NewBreathState.CurrentMaxHoldBreathTime * 0.6))
+	{
+		ReleaseBreathMode = ALSXTHoldingBreathTags::Released;
+	}
+	NewBreathState.CurrentHoldBreathTime = 0.0f;
+	NewBreathState.CurrentMaxHoldBreathTime = 0.0f;
+	NewBreathState.HoldingBreath = ReleaseBreathMode;
+	SetBreathState(NewBreathState);
+
 	GetWorld()->GetTimerManager().ClearTimer(HoldBreathTimerHandle);
 }
 
@@ -468,16 +406,6 @@ void AALSXTCharacterAdvanced::OnAttackCollision_Implementation(FAttackDoubleHitR
 }
 
 // Interface Functions
-
-FGameplayTag AALSXTCharacterAdvanced::GetCharacterGesture_Implementation() const
-{
-	return GetDesiredGesture();
-}
-
-FGameplayTag AALSXTCharacterAdvanced::GetCharacterGestureHand_Implementation() const
-{
-	return GetDesiredGestureHand();
-}
 
 FGameplayTag AALSXTCharacterAdvanced::GetCharacterReloadingType_Implementation() const
 {

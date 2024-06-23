@@ -75,9 +75,8 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		WeaponFirearmStance = IALSXTCharacterInterface::Execute_GetCharacterWeaponFirearmStance(GetOwningActor());
 		WeaponReadyPosition = IALSXTCharacterInterface::Execute_GetCharacterWeaponReadyPosition(GetOwningActor());
 		StationaryMode = IALSXTCharacterInterface::Execute_GetCharacterStationaryMode(GetOwningActor());
-		HoldingBreath = IALSXTCharacterInterface::Execute_GetCharacterHoldingBreath(GetOwningActor());		
-		Gesture = IALSXTCharacterInterface::Execute_GetCharacterGesture(GetOwningActor());
-		GestureHand = IALSXTCharacterInterface::Execute_GetCharacterGestureHand(GetOwningActor());		
+		HoldingBreath = IALSXTCharacterInterface::Execute_GetCharacterHoldingBreath(GetOwningActor());
+		IALSXTCharacterInterface::Execute_GetCharacterGesture(GetOwningActor(), Gesture, GestureHand);
 		ForegripPosition = IALSXTCharacterInterface::Execute_GetCharacterForegripPosition(GetOwningActor());
 		FirearmFingerAction = IALSXTCharacterInterface::Execute_GetCharacterFirearmFingerAction(GetOwningActor());
 		FirearmFingerActionHand = IALSXTCharacterInterface::Execute_GetCharacterFirearmFingerActionHand(GetOwningActor());

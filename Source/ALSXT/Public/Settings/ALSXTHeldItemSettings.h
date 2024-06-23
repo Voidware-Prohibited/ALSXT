@@ -59,6 +59,9 @@ struct ALSXT_API FALSXTHeldItemSettings
 	bool UsesLeftHandIK {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	bool Aimable{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	bool UsesRecoil{ false };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
@@ -126,6 +129,24 @@ struct ALSXT_API FHeldItemActionMontage
 	{
 		return (other.Montage == Montage);
 	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTHeldItemFingerAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Format")
+	FGameplayTag Animation{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Firearm", Meta = (AllowPrivateAccess))
+	TObjectPtr<UAnimMontage> Montage;
+
+	bool operator==(const FALSXTHeldItemFingerAnimation& other) const
+	{
+		return (other.Montage == Montage);
+	}
+
 };
 
 USTRUCT(BlueprintType)

@@ -338,6 +338,29 @@ void UALSXTImpactReactionComponent::CrowdNavigationVelocityTimer()
 	}
 }
 
+void UALSXTImpactReactionComponent::StartDefensiveTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(DefensiveTimerHandle, DefensiveTimerDelegate, 0.1f, false);
+}
+
+void UALSXTImpactReactionComponent::DefensiveTimer()
+{
+	if (IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner()) != ALSXTDefensiveModeTags::Blocking )
+	{
+		StopDefensiveTimer();
+	}
+
+	//Trace for Angle of closest Attack toward control rotation
+	// 
+	// 
+	// Find and apply correct animation pose
+}
+
+void UALSXTImpactReactionComponent::StopDefensiveTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(DefensiveTimerHandle);
+}
+
 void UALSXTImpactReactionComponent::BumpVelocityTimer()
 {
 	const auto* Capsule{ IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(GetOwner()) };
@@ -1301,8 +1324,11 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 					IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), ActorVelocity);
 					IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationPoint);
 
-					FGameplayTag DefensiveMode = IALSXTCombatInterface::Execute_Attacking(HitResult.GetActor()) ? DetermineDefensiveModeFromAttackingCharacter(Form, CharacterCombatStance) : DetermineDefensiveModeFromCharacter(Form, CharacterCombatStance);
-
+					
+					if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCombatInterface::StaticClass()))
+					{
+						DefensiveMode = IALSXTCombatInterface::Execute_Attacking(HitResult.GetActor()) ? DetermineDefensiveModeFromAttackingCharacter(Form, CharacterCombatStance) : DetermineDefensiveModeFromCharacter(Form, CharacterCombatStance);
+					}
 
 					FGameplayTag Stance = IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner());
 					FGameplayTag Side = LocationToImpactSide(AnticipationPoint);
@@ -1341,7 +1367,7 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 						IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), ActorMass);
 						IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), ActorVelocity);
 						IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationPoint);
-						FGameplayTag DefensiveMode = DetermineDefensiveMode(Form);
+						DefensiveMode = DetermineDefensiveMode(Form);
 						FGameplayTag Stance = IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner());
 						FGameplayTag Side = LocationToImpactSide(AnticipationPoint);
 						FGameplayTag Health = HealthToHealthTag(GetHealth());

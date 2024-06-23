@@ -16,6 +16,8 @@
 #include "Components/SceneComponent.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "Components/Character/ALSXTIdleAnimationComponent.h"
+#include "Components/Character/ALSXTEmoteComponent.h"
+#include "Components/Character/ALSXTGestureComponent.h"
 #include "Settings/ALSXTCharacterSettings.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTCombatSettings.h"
@@ -361,6 +363,12 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	IdleAnimation = CreateDefaultSubobject<UALSXTIdleAnimationComponent>(TEXT("Idle Animation"));
 	AddOwnedComponent(IdleAnimation);
 
+	Emotes = CreateDefaultSubobject<UALSXTEmoteComponent>(TEXT("Emotes"));
+	AddOwnedComponent(Emotes);
+
+	Gestures = CreateDefaultSubobject<UALSXTGestureComponent>(TEXT("Gestures"));
+	AddOwnedComponent(Gestures);
+
 	OnRagdollingStartedDelegate.BindUFunction(ImpactReaction, "OnRagdollingStarted");
 }
 
@@ -369,6 +377,11 @@ void AALSXTCharacter::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	RefreshVaulting();
+
+	// if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
+	// {
+	// 
+	// }
 
 	FVector Difference = GetActorUpVector() - GetCharacterMovement()->CurrentFloor.HitResult.Normal;
 	float Angle = FMath::RadiansToDegrees(FMath::Atan2(Difference.X, Difference.Y)) -90;
@@ -440,6 +453,8 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, AimState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, bMovementEnabled, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGesture, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredGestureHand, Parameters)
 }
 
 void AALSXTCharacter::BeginPlay()
@@ -482,14 +497,19 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::InputCrouch);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ThisClass::InputJump);
 		EnhancedInput->BindAction(AimAction, ETriggerEvent::Triggered, this, &ThisClass::InputAim);
+		EnhancedInput->BindAction(FocusAction, ETriggerEvent::Triggered, this, &ThisClass::InputFocus);
 		EnhancedInput->BindAction(RagdollAction, ETriggerEvent::Triggered, this, &ThisClass::InputRagdoll);
 		EnhancedInput->BindAction(RollAction, ETriggerEvent::Triggered, this, &ThisClass::InputRoll);
 		EnhancedInput->BindAction(RotationModeAction, ETriggerEvent::Triggered, this, &ThisClass::InputRotationMode);
 		EnhancedInput->BindAction(ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::InputViewMode);
 		EnhancedInput->BindAction(SwitchShoulderAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchShoulder);
 		EnhancedInput->BindAction(LeanLeftAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanLeft);
+		EnhancedInput->BindAction(ToggleLeanLeftAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanLeft);
 		EnhancedInput->BindAction(LeanRightAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanRight);
+		EnhancedInput->BindAction(ToggleLeanRightAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanRight);
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
+		EnhancedInput->BindAction(ToggleFreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
+		EnhancedInput->BindAction(ToggleGaitAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleGait);
 		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleCombatReady);
 		EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputPrimaryInteraction);
 		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSecondaryInteraction);
@@ -497,6 +517,8 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SwitchWeaponReadyPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchWeaponReadyPosition);
 		EnhancedInput->BindAction(SwitchGripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchGripPosition);
 		EnhancedInput->BindAction(SwitchForegripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchForegripPosition);
+		EnhancedInput->BindAction(SelectEmoteAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectEmote);
+		EnhancedInput->BindAction(SelectGestureAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectGesture);
 		
 		OnSetupPlayerInputComponentUpdated.Broadcast();
 	}
@@ -514,7 +536,16 @@ void AALSXTCharacter::DisableLookAt(const bool Disable)
 
 void AALSXTCharacter::InputLookMouse(const FInputActionValue& ActionValue)
 {
-	const auto Value{ActionValue.Get<FVector2D>()};
+	FVector2D Value{ActionValue.Get<FVector2D>()};
+
+	if (Freelooking == ALSXTFreelookingTags::True)
+	{
+		Value = HeadLookAtState.LockedLookInput;
+	}
+	else
+	{
+		Value = ActionValue.Get<FVector2D>();
+	}
 
 	if (Value.Length() > 0.0)
 	{
@@ -529,13 +560,24 @@ void AALSXTCharacter::InputLookMouse(const FInputActionValue& ActionValue)
 
 void AALSXTCharacter::InputLook(const FInputActionValue& ActionValue)
 {
-	const auto Value{ActionValue.Get<FVector2D>()};
+	FVector2D Value{ ActionValue.Get<FVector2D>() };
+
+	if (Freelooking == ALSXTFreelookingTags::True)
+	{
+		Value = HeadLookAtState.LockedLookInput;
+	}
+	else
+	{
+		Value = ActionValue.Get<FVector2D>();
+	}
 	if (Value.Length() > 0.0)
 	{
 		IdleAnimation->ResetIdleCounterTimer();
 	}
 	AddControllerPitchInput(Value.Y * LookUpRate * GetWorld()->GetDeltaSeconds());
+	PreviousLookInput.Y = Value.Y;
 	AddControllerYawInput(Value.X * LookRightRate * GetWorld()->GetDeltaSeconds());
+	PreviousLookInput.X = Value.X;
 }
 
 void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
@@ -550,21 +592,31 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 		}
 
 		FRotator CapsuleRotation = GetActorRotation();
-		const auto ForwardDirection{ UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw)) };
-		const auto RightDirection{ UAlsVector::PerpendicularCounterClockwiseXY(ForwardDirection) };
+		auto ForwardDirection{ UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw)) };
+		auto RightDirection{ UAlsVector::PerpendicularCounterClockwiseXY(ForwardDirection) };
 		const auto CharForwardDirection{ UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(CapsuleRotation.Yaw)) };
 		const auto CharRightDirection{ UAlsVector::PerpendicularCounterClockwiseXY(CharForwardDirection) };
 
 		if (GetDesiredFreelooking() == ALSXTFreelookingTags::True)
 		{
-			AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
-			MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
-			GetLocomotionState().PreviousVelocity;
+			// AddMovementInput(HeadLookAtState.PreviousControlRotation.Yaw * Value.Y + RightDirection * Value.X);
+			
+			// const auto FreelookForwardDirection{ UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetHeadLookAtState().LockedViewState.Rotation.Yaw)) };
+			ForwardDirection = UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetHeadLookAtState().LockedViewState.Rotation.Yaw));
+			RightDirection = UAlsVector::PerpendicularCounterClockwiseXY(ForwardDirection);
+			AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
+			MovementInput = ForwardDirection * Value.Y + RightDirection * Value.X;
+
+			// AddMovementInput(CharForwardDirection * Value.Y + CharRightDirection * Value.X);
+			// MovementInput = CharForwardDirection * Value.Y + CharRightDirection * Value.X;
+			// GetLocomotionState().PreviousVelocity;
 			// AddMovementInput(GetLocomotionState().PreviousVelocity);
 			// MovementInput = GetLocomotionState().PreviousVelocity;
 		}
 		else
 		{
+			ForwardDirection = UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetViewState().Rotation.Yaw)) ;
+			RightDirection = UAlsVector::PerpendicularCounterClockwiseXY(ForwardDirection);
 			AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
 			MovementInput = ForwardDirection * Value.Y + RightDirection * Value.X;
 		}
@@ -682,6 +734,7 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 			if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming)
 			{
 				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
+				SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
 			}
 			if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this)) {
 				if (GetDesiredCombatStance() != ALSXTCombatStanceTags::Neutral)
@@ -698,6 +751,21 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 				SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 			}
 			SetDesiredAiming(ActionValue.Get<bool>());
+		}
+	}
+}
+
+void AALSXTCharacter::InputFocus(const FInputActionValue& ActionValue)
+{
+	if (CanFocus())
+	{
+		if (ActionValue.Get<bool>())
+		{
+			SetDesiredFocus(ALSXTFocusedTags::True);
+		}
+		else
+		{
+			SetDesiredFocus(ALSXTFocusedTags::False);
 		}
 	}
 }
@@ -853,6 +921,24 @@ void AALSXTCharacter::ApplyDesiredStance()
 		{
 			Crouch();
 		}
+	}
+}
+
+// Input Actions
+
+void AALSXTCharacter::InputSelectEmote(const FInputActionValue& ActionValue)
+{
+	if (CanSelectEmote())
+	{
+		// 
+	}
+}
+
+void AALSXTCharacter::InputSelectGesture(const FInputActionValue& ActionValue)
+{
+	if (CanSelectGesture())
+	{
+		//
 	}
 }
 
@@ -1039,6 +1125,38 @@ void AALSXTCharacter::ResetPaintOnAllComponents_Implementation() const
 	
 }
 
+// Breath State
+void AALSXTCharacter::SetBreathState(const FALSXTBreathState& NewBreathState)
+{
+	const auto PreviousBreathState{ BreathState };
+
+	BreathState = NewBreathState;
+
+	OnBreathStateChanged(PreviousBreathState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetBreathState(NewBreathState);
+	}
+}
+
+void AALSXTCharacter::ServerSetBreathState_Implementation(const FALSXTBreathState& NewBreathState)
+{
+	SetBreathState(NewBreathState);
+}
+
+void AALSXTCharacter::ServerProcessNewBreathState_Implementation(const FALSXTBreathState& NewBreathState)
+{
+	ProcessNewBreathState(NewBreathState);
+}
+
+void AALSXTCharacter::OnReplicate_BreathState(const FALSXTBreathState& PreviousBreathState)
+{
+	OnBreathStateChanged(PreviousBreathState);
+}
+
+void AALSXTCharacter::OnBreathStateChanged_Implementation(const FALSXTBreathState& PreviousBreathState) {}
+
 // ALSXT Pose State
 void AALSXTCharacter::SetALSXTPoseState(const FALSXTPoseState& NewALSXTPoseState)
 {
@@ -1154,6 +1272,21 @@ void AALSXTCharacter::OnReplicate_FootprintsState(const FALSXTFootprintsState& P
 }
 
 void AALSXTCharacter::OnFootprintsStateChanged_Implementation(const FALSXTFootprintsState& PreviousFootprintsState) {}
+
+void AALSXTCharacter::InputToggleGait()
+{
+	if (CanToggleGait())
+	{
+		if ((GetDesiredGait() == AlsGaitTags::Walking))
+		{
+			SetDesiredGait(AlsGaitTags::Running);
+		}
+		else
+		{
+			SetDesiredGait(AlsGaitTags::Walking);
+		}
+	}
+}
 
 void AALSXTCharacter::InputToggleCombatReady()
 {
@@ -1462,12 +1595,19 @@ void AALSXTCharacter::ActivateFreelooking()
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), PreviousYaw));
 	// LockRotation(GetActorRotation().Yaw);
 	SetDesiredFreelooking(ALSXTFreelookingTags::True);
+	FALSXTHeadLookAtState NewHeadLookAtState = GetHeadLookAtState();
+	NewHeadLookAtState.LockedControlRotation = GetControlRotation();
+	NewHeadLookAtState.LockedViewState = GetViewState();
+	SetHeadLookAtState(NewHeadLookAtState);
 }
 
 void AALSXTCharacter::DeactivateFreelooking()
 {
 	// UnLockRotation();
 	SetDesiredFreelooking(ALSXTFreelookingTags::False);
+	// HeadLookAtState.LockedViewState.PreviousYawAngle = 0.0f;
+	// HeadLookAtState.LockedViewState.Rotation = FRotator(0.0f, 0.0f, 0.0f);
+	// HeadLookAtState.LockedViewState.YawSpeed = 0.0f;
 }
 
 void AALSXTCharacter::SetDesiredFreelooking(const FGameplayTag& NewFreelookingTag)
@@ -1517,6 +1657,117 @@ void AALSXTCharacter::OnFreelookingChanged_Implementation(const FGameplayTag& Pr
 {
 	
 }
+
+// Emote
+
+void AALSXTCharacter::SetDesiredEmote(const FGameplayTag& NewEmoteTag)
+{
+	if (DesiredEmote != NewEmoteTag)
+	{
+		DesiredEmote = NewEmoteTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredEmote, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredEmote(NewEmoteTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredEmote_Implementation(const FGameplayTag& NewEmoteTag)
+{
+	SetDesiredEmote(NewEmoteTag);
+}
+
+void AALSXTCharacter::SetEmote(const FGameplayTag& NewEmoteTag)
+{
+
+	if (Emote != NewEmoteTag)
+	{
+		const auto PreviousEmote{ Emote };
+
+		Gesture = NewEmoteTag;
+		Emotes->AddDesiredEmote(NewEmoteTag);
+		OnEmoteChanged(PreviousEmote);
+	}
+}
+
+void AALSXTCharacter::OnEmoteChanged_Implementation(const FGameplayTag& PreviousEmoteeTag) {}
+
+// Gesture
+
+void AALSXTCharacter::SetDesiredGesture(const FGameplayTag& NewGestureTag)
+{
+	if (DesiredGesture != NewGestureTag)
+	{
+		DesiredGesture = NewGestureTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredGesture, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredGesture(NewGestureTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredGesture_Implementation(const FGameplayTag& NewGestureTag)
+{
+	SetDesiredGesture(NewGestureTag);
+}
+
+void AALSXTCharacter::SetGesture(const FGameplayTag& NewGestureTag)
+{
+
+	if (Gesture != NewGestureTag)
+	{
+		const auto PreviousGesture{ Gesture };
+
+		Gesture = NewGestureTag;
+
+		OnGestureChanged(PreviousGesture);
+	}
+}
+
+void AALSXTCharacter::OnGestureChanged_Implementation(const FGameplayTag& PreviousGestureTag) {}
+
+// GestureHand
+
+void AALSXTCharacter::SetDesiredGestureHand(const FGameplayTag& NewGestureHandTag)
+{
+	if (DesiredGestureHand != NewGestureHandTag)
+	{
+		DesiredGestureHand = NewGestureHandTag;
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredGestureHand, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredGestureHand(NewGestureHandTag);
+			}
+	}
+}
+
+void AALSXTCharacter::ServerSetDesiredGestureHand_Implementation(const FGameplayTag& NewGestureHandTag)
+{
+	SetDesiredGestureHand(NewGestureHandTag);
+}
+
+void AALSXTCharacter::SetGestureHand(const FGameplayTag& NewGestureHandTag)
+{
+
+	if (GestureHand != NewGestureHandTag)
+	{
+		const auto PreviousGestureHand{ GestureHand };
+
+		GestureHand = NewGestureHandTag;
+
+		OnGestureHandChanged(PreviousGestureHand);
+	}
+}
+
+void AALSXTCharacter::OnGestureHandChanged_Implementation(const FGameplayTag& PreviousGestureHandTag) {}
 
 // Sex
 
@@ -2143,6 +2394,9 @@ void AALSXTCharacter::OnActorAttackCollision_Implementation(FAttackDoubleHitResu
 	{
 		UGameplayStatics::GetPlayerController(this, 0)->ClientStartCameraShake(CameraShakeClass, Scale);
 	}
+	// FALSXTDamageResult DamageResult = GetActualDamage(Hit);
+	ImpactReaction->AttackReaction(Hit);
+	CharacterSound->PlayDamageSound(true, true, true, GetDesiredSex(), GetDesiredLocomotionVariant(), GetOverlayMode(), ALSXTAttackMethodTags::Regular, Hit.Strength, Hit.DoubleHitResult.ImpactForm, Hit.BaseDamage);
 }
 
 void AALSXTCharacter::BeginFreelookTimer()
@@ -2535,7 +2789,19 @@ void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 	// }
 	Jump();
 }
-void AALSXTCharacter::CanSprint_Implementation() {}
+
+bool AALSXTCharacter::CanSprint_Implementation() const { return true; }
+bool AALSXTCharacter::CanFocus_Implementation() const { return true; }
+bool AALSXTCharacter::CanToggleGait_Implementation() const { return true; }
+bool AALSXTCharacter::CanLean_Implementation() const { return true; }
+bool AALSXTCharacter::CanAimDownSights_Implementation() const { return true; }
+bool AALSXTCharacter::CanAim_Implementation() const { return true; }
+bool AALSXTCharacter::CanRoll_Implementation() const { return true; }
+bool AALSXTCharacter::CanVault_Implementation() const { return true; }
+bool AALSXTCharacter::CanSlide_Implementation() const { return true; }
+bool AALSXTCharacter::CanWallRun_Implementation() const { return true; }
+bool AALSXTCharacter::CanWallJump_Implementation() const { return true; }
+
 void AALSXTCharacter::AIObstacleTrace_Implementation() {}
 void AALSXTCharacter::StartVault_Implementation() {}
 void AALSXTCharacter::StartWallrun_Implementation() {}
@@ -2581,6 +2847,11 @@ FGameplayTag AALSXTCharacter::GetCharacterCombatStance_Implementation() const
 	return GetDesiredCombatStance();
 }
 
+FGameplayTag AALSXTCharacter::GetCharacterWeaponReadyPosition_Implementation() const
+{
+	return GetDesiredWeaponReadyPosition();
+}
+
 FGameplayTag AALSXTCharacter::GetCharacterInjury_Implementation() const
 {
 	return GetDesiredInjury();
@@ -2601,7 +2872,10 @@ FRotator AALSXTCharacter::GetCharacterControlRotation_Implementation() const
 	return GetControlRotation();
 }
 
-
+FALSXTBreathState AALSXTCharacter::GetCharacterBreathState_Implementation() const
+{
+	return GetBreathState();
+}
 
 FALSXTPoseState AALSXTCharacter::GetCharacterPoseState_Implementation() const
 {
@@ -2618,9 +2892,14 @@ FGameplayTag AALSXTCharacter::GetCharacterGait_Implementation() const
 	return GetDesiredGait();
 }
 
+FGameplayTag AALSXTCharacter::GetCharacterLean_Implementation() const
+{
+	return GetDesiredLean();
+}
+
 FALSXTDefensiveModeState AALSXTCharacter::GetCharacterDefensiveModeState_Implementation() const
 {
-	return DefensiveModeState;
+	return GetDefensiveModeState();
 }
 
 UCapsuleComponent* AALSXTCharacter::GetCharacterCapsuleComponent_Implementation() const
@@ -2668,6 +2947,21 @@ void AALSXTCharacter::SetCharacterStatus_Implementation(const FGameplayTag& NewS
 	SetDesiredStatus(NewStatus);
 }
 
+void AALSXTCharacter::SetCharacterLocomotionVariant_Implementation(const FGameplayTag& NewLocomotionVariant)
+{
+	SetDesiredLocomotionVariant(NewLocomotionVariant);
+}
+
+void AALSXTCharacter::SetCharacterInjury_Implementation(const FGameplayTag& NewInjury)
+{
+	SetDesiredInjury(NewInjury);
+}
+
+void AALSXTCharacter::SetViewportMask_Implementation(const FGameplayTag& EquipmentSlot, const UMaterialInterface* NewViewportMask)
+{
+	// SetDesiredStatus(NewStatus);
+}
+
 void AALSXTCharacter::SetCharacterDefensiveModeState_Implementation(FALSXTDefensiveModeState NewDefensiveModeState)
 {
 	SetDefensiveModeState(NewDefensiveModeState);
@@ -2688,7 +2982,28 @@ FGameplayTag AALSXTCharacter::GetCharacterFreelooking_Implementation() const
 	return GetDesiredFreelooking();
 }
 
+FGameplayTag AALSXTCharacter::GetCharacterEmote_Implementation() const
+{
+	return DesiredEmote;
+}
 
+
+void AALSXTCharacter::SetCharacterEmote_Implementation(const FGameplayTag& NewEmote)
+{
+	SetDesiredEmote(NewEmote);
+}
+
+void AALSXTCharacter::GetCharacterGesture_Implementation(FGameplayTag& NewGesture, FGameplayTag& NewGestureHand) const
+{
+	NewGesture = GetDesiredGesture();
+	NewGestureHand = GetDesiredGestureHand();
+}
+
+void AALSXTCharacter::SetCharacterGesture_Implementation(const FGameplayTag& NewGesture, const FGameplayTag& NewGestureHand)
+{
+	SetDesiredGestureHand(NewGestureHand);
+	SetDesiredGesture(NewGesture);
+}
 
 
 FGameplayTag AALSXTCharacter::GetCharacterForegripPosition_Implementation() const

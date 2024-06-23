@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "AlsCharacter.h"
 #include "ALSXTCharacter.h"
+#include "Settings/ALSXTEmoteSettings.h"
 #include "NativeGameplayTags.h"
 #include "ALSXTEmoteComponent.generated.h"
 
@@ -32,6 +33,9 @@ public:
 
 	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	TObjectPtr<UALSXTEmoteSettings> EmoteSettings;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanEmote();
 
@@ -52,5 +56,5 @@ private:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Emote")
-		void OnEmote(const FGameplayTag& Emote);
+	void OnEmote(const FGameplayTag& Emote);
 };

@@ -50,12 +50,6 @@ public:
 	TObjectPtr<UInputAction> AcrobaticAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> SelectEmoteAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> SelectGestureAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SwitchTargetLeftAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
@@ -71,12 +65,6 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UALSXTAcrobaticActionComponent* AcrobaticActions;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
-	class UALSXTEmoteComponent* Emotes;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
-	class UALSXTGestureComponent* Gestures;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UALSXTCharacterCameraEffectsComponent* CameraEffects;
@@ -95,10 +83,6 @@ private:
 	void InputHoldBreath(const FInputActionValue& ActionValue);
 
 	void InputAcrobaticAction(const FInputActionValue& ActionValue);
-
-	void InputSelectEmote(const FInputActionValue& ActionValue);
-
-	void InputSelectGesture(const FInputActionValue& ActionValue);
 
 public:
 
@@ -130,20 +114,15 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
 	bool CanPerformAcrobaticAction() const;
 
-	// Emote
-
-public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	bool CanEmote() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	bool CanSelectEmote() const;
-
 protected:
 	// Timers
 
 	FTimerHandle HoldBreathTimerHandle;	// Timer Handle for Hold Breath
 	FTimerDelegate HoldBreathTimerDelegate; // Delegate to bind function with parameters
+
+	// Hold Breath
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	float CalculateHoldBreathTimer();
 
 	// Hold Breath
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
@@ -185,22 +164,6 @@ protected:
 	// void UpdateADSTransforms() const;
 
 private:
-	// Gesture
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredGesture{ FGameplayTag::EmptyTag };
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag Gesture{ FGameplayTag::EmptyTag };
-
-	// GestureHand
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredGestureHand{ FGameplayTag::EmptyTag };
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag GestureHand{ FGameplayTag::EmptyTag };
-
 	// ReloadingType
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
@@ -232,64 +195,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag HoldingBreath{ FGameplayTag::EmptyTag };
-
-	// Desired Gesture
-
-public:
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	const FGameplayTag& GetDesiredGesture() const;
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewGestureTag"))
-	void SetDesiredGesture(const FGameplayTag& NewGestureTag);
-
-private:
-	UFUNCTION(Server, Reliable)
-	void ServerSetDesiredGesture(const FGameplayTag& NewGestureTag);
-
-	// Gesture
-
-public:
-	const FGameplayTag& GetGesture() const;
-
-private:
-	void SetGesture(const FGameplayTag& NewGestureTag);
-
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	void OnGestureChanged(const FGameplayTag& PreviousGestureTag);
-
-	// Desired GestureHand
-
-public:
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
-	const FGameplayTag& GetDesiredGestureHand() const;
-
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewGestureHandTag"))
-	void SetDesiredGestureHand(const FGameplayTag& NewGestureHandTag);
-
-private:
-	UFUNCTION(Server, Reliable)
-	void ServerSetDesiredGestureHand(const FGameplayTag& NewGestureHandTag);
-
-	// GestureHand
-
-public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	bool CanGesture() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
-	bool CanSelectGesture() const;
-
-	const FGameplayTagContainer GetAvailableGestureHands() const;
-
-	const FGameplayTag& GetGestureHand() const;
-
-private:
-	void SetGestureHand(const FGameplayTag& NewGestureHandTag);
-
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	void OnGestureHandChanged(const FGameplayTag& PreviousGestureHandTag);
 
 	// Desired ReloadingType
 
@@ -381,10 +286,6 @@ public:
 	// Character Interface
 	virtual FGameplayTag GetCharacterHoldingBreath_Implementation() const override;
 
-	// Gesture Interface Functions
-	virtual FGameplayTag GetCharacterGesture_Implementation() const override;
-	virtual FGameplayTag GetCharacterGestureHand_Implementation() const override;
-
 	// Held Item Interface Functions
 	virtual FGameplayTag GetCharacterReloadingType_Implementation() const override;
 	virtual FGameplayTag GetCharacterFirearmFingerAction_Implementation() const override;
@@ -427,26 +328,6 @@ public:
 	virtual FALSXTFirearmAimState GetFirearmAimState_Implementation() const override;
 };
 
-inline const FGameplayTag& AALSXTCharacterAdvanced::GetDesiredGesture() const
-{
-	return DesiredGesture;
-}
-
-inline const FGameplayTag& AALSXTCharacterAdvanced::GetGesture() const
-{
-	return Gesture;
-}
-
-inline const FGameplayTag& AALSXTCharacterAdvanced::GetDesiredGestureHand() const
-{
-	return DesiredGestureHand;
-}
-
-inline const FGameplayTag& AALSXTCharacterAdvanced::GetGestureHand() const
-{
-	return GestureHand;
-}
-
 inline const FGameplayTag& AALSXTCharacterAdvanced::GetDesiredReloadingType() const
 {
 	return DesiredReloadingType;
@@ -475,13 +356,6 @@ inline const FGameplayTag& AALSXTCharacterAdvanced::GetDesiredFirearmFingerActio
 inline const FGameplayTag& AALSXTCharacterAdvanced::GetFirearmFingerActionHand() const
 {
 	return FirearmFingerActionHand;
-}
-
-inline const FGameplayTagContainer AALSXTCharacterAdvanced::GetAvailableGestureHands() const
-{
-	FGameplayTagContainer AvailableHands;
-
-	return AvailableHands;
 }
 
 inline const FGameplayTag& AALSXTCharacterAdvanced::GetDesiredHoldingBreath() const

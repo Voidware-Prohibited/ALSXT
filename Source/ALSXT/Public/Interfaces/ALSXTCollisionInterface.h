@@ -3,6 +3,8 @@
 #include "NativeGameplayTags.h"
 #include "Utility/ALSXTStructs.h"
 #include "State/ALSXTImpactReactionState.h"
+#include "Settings/ALSXTCollisionSettings.h"
+#include "State/ALSXTDefensiveModeState.h"
 #include "Settings/ALSXTElementalInteractionSettings.h"
 #include "ALSXTCollisionInterface.generated.h"
 
@@ -184,6 +186,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Events")
 	void ActorBumpCollision(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Events")
+	FALSXTDamageResult CalculateActualDamage(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Events")
 	void OnActorAttackCollision(FAttackDoubleHitResult Hit);

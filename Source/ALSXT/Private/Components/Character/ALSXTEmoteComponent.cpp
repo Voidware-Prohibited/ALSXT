@@ -19,7 +19,7 @@ void UALSXTEmoteComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Character = Cast<AALSXTCharacter>(GetOwner());
+	Character = IALSXTCharacterInterface::Execute_GetCharacter(GetOwner());
 	AlsCharacter = Cast<AAlsCharacter>(GetOwner());
 	
 }
@@ -54,9 +54,13 @@ void UALSXTEmoteComponent::ServerAddDesiredEmote_Implementation(const FGameplayT
 void UALSXTEmoteComponent::AddEmote(const FGameplayTag& Emote)
 {
 
-	if (CanEmote())
+	if (IsValid(EmoteSettings) && CanEmote())
 	{
-		OnEmote(Emote);
+		if (UAnimMontage* FoundMontage = EmoteSettings->Emotes.Find(Emote)->Montage)
+		{
+			Character->GetMesh()->GetAnimInstance()->Montage_Play(FoundMontage);
+			OnEmote(Emote);
+		}
 	}
 }
 
