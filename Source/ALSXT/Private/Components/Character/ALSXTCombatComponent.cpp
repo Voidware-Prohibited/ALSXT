@@ -196,6 +196,7 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 
 void UALSXTCombatComponent::GetClosestTarget()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "GetClosestTarget");
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;

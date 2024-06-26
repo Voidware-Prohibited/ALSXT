@@ -115,7 +115,7 @@ public:
 
   // Get the current Recoil Info for the Held Item
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Firearm")
-  UALSXTFirearmRecoilAsset* GetFirearmRecoilInfo();
+  UALSXTFirearmRecoilAsset* GetFirearmRecoilInfo() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterReloadingType() const;
@@ -196,7 +196,7 @@ public:
   FRotator GetCharacterControlRotation() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  float GetStamina();
+  float GetStamina() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   FGameplayTag GetStaminaTag();
@@ -205,37 +205,37 @@ public:
   FALSXTStaminaThresholdSettings GetStaminaThresholdSettings();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  float GetHealth();
+  float GetHealth() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  UPARAM(meta = (Categories = "Als.Status")) FGameplayTag GetCharacterStatus();
+  UPARAM(meta = (Categories = "Als.Status")) FGameplayTag GetCharacterStatus() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  FALSXTStatusState GetStatusState();
+  FALSXTStatusState GetStatusState() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  void GetStaminaThresholds(float& Optimal, float& Low);
+  void GetStaminaThresholds(float& Optimal, float& Low) const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  FGameplayTag GetBreathType();
+  FGameplayTag GetBreathType() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  UALSXTCameraShakeSettings* SelectCameraShakeSettings();
+  UALSXTCameraShakeSettings* SelectCameraShakeSettings() const;
 	
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  void GetCombatAttackPhysics(float& Mass, float& Velocity);
+  void GetCombatAttackPhysics(float& Mass, float& Velocity) const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  FALSXTClothingState GetClothingState();
+  FALSXTClothingState GetClothingState() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  FGameplayTag GetWeightTag();
+  FGameplayTag GetWeightTag() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Movement")
-  void GetClothingSurfaceForMovement(TEnumAsByte<EPhysicalSurface>& Surface, UPARAM(meta = (Categories = "Als.Character Movement Sound"))FGameplayTag Movement);
+  void GetClothingSurfaceForMovement(TEnumAsByte<EPhysicalSurface>& Surface, UPARAM(meta = (Categories = "Als.Character Movement Sound"))FGameplayTag Movement) const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Movement")
-  void GetAccentSurfaceForMovement(TEnumAsByte<EPhysicalSurface>& Surface, UPARAM(meta = (Categories = "Als.Character Movement Sound"))FGameplayTag Movement);
+  void GetAccentSurfaceForMovement(TEnumAsByte<EPhysicalSurface>& Surface, UPARAM(meta = (Categories = "Als.Character Movement Sound"))FGameplayTag Movement) const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Movement", Meta = (AutoCreateRefTerm = "StaminaOverride"))
   void CharacterBreathEffects(UPARAM(meta = (Categories = "Als.Stamina"))const FGameplayTag& StaminaOverride);
@@ -250,10 +250,10 @@ public:
   FALSXTPoseState GetCharacterPoseState() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
-  UPARAM(meta = (Categories = "Als.Gait")) FGameplayTag GetGait();
+  UPARAM(meta = (Categories = "Als.Gait")) FGameplayTag GetGait() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Impact Reaction")
-  UPARAM(meta = (Categories = "Als.Combat Stance")) FGameplayTag GetCombatStance();
+  UPARAM(meta = (Categories = "Als.Combat Stance")) FGameplayTag GetCombatStance() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void TryGetUp();

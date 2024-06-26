@@ -11,6 +11,7 @@
 #include "Interfaces/ALSXTCombatInterface.h"
 #include "Interfaces/ALSXTFirearmInterface.h"
 #include "AlsCameraComponent.h"
+#include "CineCameraComponent.h"
 #include "Components/Character/ALSXTCharacterCameraEffectsComponent.h"
 #include "Components/Character/ALSXTCombatComponent.h"
 #include "Components/Character/ALSXTCharacterSoundComponent.h"
@@ -21,7 +22,7 @@
 class UALSXTCharacterAdvancedSettings;
 
 UCLASS()
-class ALSXT_API AALSXTCharacterAdvanced : public AALSXTCharacter, public IALSXTCharacterCameraEffectsComponentInterface, public IALSXTHeadLookAtInterface, public IALSXTAcrobaticActionComponentInterface, public IALSXTTargetLockInterface, public IALSXTCombatInterface, public IALSXTFirearmInterface
+class ALSXT_API AALSXTCharacterAdvanced : public AALSXTCharacter, public IALSXTCharacterCameraEffectsComponentInterface, public IALSXTHeadLookAtInterface, public IALSXTAcrobaticActionComponentInterface, public IALSXTCombatInterface, public IALSXTFirearmInterface
 {
 	GENERATED_BODY()
 
@@ -48,6 +49,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> AcrobaticAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
+	TObjectPtr<UInputAction> TargetLockAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Input Actions", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> SwitchTargetLeftAction;
@@ -79,42 +83,46 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "State|Aim")
 	FRotator CalculateRecoilControlRotation(FRotator AdditiveControlRotation) const;
 
+// INPUTS
+
 private:
 	void InputHoldBreath(const FInputActionValue& ActionValue);
-
 	void InputAcrobaticAction(const FInputActionValue& ActionValue);
+	void InputTargetLock(const FInputActionValue& ActionValue);
+	void InputSwitchTargetLeft();
+	void InputSwitchTargetRight();
+	void InputChargeFirearm();
+	void InputReload();
+	void InputReloadWithRetention();
+	void ClearWeaponMalfunction();
 
 public:
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
 	void InputPrimaryAction();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
 	void InputSecondaryAction();
 
-private:
-
-	void InputSwitchTargetLeft();
-	void InputSwitchTargetRight();
-	void InputReload();
-	void InputReloadWithRetention();
+// Input Action Criteria
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
-	FALSXTFirearmAimState FirearmAimState;
-
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
 	bool CanPerformPrimaryAction() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Als|Input Actions")
 	bool CanPerformSecondaryAction() const;
 
-	void OnDesiredAimingChanged_Implementation(bool bPreviousDesiredAiming) override;
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
 	bool CanPerformAcrobaticAction() const;
 
+	void OnDesiredAimingChanged_Implementation(bool bPreviousDesiredAiming) override;
+
+	
 protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
+	FALSXTFirearmAimState FirearmAimState;
+
 	// Timers
 
 	FTimerHandle HoldBreathTimerHandle;	// Timer Handle for Hold Breath

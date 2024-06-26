@@ -60,7 +60,7 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
 
 UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
-class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTCharacterCustomizationComponentInterface, public IALSXTStationaryModeComponentInterface, public IALSXTCollisionInterface, public IALSXTCharacterSoundComponentInterface, public IALSXTMeshPaintingInterface, public IALSXTCharacterInterface, public IALSXTHeldItemInterface, public IALSXTIdleAnimationComponentInterface
+class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTCharacterCustomizationComponentInterface, public IALSXTStationaryModeComponentInterface, public IALSXTCollisionInterface, public IALSXTTargetLockInterface, public IALSXTCharacterSoundComponentInterface, public IALSXTMeshPaintingInterface, public IALSXTCharacterInterface, public IALSXTHeldItemInterface, public IALSXTIdleAnimationComponentInterface
 {
 	GENERATED_BODY()
 
@@ -206,6 +206,14 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
 	TObjectPtr<UALSXTCharacterMovementComponent> ALSXTCharacterMovement;
 
+	// Breath State
+	void UpdateBreathState();
+	bool ShouldUpdateBreathState() const;
+	bool ShouldTransitionBreathState();
+	FALSXTTargetBreathState CalculateTargetBreathState();
+	void SetTargetBreathState(FALSXTTargetBreathState NewTargetBreathState);
+	void TransitionBreathState();
+
 	virtual void OnOverlayModeChanged_Implementation(const FGameplayTag& PreviousOverlayMode) override;
 	virtual void OnJumped_Implementation() override;
 	virtual void OnMantlingStarted_Implementation(const FAlsMantlingParameters& Parameters) override;
@@ -333,8 +341,10 @@ private:
 	void OnReplicate_ALSXTPoseState(const FALSXTPoseState& PreviousALSXTPoseState);
 
 // Breath
+	UFUNCTION(Client, Reliable)
+	void ClientSetBreathState(const FALSXTBreathState& NewBreathState);
 
-	UFUNCTION(Server, Unreliable)
+	UFUNCTION(Server, Reliable)
 	void ServerSetBreathState(const FALSXTBreathState& NewBreathState);
 
 	UFUNCTION()
@@ -1500,20 +1510,20 @@ public:
 	bool ShouldEnterAnticipationDefensiveMode() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
-		bool IsBlocking() const;
+	bool IsBlocking() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
-		bool IsInDefensiveMode() const;
+	bool IsInDefensiveMode() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
-		bool IsInAnticipationMode() const;
+	bool IsInAnticipationMode() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeTag"))
-		void SetDesiredDefensiveMode(UPARAM(meta = (Categories = "Als.Defensive Mode"))const FGameplayTag& NewDefensiveModeTag);
+	void SetDesiredDefensiveMode(UPARAM(meta = (Categories = "Als.Defensive Mode"))const FGameplayTag& NewDefensiveModeTag);
 
 private:
 	UFUNCTION(Server, Reliable)
-		void ServerSetDesiredDefensiveMode(const FGameplayTag& NewDefensiveModeTag);
+	void ServerSetDesiredDefensiveMode(const FGameplayTag& NewDefensiveModeTag);
 
 	// Blocking
 
@@ -1556,7 +1566,7 @@ private:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-		void OnStationaryModeChanged(const FGameplayTag& PreviousStationaryModeTag);
+	void OnStationaryModeChanged(const FGameplayTag& PreviousStationaryModeTag);
 
 	// Desired Status
 

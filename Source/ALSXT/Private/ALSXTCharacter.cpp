@@ -389,6 +389,13 @@ void AALSXTCharacter::Tick(const float DeltaTime)
 	{
 		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), Angle));
 	}
+
+	BreathState.TargetState = CalculateTargetBreathState();
+
+	if (ShouldTransitionBreathState())
+	{
+		TransitionBreathState();
+	}
 }
 
 void AALSXTCharacter::NotifyControllerChanged()
@@ -713,6 +720,8 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 {
 	if (CanAim())
 	{
+		SetDesiredAiming(ActionValue.Get<bool>());
+
 		if (ActionValue.Get<bool>())
 		{
 			SetDesiredRotationMode(AlsRotationModeTags::Aiming);
@@ -727,7 +736,6 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Aiming);
 				}
 			}
-			SetDesiredAiming(ActionValue.Get<bool>());
 		}
 		else 
 		{
@@ -750,7 +758,6 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 			{
 				SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 			}
-			SetDesiredAiming(ActionValue.Get<bool>());
 		}
 	}
 }
@@ -1130,17 +1137,42 @@ void AALSXTCharacter::SetBreathState(const FALSXTBreathState& NewBreathState)
 {
 	const auto PreviousBreathState{ BreathState };
 
-	BreathState = NewBreathState;
+	// BreathState = NewBreathState;
 
 	OnBreathStateChanged(PreviousBreathState);
 
-	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	// if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	// {
+	// 	ServerSetBreathState(NewBreathState);
+	// }
+
+	// if (GetLocalRole() >= ROLE_Authority)
+	// {
+	// 	BreathState = NewBreathState;
+	// }
+	// else
+	// {
+	// 	ServerSetBreathState(NewBreathState);
+	// }
+
+	// MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, BreathState, this)
+
+	if (GetLocalRole() >= ROLE_Authority)
+	{
+		ClientSetBreathState(NewBreathState);
+	}
+	else
 	{
 		ServerSetBreathState(NewBreathState);
 	}
 }
 
 void AALSXTCharacter::ServerSetBreathState_Implementation(const FALSXTBreathState& NewBreathState)
+{
+	SetBreathState(NewBreathState);
+}
+
+void AALSXTCharacter::ClientSetBreathState_Implementation(const FALSXTBreathState& NewBreathState)
 {
 	SetBreathState(NewBreathState);
 }
@@ -2775,6 +2807,76 @@ void AALSXTCharacter::SetWeaponObstruction(const FGameplayTag& NewWeaponObstruct
 }
 
 void AALSXTCharacter::OnWeaponObstructionChanged_Implementation(const FGameplayTag& PreviousWeaponObstructionTag) {}
+
+void AALSXTCharacter::UpdateBreathState()
+{
+	const float Stamina = GetStatusState().CurrentStamina;
+	if (this->Implements<UALSXTCharacterInterface>())
+	{
+		FGameplayTag BreathType = IALSXTCharacterInterface::Execute_GetBreathType(this);
+
+		if (ShouldTransitionBreathState())
+		{
+			FALSXTTargetBreathState NewTargetState = CalculateTargetBreathState();
+			BreathState.TargetState = NewTargetState;
+		}
+	}
+}
+
+bool AALSXTCharacter::ShouldUpdateBreathState() const
+{
+	FALSXTStatusState StatusState = IALSXTCharacterInterface::Execute_GetStatusState(this);
+	float CurrentStamina = IALSXTCharacterInterface::Execute_GetStamina(this);
+	return StatusState.CurrentStamina != CurrentStamina;
+}
+
+bool AALSXTCharacter::ShouldTransitionBreathState()
+{
+	return (GetBreathState().CurrentBreathAlpha != GetBreathState().TargetState.Alpha || GetBreathState().CurrentBreathRate != GetBreathState().TargetState.Rate);
+}
+
+
+FALSXTTargetBreathState AALSXTCharacter::CalculateTargetBreathState()
+{
+	FALSXTTargetBreathState NewTargetBreathState;
+
+	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::True)
+	{
+		NewTargetBreathState.Alpha = 0.0;
+		NewTargetBreathState.Rate = 0.0;
+		return NewTargetBreathState;
+	}
+	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::Released)
+	{
+		NewTargetBreathState.Alpha = 0.75;
+		NewTargetBreathState.Rate = 1.2;
+		return NewTargetBreathState;
+	}
+	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::Exhausted)
+	{
+		NewTargetBreathState.Alpha = 1.0;
+		NewTargetBreathState.Rate = 1.5;
+		return NewTargetBreathState;
+	}
+	else
+	{
+		FVector2D ConversionRange{ 0, 1 };
+		FVector2D UtilizedStaminaRange{ 0, ALSXTSettings->StatusSettings.StaminaThresholdSettings.StaminaOptimalThreshold };
+		float CurrentStaminaConverted = FMath::GetMappedRangeValueClamped(UtilizedStaminaRange, ConversionRange, IALSXTCharacterInterface::Execute_GetStatusState(this).CurrentStamina);
+		float PlayRateConverted = FMath::GetMappedRangeValueClamped(ConversionRange, IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(this).BreathAnimationPlayRateRange, CurrentStaminaConverted);
+		float BlendConverted = FMath::GetMappedRangeValueClamped(ConversionRange, IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(this).BreathAnimationBlendRange, CurrentStaminaConverted);
+		NewTargetBreathState.Alpha = BlendConverted;
+		NewTargetBreathState.Rate = PlayRateConverted;
+		NewTargetBreathState.TransitionRate = 1.0;
+		return NewTargetBreathState;
+	}
+}
+
+void AALSXTCharacter::TransitionBreathState()
+{
+	BreathState.CurrentBreathAlpha = BreathState.TargetState.Alpha;
+	BreathState.CurrentBreathRate = BreathState.TargetState.Rate;
+}
 
 void AALSXTCharacter::OnAIJumpObstacle_Implementation()
 {

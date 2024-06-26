@@ -17,6 +17,9 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	FGameplayTag ImpactReactionStage{FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	FGameplayTag CrowdNavigationPose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FDoubleHitResult CrowdNavigationHit;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")

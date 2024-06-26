@@ -61,14 +61,7 @@ void UALSXTAdvancedAnimationInstance::NativeUpdateAnimation(const float DeltaTim
 
 	if (GetOwningActor()->Implements<UALSXTFirearmInterface>())
 	{
-		FirearmAimState = IALSXTFirearmInterface::Execute_GetFirearmAimState(GetOwningActor());
-
-		if (IsValid(IALSXTFirearmInterface::Execute_GetFirearmDischargeEffectsState(GetOwningActor()).RecoilAsset))
-		{
-			RecoilState = IALSXTFirearmInterface::Execute_GetRecoilState(GetOwningActor());
-		}
-
-		
+		FirearmAimState = IALSXTFirearmInterface::Execute_GetFirearmAimState(GetOwningActor());		
 	}
 }
 

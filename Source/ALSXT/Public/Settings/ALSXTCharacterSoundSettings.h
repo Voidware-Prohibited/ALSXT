@@ -45,8 +45,17 @@ public:
 	TArray<FALSXTBreathSound> HoldingBreathSounds;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Sex} {Variant} {BreathType} {Stamina}", AllowPrivateAccess))
-	TArray<FALSXTBreathSound> ExhalingSounds;
-	
+	TArray<FALSXTBreathSound> ReleasingBreathSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Sex} {Variant} {BreathType} {Stamina}", AllowPrivateAccess))
+	TArray<FALSXTBreathSound> GaspingHoldingBreathSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Sex} {Variant} {BreathType} {Stamina}", AllowPrivateAccess))
+	TArray<FALSXTBreathSound> ExhuastedHoldingBreathSounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Sex} {Variant} {BreathType} {Stamina}", AllowPrivateAccess))
+	TArray<FALSXTBreathSound> CoughingBreathSounds;
+	 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Vocalizations", Meta = (TitleProperty = "{Strength} {Stamina} {Sound}", AllowPrivateAccess))
 	TArray<FALSXTCharacterActionSound> ActionSounds;
 

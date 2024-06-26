@@ -10,6 +10,7 @@
 #include "ALS/Public/Utility/AlsMacros.h"
 #include "Math/UnrealMathUtility.h"
 #include "Stats/Stats.h"
+#include "Interfaces/ALSXTFirearmInterface.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ALSXTAnimationInstance)
 
@@ -107,6 +108,16 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		HeldItemSettings = IALSXTHeldItemInterface::Execute_GetHeldItemSettings(GetOwningActor());
 		HeldItemState = IALSXTHeldItemInterface::Execute_GetHeldItemState(GetOwningActor());
 		DoesOverlayObjectUseLeftHandIK = IALSXTHeldItemInterface::Execute_GetHeldItemSettings(GetOwningActor()).UsesLeftHandIK;
+	}
+
+	if (GetOwningActor()->Implements<UALSXTFirearmInterface>())
+	{
+		if (IsValid(IALSXTFirearmInterface::Execute_GetFirearmDischargeEffectsState(GetOwningActor()).RecoilAsset))
+		{
+			RecoilState = IALSXTFirearmInterface::Execute_GetRecoilState(GetOwningActor());
+		}
+
+
 	}
 }
 
@@ -291,6 +302,18 @@ FALSXTTargetBreathState UALSXTAnimationInstance::CalculateTargetBreathState()
 	{
 		NewTargetBreathState.Alpha = 0.0;
 		NewTargetBreathState.Rate = 0.0;
+		return NewTargetBreathState;
+	}
+	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::Released)
+	{
+		NewTargetBreathState.Alpha = 0.75;
+		NewTargetBreathState.Rate = 1.2;
+		return NewTargetBreathState;
+	}
+	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::Exhausted)
+	{
+		NewTargetBreathState.Alpha = 1.0;
+		NewTargetBreathState.Rate = 1.5;
 		return NewTargetBreathState;
 	}
 	else

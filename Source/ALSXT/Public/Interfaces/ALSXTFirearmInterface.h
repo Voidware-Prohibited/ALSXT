@@ -32,4 +32,16 @@ public:
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Firearm Interface")
   TArray <FALSXTFirearmActionSound> GetFirearmActionSounds(const FGameplayTag& ActionType) const;
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Firearm Interface|Actions")
+  void ChargeFirearm();
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Firearm Interface|Actions")
+  void Reload();
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Firearm Interface|Actions")
+  void ReloadWithRetention();
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Firearm Interface|Actions")
+  void ClearWeaponMalfunction();
 };

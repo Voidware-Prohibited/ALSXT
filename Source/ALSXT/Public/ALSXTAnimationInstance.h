@@ -158,6 +158,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	bool DoesOverlayObjectUseLeftHandIK{ false };
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FALSXTRecoilState RecoilState;
+
 protected:
 	void RefreshALSXTPose();
 

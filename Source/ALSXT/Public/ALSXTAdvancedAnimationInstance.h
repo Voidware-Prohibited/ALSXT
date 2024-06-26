@@ -29,9 +29,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FALSXTFirearmAimState FirearmAimState;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	FALSXTRecoilState RecoilState;
-
 private:
 	void RefreshALSXTPose();
 
