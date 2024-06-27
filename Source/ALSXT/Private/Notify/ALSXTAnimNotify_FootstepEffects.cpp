@@ -92,7 +92,7 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 	TWeakObjectPtr<UPhysicalMaterial> HitPhysicalMaterial;
 
 #if ENABLE_DRAW_DEBUG
-	const auto bDisplayDebug{ false };
+	const auto bDisplayDebug{ true };
 #endif
 
 	FCollisionQueryParams QueryParameters{ ANSI_TO_TCHAR(__FUNCTION__), true, Mesh->GetOwner() };

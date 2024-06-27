@@ -177,7 +177,7 @@ bool UALSXTAnimationInstance::IsRotateInPlaceAllowed()
 {
 	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
 	{
-		return Super::IsRotateInPlaceAllowed() && IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor()) != ALSXTFreelookingTags::True;
+		return Super::IsRotateInPlaceAllowed() && Freelooking != ALSXTFreelookingTags::True;
 	}
 	else
 	{
@@ -189,7 +189,7 @@ bool UALSXTAnimationInstance::IsTurnInPlaceAllowed()
 {
 	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
 	{
-		return Super::IsTurnInPlaceAllowed() && IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor()) != ALSXTFreelookingTags::True;
+		return Super::IsTurnInPlaceAllowed() && Freelooking != ALSXTFreelookingTags::True;
 	}
 	else
 	{

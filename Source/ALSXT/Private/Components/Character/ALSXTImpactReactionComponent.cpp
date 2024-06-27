@@ -110,6 +110,8 @@ void UALSXTImpactReactionComponent::OnRagdollingStarted()
 {
 	if (PreviousImpacts.IsEmpty() && PreviousAttackImpacts.IsEmpty())
 	{
+		FDoubleHitResult LastImpact;
+		StartImpactFall(LastImpact);
 		return;
 	}
 	else
@@ -2188,7 +2190,7 @@ void UALSXTImpactReactionComponent::StartImpactFall(FDoubleHitResult Hit)
 	FActionMontageInfo SelectedAttackFall = SelectImpactFallMontage(Hit);
 	Montage = SelectedAttackFall;
 
-	if ((!ALS_ENSURE(IsValid(Montage.Montage)) || !IsAttackFallAllowedToStart(Montage.Montage)) && ImpactReactionSettings.DebugMode)
+	if ((!ALS_ENSURE(IsValid(Montage.Montage)) || !IsImpactFallAllowedToStart(Montage.Montage)) && ImpactReactionSettings.DebugMode)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Impact Fall Montage Invalid"));
 		return;

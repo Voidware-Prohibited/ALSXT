@@ -205,6 +205,18 @@ namespace ALSXTHoldingBreathTags
 	UE_DEFINE_GAMEPLAY_TAG(Coughing, TEXT("Als.Holding Breath.Coughing"))
 }
 
+namespace ALSXTFootwearType
+{
+	UE_DEFINE_GAMEPLAY_TAG(Barefoot, TEXT("Als.Footwear Type.Barefoot"))
+	UE_DEFINE_GAMEPLAY_TAG(Sandals, TEXT("Als.Footwear Type.Sandals"))
+	UE_DEFINE_GAMEPLAY_TAG(Sneakers, TEXT("Als.Footwear Type.Sneakers"))
+	UE_DEFINE_GAMEPLAY_TAG(DressShoes, TEXT("Als.Footwear Type.Dress Shoes"))
+	UE_DEFINE_GAMEPLAY_TAG(WorkBoots, TEXT("Als.Footwear Type.Work Boots"))
+	UE_DEFINE_GAMEPLAY_TAG(HikingBoots, TEXT("Als.Footwear Type.Hiking Boots"))
+	UE_DEFINE_GAMEPLAY_TAG(MilitaryBoots, TEXT("Als.Footwear Type.Military Boots"))
+	UE_DEFINE_GAMEPLAY_TAG(TacticalBoots, TEXT("Als.Footwear Type.Tactical Boots"))
+}
+
 namespace ALSXTCursorLocationTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(ScreenCenter, TEXT("Als.Cursor Location.Screen Center"))
@@ -220,7 +232,6 @@ namespace ALSXTObjectCollisionTypeTags
 	UE_DEFINE_GAMEPLAY_TAG(Drag, TEXT("Game.Object Collision Type.Drag"))
 	UE_DEFINE_GAMEPLAY_TAG(Roll, TEXT("Game.Object Collision Type.Roll"))
 }
-
 
 namespace ALSXTImpactTypeTags
 {

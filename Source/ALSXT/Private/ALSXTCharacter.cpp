@@ -392,6 +392,13 @@ void AALSXTCharacter::Tick(const float DeltaTime)
 
 	BreathState.TargetState = CalculateTargetBreathState();
 
+	if (IsHoldingAimableItem() && ((GetDesiredCombatStance() == ALSXTCombatStanceTags::Ready) || (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming)))
+	{
+		FALSXTAimState NewAimState = GetAimState();
+		// OverlaySkeletalMesh->GetSock
+		// NewAimState.CurrentHeadTargetTransform.Location = IALSXTCharacterInterface::Execute_GetCharacterFirearmSightLocation(this);
+	}
+
 	if (ShouldTransitionBreathState())
 	{
 		TransitionBreathState();

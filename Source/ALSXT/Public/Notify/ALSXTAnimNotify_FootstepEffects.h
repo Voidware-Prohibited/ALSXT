@@ -59,12 +59,28 @@ struct ALSXT_API FALSXTFootstepParticles
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTFootstepSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	FGameplayTagContainer FootwearType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TSoftObjectPtr<USoundBase> Sound;
+
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTFootstepEffectSettings
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TSoftObjectPtr<USoundBase> Sound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TArray<FALSXTFootstepSound> Sounds;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	EALSXTFootstepSoundSpawnType SoundSpawnType{EALSXTFootstepSoundSpawnType::SpawnAtTraceHitLocation};
@@ -221,6 +237,9 @@ class ALSXT_API UALSXTAnimNotify_FootstepEffects : public UAnimNotify
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess))
 	TWeakObjectPtr<UPhysicalMaterial> FootstepSoleSurfaceType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess))
+	FGameplayTag PreviewFootstepSoleSurfaceType;
 
 public:
 	virtual FString GetNotifyName_Implementation() const override;
