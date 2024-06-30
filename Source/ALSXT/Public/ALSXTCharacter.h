@@ -1305,7 +1305,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFreelookingTag"))
 	void SetDesiredFreelooking(const FGameplayTag& NewFreelookingTag);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Movement System")
 	bool CanFreelook() const;
 
 private:

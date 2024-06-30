@@ -392,7 +392,7 @@ void AALSXTCharacter::Tick(const float DeltaTime)
 
 	BreathState.TargetState = CalculateTargetBreathState();
 
-	if (IsHoldingAimableItem() && ((GetDesiredCombatStance() == ALSXTCombatStanceTags::Ready) || (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming)))
+	if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this) && ((GetDesiredCombatStance() == ALSXTCombatStanceTags::Ready) || (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming)))
 	{
 		FALSXTAimState NewAimState = GetAimState();
 		// OverlaySkeletalMesh->GetSock
@@ -955,6 +955,8 @@ void AALSXTCharacter::InputSelectGesture(const FInputActionValue& ActionValue)
 		//
 	}
 }
+
+bool AALSXTCharacter::CanFreelook_Implementation() const {return true;}
 
 void AALSXTCharacter::ALSXTRefreshRotationInstant(const float TargetYawAngle, const ETeleportType Teleport)
 {
