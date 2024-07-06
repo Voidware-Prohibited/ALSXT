@@ -533,6 +533,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FALSXTHeadLookAtState& GetHeadLookAtState() const;
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	bool CanHeadLookAt() const;
+
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHeadLookAtState"))
 	void SetHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState);
 

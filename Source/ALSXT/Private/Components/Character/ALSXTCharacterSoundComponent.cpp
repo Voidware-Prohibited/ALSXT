@@ -174,129 +174,82 @@ void UALSXTCharacterSoundComponent::SetNewSound(UObject* Sound, TArray<UObject*>
 
 void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTag& StaminaOverride)
 {	
-	// if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
-	// {
-	// 	return;
-	// }
-
-	// V2
-	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
 	{
-		// Server
-		ServerPlayCharacterBreathEffects(StaminaOverride);
-	}
-	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
-	{
-		// Reg
-		MulticastPlayCharacterBreathEffects(StaminaOverride);
+		return;
 	}
 
-	 if (IsValid(VocalizationMixerAudioComponent))
-	 {	
-	 	UpdateStaminaThresholds();
-	 	bool StaminaTagChanged;
-	 	UpdateStamina(StaminaTagChanged);
-	 	FGameplayTag StaminaToUse{ (StaminaOverride != FGameplayTag::EmptyTag) ? StaminaOverride : CurrentStaminaTag};
-	 	UpdateVoiceSocketLocation();
-	 
-	 	// If New
-	 	if (StaminaTagChanged || StaminaToUse != CurrentStaminaTag || CurrentBreathSounds.IsEmpty())
-	 	{				
-	 		if (CanPlayBreathSound() && ShouldPlayBreathSound() && IsValid(VocalizationMixerAudioComponent))
-	 		{
-	 			// Get and Set New Sounds
-	 			UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
-	 			CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), ALSXTVoiceVariantTags::Default, ALSXTBreathTypeTags::Regular, StaminaOverride);
-	 			TArray<FSound> Sounds;
-	 
-	 			for (FALSXTBreathSound BS : CurrentBreathSounds)
-	 			{
-	 				Sounds.Append(BS.Sounds);
-	 			}
-	 
-	 			if (Sounds.IsValidIndex(0))
-	 			{
-	 				FSound NewBreathSound;
-	 				DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-	 				float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-	 				CurrentBreathSound = NewBreathSound;
-	 				SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-	 				VocalizationMixerAudioComponent->SetObjectParameter("BreathSound", NewBreathSound.Sound);
-	 				VocalizationMixerAudioComponent->SetFloatParameter("Pitch", Pitch);
-	 
-	 				if (GetOwner()->GetRemoteRole() == ROLE_Authority)
-	 				{
-	 					VocalizationMixerAudioComponent->SetBoolParameter("Player", true);
-	 				}
-	 
-	 				VocalizationMixerAudioComponent->SetTriggerParameter("BreathInput");
-	 				GetOwner()->MakeNoise(1.0, Cast<APawn>(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), 10, "Vocal");
-	 				OnVocalization.Broadcast(NewBreathSound);
-	 				//OnVocalization(NewBreathSound);
-	 			}
-	 		}
-	 		if (IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
-	 		{
-	 			UE_LOG(LogTemp, Warning, TEXT("SelectNewBreathParticles"));
-	 			CurrentBreathParticles = SelectBreathParticles(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner()), StaminaToUse);
-	 			if (CurrentBreathParticles.IsValidIndex(0))
-	 			{
-	 				UpdateVoiceSocketRotation();
-	 				UNiagaraSystem* NiagaraSystem { (CurrentBreathParticles.Num() > 1)? DetermineNewBreathParticle() : CurrentBreathParticles [0]};
-	 				ServerPlayBreathParticle(NiagaraSystem);
-	 			}
-	 		}
-	 	}
-	 	else // If Same
-	 	{
-	 		
-	 		if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound() && IsValid(VocalizationMixerAudioComponent))
-	 		{
-	 			TArray<FSound> Sounds;
-	 
-	 			for (FALSXTBreathSound BS : CurrentBreathSounds)
-	 			{
-	 				Sounds.Append(BS.Sounds);
-	 			}
-	 
-	 			if (Sounds.IsValidIndex(0))
-	 			{
-	 				FSound NewBreathSound;
-	 				DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-	 				float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-	 				CurrentBreathSound = NewBreathSound;
-	 				SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-	 				VocalizationMixerAudioComponent->SetObjectParameter("BreathSound", NewBreathSound.Sound);
-	 				VocalizationMixerAudioComponent->SetFloatParameter("Pitch", Pitch);
-	 
-	 				if (GetOwner()->GetRemoteRole() == ROLE_Authority)
-	 				{
-	 					VocalizationMixerAudioComponent->SetBoolParameter("Player", true);
-	 				}
-	 
-	 				VocalizationMixerAudioComponent->SetTriggerParameter("BreathInput");
-	 				GetOwner()->MakeNoise(1.0, Cast<APawn>(GetOwner()), VoiceSocketLocation, 10, "Vocal");
-	 				// OnVocalization(NewBreathSound);
-	 				OnVocalization.Broadcast(NewBreathSound);
-	 			}
-	 		}
-	 		if (IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
-	 		{
-	 			if (CurrentBreathParticles.IsValidIndex(0))
-	 			{
-	 				UpdateVoiceSocketRotation();
-	 				UE_LOG(LogTemp, Warning, TEXT("SelectFromExistingBreathParticles"));
-	 				UNiagaraSystem* NiagaraSystem{ (CurrentBreathParticles.Num() > 1) ? DetermineNewBreathParticle() : CurrentBreathParticles[0] };
-	 				ServerPlayBreathParticle(NiagaraSystem);
-	 			}
-	 		}
-	 
-	 	}
-	 }
-	 else
-	 {
-	 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlayCharacterBreathEffects: VocalizationMixerAudioComponent not valid");
-	 }
+	if (CanPlayBreathSound() && ShouldPlayBreathSound())
+	{
+		UpdateStaminaThresholds();
+		bool StaminaTagChanged;
+		UpdateStamina(StaminaTagChanged);
+		FGameplayTag StaminaToUse{ (StaminaOverride != FGameplayTag::EmptyTag) ? StaminaOverride : CurrentStaminaTag };
+		UpdateVoiceSocketLocation();
+		FMotionSounds NewMotionSounds;
+
+		// If New
+		if (StaminaTagChanged || StaminaToUse != CurrentStaminaTag || CurrentBreathSounds.IsEmpty())
+		{
+			if (CanPlayBreathSound() && ShouldPlayBreathSound())
+			{
+				// Get and Set New Sounds
+				UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
+				CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), ALSXTVoiceVariantTags::Default, ALSXTBreathTypeTags::Regular, StaminaOverride);
+				TArray<FSound> Sounds;
+
+				for (FALSXTBreathSound BS : CurrentBreathSounds)
+				{
+					Sounds.Append(BS.Sounds);
+				}
+
+				if (Sounds.IsValidIndex(0))
+				{
+					FSound NewBreathSound;
+					DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
+					float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
+					CurrentBreathSound = NewBreathSound;
+					SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
+				}
+				NewMotionSounds.BreathSounds = Sounds;
+			}
+		}
+		else // If Same
+		{
+
+			if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
+			{
+				TArray<FSound> Sounds;
+
+				for (FALSXTBreathSound BS : CurrentBreathSounds)
+				{
+					Sounds.Append(BS.Sounds);
+				}
+
+				if (Sounds.IsValidIndex(0))
+				{
+					FSound NewBreathSound;
+					DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
+					float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
+					CurrentBreathSound = NewBreathSound;
+					SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
+				}
+				NewMotionSounds.BreathSounds = Sounds;
+			}
+		}
+
+		// V2
+		if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+		{
+			// Server
+			ServerPlaySound(NewMotionSounds);
+		}
+		else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+		{
+			// Reg
+			PlaySound(NewMotionSounds);
+		}
+	}
 
 	///////////////////////////////
 
@@ -358,6 +311,8 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTa
 	// 	// Reg
 	// 	PlaySound(MotionSounds);
 	// }
+
+	//
 
 }
 
@@ -1927,8 +1882,20 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 			GetOwner()->MakeNoise(1.0, Cast<APawn>(GetOwner()), VoiceSocketLocation, 10, "Vocal");
 			// OnVocalization(NewBreathSound);
 			OnVocalization.Broadcast(NewBreathSound);
-			// CurrentBreathParticles = SelectBreathParticles(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner()), CurrentStaminaTag);
-			// UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(DetermineNewBreathParticle(), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), GeneralCharacterSoundSettings.VoiceSocketName, NewVoiceSocketLocation, NewVoiceSocketRotation, EAttachLocation::KeepRelativeOffset, true, true, ENCPoolMethod::None, true);
+			
+			if (IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("SelectNewBreathParticles"));
+				FGameplayTag NewStaminaTag{ ConvertStaminaToStaminaTag(IALSXTCharacterInterface::Execute_GetStamina(GetOwner())) };
+				CurrentBreathParticles = SelectBreathParticles(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner()), NewStaminaTag);
+				if (CurrentBreathParticles.IsValidIndex(0))
+				{
+					UpdateVoiceSocketRotation();
+					UNiagaraSystem* NiagaraSystem{ (CurrentBreathParticles.Num() > 1) ? DetermineNewBreathParticle() : CurrentBreathParticles[0] };
+					UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystem, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), GeneralCharacterSoundSettings.VoiceSocketName, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), EAttachLocation::KeepWorldPosition, true, true, ENCPoolMethod::None, true);
+					// ServerPlayBreathParticle(NiagaraSystem);
+				}
+			}
 			
 		}
 

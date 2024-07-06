@@ -200,12 +200,6 @@ protected:
 	virtual bool IsTurnInPlaceAllowed() override;
 
 	void UpdateStatusState();
-	void UpdateBreathState();
-	bool ShouldUpdateBreathState() const;
-	bool ShouldTransitionBreathState();
-	FALSXTTargetBreathState CalculateTargetBreathState();
-	void SetTargetBreathState(FALSXTTargetBreathState NewTargetBreathState);
-	void TransitionBreathState();
 };
 
 inline UALSXTAnimationInstanceSettings* UALSXTAnimationInstance::GetALSXTSettingsUnsafe() const

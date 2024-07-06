@@ -91,7 +91,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		StatusState = IALSXTCharacterInterface::Execute_GetStatusState(GetOwningActor());
 		DefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwningActor());
 		WeaponObstruction = IALSXTCharacterInterface::Execute_GetCharacterWeaponObstruction(GetOwningActor());
-		BreathState.HoldingBreath = IALSXTCharacterInterface::Execute_GetCharacterHoldingBreath(GetOwningActor());
+		BreathState = IALSXTCharacterInterface::Execute_GetCharacterBreathState(GetOwningActor());
 		// ReloadingType = IALSXTCharacterInterface::Execute_GetCharacterReloadingType(GetOwningActor());
 		
 	}
@@ -130,16 +130,6 @@ void UALSXTAnimationInstance::NativeThreadSafeUpdateAnimation(const float DeltaT
 	{
 		return;
 	}
-
-	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
-	{
-		BreathState.TargetState = CalculateTargetBreathState();
-
-		if (ShouldTransitionBreathState())
-		{
-			TransitionBreathState();
-		}
-	}
 }
 
 void UALSXTAnimationInstance::NativePostEvaluateAnimation()
@@ -177,7 +167,7 @@ bool UALSXTAnimationInstance::IsRotateInPlaceAllowed()
 {
 	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
 	{
-		return Super::IsRotateInPlaceAllowed() && Freelooking != ALSXTFreelookingTags::True;
+		return Super::IsRotateInPlaceAllowed() && IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor()) != ALSXTFreelookingTags::True;
 	}
 	else
 	{
@@ -189,7 +179,7 @@ bool UALSXTAnimationInstance::IsTurnInPlaceAllowed()
 {
 	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
 	{
-		return Super::IsTurnInPlaceAllowed() && Freelooking != ALSXTFreelookingTags::True;
+		return Super::IsTurnInPlaceAllowed() && IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor()) != ALSXTFreelookingTags::True;
 	}
 	else
 	{
@@ -250,88 +240,6 @@ void UALSXTAnimationInstance::UpdateStatusState()
 		if (NewStatusState != StatusState)
 		{
 			StatusState = NewStatusState;
-			if (StatusState.CurrentStatus == ALSXTStatusTags::Dead)
-			{
-				BreathState.CurrentBreathRate = 0.0;
-				BreathState.CurrentBreathAlpha = 0.0;
-				BreathState.TargetState.Alpha = 0.0;
-				BreathState.TargetState.Rate = 0.0;
-				BreathState.TargetState.TransitionRate = 1.0;
-			}
 		}
 	}
-}
-
-void UALSXTAnimationInstance::UpdateBreathState()
-{
-	const float Stamina = StatusState.CurrentStamina;
-	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
-	{
-		FGameplayTag BreathType = IALSXTCharacterInterface::Execute_GetBreathType(ALSXTCharacter);
-
-		if (ShouldTransitionBreathState())
-		{
-			FALSXTTargetBreathState NewTargetState = CalculateTargetBreathState();
-			BreathState.TargetState = NewTargetState;
-		}
-	}
-}
-
-bool UALSXTAnimationInstance::ShouldUpdateBreathState() const
-{
-	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
-	{
-		return StatusState.CurrentStamina != IALSXTCharacterInterface::Execute_GetStamina(ALSXTCharacter);
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool UALSXTAnimationInstance::ShouldTransitionBreathState()
-{
-	return (BreathState.CurrentBreathAlpha != BreathState.TargetState.Alpha || BreathState.CurrentBreathRate != BreathState.TargetState.Rate);
-}
-
-FALSXTTargetBreathState UALSXTAnimationInstance::CalculateTargetBreathState()
-{
-	FALSXTTargetBreathState NewTargetBreathState;
-
-	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::True)
-	{
-		NewTargetBreathState.Alpha = 0.0;
-		NewTargetBreathState.Rate = 0.0;
-		return NewTargetBreathState;
-	}
-	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::Released)
-	{
-		NewTargetBreathState.Alpha = 0.75;
-		NewTargetBreathState.Rate = 1.2;
-		return NewTargetBreathState;
-	}
-	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::Exhausted)
-	{
-		NewTargetBreathState.Alpha = 1.0;
-		NewTargetBreathState.Rate = 1.5;
-		return NewTargetBreathState;
-	}
-	else
-	{
-		FVector2D ConversionRange{ 0, 1 };
-		FVector2D UtilizedStaminaRange{ 0, StaminaThresholdSettings.StaminaOptimalThreshold };
-		float CurrentStaminaConverted = FMath::GetMappedRangeValueClamped(UtilizedStaminaRange, ConversionRange, StatusState.CurrentStamina);
-		float PlayRateConverted = FMath::GetMappedRangeValueClamped(ConversionRange, CharacterBreathEffectsSettings.BreathAnimationPlayRateRange, CurrentStaminaConverted);
-		float BlendConverted = FMath::GetMappedRangeValueClamped(ConversionRange, CharacterBreathEffectsSettings.BreathAnimationBlendRange, CurrentStaminaConverted);
-		NewTargetBreathState.Alpha = BlendConverted;
-		NewTargetBreathState.Rate = PlayRateConverted;
-		NewTargetBreathState.TransitionRate = 1.0;
-		return NewTargetBreathState;
-	}
-}
-
-void UALSXTAnimationInstance::TransitionBreathState()
-{
-	BreathState.CurrentBreathAlpha = BreathState.TargetState.Alpha;
-	BreathState.CurrentBreathRate = BreathState.TargetState.Rate;
 }

@@ -2,6 +2,7 @@
 
 #include "ALSXTCharacterMovementComponent.h"
 #include "Utility/ALSXTGameplayTags.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
 
 void UALSXTCharacterMovementComponent::BeginPlay()
 {
@@ -12,7 +13,7 @@ FVector UALSXTCharacterMovementComponent::ConsumeInputVector()
 {
 	// return Super::ConsumeInputVector();
 
-	if (Cast<AALSXTCharacter>(GetOwner())->GetDesiredStatus() == ALSXTStatusTags::Normal)
+	if (IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::Normal)
 	{
 		return Super::ConsumeInputVector();
 	}

@@ -244,6 +244,28 @@ void AALSXTCharacterAdvanced::SetDesiredHoldingBreath(const FGameplayTag& NewHol
 	}
 }
 
+FGameplayTag AALSXTCharacterAdvanced::CalculateBreathReleaseMode() const
+{
+	FALSXTBreathState NewBreathState = GetBreathState();
+	FGameplayTag ReleaseBreathMode;
+	float RemainingBreath = NewBreathState.CurrentMaxHoldBreathTime - NewBreathState.CurrentHoldBreathTime;
+
+	if (RemainingBreath > (NewBreathState.CurrentMaxHoldBreathTime * 0.6))
+	{
+		ReleaseBreathMode = ALSXTHoldingBreathTags::Released;
+	}
+	if ((RemainingBreath >= (NewBreathState.CurrentMaxHoldBreathTime * 0.1)) && (RemainingBreath <= (NewBreathState.CurrentMaxHoldBreathTime * 0.6)))
+	{
+		ReleaseBreathMode = ALSXTHoldingBreathTags::Gasping;
+	}
+	if (RemainingBreath < (NewBreathState.CurrentMaxHoldBreathTime * 0.1))
+	{
+		ReleaseBreathMode = ALSXTHoldingBreathTags::Exhausted;
+	}
+
+	return ReleaseBreathMode;
+}
+
 void AALSXTCharacterAdvanced::ServerSetDesiredHoldingBreath_Implementation(const FGameplayTag& NewHoldingBreathTag)
 {
 	SetDesiredHoldingBreath(NewHoldingBreathTag);
@@ -255,14 +277,7 @@ void AALSXTCharacterAdvanced::SetHoldingBreath(const FGameplayTag& NewHoldingBre
 	if (HoldingBreath != NewHoldingBreathTag)
 	{
 		const auto PreviousHoldingBreath{ HoldingBreath };
-
 		HoldingBreath = NewHoldingBreathTag;
-		FALSXTBreathState NewBreathState = GetBreathState();
-		NewBreathState.HoldingBreath = NewHoldingBreathTag;
-		NewBreathState.CurrentMaxHoldBreathTime = CalculateHoldBreathTimer();
-		SetBreathState(NewBreathState);
-		GetWorld()->GetTimerManager().SetTimer(HoldBreathTimerHandle, HoldBreathTimerDelegate, 0.1f, true);
-
 		OnHoldingBreathChanged(PreviousHoldingBreath);
 	}
 }
@@ -308,21 +323,6 @@ void AALSXTCharacterAdvanced::InputAcrobaticAction(const FInputActionValue& Acti
 	}
 }
 
-void AALSXTCharacterAdvanced::InputHoldBreath(const FInputActionValue& ActionValue)
-{
-	if (CanHoldBreath())
-	{
-		if (ActionValue.Get<bool>())
-		{
-			BeginHoldBreathTimer();
-		}
-		else
-		{
-			EndHoldBreathTimer();
-		}
-	}
-}
-
 void AALSXTCharacterAdvanced::InputChargeFirearm()
 {
 	// 
@@ -358,12 +358,35 @@ void AALSXTCharacterAdvanced::InputTargetLock(const FInputActionValue& ActionVal
 
 void AALSXTCharacterAdvanced::InputSwitchTargetLeft()
 {
-	Combat->GetTargetLeft();
+	if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming && GetTargetableOverlayModes().HasTag(GetOverlayMode()))
+	{
+		Combat->GetTargetLeft();
+	}
 }
 
 void AALSXTCharacterAdvanced::InputSwitchTargetRight()
 {
-	Combat->GetTargetRight();
+	if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming && GetTargetableOverlayModes().HasTag(GetOverlayMode()))
+	{
+		Combat->GetTargetRight();
+	}
+}
+
+void AALSXTCharacterAdvanced::InputHoldBreath(const FInputActionValue& ActionValue)
+{
+	if (ActionValue.Get<bool>() == true)
+	{
+		if (CanHoldBreath())
+		{
+			SetDesiredHoldingBreath(ALSXTHoldingBreathTags::True);
+			BeginHoldBreathTimer();
+		}
+	}
+	else
+	{
+		SetDesiredHoldingBreath(CalculateBreathReleaseMode());
+		EndHoldBreathTimer();
+	}
 }
 
 float AALSXTCharacterAdvanced::CalculateHoldBreathTimer()
@@ -373,9 +396,10 @@ float AALSXTCharacterAdvanced::CalculateHoldBreathTimer()
 
 void AALSXTCharacterAdvanced::BeginHoldBreathTimer()
 {
-	SetDesiredHoldingBreath(ALSXTHoldingBreathTags::True);
 	FALSXTBreathState NewBreathState = GetBreathState();
 	NewBreathState.HoldingBreath = ALSXTHoldingBreathTags::True;
+	NewBreathState.PreviousBreathRate = NewBreathState.CurrentBreathRate;
+	NewBreathState.PreviousBreathAlpha = NewBreathState.CurrentBreathAlpha;
 	NewBreathState.CurrentMaxHoldBreathTime = CalculateHoldBreathTimer();
 	SetBreathState(NewBreathState);
 	GetWorld()->GetTimerManager().SetTimer(HoldBreathTimerHandle, HoldBreathTimerDelegate, 0.1f, true);
@@ -383,17 +407,19 @@ void AALSXTCharacterAdvanced::BeginHoldBreathTimer()
 
 void AALSXTCharacterAdvanced::HoldBreathTimer()
 {
+	if (GetDesiredHoldingBreath() != ALSXTHoldingBreathTags::True)
+	{
+		SetDesiredHoldingBreath(CalculateBreathReleaseMode());
+		EndHoldBreathTimer();
+	}
+
 	FALSXTBreathState NewBreathState = GetBreathState();
 	NewBreathState.CurrentHoldBreathTime = NewBreathState.CurrentHoldBreathTime + 0.1f;
 	SetBreathState(NewBreathState);
 
-	// if (InputHoldBreath().ActionValue.Get<bool>())
-	// {
-	// 
-	// }
-
 	if (BreathState.CurrentHoldBreathTime >= BreathState.CurrentMaxHoldBreathTime)
 	{
+		SetDesiredHoldingBreath(CalculateBreathReleaseMode());
 		EndHoldBreathTimer();
 	}
 }
@@ -401,25 +427,9 @@ void AALSXTCharacterAdvanced::HoldBreathTimer()
 void AALSXTCharacterAdvanced::EndHoldBreathTimer()
 {
 	FALSXTBreathState NewBreathState = GetBreathState();
-	FGameplayTag ReleaseBreathMode;
-	float RemainingBreath = NewBreathState.CurrentMaxHoldBreathTime - NewBreathState.CurrentHoldBreathTime;	
-
-	if (RemainingBreath <= (NewBreathState.CurrentMaxHoldBreathTime * 0.1))
-	{
-		ReleaseBreathMode = ALSXTHoldingBreathTags::Exhausted;
-	}
-	if ((RemainingBreath >= (NewBreathState.CurrentMaxHoldBreathTime * 0.1)) && (RemainingBreath <= (NewBreathState.CurrentMaxHoldBreathTime * 0.6)))
-	{
-		ReleaseBreathMode = ALSXTHoldingBreathTags::Gasping;
-	}
-	if (RemainingBreath >= (NewBreathState.CurrentMaxHoldBreathTime * 0.6))
-	{
-		ReleaseBreathMode = ALSXTHoldingBreathTags::Released;
-	}
-	SetDesiredHoldingBreath(ReleaseBreathMode);
 	NewBreathState.CurrentHoldBreathTime = 0.0f;
 	NewBreathState.CurrentMaxHoldBreathTime = 0.0f;
-	NewBreathState.HoldingBreath = ReleaseBreathMode;
+	NewBreathState.HoldingBreath = GetDesiredHoldingBreath();
 	SetBreathState(NewBreathState);
 	GetWorld()->GetTimerManager().ClearTimer(HoldBreathTimerHandle);
 }

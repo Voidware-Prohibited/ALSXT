@@ -390,14 +390,14 @@ void AALSXTCharacter::Tick(const float DeltaTime)
 		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), Angle));
 	}
 
-	BreathState.TargetState = CalculateTargetBreathState();
-
 	if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this) && ((GetDesiredCombatStance() == ALSXTCombatStanceTags::Ready) || (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming)))
 	{
 		FALSXTAimState NewAimState = GetAimState();
 		// OverlaySkeletalMesh->GetSock
 		// NewAimState.CurrentHeadTargetTransform.Location = IALSXTCharacterInterface::Execute_GetCharacterFirearmSightLocation(this);
 	}
+
+	BreathState.TargetState = CalculateTargetBreathState();
 
 	if (ShouldTransitionBreathState())
 	{
@@ -554,7 +554,7 @@ void AALSXTCharacter::InputLookMouse(const FInputActionValue& ActionValue)
 
 	if (Freelooking == ALSXTFreelookingTags::True)
 	{
-		Value = HeadLookAtState.LockedLookInput;
+		Value = FreelookState.LockedLookInput;
 	}
 	else
 	{
@@ -578,7 +578,7 @@ void AALSXTCharacter::InputLook(const FInputActionValue& ActionValue)
 
 	if (Freelooking == ALSXTFreelookingTags::True)
 	{
-		Value = HeadLookAtState.LockedLookInput;
+		Value = FreelookState.LockedLookInput;
 	}
 	else
 	{
@@ -616,7 +616,7 @@ void AALSXTCharacter::InputMove(const FInputActionValue& ActionValue)
 			// AddMovementInput(HeadLookAtState.PreviousControlRotation.Yaw * Value.Y + RightDirection * Value.X);
 			
 			// const auto FreelookForwardDirection{ UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetHeadLookAtState().LockedViewState.Rotation.Yaw)) };
-			ForwardDirection = UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetHeadLookAtState().LockedViewState.Rotation.Yaw));
+			ForwardDirection = UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(GetFreelookState().LockedViewState.Rotation.Yaw));
 			RightDirection = UAlsVector::PerpendicularCounterClockwiseXY(ForwardDirection);
 			AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
 			MovementInput = ForwardDirection * Value.Y + RightDirection * Value.X;
@@ -1145,10 +1145,13 @@ void AALSXTCharacter::ResetPaintOnAllComponents_Implementation() const
 void AALSXTCharacter::SetBreathState(const FALSXTBreathState& NewBreathState)
 {
 	const auto PreviousBreathState{ BreathState };
-
-	// BreathState = NewBreathState;
-
+	BreathState = NewBreathState;
 	OnBreathStateChanged(PreviousBreathState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetBreathState(NewBreathState);
+	}
 
 	// if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
 	// {
@@ -1166,14 +1169,6 @@ void AALSXTCharacter::SetBreathState(const FALSXTBreathState& NewBreathState)
 
 	// MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, BreathState, this)
 
-	if (GetLocalRole() >= ROLE_Authority)
-	{
-		ClientSetBreathState(NewBreathState);
-	}
-	else
-	{
-		ServerSetBreathState(NewBreathState);
-	}
 }
 
 void AALSXTCharacter::ServerSetBreathState_Implementation(const FALSXTBreathState& NewBreathState)
@@ -1523,7 +1518,7 @@ bool AALSXTCharacter::IsFirstPersonEyeFocusActive() const
 {
 	if (GetViewMode() == AlsViewModeTags::FirstPerson) 
 	{
-		if (IsDesiredAiming()) 
+		if (GetDesiredFocus() == ALSXTFocusedTags::True) 
 		{
 			if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this))
 			{
@@ -1632,14 +1627,14 @@ void AALSXTCharacter::ActivateFreelooking()
 	PreviousYaw = FMath::GetMappedRangeValueClamped(FVector2D(0, 359.998993), FVector2D(0.0, 1.0), GetControlRotation().Yaw);
 	//FMath::GetMappedRangeValueClamped(FVector2D(-90,90), FVector2D(0,1), GetViewState().Rotation.Pitch)
 	PreviousPitch = FMath::GetMappedRangeValueClamped(FVector2D(89.900002, -89.899994), FVector2D(0.0, 1.0), GetViewState().Rotation.Pitch);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("%f"), GetControlRotation().Yaw));
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), PreviousYaw));
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("%f"), GetControlRotation().Yaw));
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), PreviousYaw));
 	// LockRotation(GetActorRotation().Yaw);
 	SetDesiredFreelooking(ALSXTFreelookingTags::True);
-	FALSXTHeadLookAtState NewHeadLookAtState = GetHeadLookAtState();
-	NewHeadLookAtState.LockedControlRotation = GetControlRotation();
-	NewHeadLookAtState.LockedViewState = GetViewState();
-	SetHeadLookAtState(NewHeadLookAtState);
+	FALSXTFreelookState NewFreelookState = GetFreelookState();
+	NewFreelookState.LockedControlRotation = GetControlRotation();
+	NewFreelookState.LockedViewState = GetViewState();
+	SetFreelookState(NewFreelookState);
 }
 
 void AALSXTCharacter::DeactivateFreelooking()
@@ -1679,14 +1674,20 @@ void AALSXTCharacter::SetFreelooking(const FGameplayTag& NewFreelookingTag)
 		const auto PreviousFreelooking{ Freelooking };
 
 		Freelooking = NewFreelookingTag;
+		FALSXTFreelookState NewState = GetFreelookState();
 
 		if (NewFreelookingTag == ALSXTFreelookingTags::True)
 		{
 			// FreelookTimerHandle.IsValid()
+			
+			NewState.Freelooking = ALSXTFreelookingTags::True;
+			SetFreelookState(NewState);
 			BeginFreelookTimer();
 		}
 		if (NewFreelookingTag == ALSXTFreelookingTags::False)
 		{
+			NewState.Freelooking = ALSXTFreelookingTags::False;
+			SetFreelookState(NewState);
 			EndFreelookTimer();
 		}
 
@@ -2106,8 +2107,8 @@ void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 	{
 		IdleAnimation->ResetIdleCounterTimer();
 		const auto PreviousDefensiveMode{ DefensiveMode };
-
 		DefensiveMode = NewDefensiveModeTag;
+		OnDefensiveModeChanged(PreviousDefensiveMode);
 
 		if (DefensiveMode == ALSXTDefensiveModeTags::Anticipation)
 		{
@@ -2117,7 +2118,6 @@ void AALSXTCharacter::SetDefensiveMode(const FGameplayTag& NewDefensiveModeTag)
 		{
 
 		}
-		OnDefensiveModeChanged(PreviousDefensiveMode);
 	}
 }
 
@@ -2162,9 +2162,7 @@ void AALSXTCharacter::OnAimStateChanged_Implementation(const FALSXTAimState& Pre
 void AALSXTCharacter::SetFreelookState(const FALSXTFreelookState& NewFreelookState)
 {
 	const auto PreviousFreelookState{ FreelookState };
-
 	FreelookState = NewFreelookState;
-
 	OnFreelookStateChanged(PreviousFreelookState);
 
 	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
@@ -2198,13 +2196,12 @@ void AALSXTCharacter::OnFreelookStateChanged_Implementation(const FALSXTFreelook
 
 // Head Look At State
 
+bool AALSXTCharacter::CanHeadLookAt() const { return (GetDesiredFreelooking() == ALSXTFreelookingTags::False); };
 
 void AALSXTCharacter::SetHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState)
 {
 	const auto PreviousHeadLookAtState{ HeadLookAtState };
-
 	HeadLookAtState = NewHeadLookAtState;
-
 	OnHeadLookAtStateChanged(PreviousHeadLookAtState);
 
 	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
@@ -2819,15 +2816,19 @@ void AALSXTCharacter::OnWeaponObstructionChanged_Implementation(const FGameplayT
 
 void AALSXTCharacter::UpdateBreathState()
 {
+	FALSXTBreathState NewBreathState;
 	const float Stamina = GetStatusState().CurrentStamina;
 	if (this->Implements<UALSXTCharacterInterface>())
 	{
 		FGameplayTag BreathType = IALSXTCharacterInterface::Execute_GetBreathType(this);
 
-		if (ShouldTransitionBreathState())
+		if (ShouldTransitionBreathState() || BreathState.HoldingBreath == ALSXTHoldingBreathTags::False)
 		{
 			FALSXTTargetBreathState NewTargetState = CalculateTargetBreathState();
 			BreathState.TargetState = NewTargetState;
+			NewBreathState = GetBreathState();
+			NewBreathState.TargetState = NewTargetState;
+			SetBreathState(NewBreathState);
 		}
 	}
 }
@@ -2857,14 +2858,14 @@ FALSXTTargetBreathState AALSXTCharacter::CalculateTargetBreathState()
 	}
 	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::Released)
 	{
-		NewTargetBreathState.Alpha = 0.75;
-		NewTargetBreathState.Rate = 1.2;
+		NewTargetBreathState.Alpha = GetBreathState().PreviousBreathAlpha;
+		NewTargetBreathState.Rate = GetBreathState().PreviousBreathRate;
 		return NewTargetBreathState;
 	}
 	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::Exhausted)
 	{
 		NewTargetBreathState.Alpha = 1.0;
-		NewTargetBreathState.Rate = 1.5;
+		NewTargetBreathState.Rate = 1.0;
 		return NewTargetBreathState;
 	}
 	else
@@ -3171,7 +3172,7 @@ FALSXTFootwearDetails AALSXTCharacter::GetCharacterFootwearDetails_Implementatio
 void AALSXTCharacter::PlayBreathEffects_Implementation(const FGameplayTag& StaminaOverride)
 {
 	CharacterSound->PlayCharacterBreathEffects(StaminaOverride);
-	CharacterSound->ServerPlayCharacterBreathEffects(StaminaOverride);
+	// CharacterSound->ServerPlayCharacterBreathEffects(StaminaOverride);
 }
 
 void AALSXTCharacter::PlayActionSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)

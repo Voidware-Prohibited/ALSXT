@@ -140,6 +140,9 @@ protected:
 	void HoldBreathTimer();
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	FGameplayTag CalculateBreathReleaseMode() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void EndHoldBreathTimer();
 	// Desired HoldingBreath
 

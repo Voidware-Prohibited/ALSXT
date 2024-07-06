@@ -130,6 +130,12 @@ struct ALSXT_API FALSXTFootwearDetails
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Footwear Type"))
+	FGameplayTag FootwearType{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<EPhysicalSurface> FootwearSoleSurfaceType{ 0 };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* FootwearSoleTexture = nullptr;
 
@@ -141,8 +147,5 @@ struct ALSXT_API FALSXTFootwearDetails
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* FootwearSoleDetailTexture = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<EPhysicalSurface> FootwearSoleSurfaceType {0};
 
 };

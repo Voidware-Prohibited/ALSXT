@@ -9,18 +9,6 @@ struct ALSXT_API FALSXTHeadLookAtState
 	GENERATED_BODY()
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FRotator LockedControlRotation{ EForceInit::ForceInit };
-
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FVector2D LockedLookInput;
-
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FAlsViewState LockedViewState;
-
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FRotator FreeLookHeadRotation{ EForceInit::ForceInit };
-
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bEnableHeadLookAt{ false };
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -28,6 +16,12 @@ struct ALSXT_API FALSXTHeadLookAtState
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector HeadLookAtLocation{ EForceInit::ForceInit };
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bEnableCameraOffset{ false };
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVector CameraOffset{ EForceInit::ForceInit };
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FRotator HeadLookAtRotation{ EForceInit::ForceInit };

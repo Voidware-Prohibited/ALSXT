@@ -59,15 +59,48 @@ struct ALSXT_API FALSXTFootstepParticles
 };
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTFootstepSound
+struct ALSXT_API FALSXTFootwearTypeEffectsSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Footwear Type", AllowPrivateAccess))
 	FGameplayTagContainer FootwearType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TSoftObjectPtr<USoundBase> Sound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System")
+	FALSXTFootstepParticles FootstepParticles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System|Offset")
+	FRotator ParticleSystemFootLeftRotationOffset{ ForceInit };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System|Offset")
+	FRotator ParticleSystemFootRightRotationOffset{ ForceInit };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
+	EALSXTFootstepDecalSpawnType DecalSpawnType{ EALSXTFootstepDecalSpawnType::SpawnAttachedToTraceHitComponent };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
+	TSoftObjectPtr<UMaterialInterface> DecalMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal", Meta = (AllowPreserveRatio))
+	FVector DecalSize{ 10.0f, 20.0f, 20.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal|Offset")
+	FRotator DecalFootLeftRotationOffset{ 90.0f, -90.0f, 180.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal|Offset")
+	FRotator DecalFootRightRotationOffset{ -90.0f, 90.0f, 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal|Transfer")
+	UTexture2D* TransferTexture = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal|Transfer")
+	UTexture2D* TransferNormalTexture = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal|Transfer")
+	UTexture2D* TransferDetailTexture = nullptr;
 
 };
 
@@ -77,10 +110,10 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	TSoftObjectPtr<USoundBase> Sound;
+	TArray<FALSXTFootwearTypeEffectsSettings> FootwearTypeEffectsSettings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	TArray<FALSXTFootstepSound> Sounds;
+	TSoftObjectPtr<USoundBase> Sound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	EALSXTFootstepSoundSpawnType SoundSpawnType{EALSXTFootstepSoundSpawnType::SpawnAtTraceHitLocation};
@@ -236,10 +269,10 @@ class ALSXT_API UALSXTAnimNotify_FootstepEffects : public UAnimNotify
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-	TWeakObjectPtr<UPhysicalMaterial> FootstepSoleSurfaceType;
+	TWeakObjectPtr<UPhysicalMaterial> PreviewSurface;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Values", Meta = (AllowPrivateAccess))
-	FGameplayTag PreviewFootstepSoleSurfaceType;
+	FGameplayTag PreviewFootwearType;
 
 public:
 	virtual FString GetNotifyName_Implementation() const override;
@@ -280,9 +313,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Settings", Meta = (AutoCreateRefTerm = "NewALSXTFootstepEffectsSettings"))
 	void SetFootstepEffectsSettings(UALSXTFootstepEffectsSettings* NewALSXTFootstepEffectsSettings, float NewSoundVolumeMultiplier, float NewSoundPitchMultiplier, EAlsFootBone NewFootBone, bool bNewSkipEffectsWhenInAir, bool bNewSpawnSound, EALSXTFootstepSoundType NewFootstepSoundType, bool bNewIgnoreFootstepSoundBlockCurve, bool bNewSpawnDecal, bool bNewSpawnParticleSystem);
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	FHitResult HitResult;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Particle System", Meta = (AllowPrivateAccess))
 	FALSXTFootprintsState CurrentFootprintsState;
 };
