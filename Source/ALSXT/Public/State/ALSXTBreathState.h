@@ -61,6 +61,12 @@ struct ALSXT_API FALSXTBreathState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
 	float PreviousBreathAlpha{ 0.75 };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 5))
+	float BreathRecoveryTime{ 0.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 5))
+	float CurrentBreathRecoveryTime{ 0.0 };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
 	int CurrentReleaseBreaths{ 0 };
 

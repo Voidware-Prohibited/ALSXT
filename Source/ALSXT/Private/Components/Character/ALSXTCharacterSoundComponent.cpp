@@ -47,13 +47,14 @@ void UALSXTCharacterSoundComponent::BeginPlay()
 		if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
 		{
 			// Server
-			MulticastSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
+			ServerSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
 		}
 		else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
 		{
 			// Reg
 			SpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
 		}
+
 
 		
 
@@ -174,13 +175,16 @@ void UALSXTCharacterSoundComponent::SetNewSound(UObject* Sound, TArray<UObject*>
 
 void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTag& StaminaOverride)
 {	
-	if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
-	{
-		return;
-	}
+	// if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
+	// {
+	// 	return;
+	// }
 
-	if (CanPlayBreathSound() && ShouldPlayBreathSound())
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "PlayCharacterBreathEffects");
+
+	if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "CanPlayBreathSound");
 		UpdateStaminaThresholds();
 		bool StaminaTagChanged;
 		UpdateStamina(StaminaTagChanged);
@@ -191,7 +195,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTa
 		// If New
 		if (StaminaTagChanged || StaminaToUse != CurrentStaminaTag || CurrentBreathSounds.IsEmpty())
 		{
-			if (CanPlayBreathSound() && ShouldPlayBreathSound())
+			if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
 			{
 				// Get and Set New Sounds
 				UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
@@ -243,11 +247,13 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTa
 		{
 			// Server
 			ServerPlaySound(NewMotionSounds);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "ServerPlaySound");
 		}
 		else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
 		{
 			// Reg
 			PlaySound(NewMotionSounds);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "PlaySound");
 		}
 	}
 
@@ -1177,22 +1183,23 @@ TArray<FALSXTCharacterDamageSound> UALSXTCharacterSoundComponent::SelectDeathSou
 
 bool UALSXTCharacterSoundComponent::ShouldPlayBreathSound()
 {
-	if (IsValid(VocalizationMixerAudioComponent))
-	{
-		float Stamina = IALSXTCharacterInterface::Execute_GetStamina(GetOwner());
-		bool IsPaused = VocalizationMixerAudioComponent->bIsPaused;
-		// if (!IsPaused && Stamina < 0.75)
-		// {
-		// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ShouldPlayBreathSound:true");
-		// }
-		return !IsPaused && IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).AudibleBreathStaminaLevels.HasTag(ConvertStaminaToStaminaTag(Stamina));
-		// return !IsPaused && Stamina < StaminaOptimalThreshold;
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ShouldPlayBreathSound");
-		return false;
-	}
+	return true;
+	// if (IsValid(VocalizationMixerAudioComponent))
+	// {
+	// 	float Stamina = IALSXTCharacterInterface::Execute_GetStamina(GetOwner());
+	// 	bool IsPaused = VocalizationMixerAudioComponent->bIsPaused;
+	// 	// if (!IsPaused && Stamina < 0.75)
+	// 	// {
+	// 	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ShouldPlayBreathSound:true");
+	// 	// }
+	// 	return !IsPaused && IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).AudibleBreathStaminaLevels.HasTag(ConvertStaminaToStaminaTag(Stamina));
+	// 	// return !IsPaused && Stamina < StaminaOptimalThreshold;
+	// }
+	// else
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ShouldPlayBreathSound");
+	// 	return false;
+	// }
 }
 
 bool UALSXTCharacterSoundComponent::ShouldPlayActionSound(const FGameplayTag& Strength, const float Stamina)

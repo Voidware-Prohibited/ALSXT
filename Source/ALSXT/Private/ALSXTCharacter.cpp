@@ -2884,6 +2884,8 @@ FALSXTTargetBreathState AALSXTCharacter::CalculateTargetBreathState()
 
 void AALSXTCharacter::TransitionBreathState()
 {
+	BreathState.PreviousBreathAlpha = BreathState.CurrentBreathAlpha;
+	BreathState.PreviousBreathRate = BreathState.CurrentBreathRate;
 	BreathState.CurrentBreathAlpha = BreathState.TargetState.Alpha;
 	BreathState.CurrentBreathRate = BreathState.TargetState.Rate;
 }

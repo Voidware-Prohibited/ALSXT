@@ -128,6 +128,9 @@ protected:
 	FTimerHandle HoldBreathTimerHandle;	// Timer Handle for Hold Breath
 	FTimerDelegate HoldBreathTimerDelegate; // Delegate to bind function with parameters
 
+	FTimerHandle BreathRecoveryTimerHandle;	// Timer Handle for Hold Breath
+	FTimerDelegate BreathRecoveryTimerDelegate; // Delegate to bind function with parameters
+
 	// Hold Breath
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	float CalculateHoldBreathTimer();
@@ -144,6 +147,20 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void EndHoldBreathTimer();
+
+	// Breath Recovery
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	float CalculateBreathRecoveryTime();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void BeginBreathRecoveryTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void BreathRecoveryTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void EndBreathRecoveryTimer();
+
 	// Desired HoldingBreath
 
 public:
