@@ -2196,7 +2196,7 @@ void AALSXTCharacter::OnFreelookStateChanged_Implementation(const FALSXTFreelook
 
 // Head Look At State
 
-bool AALSXTCharacter::CanHeadLookAt() const { return (GetDesiredFreelooking() == ALSXTFreelookingTags::False); };
+bool AALSXTCharacter::CanHeadLookAt_Implementation() const { return (GetDesiredFreelooking() == ALSXTFreelookingTags::False); };
 
 void AALSXTCharacter::SetHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState)
 {
@@ -3155,6 +3155,12 @@ FALSXTHeadLookAtState AALSXTCharacter::GetCharacterHeadLookAtState_Implementatio
 	return GetHeadLookAtState();
 }
 
+FALSXTHeadLookAtEntry AALSXTCharacter::GetBestHeadLookAtEntry_Implementation() const
+{
+	FALSXTHeadLookAtEntry BestHeadLookAtEntry;	
+	return BestHeadLookAtEntry;
+}
+
 FGameplayTag AALSXTCharacter::GetCharacterLocomotionVariant_Implementation() const
 {
 	return GetDesiredLocomotionVariant();
@@ -3174,7 +3180,7 @@ FALSXTFootwearDetails AALSXTCharacter::GetCharacterFootwearDetails_Implementatio
 void AALSXTCharacter::PlayBreathEffects_Implementation(const FGameplayTag& StaminaOverride)
 {
 	CharacterSound->PlayCharacterBreathEffects(StaminaOverride);
-	// CharacterSound->ServerPlayCharacterBreathEffects(StaminaOverride);
+	CharacterSound->ServerPlayCharacterBreathEffects(StaminaOverride);
 }
 
 void AALSXTCharacter::PlayActionSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)

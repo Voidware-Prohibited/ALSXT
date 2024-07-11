@@ -3,6 +3,7 @@
 #include "GameplayTagContainer.h"
 #include "Engine/EngineTypes.h"
 #include "Utility/ALSXTStructs.h"
+#include "State/ALSXTHeadLookAtState.h"
 #include "ALSXTHeadLookAtInterface.generated.h"
 
 UINTERFACE(Blueprintable)
@@ -15,26 +16,38 @@ class ALSXT_API IALSXTHeadLookAtInterface {
 
 public:
 
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
-  bool CanHeadLookAt();
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
+  bool CanHeadLookAt() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
-  bool CanBeHeadLookedAt();
+  bool CanBeHeadLookedAt() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Head Look At Interface")
   void IsInFrontOf(bool& IsInFrontOf, FVector LookAtActorLocation) const;
 
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
+  float GetScore() const;
+
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
-  float GetRating();
+  FVector GetHeadLookAtLocation();
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
+  void AddHeadLookAtEntry(FALSXTHeadLookAtEntry HeadLookAtEntry);
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
+  void RemoveHeadLookAtEntry(FALSXTHeadLookAtEntry HeadLookAtEntry);
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
+  void ResetHeadLookAt();
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
+  FALSXTHeadLookAtEntry GetBestHeadLookAtEntry() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   void BeginHeadLookAt(AActor* Actor, bool CameraLookAt);
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   void OnBeginHeadLookAt();
-
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
-  FVector GetHeadLookAtLocation();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   void EndHeadLookAt();

@@ -237,9 +237,6 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Movement")
   void GetAccentSurfaceForMovement(TEnumAsByte<EPhysicalSurface>& Surface, UPARAM(meta = (Categories = "Als.Character Movement Sound"))FGameplayTag Movement) const;
 
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Movement", Meta = (AutoCreateRefTerm = "StaminaOverride"))
-  void CharacterBreathEffects(UPARAM(meta = (Categories = "Als.Stamina"))const FGameplayTag& StaminaOverride);
-
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Movement", Meta = (AutoCreateRefTerm = "Type, Weight"))
   void PlayCharacterMovementSound(bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
 

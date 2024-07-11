@@ -47,6 +47,7 @@ void UALSXTCombatComponent::BeginPlay()
 	}
 	TargetTraceTimerDelegate.BindUFunction(this, "TryTraceForTargets");
 	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace");
+	MoveToTargetTimerDelegate.BindUFunction(this, "UpdateMoveToTarget");
 }
 
 // Called every frame
@@ -482,6 +483,21 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 		}
 	}
 	return nullptr;
+}
+
+void UALSXTCombatComponent::BeginMoveToTarget()
+{
+
+}
+
+void UALSXTCombatComponent::UpdateMoveToTarget()
+{
+	Character->GetMovementComponent()->Velocity = FMath::VInterpTo(GetOwner()->GetVelocity(), CurrentTarget.HitResult.Location, GetOwner()->GetWorld()->DeltaTimeSeconds, 1.0f);	
+}
+
+void UALSXTCombatComponent::EndMoveToTarget()
+{
+
 }
 
 void UALSXTCombatComponent::BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings)

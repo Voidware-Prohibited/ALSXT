@@ -359,7 +359,7 @@ void AALSXTCharacterAdvanced::InputTargetLock(const FInputActionValue& ActionVal
 
 void AALSXTCharacterAdvanced::InputSwitchTargetLeft()
 {
-	if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming && GetTargetableOverlayModes().HasTag(GetOverlayMode()))
+	if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming && Execute_GetTargetableOverlayModes(this).HasTag(GetOverlayMode()))
 	{
 		Combat->GetTargetLeft();
 	}
@@ -367,7 +367,7 @@ void AALSXTCharacterAdvanced::InputSwitchTargetLeft()
 
 void AALSXTCharacterAdvanced::InputSwitchTargetRight()
 {
-	if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming && GetTargetableOverlayModes().HasTag(GetOverlayMode()))
+	if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Aiming && Execute_GetTargetableOverlayModes(this).HasTag(GetOverlayMode()))
 	{
 		Combat->GetTargetRight();
 	}

@@ -15,22 +15,22 @@ class ALSXT_API IALSXTCharacterSoundComponentInterface {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Breath Effects Interface|Parameters")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Sound Component Interface|Parameters")
 	UALSXTCharacterSoundSettings* SelectCharacterSoundSettings();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Breath Effects Interface|Parameters")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Sound Component Interface|Parameters")
 	UALSXTWeaponSoundSettings* SelectWeaponSoundSettings();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
 	FALSXTCharacterBreathEffectsSettings GetBreathEffectsSettings();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Parameters")
 	FALSXTCharacterVoiceParameters GetVoiceParameters();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
 	bool CanPlayBreathSound();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Parameters")
 	bool CanPlayActionSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
@@ -54,7 +54,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
 	FGameplayTag GetHoldingBreath();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Events", Meta = (AutoCreateRefTerm = "StaminaOverride"))
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects|Events", Meta = (AutoCreateRefTerm = "StaminaOverride"))
 	void PlayBreathEffects(UPARAM(meta = (Categories = "Als.Stamina"))const FGameplayTag& StaminaOverride);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Events", Meta = (AutoCreateRefTerm = "Type, SoundSex, Variant, Overlay, Strength"))

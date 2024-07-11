@@ -208,6 +208,9 @@ public:
 	bool CanPlayDeathSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool ShouldPlayHoldBreathSound(const FGameplayTag& HoldBreathType, const float Stamina);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool ShouldPlayMovementAccentSound(const FGameplayTag& Type, const FGameplayTag& Strength);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
@@ -253,6 +256,9 @@ public:
 	FALSXTWeaponActionSound SelectWeaponActionSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Type);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	TArray<FALSXTCharacterActionSound> SelectHoldBreathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& HoldBreathType, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const float Stamina);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	TArray<FALSXTCharacterActionSound> SelectActionSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
@@ -275,6 +281,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type"))
 	void PlayWeaponActionSound(UPARAM(meta = (Categories = "Als.Weapon Action"))const FGameplayTag& Type);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "HoldBreathType, Sex, Variant, Overlay"))
+	void PlayHoldBreathSound(UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& HoldBreathType, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, const float Stamina);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Sex, Variant, Overlay, Strength"))
 	void PlayActionSound(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const float Stamina);

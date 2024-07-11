@@ -39,6 +39,7 @@
 
 #include "Interfaces/ALSXTStationaryModeComponentInterface.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
+#include "Interfaces/ALSXTHeadLookAtInterface.h"
 #include "Interfaces/ALSXTMeshPaintingInterface.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTHeldItemInterface.h"
@@ -60,7 +61,7 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
 
 UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
-class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTCharacterCustomizationComponentInterface, public IALSXTStationaryModeComponentInterface, public IALSXTCollisionInterface, public IALSXTTargetLockInterface, public IALSXTCharacterSoundComponentInterface, public IALSXTMeshPaintingInterface, public IALSXTCharacterInterface, public IALSXTHeldItemInterface, public IALSXTIdleAnimationComponentInterface
+class ALSXT_API AALSXTCharacter : public AAlsCharacter, public IALSXTCharacterCustomizationComponentInterface, public IALSXTStationaryModeComponentInterface, public IALSXTCollisionInterface, public IALSXTHeadLookAtInterface, public IALSXTTargetLockInterface, public IALSXTCharacterSoundComponentInterface, public IALSXTMeshPaintingInterface, public IALSXTCharacterInterface, public IALSXTHeldItemInterface, public IALSXTIdleAnimationComponentInterface
 {
 	GENERATED_BODY()
 
@@ -526,20 +527,24 @@ protected:
 
 	// HeadLookAt
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", ReplicatedUsing = "OnReplicate_HeadLookAtState", Meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Head Look At|State", ReplicatedUsing = "OnReplicate_HeadLookAtState", Meta = (AllowPrivateAccess))
 	FALSXTHeadLookAtState HeadLookAtState;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Head Look At", Meta = (AllowPrivateAccess))
+	TArray<FALSXTHeadLookAtEntry> HeadLookAtEntries;
+
 public:
-	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	UFUNCTION(BlueprintCallable, Category = "Head Look At|State")
 	const FALSXTHeadLookAtState& GetHeadLookAtState() const;
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
-	bool CanHeadLookAt() const;
+	virtual FALSXTHeadLookAtEntry GetBestHeadLookAtEntry_Implementation() const override;
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHeadLookAtState"))
+	virtual bool CanHeadLookAt_Implementation() const override;
+
+	UFUNCTION(BlueprintCallable, Category = "Head Look At|State", Meta = (AutoCreateRefTerm = "NewHeadLookAtState"))
 	void SetHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHeadLookAtState"))
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Head Look At|State", Meta = (AutoCreateRefTerm = "NewHeadLookAtState"))
 	FALSXTHeadLookAtState ProcessNewHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState);
 
 	UFUNCTION(Server, Unreliable)
@@ -553,7 +558,7 @@ private:
 	void OnReplicate_HeadLookAtState(const FALSXTHeadLookAtState& PreviousHeadLookAtState);
 
 protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "Head Look At|State")
 	void OnHeadLookAtStateChanged(const FALSXTHeadLookAtState& PreviousHeadLookAtState);
 
 	// Lean

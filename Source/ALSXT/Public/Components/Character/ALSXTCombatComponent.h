@@ -234,11 +234,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
 	TArray<AActor*> AttackTraceLastHitActors;
 
-private:
+protected:
 
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Combat")
 	void BeginMoveToTarget();
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Combat")
 	void UpdateMoveToTarget();
-	void StopMoveToTarget();
+
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Combat")
+	void EndMoveToTarget();
 
 	// Attack Trace Timer
 	FTimerHandle AttackTraceTimerHandle;	// Timer Handle for Attack Trace
@@ -246,13 +251,13 @@ private:
 
 public:
 	// Attack Collision Trace
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Combat")
 	void BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings);
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Combat")
 	void AttackCollisionTrace();
 
-	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	UFUNCTION(BlueprintCallable, Category = "ALSXT|Combat")
 	void EndAttackCollisionTrace();
 
 private:

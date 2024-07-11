@@ -22,7 +22,7 @@
 class UALSXTCharacterAdvancedSettings;
 
 UCLASS()
-class ALSXT_API AALSXTCharacterAdvanced : public AALSXTCharacter, public IALSXTCharacterCameraEffectsComponentInterface, public IALSXTHeadLookAtInterface, public IALSXTAcrobaticActionComponentInterface, public IALSXTCombatInterface, public IALSXTFirearmInterface
+class ALSXT_API AALSXTCharacterAdvanced : public AALSXTCharacter, public IALSXTCharacterCameraEffectsComponentInterface, public IALSXTAcrobaticActionComponentInterface, public IALSXTCombatInterface, public IALSXTFirearmInterface
 {
 	GENERATED_BODY()
 

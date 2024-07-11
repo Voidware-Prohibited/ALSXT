@@ -42,18 +42,18 @@ void UALSXTCharacterSoundComponent::BeginPlay()
 	if (IsValid(Settings))
 	{
 			
-		// SpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
+		SpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
 
-		if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
-		{
-			// Server
-			ServerSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
-		}
-		else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
-		{
-			// Reg
-			SpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
-		}
+		// if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+		// {
+		// 	// Server
+		// 	ServerSpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), // IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
+		// }
+		// else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+		// {
+		// 	// Reg
+		// 	SpawnAudioComponent(VocalizationMixerAudioComponent, Settings->VocalizationMixer, IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), // IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName), 1.0f, GeneralCharacterSoundSettings.VoiceSocketName);
+		// }
 
 
 		
@@ -956,6 +956,51 @@ FALSXTWeaponActionSound UALSXTCharacterSoundComponent::SelectWeaponActionSound(U
 	return SelectedSound;
 }
 
+TArray<FALSXTCharacterActionSound> UALSXTCharacterSoundComponent::SelectHoldBreathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& HoldBreathType, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const float Stamina)
+{
+	FGameplayTagContainer TagsContainer;
+	TArray<FALSXTCharacterActionSound> ActionSounds = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner())->ActionSounds;
+	TArray<FALSXTCharacterActionSound> FilteredActionSounds;
+	FGameplayTag StaminaTag = ConvertStaminaToStaminaTag(Stamina);
+	TagsContainer.AddTag(HoldBreathType);
+	TagsContainer.AddTag(Sex);
+	TagsContainer.AddTag(Variant);
+	TagsContainer.AddTag(Overlay);
+	TagsContainer.AddTag(StaminaTag);
+
+	// Return if there are no sounds
+	if (ActionSounds.Num() < 1)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "No Sounds");
+		return FilteredActionSounds;
+	}
+
+	// Filter sounds based on Tag parameters
+	for (auto ActionSound : ActionSounds)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(ActionSound.Sex);
+		CurrentTagsContainer.AppendTags(ActionSound.Variant);
+		CurrentTagsContainer.AppendTags(ActionSound.Overlay);
+		CurrentTagsContainer.AppendTags(ActionSound.Strength);
+		CurrentTagsContainer.AppendTags(ActionSound.Stamina);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredActionSounds.Add(ActionSound);
+		}
+	}
+
+	// Return if Return is there are no filtered sounds
+	if (FilteredActionSounds.Num() < 1)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "No Filtered ActionSounds");
+		return FilteredActionSounds;
+	}
+
+	return FilteredActionSounds;
+}
+
 TArray<FALSXTCharacterActionSound> UALSXTCharacterSoundComponent::SelectActionSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
 {
 	FGameplayTagContainer TagsContainer;
@@ -1202,6 +1247,12 @@ bool UALSXTCharacterSoundComponent::ShouldPlayBreathSound()
 	// }
 }
 
+bool UALSXTCharacterSoundComponent::ShouldPlayHoldBreathSound(const FGameplayTag& HoldBreathType, const float Stamina)
+{
+	// return (TimeSinceLastActionSound >= TargetActionSoundDelay);
+	return true;
+}
+
 bool UALSXTCharacterSoundComponent::ShouldPlayActionSound(const FGameplayTag& Strength, const float Stamina)
 {
 	// return (TimeSinceLastActionSound >= TargetActionSoundDelay);
@@ -1394,6 +1445,49 @@ void UALSXTCharacterSoundComponent::PlayWeaponActionSound(const FGameplayTag& Ty
 		MotionSounds.WeaponMovementSounds = Sounds;
 	}
 
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// Server
+		ServerPlaySound(MotionSounds);
+	}
+	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+	{
+		// Reg
+		PlaySound(MotionSounds);
+	}
+}
+
+void UALSXTCharacterSoundComponent::PlayHoldBreathSound(const FGameplayTag& HoldBreathType, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const float Stamina)
+{
+	if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
+	{
+		return;
+	}
+	FGameplayTag Weight = IALSXTCharacterInterface::Execute_GetWeightTag(GetOwner());
+	FMotionSounds MotionSounds;
+	float Delay = FMath::RandRange(GeneralCharacterSoundSettings.ActionSoundDelay.X, GeneralCharacterSoundSettings.ActionSoundDelay.Y);
+	StartTimeSinceLastActionSoundTimer(Delay);
+	UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
+	FGameplayTag MovementStrength = ConvertWeightTagToStrengthTag(Weight);
+
+	//ACTION
+	if (ShouldPlayHoldBreathSound(HoldBreathType, Stamina))
+	{
+		TArray<FALSXTCharacterActionSound> ActionSounds = SelectHoldBreathSounds(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), MovementStrength, Stamina);
+		TArray<FSound> Sounds;
+
+		for (FALSXTCharacterActionSound AC : ActionSounds)
+		{
+			Sounds.Append(AC.Sounds);
+		}
+
+		if (Sounds.IsValidIndex(0))
+		{
+			MotionSounds.VocalSounds = Sounds;
+		}
+	}
+
+	// V2
 	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		// Server
