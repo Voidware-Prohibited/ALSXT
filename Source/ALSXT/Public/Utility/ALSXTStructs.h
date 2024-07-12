@@ -940,6 +940,29 @@ struct ALSXT_API FALSXTBreathSound
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTHoldingBreathSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Sex", AllowPrivateAccess))
+	FGameplayTagContainer Sex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Voice Variant", AllowPrivateAccess))
+	FGameplayTagContainer Variant;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Holding Breath", AllowPrivateAccess))
+	FGameplayTagContainer HoldingBreathType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Sound}", AllowPrivateAccess))
+	TArray<FSound> Sounds;
+
+	bool operator==(const FALSXTHoldingBreathSound& other) const
+	{
+		return (other.Sex == Sex) && (other.Variant == Variant) && (other.HoldingBreathType == HoldingBreathType) && (other.Sounds == Sounds);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTBreathParticle
 {
 	GENERATED_BODY()

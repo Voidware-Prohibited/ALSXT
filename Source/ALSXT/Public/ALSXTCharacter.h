@@ -550,6 +550,11 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void ServerProcessNewHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState);
 
+	virtual void AddHeadLookAtEntry_Implementation(FALSXTHeadLookAtEntry HeadLookAtEntry) override;
+	virtual void RemoveHeadLookAtEntry_Implementation(FALSXTHeadLookAtEntry HeadLookAtEntry) override;
+	virtual void BeginHeadLookAt_Implementation(FALSXTHeadLookAtEntry HeadLookAtEntry) override;
+	virtual void EndHeadLookAt_Implementation() override;
+
 private:
 	UFUNCTION(Server, Unreliable)
 	void ServerSetHeadLookAtState(const FALSXTHeadLookAtState& NewHeadLookAtState);

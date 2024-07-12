@@ -43,13 +43,13 @@ public:
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
   FALSXTHeadLookAtEntry GetBestHeadLookAtEntry() const;
 
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
-  void BeginHeadLookAt(AActor* Actor, bool CameraLookAt);
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
+  void BeginHeadLookAt(FALSXTHeadLookAtEntry HeadLookAtEntry);
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   void OnBeginHeadLookAt();
 
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
   void EndHeadLookAt();
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")

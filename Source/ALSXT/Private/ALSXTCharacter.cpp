@@ -2215,10 +2215,29 @@ void AALSXTCharacter::ServerSetHeadLookAtState_Implementation(const FALSXTHeadLo
 	SetHeadLookAtState(NewHeadLookAtState);
 }
 
-
 void AALSXTCharacter::ServerProcessNewHeadLookAtState_Implementation(const FALSXTHeadLookAtState& NewHeadLookAtState)
 {
 	ProcessNewHeadLookAtState(NewHeadLookAtState);
+}
+
+void AALSXTCharacter::AddHeadLookAtEntry_Implementation(FALSXTHeadLookAtEntry HeadLookAtEntry)
+{
+	HeadLookAtEntries.Add(HeadLookAtEntry);
+}
+
+void AALSXTCharacter::RemoveHeadLookAtEntry_Implementation(FALSXTHeadLookAtEntry HeadLookAtEntry)
+{
+	HeadLookAtEntries.Remove(HeadLookAtEntry);
+}
+
+void AALSXTCharacter::BeginHeadLookAt_Implementation(FALSXTHeadLookAtEntry HeadLookAtEntry)
+{
+	IALSXTHeadLookAtInterface::Execute_GetBestHeadLookAtEntry(this);
+}
+
+void AALSXTCharacter::EndHeadLookAt_Implementation()
+{
+
 }
 
 void AALSXTCharacter::OnReplicate_HeadLookAtState(const FALSXTHeadLookAtState& PreviousHeadLookAtState)
@@ -3157,8 +3176,34 @@ FALSXTHeadLookAtState AALSXTCharacter::GetCharacterHeadLookAtState_Implementatio
 
 FALSXTHeadLookAtEntry AALSXTCharacter::GetBestHeadLookAtEntry_Implementation() const
 {
-	FALSXTHeadLookAtEntry BestHeadLookAtEntry;	
-	return BestHeadLookAtEntry;
+	TArray<FALSXTHeadLookAtEntry> BestHeadLookAtEntries;
+	FALSXTHeadLookAtEntry BestHeadLookAtEntry;
+	FALSXTHeadLookAtEntry CurrentBestHeadLookAtEntry;
+
+	if (HeadLookAtEntries.Num() > 1)
+	{
+		return BestHeadLookAtEntry;
+	}
+
+	for (auto HeadLookAtEntry : HeadLookAtEntries)
+	{
+		if (HeadLookAtEntry.Score > CurrentBestHeadLookAtEntry.Score)
+		{
+			CurrentBestHeadLookAtEntry = HeadLookAtEntry;
+		}
+		if (HeadLookAtEntry.Score == CurrentBestHeadLookAtEntry.Score)
+		{
+			if (HeadLookAtEntry.Distance < CurrentBestHeadLookAtEntry.Distance)
+			{
+				if (HeadLookAtEntry.Score == CurrentBestHeadLookAtEntry.Score)
+				{
+					CurrentBestHeadLookAtEntry = HeadLookAtEntry;
+				}
+			}
+		}
+	}
+
+	return CurrentBestHeadLookAtEntry;
 }
 
 FGameplayTag AALSXTCharacter::GetCharacterLocomotionVariant_Implementation() const

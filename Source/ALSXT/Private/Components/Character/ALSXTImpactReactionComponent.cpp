@@ -54,11 +54,11 @@ void UALSXTImpactReactionComponent::BeginPlay()
 	{
 		AnimInstance = IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetAnimInstance();
 	}
+
+	// Setup Timer Functions
 	CrowdNavigationVelocityTimerDelegate.BindUFunction(this, "CrowdNavigationVelocityTimer");
 	BumpVelocityTimerDelegate.BindUFunction(this, "BumpVelocityTimer");
-
 	AnticipationTimerDelegate.BindUFunction(this, "AnticipationTimer");
-
 	ImpactFallingTimerDelegate.BindUFunction(this, "ImpactFallingTimer");
 	AttackFallingTimerDelegate.BindUFunction(this, "AttackFallingTimer");
 	StabilizeTimerDelegate.BindUFunction(this, "StabilizeTimer");

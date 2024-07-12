@@ -15,6 +15,7 @@
 #include "Notifies/AlsAnimNotify_FootstepEffects.h"
 #include "ALSXTCharacterSoundComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShouldPlayHoldingBreathSoundDelegateSignature, const FGameplayTag&, HoldBreathType, const float, Stamina);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVocalizationSignature, FSound, Vocalization);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMovementSoundSignature, FSound, MovementSound);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponMovementSoundSignature, FSound, WeaponMovementSound);
@@ -30,6 +31,51 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UPROPERTY(BlueprintAssignable)
+	FShouldPlayHoldingBreathSoundDelegateSignature ShouldPlayHoldingBreathSoundDelegate;
+
+	/*
+
+	CanPlayBreathSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayCharacterMovementSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayWeaponMovementSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayWeaponActionSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayActionSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayAttackSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayDamageSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool CanPlayDeathSound
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
+	bool ShouldPlayDeathSoundModeration();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool ShouldPlayMovementAccentSound(const FGameplayTag& Type, const FGameplayTag& Strength);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
+	bool ShouldPlayWeaponMovementSound(const FGameplayTag& Type, const FGameplayTag& Strength);
+
+	bool ShouldPlayBreathSound();
+	bool ShouldPlayActionSound(const FGameplayTag& Strength, const float Stamina);
+	bool ShouldPlayAttackSound(const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const float Stamina);
+	bool ShouldPlayDamageSound(const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);	
+	bool ShouldPlayDeathSound(const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
+
+	*/
+	
 	UPROPERTY(BlueprintAssignable)
 	FOnVocalizationSignature OnVocalization;
 
@@ -207,8 +253,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayDeathSound();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
-	bool ShouldPlayHoldBreathSound(const FGameplayTag& HoldBreathType, const float Stamina);
+	bool ShouldPlayHoldingBreathSound(const FGameplayTag& HoldBreathType, const float Stamina);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool ShouldPlayMovementAccentSound(const FGameplayTag& Type, const FGameplayTag& Strength);
@@ -256,7 +301,7 @@ public:
 	FALSXTWeaponActionSound SelectWeaponActionSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Type);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
-	TArray<FALSXTCharacterActionSound> SelectHoldBreathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& HoldBreathType, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const float Stamina);
+	TArray<FALSXTHoldingBreathSound> SelectHoldingBreathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& HoldingBreathType);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	TArray<FALSXTCharacterActionSound> SelectActionSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina);
@@ -282,8 +327,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type"))
 	void PlayWeaponActionSound(UPARAM(meta = (Categories = "Als.Weapon Action"))const FGameplayTag& Type);
 
-	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "HoldBreathType, Sex, Variant, Overlay"))
-	void PlayHoldBreathSound(UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& HoldBreathType, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, const float Stamina);
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "HoldingBreathType, Sex, Variant"))
+	void PlayHoldingBreathSound(UPARAM(meta = (Categories = "Als.Holding Breath"))const FGameplayTag& HoldingBreathType, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, const float Stamina);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Sex, Variant, Overlay, Strength"))
 	void PlayActionSound(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const float Stamina);

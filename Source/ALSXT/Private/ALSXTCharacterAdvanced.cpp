@@ -283,7 +283,13 @@ void AALSXTCharacterAdvanced::SetHoldingBreath(const FGameplayTag& NewHoldingBre
 	}
 }
 
-void AALSXTCharacterAdvanced::OnHoldingBreathChanged_Implementation(const FGameplayTag& PreviousHoldingBreathTag) {}
+void AALSXTCharacterAdvanced::OnHoldingBreathChanged_Implementation(const FGameplayTag& PreviousHoldingBreathTag) 
+{
+	if (GetDesiredHoldingBreath() != ALSXTHoldingBreathTags::False)
+	{
+		CharacterSound->PlayHoldingBreathSound(GetDesiredHoldingBreath(), GetDesiredSex(), CharacterCustomization->VoiceParameters.Variant, IALSXTCharacterInterface::Execute_GetStamina(this));
+	}
+}
 
 FGameplayTag AALSXTCharacterAdvanced::GetCharacterHoldingBreath_Implementation() const
 {

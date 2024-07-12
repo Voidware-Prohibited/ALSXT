@@ -956,49 +956,44 @@ FALSXTWeaponActionSound UALSXTCharacterSoundComponent::SelectWeaponActionSound(U
 	return SelectedSound;
 }
 
-TArray<FALSXTCharacterActionSound> UALSXTCharacterSoundComponent::SelectHoldBreathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& HoldBreathType, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const float Stamina)
+TArray<FALSXTHoldingBreathSound> UALSXTCharacterSoundComponent::SelectHoldingBreathSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& HoldingBreathType)
 {
 	FGameplayTagContainer TagsContainer;
-	TArray<FALSXTCharacterActionSound> ActionSounds = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner())->ActionSounds;
-	TArray<FALSXTCharacterActionSound> FilteredActionSounds;
-	FGameplayTag StaminaTag = ConvertStaminaToStaminaTag(Stamina);
-	TagsContainer.AddTag(HoldBreathType);
+	TArray<FALSXTHoldingBreathSound> HoldingBreathSounds = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner())->HoldingBreathSounds;
+	TArray<FALSXTHoldingBreathSound> FilteredHoldingBreathSounds;
 	TagsContainer.AddTag(Sex);
 	TagsContainer.AddTag(Variant);
-	TagsContainer.AddTag(Overlay);
-	TagsContainer.AddTag(StaminaTag);
+	TagsContainer.AddTag(HoldingBreathType);
 
 	// Return if there are no sounds
-	if (ActionSounds.Num() < 1)
+	if (HoldingBreathSounds.Num() < 1)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "No Sounds");
-		return FilteredActionSounds;
+		return FilteredHoldingBreathSounds;
 	}
 
 	// Filter sounds based on Tag parameters
-	for (auto ActionSound : ActionSounds)
+	for (auto HoldingBreathSound : HoldingBreathSounds)
 	{
 		FGameplayTagContainer CurrentTagsContainer;
-		CurrentTagsContainer.AppendTags(ActionSound.Sex);
-		CurrentTagsContainer.AppendTags(ActionSound.Variant);
-		CurrentTagsContainer.AppendTags(ActionSound.Overlay);
-		CurrentTagsContainer.AppendTags(ActionSound.Strength);
-		CurrentTagsContainer.AppendTags(ActionSound.Stamina);
+		CurrentTagsContainer.AppendTags(HoldingBreathSound.Sex);
+		CurrentTagsContainer.AppendTags(HoldingBreathSound.Variant);
+		CurrentTagsContainer.AppendTags(HoldingBreathSound.HoldingBreathType);
 
 		if (CurrentTagsContainer.HasAll(TagsContainer))
 		{
-			FilteredActionSounds.Add(ActionSound);
+			FilteredHoldingBreathSounds.Add(HoldingBreathSound);
 		}
 	}
 
 	// Return if Return is there are no filtered sounds
-	if (FilteredActionSounds.Num() < 1)
+	if (FilteredHoldingBreathSounds.Num() < 1)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "No Filtered ActionSounds");
-		return FilteredActionSounds;
+		return FilteredHoldingBreathSounds;
 	}
 
-	return FilteredActionSounds;
+	return FilteredHoldingBreathSounds;
 }
 
 TArray<FALSXTCharacterActionSound> UALSXTCharacterSoundComponent::SelectActionSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
@@ -1247,7 +1242,7 @@ bool UALSXTCharacterSoundComponent::ShouldPlayBreathSound()
 	// }
 }
 
-bool UALSXTCharacterSoundComponent::ShouldPlayHoldBreathSound(const FGameplayTag& HoldBreathType, const float Stamina)
+bool UALSXTCharacterSoundComponent::ShouldPlayHoldingBreathSound(const FGameplayTag& HoldBreathType, const float Stamina)
 {
 	// return (TimeSinceLastActionSound >= TargetActionSoundDelay);
 	return true;
@@ -1457,28 +1452,24 @@ void UALSXTCharacterSoundComponent::PlayWeaponActionSound(const FGameplayTag& Ty
 	}
 }
 
-void UALSXTCharacterSoundComponent::PlayHoldBreathSound(const FGameplayTag& HoldBreathType, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const float Stamina)
+void UALSXTCharacterSoundComponent::PlayHoldingBreathSound(const FGameplayTag& HoldingBreathType, const FGameplayTag& Sex, const FGameplayTag& Variant, const float Stamina)
 {
 	if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
 	{
 		return;
 	}
-	FGameplayTag Weight = IALSXTCharacterInterface::Execute_GetWeightTag(GetOwner());
 	FMotionSounds MotionSounds;
-	float Delay = FMath::RandRange(GeneralCharacterSoundSettings.ActionSoundDelay.X, GeneralCharacterSoundSettings.ActionSoundDelay.Y);
-	StartTimeSinceLastActionSoundTimer(Delay);
 	UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
-	FGameplayTag MovementStrength = ConvertWeightTagToStrengthTag(Weight);
 
 	//ACTION
-	if (ShouldPlayHoldBreathSound(HoldBreathType, Stamina))
+	if (ShouldPlayHoldingBreathSound(HoldingBreathType, Stamina))
 	{
-		TArray<FALSXTCharacterActionSound> ActionSounds = SelectHoldBreathSounds(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), MovementStrength, Stamina);
+		TArray<FALSXTHoldingBreathSound> HoldingBreathSounds = SelectHoldingBreathSounds(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), Variant, HoldingBreathType);
 		TArray<FSound> Sounds;
 
-		for (FALSXTCharacterActionSound AC : ActionSounds)
+		for (FALSXTHoldingBreathSound HoldingBreathSound : HoldingBreathSounds)
 		{
-			Sounds.Append(AC.Sounds);
+			Sounds.Append(HoldingBreathSound.Sounds);
 		}
 
 		if (Sounds.IsValidIndex(0))
