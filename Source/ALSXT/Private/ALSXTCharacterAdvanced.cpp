@@ -285,10 +285,7 @@ void AALSXTCharacterAdvanced::SetHoldingBreath(const FGameplayTag& NewHoldingBre
 
 void AALSXTCharacterAdvanced::OnHoldingBreathChanged_Implementation(const FGameplayTag& PreviousHoldingBreathTag) 
 {
-	if (GetDesiredHoldingBreath() != ALSXTHoldingBreathTags::False)
-	{
-		CharacterSound->PlayHoldingBreathSound(GetDesiredHoldingBreath(), GetDesiredSex(), CharacterCustomization->VoiceParameters.Variant, IALSXTCharacterInterface::Execute_GetStamina(this));
-	}
+	CharacterSound->PlayHoldingBreathSound(GetBreathState().HoldingBreath, GetDesiredSex(), CharacterCustomization->VoiceParameters.Variant, IALSXTCharacterInterface::Execute_GetStamina(this));
 }
 
 FGameplayTag AALSXTCharacterAdvanced::GetCharacterHoldingBreath_Implementation() const
@@ -385,17 +382,14 @@ void AALSXTCharacterAdvanced::InputHoldBreath(const FInputActionValue& ActionVal
 	{
 		if (CanHoldBreath())
 		{
-			SetHoldingBreath(ALSXTHoldingBreathTags::True);
+			// SetHoldingBreath(ALSXTHoldingBreathTags::True);
 			BeginHoldBreathTimer();
 		}
 	}
 	else
 	{
-		if (GetDesiredHoldingBreath() == ALSXTHoldingBreathTags::True)
-		{
-			SetHoldingBreath(CalculateBreathReleaseMode());
-			EndHoldBreathTimer();
-		}
+		// SetHoldingBreath(CalculateBreathReleaseMode());
+		EndHoldBreathTimer();
 	}
 }
 
@@ -431,11 +425,13 @@ void AALSXTCharacterAdvanced::HoldBreathTimer()
 
 void AALSXTCharacterAdvanced::EndHoldBreathTimer()
 {
-	SetDesiredHoldingBreath(CalculateBreathReleaseMode());
+	FGameplayTag BreathReleaseMode;
+	BreathReleaseMode = CalculateBreathReleaseMode();
 	FALSXTBreathState NewBreathState = GetBreathState();
 	NewBreathState.CurrentHoldBreathTime = 0.0f;
 	NewBreathState.CurrentMaxHoldBreathTime = 0.0f;
-	NewBreathState.HoldingBreath = CalculateBreathReleaseMode();
+	NewBreathState.HoldingBreath = BreathReleaseMode;
+	SetDesiredHoldingBreath(BreathReleaseMode);
 	SetBreathState(NewBreathState);
 	GetWorld()->GetTimerManager().ClearTimer(HoldBreathTimerHandle);
 	BeginBreathRecoveryTimer();
@@ -486,9 +482,12 @@ void AALSXTCharacterAdvanced::BreathRecoveryTimer()
 void AALSXTCharacterAdvanced::EndBreathRecoveryTimer()
 {
 	FALSXTBreathState NewBreathState = GetBreathState();
+	FGameplayTag BreathReleaseMode;
+	BreathReleaseMode = CalculateBreathReleaseMode();
 	NewBreathState.HoldingBreath = ALSXTHoldingBreathTags::False;
 	NewBreathState.TargetState = CalculateTargetBreathState();
 	SetBreathState(NewBreathState);
+	SetDesiredHoldingBreath(BreathReleaseMode);
 	GetWorld()->GetTimerManager().ClearTimer(BreathRecoveryTimerHandle);
 }
 
