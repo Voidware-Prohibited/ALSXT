@@ -2453,7 +2453,7 @@ void AALSXTCharacter::OnActorAttackCollision_Implementation(FAttackDoubleHitResu
 	}
 	// FALSXTDamageResult DamageResult = GetActualDamage(Hit);
 	ImpactReaction->AttackReaction(Hit);
-	CharacterSound->PlayDamageSound(true, true, true, GetDesiredSex(), GetDesiredLocomotionVariant(), GetOverlayMode(), ALSXTAttackMethodTags::Regular, Hit.Strength, Hit.DoubleHitResult.ImpactForm, Hit.BaseDamage);
+	CharacterSound->PlayDamageSound(true, true, true, GetDesiredSex(), CharacterCustomization->VoiceParameters.Variant, GetOverlayMode(), ALSXTAttackMethodTags::Regular, Hit.Strength, Hit.DoubleHitResult.ImpactForm, Hit.BaseDamage);
 }
 
 void AALSXTCharacter::BeginFreelookTimer()

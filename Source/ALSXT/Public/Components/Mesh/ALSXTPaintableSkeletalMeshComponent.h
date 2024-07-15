@@ -35,13 +35,13 @@ public:
 	UALSXTPaintableSkeletalMeshComponent();
 
 private:
-	UPROPERTY(EditAnywhere, Transient, Setter = SetMeshPaintingSettingsMap, BlueprintSetter = SetMeshPaintingSettingsMap, Getter = GetMeshPaintingSettingsMap, BlueprintGetter = GetMeshPaintingSettingsMap, Category = Mesh)
-	TObjectPtr <UALSXTMeshPaintingSettingsMap> MeshPaintingSettingsMap;
+	UPROPERTY(EditAnywhere, Setter = SetMeshPaintingSettingsMap, BlueprintSetter = SetMeshPaintingSettingsMap, Getter = GetMeshPaintingSettingsMap, BlueprintGetter = GetMeshPaintingSettingsMap, Category = "Settings")
+	UALSXTMeshPaintingSettingsMap* MeshPaintingSettingsMap;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess), Category = "Viewport Mask")
 	UMaterialInterface* ViewportMask;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess), Category = "Viewport Mask")
 	FSlateColor ViewportMaskColor;
 
 public:
@@ -87,7 +87,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	UPhysicalMaterialMask* PhysicalMaterialMask;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Mesh, Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = Mesh, Meta = (AllowPrivateAccess))
 	TArray<UPhysicalMaterial*> PhysicalMaterialMap;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (Categories = "Als.Elemental Condition", AllowPrivateAccess))

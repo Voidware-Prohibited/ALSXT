@@ -40,7 +40,13 @@ public:
 	bool CanPlayWeaponMovementSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
+	bool CanPlayDamageSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
 	bool ShouldPlayWeaponMovementSound();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
+	bool ShouldPlayDamageSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
 	FVector GetVoiceSocketLocation();

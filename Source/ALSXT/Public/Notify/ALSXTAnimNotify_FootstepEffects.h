@@ -112,6 +112,9 @@ struct ALSXT_API FALSXTFootstepEffectSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TArray<FALSXTFootwearTypeEffectsSettings> FootwearTypeEffectsSettings;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<TEnumAsByte<enum EPhysicalSurface>> TransferrableSurfaces;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TSoftObjectPtr<USoundBase> Sound;
 

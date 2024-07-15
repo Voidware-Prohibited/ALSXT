@@ -218,6 +218,9 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		}
 	}
 
+	// Prevent Spawning Decal if not in TransferrableSurfaces, but continue with saturation calculations
+	// if EffectSettings->TransferrableSurfaces.Contains(HitResult.PhysMaterial->SurfaceType.GetValue())
+
 	if (bSpawnDecal && IsValid(EffectSettings->DecalMaterial.LoadSynchronous()))
 	{
 		const auto DecalRotation{
@@ -229,6 +232,13 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		const auto DecalLocation{
 			FootstepLocation + DecalRotation.RotateVector(EffectSettings->DecalLocationOffset * CapsuleScale)
 		};
+
+		// Calculate New Values
+		// Then
+		if (EffectSettings->TransferrableSurfaces.Contains(HitResult.PhysMaterial->SurfaceType.GetValue()))
+		{
+			// Spawn Decal
+		}
 
 		UDecalComponent* Decal;
 
@@ -259,6 +269,31 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 				FVector2D InputRange{ 0, 1 };
 				FVector2D OutputRange{ 0, 1 };
 				float DurationModifier{ 0.0f };
+
+				FALSXTFootprintState ActiveFootState;
+				FALSXTFootprintState CharacterFootState;
+
+				if (FootBone == EAlsFootBone::Left)
+				{
+					ActiveFootState = CurrentFootprintsState.Left;
+					CharacterFootState = IALSXTCharacterInterface::Execute_GetCharacterFootprintsState(ALSXTCharacter).Left;
+					ActiveFootState.Previous = CharacterFootState.Current;
+				}
+				
+				if (FootBone == EAlsFootBone::Right)
+				{
+					ActiveFootState = CurrentFootprintsState.Right;
+					CharacterFootState = IALSXTCharacterInterface::Execute_GetCharacterFootprintsState(ALSXTCharacter).Right;
+					ActiveFootState.Previous = CharacterFootState.Current;
+				}
+
+				//Example using above
+				//Set New Current
+				// ActiveFootState.Current.SurfaceType = UGameplayStatics::GetSurfaceType(Hit);
+				// ActiveFootState.Current.TransferDetailTexture = EffectSettings->TransferDetailTexture;
+				// ActiveFootState.Current.TransferDetailScale = EffectSettings->TransferDetailTextureScale;
+				
+				// ALSXTCharacter->ProcessNewFootprintsState(FootBone, CurrentFootprintsState);
 
 				// Set New Left or Right foot Values based on current FootBone
 				if (FootBone == EAlsFootBone::Left) {

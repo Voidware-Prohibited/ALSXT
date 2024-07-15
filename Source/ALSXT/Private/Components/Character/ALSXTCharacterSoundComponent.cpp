@@ -1740,6 +1740,8 @@ void UALSXTCharacterSoundComponent::PlayDamageSound(bool MovementSound, bool Acc
 		TArray<FALSXTCharacterDamageSound> DamageSounds = SelectDamageSounds(Settings, Sex, Variant, Overlay, AttackMethod, AttackForm, Strength);
 		TArray<FSound> Sounds;
 
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ShouldPlayDamageSound");
+
 		for (FALSXTCharacterDamageSound AC : DamageSounds)
 		{
 			Sounds.Append(AC.Sounds);
@@ -1774,11 +1776,14 @@ void UALSXTCharacterSoundComponent::PlayDamageSound(bool MovementSound, bool Acc
 	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		// Server
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ServerPlaySound (Damage)");
+
 		ServerPlaySound(MotionSounds);
 	}
 	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
 	{
 		// Reg
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlaySound (Damage)");
 		PlaySound(MotionSounds);
 	}
 }
