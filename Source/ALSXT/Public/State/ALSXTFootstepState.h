@@ -5,6 +5,7 @@
 #include "Engine/Texture2D.h"
 #include "Engine/EngineTypes.h"
 #include "Settings/ALSXTFootstepEffectSettings.h"
+#include "GameplayTagContainer.h"
 #include "ALSXTFootstepState.generated.h"
 
 UENUM(BlueprintType)
@@ -131,7 +132,7 @@ struct ALSXT_API FALSXTFootwearDetails
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Footwear Type"))
-	FGameplayTag FootwearType{ FGameplayTag::EmptyTag };
+	FGameplayTag FootwearType { FGameplayTag::EmptyTag };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<EPhysicalSurface> FootwearSoleSurfaceType{ 0 };

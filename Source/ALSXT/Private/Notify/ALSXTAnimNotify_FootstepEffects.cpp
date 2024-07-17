@@ -141,8 +141,12 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		HitResult.PhysMaterial = nullptr;
 	}
 
+	FGameplayTag CharacterGait = IALSXTCharacterInterface::Execute_GetCharacterGait(Mesh->GetOwner());
+	FGameplayTag CharacterStance = IALSXTCharacterInterface::Execute_GetCharacterStance(Mesh->GetOwner());
 	const auto SurfaceType{ HitResult.PhysMaterial.IsValid() ? HitResult.PhysMaterial->SurfaceType.GetValue() : SurfaceType_Default };
 	const auto* EffectSettings{ FootstepEffectsSettings->Effects.Find(SurfaceType) };
+	FGameplayTag CharacterFootwearType = IALSXTCharacterInterface::Execute_GetCharacterFootwearDetails(Mesh->GetOwner()).FootwearType;
+	FALSXTFootwearTypeEffectsSettings CharacterFootwearTypeEffectsSettings;
 
 	if (EffectSettings == nullptr)
 	{
@@ -155,6 +159,14 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 		if (EffectSettings == nullptr)
 		{
 			return;
+		}
+	}
+
+	for (FALSXTFootwearTypeEffectsSettings FootwearTypeEffectsSettings : EffectSettings->FootwearTypeEffectsSettings)
+	{
+		if (FootwearTypeEffectsSettings.FootwearType.HasTag(CharacterFootwearType))
+		{
+			CharacterFootwearTypeEffectsSettings = FootwearTypeEffectsSettings;
 		}
 	}
 
@@ -201,6 +213,44 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					Audio = UGameplayStatics::SpawnSoundAtLocation(World, EffectSettings->Sound.Get(), FootstepLocation,
 						FootstepRotation.Rotator(),
 						VolumeMultiplier, SoundPitchMultiplier);
+
+					if (FootstepEffectsSettings->EnableMakeNoise)
+					{
+						float FootstepMakeNoiseLoudness { 0.0f };
+
+						if (CharacterStance == AlsStanceTags::Standing)
+						{
+							if (CharacterGait == AlsGaitTags::Walking)
+							{
+								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.StandingWalkSoundLevel;
+							}
+							if (CharacterGait == AlsGaitTags::Running)
+							{
+								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.StandingRunSoundLevel;
+							}
+							if (CharacterGait == AlsGaitTags::Sprinting)
+							{
+								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.StandingSprintSoundLevel;
+							}
+						}
+						if (CharacterStance == AlsStanceTags::Crouching)
+						{
+							if (CharacterGait == AlsGaitTags::Walking)
+							{
+								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.CrouchedWalkSoundLevel;
+							}
+							if (CharacterGait == AlsGaitTags::Running)
+							{
+								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.CrouchedRunSoundLevel;
+							}
+							if (CharacterGait == AlsGaitTags::Sprinting)
+							{
+								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.CrouchedSprintSoundLevel;
+							}
+						}
+
+						Mesh->GetOwner()->MakeNoise(FootstepMakeNoiseLoudness, Cast<APawn>(Mesh->GetOwner()), FootstepLocation, 10, "Footstep");
+					}
 				}
 				break;
 

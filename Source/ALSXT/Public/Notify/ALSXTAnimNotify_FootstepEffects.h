@@ -4,6 +4,7 @@
 #include "Chaos/ChaosEngineInterface.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
+#include "GameplayTagContainer.h"
 #include "Settings/ALSXTFootstepEffectSettings.h"
 #include "State/ALSXTFootstepState.h"
 #include "Notifies/AlsAnimNotify_FootstepEffects.h"
@@ -68,6 +69,24 @@ struct ALSXT_API FALSXTFootwearTypeEffectsSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TSoftObjectPtr<USoundBase> Sound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Make Sound")
+	float StandingWalkSoundLevel{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Make Sound")
+	float StandingRunSoundLevel{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Make Sound")
+	float StandingSprintSoundLevel{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Make Sound")
+	float CrouchedWalkSoundLevel{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Make Sound")
+	float CrouchedRunSoundLevel{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Make Sound")
+	float CrouchedSprintSoundLevel{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System")
 	FALSXTFootstepParticles FootstepParticles;
@@ -232,6 +251,9 @@ class ALSXT_API UALSXTFootstepEffectsSettings : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TEnumAsByte<ETraceTypeQuery> SurfaceTraceChannel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool EnableMakeNoise{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool EnableVertexPaintTrace{ false };
