@@ -9,13 +9,6 @@
 #include "ALSXTFootstepState.generated.h"
 
 UENUM(BlueprintType)
-enum class EALSXTFootBone : uint8
-{
-	Left,
-	Right,
-};
-
-UENUM(BlueprintType)
 enum class EALSXTFootprintPhase : uint8
 {
 	Current,

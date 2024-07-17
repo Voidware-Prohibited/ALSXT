@@ -178,7 +178,7 @@ public:
 	float SoundPitchMultiplier{ 1.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
-	EALSXTFootBone FootBone {EALSXTFootBone::Left};
+	EAlsFootBone FootBone { EAlsFootBone::Left};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Sound", Meta = (AllowPrivateAccess))
 	bool bSkipEffectsWhenInAir;

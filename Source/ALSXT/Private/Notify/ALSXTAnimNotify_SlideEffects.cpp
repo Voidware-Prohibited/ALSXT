@@ -55,11 +55,11 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 	const auto* AnimationInstance{ Mesh->GetAnimInstance() };
 	const auto* ALSXTAnimationInstance{ Cast<UALSXTAnimationInstance>(Mesh->GetAnimInstance()) };
 
-	const auto FootBoneName{FootBone == EALSXTFootBone::Left ? UAlsConstants::FootLeftBoneName() : UAlsConstants::FootRightBoneName()};
+	const auto FootBoneName{FootBone == EAlsFootBone::Left ? UAlsConstants::FootLeftBoneName() : UAlsConstants::FootRightBoneName()};
 	const auto FootTransform{Mesh->GetSocketTransform(FootBoneName)};
 
 	const auto FootZAxis{
-		FootTransform.TransformVectorNoScale(FootBone == EALSXTFootBone::Left
+		FootTransform.TransformVectorNoScale(FootBone == EAlsFootBone::Left
 												 ? SlideEffectsSettings->FootLeftZAxis
 												 : SlideEffectsSettings->FootRightZAxis)
 	};
@@ -135,7 +135,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 
 	const auto FootstepRotation{
 		FRotationMatrix::MakeFromZY(HitResult.ImpactNormal,
-									FootTransform.TransformVectorNoScale(FootBone == EALSXTFootBone::Left
+									FootTransform.TransformVectorNoScale(FootBone == EAlsFootBone::Left
 																			 ? SlideEffectsSettings->FootLeftYAxis
 																			 : SlideEffectsSettings->FootRightYAxis)).ToQuat()
 	};
@@ -193,7 +193,7 @@ void UALSXTAnimNotify_SlideEffects::Notify(USkeletalMeshComponent* Mesh, UAnimSe
 		case EALSXTFootstepParticleEffectSpawnType::SpawnAtTraceHitLocation:
 		{
 			const auto ParticleSystemRotation{
-				FootstepRotation * (FootBone == EALSXTFootBone::Left
+				FootstepRotation * (FootBone == EAlsFootBone::Left
 										? EffectSettings->ParticleSystemFootLeftRotationOffset
 										: EffectSettings->ParticleSystemFootLeftRotationOffset).Quaternion()
 			};
