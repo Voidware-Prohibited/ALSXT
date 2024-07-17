@@ -14,7 +14,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Notify/ALSXTAnimNotify_FootstepEffects.h"
+#include "Notifies/AlsAnimNotify_FootstepEffects.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Utility/AlsConstants.h"
 #include "Utility/AlsEnumUtility.h"
