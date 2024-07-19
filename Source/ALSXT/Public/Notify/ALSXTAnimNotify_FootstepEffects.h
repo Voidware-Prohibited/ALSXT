@@ -60,16 +60,13 @@ struct ALSXT_API FALSXTFootstepParticles
 };
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTFootwearTypeEffectsSettings
+struct ALSXT_API FALSXTFootwearTypeSoundLevels
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Footwear Type", AllowPrivateAccess))
-	FGameplayTagContainer FootwearType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	TSoftObjectPtr<USoundBase> Sound;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Make Sound")
+	float LandingSoundLevel{ 1.0f };
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Make Sound")
 	float StandingWalkSoundLevel{ 1.0f };
 
@@ -87,6 +84,22 @@ struct ALSXT_API FALSXTFootwearTypeEffectsSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound|Make Sound")
 	float CrouchedSprintSoundLevel{ 1.0f };
+
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTFootwearTypeEffectsSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Footwear Type", AllowPrivateAccess))
+	FGameplayTagContainer FootwearType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TSoftObjectPtr<USoundBase> Sound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	FALSXTFootwearTypeSoundLevels FootwearTypeSoundLevels;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System")
 	FALSXTFootstepParticles FootstepParticles;

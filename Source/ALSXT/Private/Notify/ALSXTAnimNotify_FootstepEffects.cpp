@@ -218,34 +218,41 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 					{
 						float FootstepMakeNoiseLoudness { 0.0f };
 
-						if (CharacterStance == AlsStanceTags::Standing)
+						if (SoundType == EALSXTFootstepSoundType::Land)
 						{
-							if (CharacterGait == AlsGaitTags::Walking)
-							{
-								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.StandingWalkSoundLevel;
-							}
-							if (CharacterGait == AlsGaitTags::Running)
-							{
-								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.StandingRunSoundLevel;
-							}
-							if (CharacterGait == AlsGaitTags::Sprinting)
-							{
-								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.StandingSprintSoundLevel;
-							}
+							FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.FootwearTypeSoundLevels.LandingSoundLevel;
 						}
-						if (CharacterStance == AlsStanceTags::Crouching)
+						else
 						{
-							if (CharacterGait == AlsGaitTags::Walking)
+							if (CharacterStance == AlsStanceTags::Standing)
 							{
-								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.CrouchedWalkSoundLevel;
+								if (CharacterGait == AlsGaitTags::Walking)
+								{
+									FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.FootwearTypeSoundLevels.StandingWalkSoundLevel;
+								}
+								if (CharacterGait == AlsGaitTags::Running)
+								{
+									FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.FootwearTypeSoundLevels.StandingRunSoundLevel;
+								}
+								if (CharacterGait == AlsGaitTags::Sprinting)
+								{
+									FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.FootwearTypeSoundLevels.StandingSprintSoundLevel;
+								}
 							}
-							if (CharacterGait == AlsGaitTags::Running)
+							if (CharacterStance == AlsStanceTags::Crouching)
 							{
-								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.CrouchedRunSoundLevel;
-							}
-							if (CharacterGait == AlsGaitTags::Sprinting)
-							{
-								FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.CrouchedSprintSoundLevel;
+								if (CharacterGait == AlsGaitTags::Walking)
+								{
+									FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.FootwearTypeSoundLevels.CrouchedWalkSoundLevel;
+								}
+								if (CharacterGait == AlsGaitTags::Running)
+								{
+									FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.FootwearTypeSoundLevels.CrouchedRunSoundLevel;
+								}
+								if (CharacterGait == AlsGaitTags::Sprinting)
+								{
+									FootstepMakeNoiseLoudness = CharacterFootwearTypeEffectsSettings.FootwearTypeSoundLevels.CrouchedSprintSoundLevel;
+								}
 							}
 						}
 
