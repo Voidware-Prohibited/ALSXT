@@ -3225,7 +3225,7 @@ FALSXTFootwearDetails AALSXTCharacter::GetCharacterFootwearDetails_Implementatio
 void AALSXTCharacter::PlayBreathEffects_Implementation(const FGameplayTag& StaminaOverride)
 {
 	CharacterSound->PlayCharacterBreathEffects(StaminaOverride);
-	CharacterSound->ServerPlayCharacterBreathEffects(StaminaOverride);
+	// CharacterSound->MulticastPlayCharacterBreathEffects(StaminaOverride);
 }
 
 void AALSXTCharacter::PlayActionSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)

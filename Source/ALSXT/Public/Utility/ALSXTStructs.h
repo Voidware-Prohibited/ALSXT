@@ -1181,7 +1181,7 @@ struct ALSXT_API FALSXTImpactParticleActor
 	FGameplayTagContainer Form;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	AActor* ParticleActor{ nullptr };
+	TSubclassOf<AActor> ParticleActor;
 
 	bool operator==(const FALSXTImpactParticleActor& other) const
 	{

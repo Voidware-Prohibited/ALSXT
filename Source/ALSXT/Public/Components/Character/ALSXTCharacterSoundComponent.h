@@ -32,7 +32,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(BlueprintAssignable)
-	FShouldPlayHoldingBreathSoundDelegateSignature ShouldPlayHoldingBreathSoundDelegate;
+	FShouldPlayHoldingBreathSoundDelegateSignature ShouldPlayHoldingBreathSound;
 
 	/*
 
@@ -109,13 +109,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
 	FALSXTCharacterBreathEffectsSettings BreathParticleSettings;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	float CurrentStamina {1.0f};
 
-	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTag CurrentStaminaTag {ALSXTStaminaTags::Optimal};
 
-	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTag CurrentBreathType{ ALSXTBreathTypeTags::Regular };
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Settings", Meta = (AllowPrivateAccess))
@@ -229,6 +229,12 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastPlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
 
+	UFUNCTION(Client, Unreliable)
+	void ClientPlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	void PlayCharacterBreathEffectsImplementation(const FGameplayTag& StaminaOverride);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayBreathSound();
 	
@@ -253,7 +259,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayDeathSound();
 
-	bool ShouldPlayHoldingBreathSound(const FGameplayTag& HoldBreathType, const float Stamina);
+	bool ShouldPlayHoldingBreathSoundDelegate(const FGameplayTag& HoldBreathType, const float Stamina);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool ShouldPlayMovementAccentSound(const FGameplayTag& Type, const FGameplayTag& Strength);
@@ -336,7 +342,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, Strength, AttackMode"))
 	void PlayAttackSound(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float Stamina);
 
-	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, AttackMethod, Strength, AttackForm"))
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, AttackMethod, Strength, AttackForm"))
 	void PlayDamageSound(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Attack Method"))const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, Strength, AttackForm"))

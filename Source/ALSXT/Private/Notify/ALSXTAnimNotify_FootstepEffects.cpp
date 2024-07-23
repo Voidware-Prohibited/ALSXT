@@ -145,7 +145,11 @@ void UALSXTAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 	FGameplayTag CharacterStance = IALSXTCharacterInterface::Execute_GetCharacterStance(Mesh->GetOwner());
 	const auto SurfaceType{ HitResult.PhysMaterial.IsValid() ? HitResult.PhysMaterial->SurfaceType.GetValue() : SurfaceType_Default };
 	const auto* EffectSettings{ FootstepEffectsSettings->Effects.Find(SurfaceType) };
-	FGameplayTag CharacterFootwearType = IALSXTCharacterInterface::Execute_GetCharacterFootwearDetails(Mesh->GetOwner()).FootwearType;
+	FALSXTFootwearDetails FootwearDetails = IALSXTCharacterInterface::Execute_GetCharacterFootwearDetails(Mesh->GetOwner());
+	FGameplayTag CharacterFootwearType = FootwearDetails.FootwearType;
+	UTexture2D* SoleTexture = FootwearDetails.FootwearSoleTexture;
+	UTexture2D* SoleNormalTexture = FootwearDetails.FootwearSoleNormalTexture;
+	UTexture2D* SoleDetailTexture = FootwearDetails.FootwearSoleDetailTexture;
 	FALSXTFootwearTypeEffectsSettings CharacterFootwearTypeEffectsSettings;
 
 	if (EffectSettings == nullptr)
