@@ -3237,3 +3237,18 @@ void AALSXTCharacter::PlayDamageSound_Implementation(bool MovementSound, bool Ac
 {
 	CharacterSound->PlayDamageSound(MovementSound, AccentSound, WeaponSound, SoundSex, Variant, Overlay, AttackMethod, Strength, AttackForm, Damage);
 }
+
+float AALSXTCharacter::GetCurrentStamina_Implementation() const
+{
+	return CharacterSound->CurrentStamina;
+}
+
+FGameplayTag AALSXTCharacter::GetCurrentStaminaTag_Implementation() const
+{
+	return CharacterSound->CurrentStaminaTag;
+}
+
+FGameplayTag AALSXTCharacter::GetCurrentBreathType_Implementation() const
+{
+	return CharacterSound->CurrentBreathType;
+}

@@ -113,7 +113,7 @@ public:
 	float CurrentStamina {1.0f};
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
-	FGameplayTag CurrentStaminaTag {ALSXTStaminaTags::Optimal};
+	FGameplayTag CurrentStaminaTag {ALSXTStaminaTags::Full};
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTag CurrentBreathType{ ALSXTBreathTypeTags::Regular };

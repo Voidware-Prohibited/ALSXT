@@ -28,6 +28,15 @@ public:
 	FALSXTCharacterVoiceParameters GetVoiceParameters();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
+	float GetCurrentStamina() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
+	FGameplayTag GetCurrentStaminaTag() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
+	FGameplayTag GetCurrentBreathType() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
 	bool CanPlayBreathSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Parameters")
@@ -53,9 +62,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
 	FRotator GetVoiceSocketRotation();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
-	FGameplayTag GetCurrentBreathType();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
 	FGameplayTag GetHoldingBreath();

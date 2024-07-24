@@ -92,6 +92,8 @@ void UALSXTCharacterSoundComponent::UpdateStamina(bool& StaminaTagChanged)
 	if ((CurrentStamina != NewStamina) && IsValid(VocalizationMixerAudioComponent))
 	{
 		CurrentStamina = NewStamina;
+		FGameplayTag NewStaminaTag{ ConvertStaminaToStaminaTag(IALSXTCharacterInterface::Execute_GetStamina(GetOwner())) };
+		CurrentStaminaTag = NewStaminaTag;
 		VocalizationMixerAudioComponent->SetFloatParameter("Stamina", CurrentStamina);
 	}
 	else
@@ -181,58 +183,51 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffectsImplementation(con
 		UpdateStaminaThresholds();
 		bool StaminaTagChanged;
 		UpdateStamina(StaminaTagChanged);
-		FGameplayTag StaminaToUse{ (StaminaOverride != FGameplayTag::EmptyTag) ? StaminaOverride : CurrentStaminaTag };
+		FGameplayTag StaminaToUse{ (StaminaOverride != FGameplayTag::EmptyTag || !StaminaOverride.IsValid()) ? StaminaOverride : CurrentStaminaTag };
 		UpdateVoiceSocketLocation();
 		FMotionSounds NewMotionSounds;
 
 		// If New
 		if (StaminaTagChanged || StaminaToUse != CurrentStaminaTag || CurrentBreathSounds.IsEmpty())
 		{
-			if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
+			// Get and Set New Sounds
+			UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
+			CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(GetOwner()).Variant, IALSXTCharacterInterface::Execute_GetCharacterBreathState(GetOwner()).BreathType, StaminaOverride);
+			TArray<FSound> Sounds;
+
+			for (FALSXTBreathSound BS : CurrentBreathSounds)
 			{
-				// Get and Set New Sounds
-				UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
-				CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), ALSXTVoiceVariantTags::Default, ALSXTBreathTypeTags::Regular, StaminaOverride);
-				TArray<FSound> Sounds;
-
-				for (FALSXTBreathSound BS : CurrentBreathSounds)
-				{
-					Sounds.Append(BS.Sounds);
-				}
-
-				if (Sounds.IsValidIndex(0))
-				{
-					FSound NewBreathSound;
-					DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-					float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-					CurrentBreathSound = NewBreathSound;
-					SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-				}
-				NewMotionSounds.BreathSounds = Sounds;
+				Sounds.Append(BS.Sounds);
 			}
+
+			if (Sounds.IsValidIndex(0))
+			{
+				FSound NewBreathSound;
+				DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
+				float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
+				CurrentBreathSound = NewBreathSound;
+				SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
+			}
+			NewMotionSounds.BreathSounds = Sounds;
 		}
 		else // If Same
 		{
+			TArray<FSound> Sounds;
 
-			if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
+			for (FALSXTBreathSound BS : CurrentBreathSounds)
 			{
-				TArray<FSound> Sounds;
-
-				for (FALSXTBreathSound BS : CurrentBreathSounds)
-				{
-					Sounds.Append(BS.Sounds);
-				}
-
-				if (Sounds.IsValidIndex(0))
-				{
-					FSound NewBreathSound;
-					DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-					float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-					CurrentBreathSound = NewBreathSound;
-					SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-				}
-				NewMotionSounds.BreathSounds = Sounds;
+				Sounds.Append(BS.Sounds);
 			}
+
+			if (Sounds.IsValidIndex(0))
+			{
+				FSound NewBreathSound;
+				DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
+				float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
+				CurrentBreathSound = NewBreathSound;
+				SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
+			}
+			NewMotionSounds.BreathSounds = Sounds;
 		}
 		// V2
 		if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
@@ -752,19 +747,23 @@ FGameplayTag UALSXTCharacterSoundComponent::ConvertWeightTagToStrengthTag(const 
 
 FGameplayTag UALSXTCharacterSoundComponent::ConvertStaminaToStaminaTag(const float Stamina)
 {
-	if (Stamina >= GeneralCharacterSoundSettings.StaminaOptimalThreshold)
+	if (Stamina == 1.0)
+	{
+		return ALSXTStaminaTags::Full;
+	}
+	else if (Stamina < 1.0 && Stamina >= GeneralCharacterSoundSettings.StaminaOptimalThreshold)
 	{
 		return ALSXTStaminaTags::Optimal;
 	}
-	else if ((Stamina <= GeneralCharacterSoundSettings.StaminaHalfPoint && Stamina > GeneralCharacterSoundSettings.StaminaLowThreshold))
+	else if (( Stamina >= GeneralCharacterSoundSettings.StaminaHalfPoint && Stamina < GeneralCharacterSoundSettings.StaminaOptimalThreshold))
 	{
 		return ALSXTStaminaTags::Half;
 	}
-	else if ((Stamina <= GeneralCharacterSoundSettings.StaminaLowThreshold && Stamina > .15))
+	else if ((Stamina < GeneralCharacterSoundSettings.StaminaHalfPoint && Stamina > GeneralCharacterSoundSettings.StaminaLowThreshold))
 	{
 		return ALSXTStaminaTags::Low;
 	}
-	else if ((Stamina <= .15))
+	else if ((Stamina < GeneralCharacterSoundSettings.StaminaLowThreshold))
 	{
 		return ALSXTStaminaTags::Empty;
 	}
@@ -2150,8 +2149,7 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 			if (IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
 			{
 				// UE_LOG(LogTemp, Warning, TEXT("SelectNewBreathParticles"));
-				FGameplayTag NewStaminaTag{ ConvertStaminaToStaminaTag(IALSXTCharacterInterface::Execute_GetStamina(GetOwner())) };
-				CurrentBreathParticles = SelectBreathParticles(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner()), NewStaminaTag);
+				CurrentBreathParticles = SelectBreathParticles(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner()), CurrentStaminaTag);
 				if (CurrentBreathParticles.IsValidIndex(0))
 				{
 					// UpdateVoiceSocketRotation();
@@ -2160,7 +2158,7 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 					ServerPlayBreathParticle(NiagaraSystem);
 				}
 			}
-			
+			return;
 		}
 
 		// VOCAL
@@ -2199,6 +2197,7 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 					// ServerPlayBreathParticle(NiagaraSystem);
 				}
 			}
+			return;
 		}
 	}
 }
