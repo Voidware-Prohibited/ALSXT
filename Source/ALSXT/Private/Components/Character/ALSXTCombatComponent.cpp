@@ -197,7 +197,6 @@ void UALSXTCombatComponent::TraceForTargets(TArray<FTargetHitResultEntry>& Targe
 
 void UALSXTCombatComponent::GetClosestTarget()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "GetClosestTarget");
 	TArray<FTargetHitResultEntry> OutHits;
 	TraceForTargets(OutHits);
 	FTargetHitResultEntry FoundHit;
@@ -241,7 +240,7 @@ void UALSXTCombatComponent::GetClosestTarget()
 				FString DebugMsg = FString::SanitizeFloat(FoundHit.AngleFromCenter);
 				DebugMsg.Append(" Hit Result: ");
 				DebugMsg.Append(FoundHit.HitResult.GetActor()->GetName());
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DebugMsg);
+				// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DebugMsg);
 			}
 		}
 	}
@@ -476,7 +475,7 @@ AActor* UALSXTCombatComponent::TraceForPotentialAttackTarget(float Distance)
 			{
 				if (GEngine && CombatSettings.DebugMode)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Potential Target: %s"), *Hit.GetActor()->GetName()));
+					// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Potential Target: %s"), *Hit.GetActor()->GetName()));
 				}
 				return Hit.GetActor();
 			}
@@ -1129,12 +1128,12 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 				FVector NewLocation = CurrentTarget.HitResult.GetActor()->GetActorLocation() + IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner())->MoveToTargetMaxDistance * Direction;
 
 				//Calculate Speed of MoveSmooth based on Min and Max values
-				float MovementSpeed = ((DistanceToTarget - 60.0f) / (IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner())->MoveToTargetMaxDistance - 60.0f)) * 3.0f;
+				float MovementSpeed = ((DistanceToTarget - 60.0f) / (IALSXTCombatInterface::Execute_SelectCombatSettings(GetOwner())->MoveToTargetMaxDistance - 60.0f)) * 0.5f;
 
 				//vector from our current location to the target which is slightly further away from the target
 				FVector SmoothMoveVector = NewLocation - Character->GetActorLocation();
-				FStepDownResult* StepdownResult{ nullptr };
-				IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MoveSmooth(SmoothMoveVector, MovementSpeed, StepdownResult);
+				FStepDownResult StepdownResult;
+				IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MoveSmooth(SmoothMoveVector, MovementSpeed, &StepdownResult);
 			}
 		}
 		

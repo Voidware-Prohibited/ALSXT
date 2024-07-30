@@ -201,7 +201,7 @@ public:
 	FALSXTImpactParticleMap ImpactParticles;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
-	TArray <FALSXTImpactParticleActor> ImpactParticleActors;
+	TArray <FALSXTImpactParticleActorMap> ImpactParticleActors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particle}", AllowPrivateAccess))
 	TArray<FALSXTImpactPointParticle> ImpactPointParticles;

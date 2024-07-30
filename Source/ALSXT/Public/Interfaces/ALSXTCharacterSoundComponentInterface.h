@@ -37,6 +37,18 @@ public:
 	FGameplayTag GetCurrentBreathType() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
+	FString GetCurrentBreathSounds() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
+	FString GetCurrentBreathSound() const;
+
+	// UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
+	// FString GetCurrentVocalizations() const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
+	FString GetCurrentVocalization() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
 	bool CanPlayBreathSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Parameters")

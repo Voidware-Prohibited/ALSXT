@@ -103,7 +103,7 @@ void UALSXTCharacterSoundComponent::UpdateStamina(bool& StaminaTagChanged)
 			FString Objectname = GetOwner()->GetDebugName(GetOwner());
 			FString FunctionName = ": UpdateStamina: VocalizationMixerAudioComponent not valid";
 			Objectname.Append(FunctionName);
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Objectname);
+			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Objectname);
 		}
 	}
 }
@@ -176,6 +176,34 @@ void UALSXTCharacterSoundComponent::SetNewSound(UObject* Sound, TArray<UObject*>
 	}
 }
 
+void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTag& StaminaOverride)
+{	
+	// FString LocalRoleString = StaticEnum<ENetRole>()->GetValueAsString(GetOwner()->GetLocalRole());
+	// FString RemoteRoleString = StaticEnum<ENetRole>()->GetValueAsString(GetOwner()->GetRemoteRole());
+	// FString DebugString = GetOwner()->GetDebugName(GetOwner());
+	// DebugString.Append(" Local Role : ");
+	// DebugString.Append(LocalRoleString);
+	// DebugString.Append(" Remote Role: ");
+	// DebugString.Append(RemoteRoleString);
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, DebugString);
+	
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// Player
+		MulticastPlayCharacterBreathEffects(StaminaOverride);
+	}
+	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+	{
+		// AI
+		PlayCharacterBreathEffectsImplementation(StaminaOverride);
+	}
+}
+
+void UALSXTCharacterSoundComponent::MulticastPlayCharacterBreathEffects_Implementation(const FGameplayTag& StaminaOverride)
+{
+	PlayCharacterBreathEffectsImplementation(StaminaOverride);
+}
+
 void UALSXTCharacterSoundComponent::PlayCharacterBreathEffectsImplementation(const FGameplayTag& StaminaOverride)
 {
 	if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
@@ -241,355 +269,6 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffectsImplementation(con
 			PlaySound(NewMotionSounds);
 		}
 	}
-}
-
-void UALSXTCharacterSoundComponent::PlayCharacterBreathEffects(const FGameplayTag& StaminaOverride)
-{	
-	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		// Server
-		// ClientPlayCharacterBreathEffects(StaminaOverride);
-		// ServerPlayCharacterBreathEffects(StaminaOverride);
-		MulticastPlayCharacterBreathEffects(StaminaOverride);
-	}
-	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
-	{
-		// Reg
-		PlayCharacterBreathEffectsImplementation(StaminaOverride);
-	}
-	
-	// if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
-	// {
-	// 	UpdateStaminaThresholds();
-	// 	bool StaminaTagChanged;
-	// 	UpdateStamina(StaminaTagChanged);
-	// 	FGameplayTag StaminaToUse{ (StaminaOverride != FGameplayTag::EmptyTag) ? StaminaOverride : CurrentStaminaTag };
-	// 	UpdateVoiceSocketLocation();
-	// 	FMotionSounds NewMotionSounds;
-	// 
-	// 	// If New
-	// 	if (StaminaTagChanged || StaminaToUse != CurrentStaminaTag || CurrentBreathSounds.IsEmpty())
-	// 	{
-	// 		if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
-	// 		{
-	// 			// Get and Set New Sounds
-	// 			UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
-	// 			CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), ALSXTVoiceVariantTags::Default, ALSXTBreathTypeTags::Regular, StaminaOverride);
-	// 			TArray<FSound> Sounds;
-	// 
-	// 			for (FALSXTBreathSound BS : CurrentBreathSounds)
-	// 			{
-	// 				Sounds.Append(BS.Sounds);
-	// 			}
-	// 
-	// 			if (Sounds.IsValidIndex(0))
-	// 			{
-	// 				FSound NewBreathSound;
-	// 				DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-	// 				float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-	// 				CurrentBreathSound = NewBreathSound;
-	// 				SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-	// 			}
-	// 			NewMotionSounds.BreathSounds = Sounds;
-	// 		}
-	// 	}
-	// 	else // If Same
-	// 	{
-	// 
-	// 		if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
-	// 		{
-	// 			TArray<FSound> Sounds;
-	// 
-	// 			for (FALSXTBreathSound BS : CurrentBreathSounds)
-	// 			{
-	// 				Sounds.Append(BS.Sounds);
-	// 			}
-	// 
-	// 			if (Sounds.IsValidIndex(0))
-	// 			{
-	// 				FSound NewBreathSound;
-	// 				DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-	// 				float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-	// 				CurrentBreathSound = NewBreathSound;
-	// 				SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-	// 			}
-	// 			NewMotionSounds.BreathSounds = Sounds;
-	// 		}
-	// 	}
-	// 
-	// 	// V2
-	// 	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
-	// 	{
-	// 		// Server
-	// 		ServerPlaySound(NewMotionSounds);
-	// 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "ServerPlaySound");
-	// 	}
-	// 	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
-	// 	{
-	// 		// Reg
-	// 		PlaySound(NewMotionSounds);
-	// 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "PlaySound");
-	// 	}
-	// }
-
-	///////////////////////////////
-
-	// FMotionSounds MotionSounds;
-
-	// BREATH
-	// if (CanPlayBreathSound() && ShouldPlayBreathSound())
-	// {
-	// 	UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
-	// 	CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), ALSXTVoiceVariantTags::Default, ALSXTBreathTypeTags::Regular, StaminaOverride);
-	// 	TArray<FSound> Sounds;
-	// 
-	// 	for (FALSXTBreathSound AC : CurrentBreathSounds)
-	// 	{
-	// 		Sounds.Append(AC.Sounds);
-	// 	}
-	// 
-	// 	if (Sounds.IsValidIndex(0))
-	// 	{
-	// 		MotionSounds.VocalSounds = Sounds;
-	// 	}
-	// }
-	// 
-	// // Breath
-	// if (IsValid(VocalizationMixerAudioComponent) && (BreathSound) && (!CharacterVocalSound))
-	// {
-	// 	FSound NewBreathSound;
-	// 	DetermineNewSound(MotionSounds.BreathSounds, PreviousBreathsAssets, NewBreathSound);
-	// 	float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-	// 	CurrentBreathSound = NewBreathSound;
-	// 	SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-	// 	FVector NewVoiceSocketLocation = IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName);
-	// 	FRotator NewVoiceSocketRotation = IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName);
-	// 	VocalizationMixerAudioComponent->SetObjectParameter("BreathSound", NewBreathSound.Sound);
-	// 	VocalizationMixerAudioComponent->SetFloatParameter("Pitch", Pitch);
-	// 
-	// 	if (GetOwner()->GetRemoteRole() == ROLE_Authority)
-	// 	{
-	// 		VocalizationMixerAudioComponent->SetBoolParameter("Player", true);
-	// 	}
-	// 
-	// 	VocalizationMixerAudioComponent->SetTriggerParameter("BreathInput");
-	// 	GetOwner()->MakeNoise(1.0, Cast<APawn>(GetOwner()), VoiceSocketLocation, 10, "Vocal");
-	// 	// OnVocalization(NewBreathSound);
-	// 	OnVocalization.Broadcast(NewBreathSound);
-	// 	// CurrentBreathParticles = SelectBreathParticles(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner()), CurrentStaminaTag);
-	// 	// UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(DetermineNewBreathParticle(), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner()), GeneralCharacterSoundSettings.VoiceSocketName, NewVoiceSocketLocation, NewVoiceSocketRotation, EAttachLocation::KeepRelativeOffset, true, true, ENCPoolMethod::None, true);
-	// 
-	// }
-	// 
-	// // V2
-	// if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
-	// {
-	// 	// Server
-	// 	ServerPlaySound(MotionSounds);
-	// }
-	// else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
-	// {
-	// 	// Reg
-	// 	PlaySound(MotionSounds);
-	// }
-
-	//
-
-}
-
-void UALSXTCharacterSoundComponent::ServerPlayCharacterBreathEffects_Implementation(const FGameplayTag& StaminaOverride)
-{
-	PlayCharacterBreathEffectsImplementation(StaminaOverride);
-}
-
-void UALSXTCharacterSoundComponent::ClientPlayCharacterBreathEffects_Implementation(const FGameplayTag& StaminaOverride)
-{
-	PlayCharacterBreathEffectsImplementation(StaminaOverride);
-}
-
-void UALSXTCharacterSoundComponent::MulticastPlayCharacterBreathEffects_Implementation(const FGameplayTag& StaminaOverride)
-{
-	// if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
-	// {
-	// 	return;
-	// }
-
-	// if (GetOwner()->GetLocalRole() <= ROLE_Authority)
-	// {
-	// 	return;
-	// }
-
-	// if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy)
-	// {
-	// 	return;
-	// }
-
-	// GetOwner()->GetInstigatorController()->HasAuthority()
-
-	// if (GetOwner()->GetLocalRole() == ROLE_Authority && GetOwner()->GetRemoteRole() == ROLE_Authority)
-	// {
-	// 	return;
-	// }
-
-	PlayCharacterBreathEffectsImplementation(StaminaOverride);
-
-	// if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "MulticastCanPlayBreathSound");
-	// 	UpdateStaminaThresholds();
-	// 	bool StaminaTagChanged;
-	// 	UpdateStamina(StaminaTagChanged);
-	// 	FGameplayTag StaminaToUse{ (StaminaOverride != FGameplayTag::EmptyTag) ? StaminaOverride : CurrentStaminaTag };
-	// 	UpdateVoiceSocketLocation();
-	// 	FMotionSounds NewMotionSounds;
-	// 
-	// 	// If New
-	// 	if (StaminaTagChanged || StaminaToUse != CurrentStaminaTag || CurrentBreathSounds.IsEmpty())
-	// 	{
-	// 		if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
-	// 		{
-	// 			// Get and Set New Sounds
-	// 			UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
-	// 			CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), ALSXTVoiceVariantTags::Default, ALSXTBreathTypeTags::Regular, StaminaOverride);
-	// 			TArray<FSound> Sounds;
-	// 
-	// 			for (FALSXTBreathSound BS : CurrentBreathSounds)
-	// 			{
-	// 				Sounds.Append(BS.Sounds);
-	// 			}
-	// 
-	// 			if (Sounds.IsValidIndex(0))
-	// 			{
-	// 				FSound NewBreathSound;
-	// 				DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-	// 				float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-	// 				CurrentBreathSound = NewBreathSound;
-	// 				SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-	// 			}
-	// 			NewMotionSounds.BreathSounds = Sounds;
-	// 		}
-	// 	}
-	// 	else // If Same
-	// 	{
-	// 
-	// 		if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound())
-	// 		{
-	// 			TArray<FSound> Sounds;
-	// 
-	// 			for (FALSXTBreathSound BS : CurrentBreathSounds)
-	// 			{
-	// 				Sounds.Append(BS.Sounds);
-	// 			}
-	// 
-	// 			if (Sounds.IsValidIndex(0))
-	// 			{
-	// 				FSound NewBreathSound;
-	// 				DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-	// 				float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-	// 				CurrentBreathSound = NewBreathSound;
-	// 				SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-	// 			}
-	// 			NewMotionSounds.BreathSounds = Sounds;
-	// 		}
-	// 	}
-	// 	PlaySound(NewMotionSounds);
-	// }
-
-	
-	
-	// If New
-	// if (StaminaTagChanged || StaminaToUse != CurrentStaminaTag || CurrentBreathSounds.IsEmpty())
-	// {
-	// 	if (CanPlayBreathSound() && ShouldPlayBreathSound() && IsValid(VocalizationMixerAudioComponent))
-	// 	{
-	// 		// Get and Set New Sounds
-	// 		UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
-	// 		CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), ALSXTVoiceVariantTags::Default, ALSXTBreathTypeTags::Regular, StaminaOverride);
-	// 		TArray<FSound> Sounds;
-	// 
-	// 		for (FALSXTBreathSound BS : CurrentBreathSounds)
-	// 		{
-	// 			Sounds.Append(BS.Sounds);
-	// 		}
-	// 
-	// 		if (Sounds.IsValidIndex(0))
-	// 		{
-	// 			FSound NewBreathSound;
-	// 			DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-	// 			float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-	// 			CurrentBreathSound = NewBreathSound;
-	// 			SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-	// 			VocalizationMixerAudioComponent->SetObjectParameter("BreathSound", NewBreathSound.Sound);
-	// 			VocalizationMixerAudioComponent->SetFloatParameter("Pitch", Pitch);
-	// 
-	// 			if (GetOwner()->GetRemoteRole() == ROLE_Authority)
-	// 			{
-	// 				VocalizationMixerAudioComponent->SetBoolParameter("Player", true);
-	// 			}
-	// 
-	// 			VocalizationMixerAudioComponent->SetTriggerParameter("BreathInput");
-	// 			GetOwner()->MakeNoise(1.0, Cast<APawn>(GetOwner()), IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName), 10, "Vocal");
-	// 			OnVocalization.Broadcast(NewBreathSound);
-	// 			//OnVocalization(NewBreathSound);
-	// 		}
-	// 	}
-	// 	if (IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("SelectNewBreathParticles"));
-	// 		CurrentBreathParticles = SelectBreathParticles(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner()), StaminaToUse);
-	// 		if (CurrentBreathParticles.IsValidIndex(0))
-	// 		{
-	// 			UpdateVoiceSocketRotation();
-	// 			UNiagaraSystem* NiagaraSystem{ (CurrentBreathParticles.Num() > 1) ? DetermineNewBreathParticle() : CurrentBreathParticles[0] };
-	// 			ServerPlayBreathParticle(NiagaraSystem);
-	// 		}
-	// 	}
-	// }
-	// else // If Same
-	// {
-	// 
-	// 	if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayBreathSound(GetOwner()) && ShouldPlayBreathSound() && IsValid(VocalizationMixerAudioComponent))
-	// 	{
-	// 		TArray<FSound> Sounds;
-	// 
-	// 		for (FALSXTBreathSound BS : CurrentBreathSounds)
-	// 		{
-	// 			Sounds.Append(BS.Sounds);
-	// 		}
-	// 
-	// 		if (Sounds.IsValidIndex(0))
-	// 		{
-	// 			FSound NewBreathSound;
-	// 			DetermineNewSound(Sounds, PreviousBreathsAssets, NewBreathSound);
-	// 			float Pitch = FMath::RandRange(NewBreathSound.PitchRange.X, NewBreathSound.PitchRange.Y);
-	// 			CurrentBreathSound = NewBreathSound;
-	// 			SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
-	// 			VocalizationMixerAudioComponent->SetObjectParameter("BreathSound", NewBreathSound.Sound);
-	// 			VocalizationMixerAudioComponent->SetFloatParameter("Pitch", Pitch);
-	// 
-	// 			if (GetOwner()->GetRemoteRole() == ROLE_Authority)
-	// 			{
-	// 				VocalizationMixerAudioComponent->SetBoolParameter("Player", true);
-	// 			}
-	// 
-	// 			VocalizationMixerAudioComponent->SetTriggerParameter("BreathInput");
-	// 			GetOwner()->MakeNoise(1.0, Cast<APawn>(GetOwner()), VoiceSocketLocation, 10, "Vocal");
-	// 			// OnVocalization(NewBreathSound);
-	// 			OnVocalization.Broadcast(NewBreathSound);
-	// 		}
-	// 	}
-	// 	if (IALSXTCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(GetOwner()).VisibleBreathTypes.HasTag(IALSXTCharacterInterface::Execute_GetBreathType(GetOwner())))
-	// 	{
-	// 		if (CurrentBreathParticles.IsValidIndex(0))
-	// 		{
-	// 			UpdateVoiceSocketRotation();
-	// 			UE_LOG(LogTemp, Warning, TEXT("SelectFromExistingBreathParticles"));
-	// 			UNiagaraSystem* NiagaraSystem{ (CurrentBreathParticles.Num() > 1) ? DetermineNewBreathParticle() : CurrentBreathParticles[0] };
-	// 			ServerPlayBreathParticle(NiagaraSystem);
-	// 		}
-	// 	}
-	// 
-	// }
 }
 
 void UALSXTCharacterSoundComponent::ServerPlayBreathParticle_Implementation(UNiagaraSystem* NiagaraSystem)
@@ -1254,18 +933,22 @@ TArray<FALSXTCharacterActionSound> UALSXTCharacterSoundComponent::SelectAttackSo
 TArray<FALSXTCharacterDamageSound> UALSXTCharacterSoundComponent::SelectDamageSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& AttackMethod, const FGameplayTag& Form, const FGameplayTag& Strength)
 {
 	FGameplayTagContainer TagsContainer;
-	TArray<FALSXTCharacterDamageSound> DamageSounds = Settings->DamageSounds;
+	// TArray<FALSXTCharacterDamageSound> DamageSounds = Settings->DamageSounds;
+	TArray<FALSXTCharacterDamageSound> DamageSounds = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner())->DamageSounds;
 	TArray<FALSXTCharacterDamageSound> FilteredDamageSounds;
+	TArray<FSound> FilteredFSounds;
 	TagsContainer.AddTagFast(Sex);
-	TagsContainer.AddTagFast(Variant);
+	TagsContainer.AddTagFast(ALSXTVoiceVariantTags::Default);
 	TagsContainer.AddTagFast(AttackMethod);
 	// TagsContainer.AddTagFast(Overlay);
-	TagsContainer.AddTagFast(Form);
+	TagsContainer.AddTagFast(ALSXTImpactFormTags::Blunt);
 	FGameplayTag DamageTag = ALSXTDamageAmountTags::Moderate;
 	TagsContainer.AddTagFast(DamageTag);
 
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TagsContainer.ToString());
+
 	// Return if there are no sounds
-	if (DamageSounds.Num() < 0)
+	if (DamageSounds.Num() < 1)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "No Damage Sounds");
 		return FilteredDamageSounds;
@@ -1277,23 +960,28 @@ TArray<FALSXTCharacterDamageSound> UALSXTCharacterSoundComponent::SelectDamageSo
 		FGameplayTagContainer CurrentTagsContainer;
 		CurrentTagsContainer.AppendTags(DamageSound.Sex);
 		CurrentTagsContainer.AppendTags(DamageSound.Variant);
-		CurrentTagsContainer.AppendTags(DamageSound.AttackMethod);
 		CurrentTagsContainer.AppendTags(DamageSound.Form);
+		CurrentTagsContainer.AppendTags(DamageSound.AttackMethod);
 		CurrentTagsContainer.AppendTags(DamageSound.Damage);
+
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, CurrentTagsContainer.ToString());
+
+		// FilteredDamageSounds.Add(DamageSound);
 
 		if (CurrentTagsContainer.HasAll(TagsContainer))
 		{
 			FilteredDamageSounds.Add(DamageSound);
+			FilteredFSounds.Append(DamageSound.Sounds);
 		}
 	}
 
 	// Return if Return is there are no filtered sounds
-	if (FilteredDamageSounds.Num() < 0 )
+	if (FilteredDamageSounds.Num() < 1 )
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "No Filtered Damage Sounds");
 		return FilteredDamageSounds;
 	}
-
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Found Sounds");
 	return FilteredDamageSounds;
 
 }
@@ -1525,7 +1213,154 @@ void UALSXTCharacterSoundComponent::PlayCharacterMovementSound(bool AccentSound,
 
 }
 
+void UALSXTCharacterSoundComponent::MulticastPlayCharacterMovementSound_Implementation(bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& Weight)
+{
+	PlayCharacterMovementSoundImplementation(AccentSound, WeaponSound, Type, Weight);
+}
+
+void UALSXTCharacterSoundComponent::PlayCharacterMovementSoundImplementation(bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& Weight)
+{
+	if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
+	{
+		return;
+	}
+	FMotionSounds MotionSounds;
+	float Delay = FMath::RandRange(GeneralCharacterSoundSettings.CharacterMovementSoundDelay.X, GeneralCharacterSoundSettings.CharacterMovementSoundDelay.Y);
+	StartTimeSinceLastActionSoundTimer(Delay);
+	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
+	FGameplayTag MovementStrength = ConvertWeightTagToStrengthTag(Weight);
+
+	// MOVEMENT
+	if (CanPlayCharacterMovementSound())
+	{
+		TArray<FALSXTCharacterMovementSound> CharacterMovementSounds = SelectCharacterMovementSounds(Settings, Type, Weight);
+		TArray<FSound> Sounds;
+
+		for (FALSXTCharacterMovementSound CM : CharacterMovementSounds)
+		{
+			Sounds.Append(CM.Sounds);
+		}
+
+		if (Sounds.IsValidIndex(0))
+		{
+			MotionSounds.CharacterMovementSounds = Sounds;
+		}
+	}
+
+	// ACCENT
+	if (ShouldPlayMovementAccentSound(Type, MovementStrength) && AccentSound)
+	{
+		TArray<FALSXTCharacterMovementSound> CharacterMovementAccentSounds = SelectCharacterMovementAccentSounds(Settings, Type, Weight);
+		TArray<FSound> Sounds;
+
+		for (FALSXTCharacterMovementSound CM : CharacterMovementAccentSounds)
+		{
+			Sounds.Append(CM.Sounds);
+		}
+
+		if (Sounds.IsValidIndex(0))
+		{
+			MotionSounds.CharacterMovementAccentSounds = Sounds;
+		}
+	}
+
+	//WEAPON
+	if (ShouldPlayWeaponMovementSound(Type, MovementStrength) && WeaponSound)
+	{
+		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
+		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
+		MotionSounds.WeaponMovementSocketName = "hand_r";
+		TArray<FSound> Sounds;
+
+		for (FALSXTWeaponMovementSound CM : WeaponMovementSounds)
+		{
+			Sounds.Append(CM.Sounds);
+		}
+
+		if (Sounds.IsValidIndex(0))
+		{
+			MotionSounds.CharacterMovementAccentSounds = Sounds;
+		}
+	}
+
+	// V2
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// Server
+		ServerPlaySound(MotionSounds);
+	}
+	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+	{
+		// Reg
+		PlaySound(MotionSounds);
+	}
+
+
+	// if (GetOwner()->GetLocalRole() >= ROLE_Authority)
+	// {
+	// 	MulticastPlaySound(MotionSounds);
+	// }
+	// else
+	// {
+	// 	ServerPlaySound(MotionSounds);
+	// }
+
+}
+
 void UALSXTCharacterSoundComponent::PlayWeaponMovementSound(const FGameplayTag& Weapon, const FGameplayTag& Type)
+{
+	FGameplayTag Weight = IALSXTCharacterInterface::Execute_GetWeightTag(GetOwner());
+	FGameplayTag Strength = ConvertWeightTagToStrengthTag(Weight);
+	if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
+	{
+		return;
+	}
+	if (!CanPlayWeaponMovementSound())
+	{
+		return;
+	}
+	float Delay = FMath::RandRange(GeneralCharacterSoundSettings.WeaponMovementSoundDelay.X, GeneralCharacterSoundSettings.WeaponMovementSoundDelay.Y);
+	StartTimeSinceLastWeaponMovementSoundTimer(Delay);
+	UALSXTCharacterSoundSettings* Settings = SelectCharacterSoundSettings();
+	FMotionSounds MotionSounds;
+
+	//WEAPON
+	if (ShouldPlayWeaponMovementSound(Type, Strength))
+	{
+		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
+		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
+		MotionSounds.WeaponMovementSocketName = "hand_r";
+		TArray<FSound> Sounds;
+
+		for (FALSXTWeaponMovementSound CM : WeaponMovementSounds)
+		{
+			Sounds.Append(CM.Sounds);
+		}
+
+		if (Sounds.IsValidIndex(0))
+		{
+			MotionSounds.WeaponMovementSounds = Sounds;
+		}
+	}
+
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// Server
+		ServerPlaySound(MotionSounds);
+	}
+	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+	{
+		// Reg
+		PlaySound(MotionSounds);
+	}
+}
+
+void UALSXTCharacterSoundComponent::MulticastPlayWeaponMovementSound_Implementation(const FGameplayTag& Weapon, const FGameplayTag& Type)
+{
+	PlayWeaponMovementSoundImplementation(Weapon, Type);
+}
+
+void UALSXTCharacterSoundComponent::PlayWeaponMovementSoundImplementation(const FGameplayTag& Weapon, const FGameplayTag& Type)
 {
 	FGameplayTag Weight = IALSXTCharacterInterface::Execute_GetWeightTag(GetOwner());
 	FGameplayTag Strength = ConvertWeightTagToStrengthTag(Weight);
@@ -1657,12 +1492,80 @@ void UALSXTCharacterSoundComponent::PlayHoldingBreathSound(const FGameplayTag& H
 	}
 }
 
-void UALSXTCharacterSoundComponent::PlayActionSound(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
-{	
+void UALSXTCharacterSoundComponent::MulticastPlayHoldingBreathSound_Implementation(const FGameplayTag& HoldingBreathType, const FGameplayTag& Sex, const FGameplayTag& Variant, const float Stamina)
+{
+	PlayHoldingBreathSoundImplementation(HoldingBreathType, Sex, Variant, Stamina);
+}
+
+void UALSXTCharacterSoundComponent::PlayHoldingBreathSoundImplementation(const FGameplayTag& HoldingBreathType, const FGameplayTag& Sex, const FGameplayTag& Variant, const float Stamina)
+{
 	if (GetOwner()->GetLocalRole() <= ROLE_SimulatedProxy)
 	{
 		return;
 	}
+	FMotionSounds MotionSounds;
+	UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
+
+	//ACTION
+	if (ShouldPlayHoldingBreathSoundDelegate(HoldingBreathType, Stamina))
+	{
+		TArray<FALSXTHoldingBreathSound> HoldingBreathSounds = SelectHoldingBreathSounds(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), Variant, HoldingBreathType);
+		TArray<FSound> Sounds;
+
+		for (FALSXTHoldingBreathSound HoldingBreathSound : HoldingBreathSounds)
+		{
+			Sounds.Append(HoldingBreathSound.Sounds);
+		}
+
+		if (Sounds.IsValidIndex(0))
+		{
+			MotionSounds.VocalSounds = Sounds;
+		}
+	}
+
+	// V2
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// Server
+		ServerPlaySound(MotionSounds);
+	}
+	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+	{
+		// Reg
+		PlaySound(MotionSounds);
+	}
+}
+
+void UALSXTCharacterSoundComponent::PlayActionSound(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
+{	
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// Server
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "MulticastPlayActionSound");
+		MulticastPlayActionSound(MovementSound, AccentSound, WeaponSound, Type, Sex, Variant, Overlay, Strength, Stamina);
+	}
+	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+	{
+		// Reg
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlayActionSoundImplementation");
+		PlayActionSoundImplementation(MovementSound, AccentSound, WeaponSound, Type, Sex, Variant, Overlay, Strength, Stamina);
+	}
+	else if (GetOwner()->GetLocalRole() == ROLE_Authority && GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
+	{
+		// AI
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlayActionSoundImplementation");
+		// PlayActionSoundImplementation(MovementSound, AccentSound, WeaponSound, Type, Sex, Variant, Overlay, Strength, Stamina);
+		MulticastPlayActionSound(MovementSound, AccentSound, WeaponSound, Type, Sex, Variant, Overlay, Strength, Stamina);
+	}
+}
+
+void UALSXTCharacterSoundComponent::MulticastPlayActionSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
+{
+	PlayActionSoundImplementation(MovementSound, AccentSound, WeaponSound, Type, Sex, Variant, Overlay, Strength, Stamina);
+}
+
+void UALSXTCharacterSoundComponent::PlayActionSoundImplementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
+{
 	FGameplayTag Weight = IALSXTCharacterInterface::Execute_GetWeightTag(GetOwner());
 	FMotionSounds MotionSounds;
 	float Delay = FMath::RandRange(GeneralCharacterSoundSettings.ActionSoundDelay.X, GeneralCharacterSoundSettings.ActionSoundDelay.Y);
@@ -1712,7 +1615,7 @@ void UALSXTCharacterSoundComponent::PlayActionSound(bool MovementSound, bool Acc
 
 		for (FALSXTCharacterActionSound AC : ActionSounds)
 		{
-			Sounds.Append(AC.Sounds);			
+			Sounds.Append(AC.Sounds);
 		}
 
 		if (Sounds.IsValidIndex(0))
@@ -1859,7 +1762,33 @@ void UALSXTCharacterSoundComponent::PlayAttackSound(bool MovementSound, bool Acc
 
 }
 
-void UALSXTCharacterSoundComponent::PlayDamageSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage)
+void UALSXTCharacterSoundComponent::PlayDamageSound(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage)
+{
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// Server
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "MulticastPlayActionSound");
+		MulticastPlayDamageSound(MovementSound, AccentSound, WeaponSound, Sex, Variant, Overlay, AttackMethod, Strength, AttackForm, Damage);
+	}
+	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+	{
+		// Reg
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "AI: PlayActionSoundImplementation");
+		MulticastPlayDamageSound(MovementSound, AccentSound, WeaponSound, Sex, Variant, Overlay, AttackMethod, Strength, AttackForm, Damage);
+	}
+	else if (GetOwner()->GetLocalRole() == ROLE_Authority && GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
+	{
+		// AI
+		MulticastPlayDamageSound(MovementSound, AccentSound, WeaponSound, Sex, Variant, Overlay, AttackMethod, Strength, AttackForm, Damage);
+	}
+}
+
+void UALSXTCharacterSoundComponent::MulticastPlayDamageSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage)
+{
+	PlayDamageSoundImplementation(MovementSound, AccentSound, WeaponSound, Sex, Variant, Overlay, AttackMethod, Strength, AttackForm, Damage);
+}
+
+void UALSXTCharacterSoundComponent::PlayDamageSoundImplementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Sex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& AttackMethod, const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage)
 {
 	UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
 	FGameplayTag Weight = IALSXTCharacterInterface::Execute_GetWeightTag(GetOwner());
@@ -1906,14 +1835,12 @@ void UALSXTCharacterSoundComponent::PlayDamageSound_Implementation(bool Movement
 		TArray<FALSXTCharacterDamageSound> DamageSounds = SelectDamageSounds(Settings, Sex, Variant, Overlay, AttackMethod, AttackForm, Strength);
 		TArray<FSound> Sounds;
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ShouldPlayDamageSound");
-
 		for (FALSXTCharacterDamageSound AC : DamageSounds)
 		{
 			Sounds.Append(AC.Sounds);
 		}
 
-		if (Sounds.IsValidIndex(0))
+		if (Sounds.Num() > 0)
 		{
 			MotionSounds.VocalSounds = Sounds;
 		}
@@ -1941,16 +1868,37 @@ void UALSXTCharacterSoundComponent::PlayDamageSound_Implementation(bool Movement
 	// V2
 	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		// Server
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ServerPlaySound (Damage)");
+		// Player
+		// FString LocalRoleString = StaticEnum<ENetRole>()->GetValueAsString(GetOwner()->GetLocalRole());
+		// FString RemoteRoleString = StaticEnum<ENetRole>()->GetValueAsString(GetOwner()->GetRemoteRole());
+		// FString DebugString = GetOwner()->GetDebugName(GetOwner());
+		// DebugString.Append(" Local Role : ");
+		// DebugString.Append(LocalRoleString);
+		// DebugString.Append(" Remote Role: ");
+		// DebugString.Append(RemoteRoleString);
+		// DebugString.Append(FString::Printf(TEXT("Sounds Found: %d"), MotionSounds.VocalSounds.Num()));
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, DebugString);
 
 		ServerPlaySound(MotionSounds);
 	}
 	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
 	{
-		// Reg
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlaySound (Damage)");
+		// AI
+		// PlaySound(MotionSounds);
+
+		// FString LocalRoleString = StaticEnum<ENetRole>()->GetValueAsString(GetOwner()->GetLocalRole());
+		// FString RemoteRoleString = StaticEnum<ENetRole>()->GetValueAsString(GetOwner()->GetRemoteRole());
+		// FString DebugString = GetOwner()->GetDebugName(GetOwner());
+		// DebugString.Append(" Local Role : ");
+		// DebugString.Append(LocalRoleString);
+		// DebugString.Append(" Remote Role: ");
+		// DebugString.Append(RemoteRoleString);
+		// DebugString.Append(FString::Printf(TEXT("Sounds Found: %d"), MotionSounds.VocalSounds.Num()));
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, DebugString);
+
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Sounds Found: %d"), MotionSounds.VocalSounds.Num()));
 		PlaySound(MotionSounds);
+		// ServerPlaySound(MotionSounds);
 	}
 }
 
@@ -2133,6 +2081,9 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 			SetNewSound(NewBreathSound.Sound, PreviousBreathsAssets, GeneralCharacterSoundSettings.BreathNoRepeats);
 			FVector NewVoiceSocketLocation = IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName);
 			FRotator NewVoiceSocketRotation = IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketRotation(GeneralCharacterSoundSettings.VoiceSocketName);
+			FSound EmptySound;
+			CurrentVocalizationSound = EmptySound;
+			VocalizationMixerAudioComponent->SetObjectParameter("VocalizationSound", nullptr);
 			VocalizationMixerAudioComponent->SetObjectParameter("BreathSound", NewBreathSound.Sound);
 			VocalizationMixerAudioComponent->SetFloatParameter("Pitch", Pitch);
 
@@ -2171,6 +2122,7 @@ void UALSXTCharacterSoundComponent::PlaySound(FMotionSounds MotionSounds)
 			SetNewSound(NewVocalizationSound.Sound, PreviousVocalizationsAssets, GeneralCharacterSoundSettings.VocalizationNoRepeats);
 			FVector NewVoiceSocketLocation = IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetSocketLocation(GeneralCharacterSoundSettings.VoiceSocketName);
 			VocalizationMixerAudioComponent->SetObjectParameter("VocalizationSound", NewVocalizationSound.Sound);
+			FString SoundName = NewVocalizationSound.Sound->GetName();
 			VocalizationMixerAudioComponent->SetFloatParameter("Pitch", Pitch);
 
 			if (GetOwner()->GetRemoteRole() == ROLE_Authority)

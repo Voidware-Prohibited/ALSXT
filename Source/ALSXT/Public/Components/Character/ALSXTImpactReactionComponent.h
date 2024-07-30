@@ -126,10 +126,10 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	UCapsuleComponent* CharacterCapsule{ nullptr };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	UAnimInstance* AnimInstance{ nullptr };
 
 	FALSXTImpactReactionParameters ImpactReactionParameters;
@@ -589,13 +589,13 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	UNiagaraSystem* GetImpactPointParticle(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UNiagaraSystem* GetBodyFallParticle(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	TSubclassOf<AActor> GetImpactReactionParticleActor(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
@@ -607,7 +607,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	FALSXTCharacterSound GetBodyFallSound(FDoubleHitResult Hit);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = "OnReplicate_ImpactReactionState", Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTImpactReactionState ImpactReactionState;
 
 	// Entry Events
@@ -629,6 +629,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void AttackReaction(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void AttackReactionImplementation(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void SyncedAttackReaction(int Index);
@@ -778,7 +781,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastImpactReaction(FDoubleHitResult Hit);
 
-	UFUNCTION(Server, Reliable, WithValidation)
+	UFUNCTION(Server, Reliable)
 	void ServerAttackReaction(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -924,7 +927,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
-	UFUNCTION(Server, Reliable, WithValidation)
+	UFUNCTION(Server, Reliable)
 	void ServerStartAttackReaction(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(NetMulticast, Reliable)

@@ -3252,3 +3252,48 @@ FGameplayTag AALSXTCharacter::GetCurrentBreathType_Implementation() const
 {
 	return CharacterSound->CurrentBreathType;
 }
+
+
+FString AALSXTCharacter::GetCurrentBreathSounds_Implementation() const
+{
+	FString BreathSoundsString;
+	for (auto BreathSound : CharacterSound->CurrentBreathSounds)
+	{
+		for (auto Sound : BreathSound.Sounds)
+		{
+			BreathSoundsString.Append(Sound.Sound->GetName());
+			BreathSoundsString.Append(" ");
+		}
+	}	
+	return BreathSoundsString;
+}
+
+FString AALSXTCharacter::GetCurrentBreathSound_Implementation() const
+{
+	if (IsValid(CharacterSound->CurrentBreathSound.Sound))
+	{
+		return CharacterSound->CurrentBreathSound.Sound->GetName();
+	}
+	else
+	{
+		return "None";
+	}
+}
+
+// FString AALSXTCharacter::GetCurrentVocalizations_Implementation() const
+// {
+// 	return CharacterSound->CurrentBreathType;
+// }
+
+FString AALSXTCharacter::GetCurrentVocalization_Implementation() const
+{
+	if (IsValid(CharacterSound->CurrentVocalizationSound.Sound))
+	{
+		return CharacterSound->CurrentVocalizationSound.Sound->GetName();
+	}
+	else
+	{
+		return "None";
+	}
+	
+}

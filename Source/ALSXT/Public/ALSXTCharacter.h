@@ -1864,6 +1864,10 @@ protected:
 	virtual float GetCurrentStamina_Implementation() const;
 	virtual FGameplayTag GetCurrentStaminaTag_Implementation() const;
 	virtual FGameplayTag GetCurrentBreathType_Implementation() const;
+	virtual FString GetCurrentBreathSounds_Implementation() const;
+	virtual FString GetCurrentBreathSound_Implementation() const;
+	// virtual FString GetCurrentVocalizations_Implementation() const;
+	virtual FString GetCurrentVocalization_Implementation() const;
 
 	// Freelooking Interface Functions
 	virtual FGameplayTag GetCharacterFreelooking_Implementation() const override;

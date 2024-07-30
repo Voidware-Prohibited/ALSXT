@@ -1142,7 +1142,7 @@ struct ALSXT_API FALSXTCharacterDamageSound
 
 	bool operator==(const FALSXTCharacterDamageSound& other) const
 	{
-		return (other.Sex == Sex) && (other.Variant == Variant) && (other.Form == Form) && (other.Damage == Damage) && (other.Sounds == Sounds);
+		return (other.Sex == Sex) && (other.Variant == Variant) && (other.Form == Form) && (other.AttackMethod == AttackMethod) && (other.Damage == Damage) && (other.Sounds == Sounds);
 	}
 };
 
@@ -1174,6 +1174,9 @@ struct ALSXT_API FALSXTImpactParticleActor
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<TEnumAsByte<EPhysicalSurface>> PhysicalMaterials;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Velocity", AllowPrivateAccess))
 	FGameplayTagContainer Velocity;
 
@@ -1187,6 +1190,20 @@ struct ALSXT_API FALSXTImpactParticleActor
 	{
 		return (other.Velocity == Velocity) && (other.Form == Form) && (other.ParticleActor == ParticleActor);
 	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactParticleActorMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTImpactParticleActor> ParticleActors;
+
+	// bool operator==(const FALSXTImpactParticleActorMap& other) const
+	// {
+	// 	return (other.ParticleActors == ParticleActors);
+	// }
 };
 
 USTRUCT(BlueprintType)

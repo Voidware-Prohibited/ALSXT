@@ -223,14 +223,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	void PlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
 
-	UFUNCTION(Server, Unreliable)
-	void ServerPlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
-
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastPlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
-
-	UFUNCTION(Client, Unreliable)
-	void ClientPlayCharacterBreathEffects(const FGameplayTag& StaminaOverride);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound")
 	void PlayCharacterBreathEffectsImplementation(const FGameplayTag& StaminaOverride);
@@ -327,8 +321,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Weight"))
 	void PlayCharacterMovementSound(bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
 
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Weight"))
+	void MulticastPlayCharacterMovementSound(bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Weight"))
+	void PlayCharacterMovementSoundImplementation(bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
+
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type"))
 	void PlayWeaponMovementSound(UPARAM(meta = (Categories = "Als.Weapon"))const FGameplayTag& Weapon, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type"))
+	void MulticastPlayWeaponMovementSound(UPARAM(meta = (Categories = "Als.Weapon"))const FGameplayTag& Weapon, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type"))
+	void PlayWeaponMovementSoundImplementation(UPARAM(meta = (Categories = "Als.Weapon"))const FGameplayTag& Weapon, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type"))
 	void PlayWeaponActionSound(UPARAM(meta = (Categories = "Als.Weapon Action"))const FGameplayTag& Type);
@@ -336,14 +342,32 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "HoldingBreathType, Sex, Variant"))
 	void PlayHoldingBreathSound(UPARAM(meta = (Categories = "Als.Holding Breath"))const FGameplayTag& HoldingBreathType, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, const float Stamina);
 
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "HoldingBreathType, Sex, Variant"))
+	void MulticastPlayHoldingBreathSound(UPARAM(meta = (Categories = "Als.Holding Breath"))const FGameplayTag& HoldingBreathType, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, const float Stamina);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "HoldingBreathType, Sex, Variant"))
+	void PlayHoldingBreathSoundImplementation(UPARAM(meta = (Categories = "Als.Holding Breath"))const FGameplayTag& HoldingBreathType, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, const float Stamina);
+
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Sex, Variant, Overlay, Strength"))
 	void PlayActionSound(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const float Stamina);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Sex, Variant, Overlay, Strength"))
+	void MulticastPlayActionSound(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const float Stamina);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Type, Sex, Variant, Overlay, Strength"))
+	void PlayActionSoundImplementation(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const float Stamina);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, Strength, AttackMode"))
 	void PlayAttackSound(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float Stamina);
 
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, AttackMethod, Strength, AttackForm"))
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, AttackMethod, Strength, AttackForm"))
 	void PlayDamageSound(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Attack Method"))const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, AttackMethod, Strength, AttackForm"))
+	void MulticastPlayDamageSound(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Attack Method"))const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
+
+	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, AttackMethod, Strength, AttackForm"))
+	void PlayDamageSoundImplementation(bool MovementSound, bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Attack Method"))const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Action Sound", Meta = (AutoCreateRefTerm = "Sex, Variant, Overlay, Strength, AttackForm"))
 	void PlayDeathSound(UPARAM(meta = (Categories = "Als.Sex"))const FGameplayTag& Sex, UPARAM(meta = (Categories = "Als.Voice Variant"))const FGameplayTag& Variant, UPARAM(meta = (Categories = "Als.OverlayMode"))const FGameplayTag& Overlay, UPARAM(meta = (Categories = "Als.Attack Method"))const FGameplayTag& AttackMethod, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength, const FGameplayTag& AttackForm, const float Damage);

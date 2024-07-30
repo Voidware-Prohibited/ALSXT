@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Animation/AnimNotifies/AnimNotify.h"
+#include "GameplayTagContainer.h"
 #include "ALSXTAnimNotify_ResponseVocalizationSound.generated.h"
 
 /**
