@@ -3228,6 +3228,11 @@ void AALSXTCharacter::PlayBreathEffects_Implementation(const FGameplayTag& Stami
 	// CharacterSound->MulticastPlayCharacterBreathEffects(StaminaOverride);
 }
 
+void AALSXTCharacter::PlayCharacterMovementSound_Implementation(bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight)
+{
+	CharacterSound->PlayCharacterMovementSound(AccentSound, WeaponSound, Type, Weight);
+}
+
 void AALSXTCharacter::PlayActionSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& Type, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const float Stamina)
 {
 	CharacterSound->PlayActionSound(MovementSound, AccentSound, WeaponSound, Type, SoundSex, Variant, Overlay, Strength, Stamina);

@@ -81,6 +81,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
 	FGameplayTag GetHoldingBreath();
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Movement", Meta = (AutoCreateRefTerm = "Type, Weight"))
+	void PlayCharacterMovementSound(bool AccentSound, bool WeaponSound, UPARAM(meta = (Categories = "Als.Character Movement Sound"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight);
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects|Events", Meta = (AutoCreateRefTerm = "StaminaOverride"))
 	void PlayBreathEffects(UPARAM(meta = (Categories = "Als.Stamina"))const FGameplayTag& StaminaOverride);
 

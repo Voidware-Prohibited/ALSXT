@@ -6,6 +6,7 @@
 #include "ALSXTAnimationInstance.h"
 #include "ALSXTCharacter.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
 
 // ReSharper disable once CppUnusedIncludeDirective
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ALSXTAnimNotify_CharacterMovementSound)
@@ -27,17 +28,10 @@ void UALSXTAnimNotify_CharacterMovementSound::Notify(USkeletalMeshComponent* Mes
 	}
 
 	const auto* World{ Mesh->GetWorld() };
-	const auto* Character{ Cast<AAlsCharacter>(Mesh->GetOwner()) };
-	AALSXTCharacter* ALSXTCharacter{ Cast<AALSXTCharacter>(Mesh->GetOwner()) };
-
-	if (IsValid(ALSXTCharacter) && IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(Mesh->GetOwner()) == AlsLocomotionModeTags::InAir)
-	{
-		return;
-	}
 
 	if (World->WorldType != EWorldType::EditorPreview)
 	{
-		FGameplayTag WeightTag = IALSXTCharacterInterface::Execute_GetWeightTag(ALSXTCharacter);	
-		IALSXTCharacterInterface::Execute_PlayCharacterMovementSound(ALSXTCharacter, EnableCharacterMovementAccentSound, EnableWeaponMovementSound, MovementType, WeightTag);
+		FGameplayTag WeightTag = IALSXTCharacterInterface::Execute_GetWeightTag(Mesh->GetOwner());
+		IALSXTCharacterSoundComponentInterface::Execute_PlayCharacterMovementSound(Mesh->GetOwner(), EnableCharacterMovementAccentSound, EnableWeaponMovementSound, MovementType, WeightTag);
 	}
 }
