@@ -55,16 +55,19 @@ public:
 	bool CanPlayActionSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
-	bool CanPlayCharacterMovementSound();
+	bool CanPlayCharacterMovementSound() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
-	bool CanPlayWeaponMovementSound();
+	bool CanPlayWeaponMovementSound() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
 	bool CanPlayDamageSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
-	bool ShouldPlayWeaponMovementSound();
+	bool ShouldPlayWeaponMovementSound(UPARAM(meta = (Categories = "Als.LocomotionAction"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Action Strength"))const FGameplayTag& Strength) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
+	bool ShouldPlayMovementAccentSound(UPARAM(meta = (Categories = "Als.LocomotionAction"))const FGameplayTag& Type, UPARAM(meta = (Categories = "Als.Object Weight"))const FGameplayTag& Weight) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Breath Effects Interface|Parameters")
 	bool ShouldPlayDamageSound();

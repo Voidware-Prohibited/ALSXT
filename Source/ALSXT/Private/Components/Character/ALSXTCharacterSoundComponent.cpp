@@ -615,7 +615,7 @@ TArray<FALSXTBreathSound> UALSXTCharacterSoundComponent::SelectBreathSounds(UALS
 
 TArray<FALSXTCharacterMovementSound> UALSXTCharacterSoundComponent::SelectCharacterMovementSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Type, const FGameplayTag& Weight)
 {
-	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTCharacterMovementSounds> MovementSoundsMap = SelectCharacterSoundSettings()->MovementSounds;
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTCharacterMovementSounds> MovementSoundsMap = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner())->MovementSounds;
 	TEnumAsByte<EPhysicalSurface> FoundSurface;
 	IALSXTCharacterInterface::Execute_GetClothingSurfaceForMovement(GetOwner(), FoundSurface, Type);
 	TArray<FALSXTCharacterMovementSound> Sounds = MovementSoundsMap.FindRef(FoundSurface).Sounds;
@@ -657,7 +657,7 @@ TArray<FALSXTCharacterMovementSound> UALSXTCharacterSoundComponent::SelectCharac
 
 TArray<FALSXTCharacterMovementSound> UALSXTCharacterSoundComponent::SelectCharacterMovementAccentSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Type, const FGameplayTag& Weight)
 {
-	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTCharacterMovementSounds> MovementAccentSoundsMap = SelectCharacterSoundSettings()->MovementAccentSounds;
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTCharacterMovementSounds> MovementAccentSoundsMap = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner())->MovementAccentSounds;
 	TEnumAsByte<EPhysicalSurface> AccentSurface;
 	IALSXTCharacterInterface::Execute_GetAccentSurfaceForMovement(GetOwner(), AccentSurface, Type);
 	TArray<FALSXTCharacterMovementSound> Sounds = MovementAccentSoundsMap.FindRef(AccentSurface).Sounds;
@@ -697,7 +697,7 @@ TArray<FALSXTCharacterMovementSound> UALSXTCharacterSoundComponent::SelectCharac
 
 TArray<FALSXTWeaponMovementSound> UALSXTCharacterSoundComponent::SelectWeaponMovementSounds(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Weapon, const FGameplayTag& Type)
 {
-	TArray<FALSXTWeaponMovementSound> Sounds = SelectWeaponSoundSettings()->WeaponMovementSounds;
+	TArray<FALSXTWeaponMovementSound> Sounds = IALSXTCharacterSoundComponentInterface::Execute_SelectWeaponSoundSettings(GetOwner())->WeaponMovementSounds;
 	TArray<FALSXTWeaponMovementSound> FilteredSounds;
 	FGameplayTagContainer TagsContainer;
 	TagsContainer.AddTag(Weapon);
@@ -738,7 +738,7 @@ TArray<FALSXTWeaponMovementSound> UALSXTCharacterSoundComponent::SelectWeaponMov
 
 FALSXTWeaponActionSound UALSXTCharacterSoundComponent::SelectWeaponActionSound(UALSXTCharacterSoundSettings* Settings, const FGameplayTag& Type)
 {
-	TArray<FALSXTWeaponActionSound> Sounds = SelectWeaponSoundSettings()->WeaponActionSounds;
+	TArray<FALSXTWeaponActionSound> Sounds = IALSXTCharacterSoundComponentInterface::Execute_SelectWeaponSoundSettings(GetOwner())->WeaponActionSounds;
 	TArray<FALSXTWeaponActionSound> FilteredSounds;
 	FGameplayTagContainer TagsContainer;
 	TagsContainer.AddTag(Type);
@@ -1137,7 +1137,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterMovementSound(bool AccentSound,
 	FGameplayTag MovementStrength = ConvertWeightTagToStrengthTag(Weight);
 
 	// MOVEMENT
-	if (CanPlayCharacterMovementSound())
+	if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayCharacterMovementSound(GetOwner()))
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementSounds = SelectCharacterMovementSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1154,7 +1154,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterMovementSound(bool AccentSound,
 	}
 
 	// ACCENT
-	if (ShouldPlayMovementAccentSound(Type, MovementStrength) && AccentSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayMovementAccentSound(GetOwner(), Type, MovementStrength) && AccentSound)
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementAccentSounds = SelectCharacterMovementAccentSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1171,7 +1171,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterMovementSound(bool AccentSound,
 	}
 
 	//WEAPON
-	if (ShouldPlayWeaponMovementSound(Type, MovementStrength) && WeaponSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayWeaponMovementSound(GetOwner(), Type, MovementStrength) && WeaponSound)
 	{
 		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
 		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
@@ -1231,7 +1231,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterMovementSoundImplementation(boo
 	FGameplayTag MovementStrength = ConvertWeightTagToStrengthTag(Weight);
 
 	// MOVEMENT
-	if (CanPlayCharacterMovementSound())
+	if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayCharacterMovementSound(GetOwner()))
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementSounds = SelectCharacterMovementSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1248,7 +1248,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterMovementSoundImplementation(boo
 	}
 
 	// ACCENT
-	if (ShouldPlayMovementAccentSound(Type, MovementStrength) && AccentSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayMovementAccentSound(GetOwner(), Type, MovementStrength) && AccentSound)
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementAccentSounds = SelectCharacterMovementAccentSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1265,7 +1265,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterMovementSoundImplementation(boo
 	}
 
 	//WEAPON
-	if (ShouldPlayWeaponMovementSound(Type, MovementStrength) && WeaponSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayWeaponMovementSound(GetOwner(), Type, MovementStrength) && WeaponSound)
 	{
 		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
 		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
@@ -1315,7 +1315,7 @@ void UALSXTCharacterSoundComponent::PlayWeaponMovementSound(const FGameplayTag& 
 	{
 		return;
 	}
-	if (!CanPlayWeaponMovementSound())
+	if (!IALSXTCharacterSoundComponentInterface::Execute_CanPlayWeaponMovementSound(GetOwner()))
 	{
 		return;
 	}
@@ -1325,7 +1325,7 @@ void UALSXTCharacterSoundComponent::PlayWeaponMovementSound(const FGameplayTag& 
 	FMotionSounds MotionSounds;
 
 	//WEAPON
-	if (ShouldPlayWeaponMovementSound(Type, Strength))
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayWeaponMovementSound(GetOwner(), Type, Strength))
 	{
 		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
 		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
@@ -1368,7 +1368,7 @@ void UALSXTCharacterSoundComponent::PlayWeaponMovementSoundImplementation(const 
 	{
 		return;
 	}
-	if (!CanPlayWeaponMovementSound())
+	if (!IALSXTCharacterSoundComponentInterface::Execute_CanPlayWeaponMovementSound(GetOwner()))
 	{
 		return;
 	}
@@ -1378,7 +1378,7 @@ void UALSXTCharacterSoundComponent::PlayWeaponMovementSoundImplementation(const 
 	FMotionSounds MotionSounds;
 
 	//WEAPON
-	if (ShouldPlayWeaponMovementSound(Type, Strength))
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayWeaponMovementSound(GetOwner(), Type, Strength))
 	{
 		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
 		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
@@ -1574,7 +1574,7 @@ void UALSXTCharacterSoundComponent::PlayActionSoundImplementation(bool MovementS
 	FGameplayTag MovementStrength = ConvertWeightTagToStrengthTag(Weight);
 
 	// MOVEMENT
-	if (CanPlayCharacterMovementSound() && MovementSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayCharacterMovementSound(GetOwner()) && MovementSound)
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementSounds = SelectCharacterMovementSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1591,7 +1591,7 @@ void UALSXTCharacterSoundComponent::PlayActionSoundImplementation(bool MovementS
 	}
 
 	// ACCENT
-	if (ShouldPlayMovementAccentSound(Type, MovementStrength) && AccentSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayMovementAccentSound(GetOwner(), Type, MovementStrength) && AccentSound)
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementAccentSounds = SelectCharacterMovementAccentSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1625,7 +1625,7 @@ void UALSXTCharacterSoundComponent::PlayActionSoundImplementation(bool MovementS
 	}
 
 	//WEAPON
-	if (ShouldPlayWeaponMovementSound(Type, MovementStrength) && WeaponSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayWeaponMovementSound(GetOwner(), Type, MovementStrength) && WeaponSound)
 	{
 		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
 		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
@@ -1679,7 +1679,7 @@ void UALSXTCharacterSoundComponent::PlayAttackSound(bool MovementSound, bool Acc
 	UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
 
 	// MOVEMENT
-	if (CanPlayCharacterMovementSound() && MovementSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayCharacterMovementSound(GetOwner()) && MovementSound)
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementSounds = SelectCharacterMovementSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1696,7 +1696,7 @@ void UALSXTCharacterSoundComponent::PlayAttackSound(bool MovementSound, bool Acc
 	}
 
 	// ACCENT
-	if (ShouldPlayMovementAccentSound(Type, Strength) && AccentSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayMovementAccentSound(GetOwner(), Type, Strength) && AccentSound)
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementAccentSounds = SelectCharacterMovementAccentSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1730,7 +1730,7 @@ void UALSXTCharacterSoundComponent::PlayAttackSound(bool MovementSound, bool Acc
 	}
 
 	//WEAPON
-	if (ShouldPlayWeaponMovementSound(Type, Strength) && WeaponSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayWeaponMovementSound(GetOwner(), Type, Strength) && WeaponSound)
 	{
 		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
 		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
@@ -1796,7 +1796,7 @@ void UALSXTCharacterSoundComponent::PlayDamageSoundImplementation(bool MovementS
 	FMotionSounds MotionSounds;
 
 	// MOVEMENT
-	if (CanPlayCharacterMovementSound() && MovementSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayCharacterMovementSound(GetOwner()) && MovementSound)
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementSounds = SelectCharacterMovementSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1813,7 +1813,7 @@ void UALSXTCharacterSoundComponent::PlayDamageSoundImplementation(bool MovementS
 	}
 
 	// ACCENT
-	if (ShouldPlayMovementAccentSound(Type, Strength) && AccentSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayMovementAccentSound(GetOwner(), Type, Strength) && AccentSound)
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementAccentSounds = SelectCharacterMovementAccentSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1847,7 +1847,7 @@ void UALSXTCharacterSoundComponent::PlayDamageSoundImplementation(bool MovementS
 	}
 
 	//WEAPON
-	if (ShouldPlayWeaponMovementSound(Type, Strength) && WeaponSound)
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayWeaponMovementSound(GetOwner(), Type, Strength) && WeaponSound)
 	{
 		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
 		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);
@@ -1910,7 +1910,7 @@ void UALSXTCharacterSoundComponent::PlayDeathSound(const FGameplayTag& Sex, cons
 	FMotionSounds MotionSounds;
 
 	// MOVEMENT
-	if (CanPlayCharacterMovementSound())
+	if (IALSXTCharacterSoundComponentInterface::Execute_CanPlayCharacterMovementSound(GetOwner()))
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementSounds = SelectCharacterMovementSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1927,7 +1927,7 @@ void UALSXTCharacterSoundComponent::PlayDeathSound(const FGameplayTag& Sex, cons
 	}
 
 	// ACCENT
-	if (ShouldPlayMovementAccentSound(Type, Strength))
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayMovementAccentSound(GetOwner(), Type, Strength))
 	{
 		TArray<FALSXTCharacterMovementSound> CharacterMovementAccentSounds = SelectCharacterMovementAccentSounds(Settings, Type, Weight);
 		TArray<FSound> Sounds;
@@ -1962,7 +1962,7 @@ void UALSXTCharacterSoundComponent::PlayDeathSound(const FGameplayTag& Sex, cons
 	}
 
 	//WEAPON
-	if (ShouldPlayWeaponMovementSound(Type, Strength))
+	if (IALSXTCharacterSoundComponentInterface::Execute_ShouldPlayWeaponMovementSound(GetOwner(), Type, Strength))
 	{
 		TArray<FALSXTWeaponMovementSound> WeaponMovementSounds = SelectWeaponMovementSounds(Settings, ALSXTWeaponTags::M4, Type);
 		FName WeaponMovementSoundSocket = GetSocketForMovement(Type);

@@ -232,11 +232,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayBreathSound();
 	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
-	bool CanPlayCharacterMovementSound();
+	// UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	// bool CanPlayCharacterMovementSound();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
-	bool CanPlayWeaponMovementSound();
+	// UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	// bool CanPlayWeaponMovementSound();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
 	bool CanPlayWeaponActionSound();
@@ -255,11 +255,11 @@ public:
 
 	bool ShouldPlayHoldingBreathSoundDelegate(const FGameplayTag& HoldBreathType, const float Stamina);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
-	bool ShouldPlayMovementAccentSound(const FGameplayTag& Type, const FGameplayTag& Strength);
+	// UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	// bool ShouldPlayMovementAccentSound(const FGameplayTag& Type, const FGameplayTag& Strength);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Action Sound")
-	bool ShouldPlayWeaponMovementSound(const FGameplayTag& Type, const FGameplayTag& Strength);
+	// UFUNCTION(BlueprintCallable, Category = "Action Sound")
+	// bool ShouldPlayWeaponMovementSound(const FGameplayTag& Type, const FGameplayTag& Strength);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Vitals")
 	float GetHealth();

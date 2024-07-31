@@ -3238,6 +3238,26 @@ void AALSXTCharacter::PlayDamageSound_Implementation(bool MovementSound, bool Ac
 	CharacterSound->PlayDamageSound(MovementSound, AccentSound, WeaponSound, SoundSex, Variant, Overlay, AttackMethod, Strength, AttackForm, Damage);
 }
 
+bool AALSXTCharacter::CanPlayCharacterMovementSound_Implementation() const
+{
+	return true;
+}
+
+bool AALSXTCharacter::CanPlayWeaponMovementSound_Implementation() const
+{
+	return true;
+}
+
+bool AALSXTCharacter::ShouldPlayWeaponMovementSound_Implementation(const FGameplayTag& Type, const FGameplayTag& Strength) const
+{
+	return true;
+}
+
+bool AALSXTCharacter::ShouldPlayMovementAccentSound_Implementation(const FGameplayTag& Type, const FGameplayTag& Weight) const
+{
+	return true;
+}
+
 float AALSXTCharacter::GetCurrentStamina_Implementation() const
 {
 	return CharacterSound->CurrentStamina;
