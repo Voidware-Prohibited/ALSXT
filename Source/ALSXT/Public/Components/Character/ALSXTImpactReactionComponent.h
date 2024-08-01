@@ -337,6 +337,8 @@ private:
 	bool IsAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsSyncedAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsClutchImpactPointAllowedToStart(const UAnimSequenceBase* Montage) const;
+	bool IsStabilizeAllowedToStart(const UAnimSequenceBase* Montage) const;
+	bool IsBraceForImpactAllowedToStart(const UAnimSequenceBase* Montage) const;
 	bool IsCrowdNavigationFallAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsImpactFallAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsAttackFallAllowedToStart(const UAnimMontage* Montage) const;

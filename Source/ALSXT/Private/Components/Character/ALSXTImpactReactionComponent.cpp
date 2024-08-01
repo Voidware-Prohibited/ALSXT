@@ -1275,6 +1275,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 							}
 							else if ((IALSXTCharacterInterface::Execute_GetCombatStance(GetOwner()) == ALSXTCombatStanceTags::Neutral  && ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity) || (IALSXTCharacterInterface::Execute_GetCombatStance(GetOwner()) != ALSXTCombatStanceTags::Neutral && GetOwner()->GetVelocity().Length() >= 650.0f))
 							{
+								// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Objectname);
 								BumpReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), SideTag, FormTag);
 
 								// Set Physical Animation Component Curves/Profile Here
@@ -2165,6 +2166,16 @@ bool UALSXTImpactReactionComponent::IsClutchImpactPointAllowedToStart(const UAni
 	return (Montage != nullptr);
 }
 
+bool UALSXTImpactReactionComponent::IsStabilizeAllowedToStart(const UAnimSequenceBase* Montage) const
+{
+	return (Montage != nullptr);
+}
+
+bool UALSXTImpactReactionComponent::IsBraceForImpactAllowedToStart(const UAnimSequenceBase* Montage) const
+{
+	return (Montage != nullptr);
+}
+
 bool UALSXTImpactReactionComponent::IsCrowdNavigationFallAllowedToStart(const UAnimMontage* Montage) const
 {
 	return (Montage != nullptr);
@@ -2217,20 +2228,23 @@ void UALSXTImpactReactionComponent::StartBumpReaction(const FGameplayTag& Gait, 
 		return;
 	}
 
-	TSubclassOf<AActor> ParticleActor = GetImpactReactionParticleActor(GetImpactReactionState().ImpactReactionParameters.BumpHit);
-	UNiagaraSystem* Particle = GetImpactReactionParticle(GetImpactReactionState().ImpactReactionParameters.BumpHit);
-	USoundBase* Audio = GetImpactReactionSound(GetImpactReactionState().ImpactReactionParameters.BumpHit).Sound.Sound;
-	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(GetOwner()->GetActorRotation().Yaw)) };
+	if (IsValid(GetImpactReactionState().ImpactReactionParameters.BumpHit.HitResult.HitResult.GetComponent()))
+	{
+		TSubclassOf<AActor> ParticleActor = GetImpactReactionParticleActor(GetImpactReactionState().ImpactReactionParameters.BumpHit);
+		UNiagaraSystem* Particle = GetImpactReactionParticle(GetImpactReactionState().ImpactReactionParameters.BumpHit);
+		USoundBase* Audio = GetImpactReactionSound(GetImpactReactionState().ImpactReactionParameters.BumpHit).Sound.Sound;
+		const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(GetOwner()->GetActorRotation().Yaw)) };
 
-	if (GetOwner()->GetLocalRole() >= ROLE_Authority)
-	{
-		ServerStartBumpReaction(SelectedBumpReaction.Montage, ParticleActor, Particle, Audio);
-	}
-	else
-	{
-		IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->FlushServerMoves();
-		MulticastStartBumpReaction(SelectedBumpReaction.Montage, ParticleActor, Particle, Audio);
-		OnBumpReactionStarted();
+		if (GetOwner()->GetLocalRole() >= ROLE_Authority)
+		{
+			ServerStartBumpReaction(SelectedBumpReaction.Montage, ParticleActor, Particle, Audio);
+		}
+		else
+		{
+			IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->FlushServerMoves();
+			MulticastStartBumpReaction(SelectedBumpReaction.Montage, ParticleActor, Particle, Audio);
+			OnBumpReactionStarted();
+		}
 	}
 }
 
@@ -2341,7 +2355,7 @@ void UALSXTImpactReactionComponent::StartStabilize(FDoubleHitResult Hit)
 	Montage = SelectedClutchImpactPointReaction.Pose;
 	FALSXTDefensiveModeState DefensiveModeState;
 
-	if ((!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
+	if ((!ALS_ENSURE(IsValid(Montage)) || !IsStabilizeAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Stabilize Montage Invalid"));
 		return;
@@ -2377,38 +2391,38 @@ void UALSXTImpactReactionComponent::StartClutchImpactPoint(FDoubleHitResult Hit)
 	// 	return;
 	// }
 
-	UAnimSequenceBase* Montage;
+	UAnimSequenceBase* SelectedClutchImpactPointPose;
 	FClutchImpactLocationAnimation SelectedClutchImpactPointReaction = SelectClutchImpactPointMontage(Hit);
-	Montage = SelectedClutchImpactPointReaction.Pose;
-	FALSXTDefensiveModeState DefensiveModeState;
+	SelectedClutchImpactPointPose = SelectedClutchImpactPointReaction.Pose;
+	// FALSXTDefensiveModeState DefensiveModeState;
 
-	if ((!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Clutch Impact Point Montage Invalid"));
-		return;
-	}
-	FGameplayTag Health = HealthToHealthTag(GetHealth());
-	DefensiveModeState.Mode = ALSXTDefensiveModeTags::ClutchImpactPoint;
-	DefensiveModeState.Montage = Montage;
-	DefensiveModeState.Location = Hit.HitResult.HitResult.ImpactPoint;
-	IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
-	IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), ALSXTDefensiveModeTags::ClutchImpactPoint);
-	StartClutchImpactPointTimer();
+	// if ((!ALS_ENSURE(IsValid(SelectedClutchImpactPointPose)) || !IsClutchImpactPointAllowedToStart(SelectedClutchImpactPointPose)) && // ImpactReactionSettings.DebugMode)
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Clutch Impact Point Montage Invalid"));
+	// 	return;
+	// }
+	// FGameplayTag Health = HealthToHealthTag(IALSXTCharacterInterface::Execute_GetHealth(GetOwner()));
+	// DefensiveModeState.Mode = ALSXTDefensiveModeTags::ClutchImpactPoint;
+	// DefensiveModeState.Montage = SelectedClutchImpactPointPose;
+	// DefensiveModeState.Location = Hit.HitResult.HitResult.ImpactPoint;
+	// IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
+	// IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), ALSXTDefensiveModeTags::ClutchImpactPoint);
+	// StartClutchImpactPointTimer();
 
 	// const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(GetOwner()->GetActorRotation().Yaw)) };
-	// 
-	// // StartClutchImpactPointImplementation(Montage, Hit.HitResult.HitResult.ImpactPoint);
-	// 
-	// if (GetOwner()->GetLocalRole() >= ROLE_Authority)
-	// {
-	// 	ServerStartClutchImpactPoint(Montage, Hit.HitResult.HitResult.ImpactPoint);
-	// }
-	// else
-	// {
-	// 	IALSXTCharacterInterface::Execute_GetCharacterMovement(GetOwner())->FlushServerMoves();
-	// 	MulticastStartClutchImpactPoint(Montage, Hit.HitResult.HitResult.ImpactPoint);
-	// 	OnImpactReactionStarted(Hit);
-	// }
+	
+	StartClutchImpactPointImplementation(SelectedClutchImpactPointPose, Hit.HitResult.HitResult.ImpactPoint);
+	
+	if (GetOwner()->GetLocalRole() >= ROLE_Authority)
+	{
+		ServerStartClutchImpactPoint(SelectedClutchImpactPointPose, Hit.HitResult.HitResult.ImpactPoint);
+	}
+	else
+	{
+		IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->FlushServerMoves();
+		MulticastStartClutchImpactPoint(SelectedClutchImpactPointPose, Hit.HitResult.HitResult.ImpactPoint);
+		OnImpactReactionStarted(Hit);
+	}
 }
 
 void UALSXTImpactReactionComponent::StartImpactFall(FDoubleHitResult Hit)
@@ -2654,7 +2668,7 @@ void UALSXTImpactReactionComponent::StartBraceForImpact()
 	UAnimSequenceBase* Montage = SelectBraceForImpactPose(Side);
 	FALSXTDefensiveModeState DefensiveModeState;
 
-	if ((!ALS_ENSURE(IsValid(Montage)) || !IsClutchImpactPointAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
+	if ((!ALS_ENSURE(IsValid(Montage)) || !IsBraceForImpactAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Brace For Impact Montage Invalid"));
 		return;
@@ -2867,21 +2881,26 @@ UNiagaraSystem* UALSXTImpactReactionComponent::GetImpactPointParticle(FDoubleHit
 
 TSubclassOf<AActor> UALSXTImpactReactionComponent::GetImpactReactionParticleActor(FDoubleHitResult Hit)
 {
-	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
-	TArray<FALSXTImpactParticleActorMap> ImpactParticleActors = SelectedImpactReactionSettings->ImpactParticleActors;
 	TSubclassOf<AActor> FoundParticleActor;
-	for (FALSXTImpactParticleActorMap Entry : ImpactParticleActors)
+	if (GetOwner()->Implements<UALSXTCollisionInterface>())
 	{
-		FALSXTImpactParticleActor* FoundEntry = Entry.ParticleActors.Find(Hit.HitResult.HitResult.PhysMaterial->SurfaceType);
-		for (TEnumAsByte<EPhysicalSurface> Surface : FoundEntry->PhysicalMaterials)
+		UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
+		TArray<FALSXTImpactParticleActorMap> ImpactParticleActors = SelectedImpactReactionSettings->ImpactParticleActors;
+		for (FALSXTImpactParticleActorMap Entry : ImpactParticleActors)
 		{
-			if (Surface = Hit.OriginHitResult.HitResult.PhysMaterial->SurfaceType)
+			if (Hit.HitResult.HitResult.PhysMaterial.IsValid())
 			{
-				FoundParticleActor = FoundEntry->ParticleActor;
+				FALSXTImpactParticleActor* FoundEntry = Entry.ParticleActors.Find(Hit.HitResult.HitResult.PhysMaterial->SurfaceType);
+				for (TEnumAsByte<EPhysicalSurface> Surface : FoundEntry->PhysicalMaterials)
+				{
+					if (Surface = Hit.OriginHitResult.HitResult.PhysMaterial->SurfaceType)
+					{
+						FoundParticleActor = FoundEntry->ParticleActor;
+					}
+				}
 			}
 		}
 	}
-
 	return FoundParticleActor;
 }
 
@@ -3417,8 +3436,77 @@ FAnticipationPose UALSXTImpactReactionComponent::SelectStablizationPose_Implemen
 
 FClutchImpactLocationAnimation UALSXTImpactReactionComponent::SelectClutchImpactPointMontage_Implementation(FDoubleHitResult Hit)
 {
-	FClutchImpactLocationAnimation SelectedMontage;
-	return SelectedMontage;
+	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
+	TArray<FClutchImpactLocationAnimation> Animations = SelectedImpactReactionSettings->ClutchImpactPointAnimations;
+	TArray<FClutchImpactLocationAnimation> FilteredAnimations;
+	FClutchImpactLocationAnimation SelectedClutchImpactPointAnimation;
+	const FGameplayTag Health = HealthToHealthTag(IALSXTCharacterInterface::Execute_GetHealth(GetOwner()));
+
+	TArray<FGameplayTag> TagsArray = { Hit.Strength, Hit.ImpactSide, Hit.ImpactForm, Health };
+	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
+
+	// Return is there are no Montages
+	if (Animations.Num() < 1 || !Animations[0].Pose)
+	{
+		return SelectedClutchImpactPointAnimation;
+	}
+
+	// Filter Montages based on Tag parameters
+	for (auto Animation : Animations)
+	{
+		FGameplayTagContainer CurrentTagsContainer;
+		CurrentTagsContainer.AppendTags(Animation.ImpactStrength);
+		CurrentTagsContainer.AppendTags(Animation.ImpactSide);
+		CurrentTagsContainer.AppendTags(Animation.ImpactForm);
+		CurrentTagsContainer.AppendTags(Animation.Health);
+
+		if (CurrentTagsContainer.HasAll(TagsContainer))
+		{
+			FilteredAnimations.Add(Animation);
+		}
+	}
+
+	// Return if there are no filtered Montages
+	if (FilteredAnimations.Num() < 1 || !FilteredAnimations[0].Pose)
+	{
+		return SelectedClutchImpactPointAnimation;
+	}
+	else
+	{
+		SelectedClutchImpactPointAnimation = FilteredAnimations[0];
+	}
+
+	// If more than one result, avoid duplicates
+	// if (FilteredAnimations.Num() > 1)
+	// {
+	// 	// If FilteredMontages contains LastAttackReactionAnimation, remove it from FilteredMontages array to avoid duplicates
+	// 	if (FilteredAnimations.Contains(LastImpactReactionAnimation))
+	// 	{
+	// 		int IndexToRemove = FilteredAnimations.Find(LastImpactReactionAnimation);
+	// 		FilteredAnimations.RemoveAt(IndexToRemove, 1, true);
+	// 	}
+	// 
+	// 	//Shuffle Array
+	// 	for (int m = FilteredAnimations.Num() - 1; m >= 0; --m)
+	// 	{
+	// 		int n = FMath::Rand() % (m + 1);
+	// 		if (m != n) FilteredAnimations.Swap(m, n);
+	// 	}
+	// 
+	// 	// Select Random Array Entry
+	// 	int RandIndex = FMath::RandRange(0, (FilteredAnimations.Num() - 1));
+	// 	SelectedClutchImpactPointAnimation = FilteredAnimations[RandIndex];
+	// 	LastImpactReactionAnimation = SelectedClutchImpactPointAnimation;
+	// 	return SelectedClutchImpactPointAnimation;
+	// }
+	// else
+	// {
+	// 	SelectedClutchImpactPointAnimation = FilteredAnimations[0];
+	// 	LastImpactReactionAnimation = SelectedClutchImpactPointAnimation;
+	// 	return SelectedClutchImpactPointAnimation;
+	// }
+
+	return SelectedClutchImpactPointAnimation;
 }
 
 FAnticipationPose UALSXTImpactReactionComponent::SelectSteadyMontage_Implementation(const FGameplayTag& Side)
@@ -4290,7 +4378,7 @@ void UALSXTImpactReactionComponent::MulticastStartSyncedAttackReaction_Implement
 
 void UALSXTImpactReactionComponent::ServerStartStabilize_Implementation(UAnimSequenceBase* Pose, FVector ImpactPoint)
 {
-	if (IsClutchImpactPointAllowedToStart(Pose))
+	if (IsStabilizeAllowedToStart(Pose))
 	{
 		MulticastStartStabilize(Pose, ImpactPoint);
 		GetOwner()->ForceNetUpdate();
@@ -4842,7 +4930,7 @@ void UALSXTImpactReactionComponent::StartSyncedAttackReactionImplementation(FAct
 
 void UALSXTImpactReactionComponent::StartStabilizeImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint)
 {
-	if (IsClutchImpactPointAllowedToStart(Montage))
+	if (IsStabilizeAllowedToStart(Montage))
 	{
 		// Character->SetFacialExpression();
 
@@ -4863,8 +4951,8 @@ void UALSXTImpactReactionComponent::StartStabilizeImplementation(UAnimSequenceBa
 
 void UALSXTImpactReactionComponent::StartClutchImpactPointImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint)
 {
-	if (IsClutchImpactPointAllowedToStart(Montage))
-	{
+	// if (IsClutchImpactPointAllowedToStart(Montage))
+	// {
 		// Character->SetFacialExpression();
 
 		FALSXTDefensiveModeState CurrentDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
@@ -4875,11 +4963,11 @@ void UALSXTImpactReactionComponent::StartClutchImpactPointImplementation(UAnimSe
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), ALSXTDefensiveModeTags::ClutchImpactPoint);
 		// IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
 		StartClutchImpactPointTimer();
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("IsImpactReactionNOTAllowedToStart"));
-	}
+	// }
+	// else
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("IsClutchImpactPointNOTAllowedToStart"));
+	// }
 }
 
 void UALSXTImpactReactionComponent::StartImpactFallImplementation(FDoubleHitResult Hit, FActionMontageInfo Montage, FActionMontageInfo FallMontage)
