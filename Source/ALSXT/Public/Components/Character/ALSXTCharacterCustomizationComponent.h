@@ -47,7 +47,10 @@ public:
 	// UFUNCTION(BlueprintCallable, Category = "Character Customization")
 	// void ResetAllCustomMorphTargets();
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	UFUNCTION(BlueprintCallable, Category = "Character Customization Interface|Parameters")
+	FALSXTCharacterVoiceParameters GetVoiceParameters();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	FALSXTCharacterVoiceParameters VoiceParameters;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))

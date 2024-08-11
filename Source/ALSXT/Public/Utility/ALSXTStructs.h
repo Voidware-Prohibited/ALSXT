@@ -1161,11 +1161,14 @@ struct ALSXT_API FALSXTImpactSound
 	FGameplayTagContainer Form;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FSound> Sounds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FALSXTCharacterSound ImpactSound;
 
 	bool operator==(const FALSXTImpactSound& other) const
 	{
-		return (other.PhysicalMaterials == PhysicalMaterials) && (other.Velocity == Velocity) && (other.Form == Form) && (other.ImpactSound == ImpactSound);
+		return (other.PhysicalMaterials == PhysicalMaterials) && (other.Velocity == Velocity) && (other.Form == Form) && (other.Sounds == Sounds);
 	}
 };
 

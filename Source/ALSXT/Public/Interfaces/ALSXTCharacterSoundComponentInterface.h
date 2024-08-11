@@ -25,7 +25,7 @@ public:
 	FALSXTCharacterBreathEffectsSettings GetBreathEffectsSettings();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Parameters")
-	FALSXTCharacterVoiceParameters GetVoiceParameters();
+	FALSXTCharacterVoiceParameters GetVoiceParametersOld();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Character Sound Component Interface|Breath Effects")
 	float GetCurrentStamina() const;

@@ -741,7 +741,7 @@ FVaultAnimation AALSXTCharacter::SelectVaultingMontage_Implementation(const FGam
 
 void AALSXTCharacter::OnVaultingStarted_Implementation(const FALSXTVaultingParameters& Parameters) 
 {
-	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterCustomizationComponentInterface::Execute_GetVoiceParameters(this);
 
 	if (Parameters.VaultingType == ALSXTVaultTypeTags::Low)
 	{

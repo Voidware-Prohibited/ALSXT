@@ -122,6 +122,20 @@ struct ALSXT_API FALSXTImpactReactionParameters
 	FVector2D PlayRate{1.0f, 1.0f};
 };
 
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTFormSurfaces
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag Form{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TArray<TEnumAsByte<EPhysicalSurface>> Surfaces;
+};
+
+
 UCLASS(Blueprintable, BlueprintType)
 class ALSXT_API UALSXTImpactReactionSettings : public UDataAsset
 {
@@ -205,6 +219,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particle}", AllowPrivateAccess))
 	TArray<FALSXTImpactPointParticle> ImpactPointParticles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (TitleProperty = "{Form} {Surfaces}", AllowPrivateAccess))
+	TArray<FALSXTFormSurfaces> FormSurfaces;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", meta = (TitleProperty = "{Location}", ForceInlineRow))
+	TMap<FName, FBoneLocationEntry> BoneLocationMap;
 
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float ImpactHeight) const;

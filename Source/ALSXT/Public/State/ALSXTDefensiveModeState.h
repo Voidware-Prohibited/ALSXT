@@ -25,6 +25,9 @@ struct ALSXT_API FALSXTDefensiveModeState
 	FGameplayTag Velocity{ FGameplayTag::EmptyTag };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform Transform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location{ FVector::ZeroVector };
 };
 

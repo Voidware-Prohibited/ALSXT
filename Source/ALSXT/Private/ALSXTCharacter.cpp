@@ -464,6 +464,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PreviousLookInput, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FreelookState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, HeadLookAtState, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredEmote, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, AimState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, bMovementEnabled, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
@@ -998,7 +999,7 @@ void AALSXTCharacter::OnOverlayModeChanged_Implementation(const FGameplayTag& Pr
 
 void AALSXTCharacter::OnJumped_Implementation()
 {
-	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterCustomizationComponentInterface::Execute_GetVoiceParameters(this);
 	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Jumping, CharacterVoiceParams.Sex, CharacterVoiceParams.Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
 
 }
@@ -1006,7 +1007,7 @@ void AALSXTCharacter::OnJumped_Implementation()
 void AALSXTCharacter::OnMantlingStarted_Implementation(const FAlsMantlingParameters& Parameters)
 {
 	FGameplayTag TypeTag{ FGameplayTag::EmptyTag };
-	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterCustomizationComponentInterface::Execute_GetVoiceParameters(this);
 
 	if (Parameters.MantlingType == EAlsMantlingType::Low)
 	{
@@ -1028,7 +1029,7 @@ void AALSXTCharacter::OnMantlingEnded_Implementation()
 
 void AALSXTCharacter::OnRagdollingStarted_Implementation()
 {
-	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterCustomizationComponentInterface::Execute_GetVoiceParameters(this);
 	RefreshOverlayObject();
 	CharacterSound->PlayDamageSound(true, true, true, CharacterVoiceParams.Sex, CharacterVoiceParams.Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTAttackMethodTags::Regular, ALSXTActionStrengthTags::Medium, ALSXTImpactFormTags::Blunt, IALSXTCharacterInterface::Execute_GetStamina(this));
 }
@@ -1040,7 +1041,7 @@ void AALSXTCharacter::OnRagdollingEnded_Implementation()
 
 void AALSXTCharacter::OnSlidingStarted_Implementation()
 {
-	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(this);
+	FALSXTCharacterVoiceParameters CharacterVoiceParams = IALSXTCharacterCustomizationComponentInterface::Execute_GetVoiceParameters(this);
 	CharacterSound->PlayActionSound(true, true, true, ALSXTCharacterMovementSoundTags::Sliding, CharacterVoiceParams.Sex, CharacterVoiceParams.Variant, IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(this), ALSXTActionStrengthTags::Medium, IALSXTCharacterInterface::Execute_GetStamina(this));
 }
 

@@ -19,6 +19,7 @@
 #include "Interfaces/ALSXTHeldItemInterface.h"
 #include "Interfaces/ALSXTCombatInterface.h"
 #include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
+#include "Interfaces/ALSXTCharacterCustomizationComponentInterface.h"
 #include "ALSXTBlueprintFunctionLibrary.h"
 
 // Sets default values for this component's properties
@@ -1138,7 +1139,7 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 		}
 		
 		// Crouch(); //Hack
-		FALSXTCharacterVoiceParameters VoiceParameters = IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(GetOwner());
+		FALSXTCharacterVoiceParameters VoiceParameters = IALSXTCharacterCustomizationComponentInterface::Execute_GetVoiceParameters(GetOwner());
 		IALSXTCharacterSoundComponentInterface::Execute_PlayAttackSound(GetOwner(), true, true, true, VoiceParameters.Sex, VoiceParameters.Variant, Character->GetOverlayMode(), CombatState.CombatParameters.Strength, CombatState.CombatParameters.AttackType, IALSXTCharacterInterface::Execute_GetStamina(GetOwner()));
 	}
 }

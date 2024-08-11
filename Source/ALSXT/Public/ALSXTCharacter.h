@@ -44,6 +44,7 @@
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTHeldItemInterface.h"
 #include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
+#include "Interfaces/ALSXTCharacterCustomizationComponentInterface.h"
 #include "Interfaces/ALSXTIdleAnimationComponentInterface.h"
 #include "Notifies/AlsAnimNotify_FootstepEffects.h"
 #include "State/ALSXTFootstepState.h"

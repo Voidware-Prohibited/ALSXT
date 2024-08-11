@@ -89,6 +89,191 @@ void UALSXTImpactReactionComponent::TickComponent(float DeltaTime, ELevelTick Ti
 	AnticipationTrace();
 }
 
+FGameplayTag UALSXTImpactReactionComponent::DetermineDefensiveModeFromAttackingCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance)
+{
+	if (CombatStance == ALSXTCombatStanceTags::Ready || CombatStance == ALSXTCombatStanceTags::Aiming)
+	{
+		if (Form == ALSXTImpactFormTags::Blunt)
+		{
+			return ALSXTDefensiveModeTags::Blocking;
+		}
+		else
+
+		{
+			return ALSXTDefensiveModeTags::BraceForImpact;
+		}
+	}
+	else
+	{
+		return FGameplayTag::EmptyTag;
+	}
+}
+
+FGameplayTag UALSXTImpactReactionComponent::DetermineDefensiveModeFromCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance)
+{
+	if (CombatStance == ALSXTCombatStanceTags::Ready || CombatStance == ALSXTCombatStanceTags::Aiming)
+	{
+		if (Form == ALSXTImpactFormTags::Blunt)
+		{
+			return ALSXTDefensiveModeTags::Blocking;
+		}
+		else
+
+		{
+			return ALSXTDefensiveModeTags::Avoiding;
+		}
+	}
+	else
+	{
+		return FGameplayTag::EmptyTag;
+	}
+}
+
+FGameplayTag UALSXTImpactReactionComponent::HealthToHealthTag(float Health)
+{
+	FGameplayTag HealthTag;
+
+	if (Health > 99)
+	{
+		HealthTag = ALSXTHealthTags::All;
+	}
+	if (Health > 75)
+	{
+		HealthTag = ALSXTHealthTags::Most;
+	}
+	if (Health > 50)
+	{
+		HealthTag = ALSXTHealthTags::Moderate;
+	}
+	if (Health < 25)
+	{
+		HealthTag = ALSXTHealthTags::Little;
+	}
+	if (Health < 05)
+	{
+		HealthTag = ALSXTHealthTags::None;
+	}
+	return HealthTag;
+}
+
+FGameplayTag UALSXTImpactReactionComponent::LocationToImpactSide(FVector Location)
+{
+	float LocationDotProduct = FVector::DotProduct(GetOwner()->GetActorForwardVector(), (GetOwner()->GetActorLocation() - Location));
+	if (LocationDotProduct > 0)
+	{
+		return ALSXTImpactSideTags::Right;
+	}
+	else
+	{
+		return ALSXTImpactSideTags::Left;
+	}
+}
+
+FGameplayTag UALSXTImpactReactionComponent::LocationToActorImpactSide(AActor* Actor, FVector Location)
+{
+	float LocationDotProduct = FVector::DotProduct(Actor->GetActorForwardVector(), (Actor->GetActorLocation() - Location));
+	if (LocationDotProduct > 0)
+	{
+		return ALSXTImpactSideTags::Right;
+	}
+	else
+	{
+		return ALSXTImpactSideTags::Left;
+	}
+}
+
+FGameplayTag UALSXTImpactReactionComponent::ConvertVelocityToTag(FVector Velocity)
+{
+	if (Velocity.Length() < 100)
+	{
+		return ALSXTImpactVelocityTags::Slow;
+	}
+	if (Velocity.Length() > 100)
+	{
+		return ALSXTImpactVelocityTags::Moderate;
+	}
+	if (Velocity.Length() > 500)
+	{
+		return ALSXTImpactVelocityTags::Fast;
+	}
+	if (Velocity.Length() > 800)
+	{
+		return ALSXTImpactVelocityTags::Faster;
+	}
+	if (Velocity.Length() > 1200)
+	{
+		return ALSXTImpactVelocityTags::TerminalVelocity;
+	}
+	else
+	{
+		return ALSXTImpactVelocityTags::Slow;
+	}
+}
+
+FGameplayTag UALSXTImpactReactionComponent::ConvertVelocityToStrength(FVector Velocity)
+{
+	if (Velocity.Length() < 100)
+	{
+		return ALSXTActionStrengthTags::Light;
+	}
+	if (Velocity.Length() > 100)
+	{
+		return ALSXTActionStrengthTags::Medium;
+	}
+	if (Velocity.Length() > 500)
+	{
+		return ALSXTActionStrengthTags::Heavy;
+	}
+	else
+	{
+		return ALSXTActionStrengthTags::Light;
+	}
+}
+
+FGameplayTag UALSXTImpactReactionComponent::ConvertVelocityTagToStrength(FGameplayTag Velocity)
+{
+	if (Velocity == ALSXTImpactVelocityTags::Slow)
+	{
+		return ALSXTActionStrengthTags::Light;
+	}
+	if (Velocity == ALSXTImpactVelocityTags::Moderate)
+	{
+		return ALSXTActionStrengthTags::Medium;
+	}
+	if (Velocity == ALSXTImpactVelocityTags::Fast)
+	{
+		return ALSXTActionStrengthTags::Medium;
+	}
+	if (Velocity == ALSXTImpactVelocityTags::Faster)
+	{
+		return ALSXTActionStrengthTags::Heavy;
+	}
+	if (Velocity == ALSXTImpactVelocityTags::TerminalVelocity)
+	{
+		return ALSXTActionStrengthTags::Heavy;
+	}
+	else
+	{
+		return ALSXTActionStrengthTags::Light;
+	}
+}
+
+FGameplayTag UALSXTImpactReactionComponent::ConvertPhysicalSurfaceToFormTag(EPhysicalSurface PhysicalSurface)
+{
+	FGameplayTag FoundForm;
+	UALSXTImpactReactionSettings* SelectedSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
+	TArray <FALSXTFormSurfaces> FormSurfaces = SelectedSettings->FormSurfaces;
+	for (FALSXTFormSurfaces Entry : FormSurfaces)
+	{
+		if (Entry.Surfaces.Contains(PhysicalSurface))
+		{
+			FoundForm = Entry.Form;
+			return FoundForm;
+		}
+	}
+	return FoundForm;
+}
+
 void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if ((OtherActor != NULL) && (OtherActor != GetOwner()) && (OtherComp != NULL))
@@ -1225,8 +1410,14 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 						IALSXTCollisionInterface::Execute_GetActorVelocity(GetOwner(), DoubleHitResult.OriginHitResult.Velocity);
 						// NewImpactReactionState.ImpactReactionParameters = ImpactReactionParameters;
 
-						if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCharacterInterface::StaticClass()) && IALSXTCharacterInterface::Execute_GetCombatStance(HitResult.GetActor()) == ALSXTCombatStanceTags::Neutral)
+						if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCharacterInterface::StaticClass()))
 						{
+							if (IALSXTCharacterInterface::Execute_GetCombatStance(HitResult.GetActor()) == ALSXTCombatStanceTags::Neutral)
+							{
+
+							}
+							
+							
 							if (GetOwner()->GetVelocity().Length() < FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity))
 							{
 								// Use Static Pose instead
@@ -1236,6 +1427,11 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 
 								// Set Physical Animation Component Curves/Profile Here
 								IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Bump, DoubleHitResult.HitResult.HitResult.BoneName);
+
+								if (ImpactReactionSettings.DebugMode)
+								{
+									GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "CrowdNavigationStatic");
+								}
 							}
 							else if ((IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) == ALSXTCombatStanceTags::Neutral && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())) || (GetOwner()->GetVelocity().Length() >= 650.0f && IALSXTCollisionInterface::Execute_ShouldPerformCrowdNavigationReaction(GetOwner())))
 							{
@@ -1243,11 +1439,18 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 
 								// Set Physical Animation Component Curves/Profile Here
 								IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Bump, DoubleHitResult.HitResult.HitResult.BoneName);
+
+								if (ImpactReactionSettings.DebugMode)
+								{
+									GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "CrowdNavigation");
+								}
 							}
 							NewImpactReactionState.ImpactReactionParameters.CrowdNavigationHit = DoubleHitResult;
 							NewImpactReactionState.ImpactReactionParameters.ImpactType = ALSXTImpactTypeTags::CrowdNavigation;
 							SetImpactReactionState(NewImpactReactionState);
 							IALSXTCollisionInterface::Execute_CrowdNavigationReaction(HitResult.GetActor(), IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), DoubleHitResult, SideTag, FormTag);
+
+
 						}
 						else
 						{
@@ -1329,7 +1532,7 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 
 	if (IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()).Mode != ALSXTDefensiveModeTags::ClutchImpactPoint)
 	{
-		bool isHit = UKismetSystemLibrary::BoxTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, ImpactReactionSettings.AnticipationAreaHalfSize, IALSXTCharacterInterface::Execute_GetCharacterControlRotation(GetOwner()), ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f);
+		bool isHit = UKismetSystemLibrary::BoxTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, ImpactReactionSettings.AnticipationAreaHalfSize, IALSXTCharacterInterface::Execute_GetCharacterControlRotation(GetOwner()), ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, BumpDebugMode, HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f);
 		if (isHit)
 		{
 			for (FHitResult HitResult : HitResults)
@@ -1348,6 +1551,8 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 					IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), ActorVelocity);
 					IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationPoint);
 
+
+					// Is Hit Actor In Fighting or Aiming Stance?
 					
 					if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCombatInterface::StaticClass()))
 					{

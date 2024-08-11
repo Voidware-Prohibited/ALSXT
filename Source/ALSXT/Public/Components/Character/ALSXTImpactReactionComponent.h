@@ -467,25 +467,25 @@ private:
 	void ImpactTimelineUpdate(float Value);
 
 protected:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag HealthToHealthTag(float Health);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag LocationToImpactSide(FVector Location);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag LocationToActorImpactSide(AActor* Actor, FVector Location);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, meta = (DisplayName = "Convert Physical Surface to GameplayTag", Keywords = "physical, surface, material, gameplay, tag"), Category = "Physical Surface")
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Convert Physical Surface to GameplayTag", Keywords = "physical, surface, material, gameplay, tag"), Category = "Physical Surface")
 	FGameplayTag ConvertPhysicalSurfaceToFormTag(EPhysicalSurface PhysicalSurface);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag ConvertVelocityToTag(UPARAM(meta = (Categories = "Als.Impact Velocity")) FVector Velocity);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag ConvertVelocityToStrength(UPARAM(meta = (Categories = "Als.Action Strength")) FVector Velocity);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag ConvertVelocityTagToStrength(UPARAM(meta = (Categories = "Als.Action Strength")) FGameplayTag Velocity);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
@@ -503,10 +503,10 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveMode(const FGameplayTag& Form);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveModeFromCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveModeFromAttackingCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")

@@ -15,7 +15,7 @@ class ALSXT_API IALSXTCharacterCustomizationComponentInterface {
 
 public:
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Customization Component Interface")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Character Customization Component Interface")
 	FALSXTCharacterVoiceParameters GetVoiceParameters();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character Customization Component Interface")

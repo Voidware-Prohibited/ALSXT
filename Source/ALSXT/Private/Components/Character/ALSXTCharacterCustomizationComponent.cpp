@@ -31,6 +31,11 @@ void UALSXTCharacterCustomizationComponent::TickComponent(float DeltaTime, ELeve
 	// ...
 }
 
+FALSXTCharacterVoiceParameters UALSXTCharacterCustomizationComponent::GetVoiceParameters()
+{
+	return VoiceParameters;
+}
+
 TArray<UALSXTPaintableSkeletalMeshComponent*> UALSXTCharacterCustomizationComponent::GetAllComponents()
 {
 	TArray<UALSXTPaintableSkeletalMeshComponent*> AllComponents;

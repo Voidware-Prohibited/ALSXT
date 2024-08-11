@@ -6,6 +6,7 @@
 #include "Settings/ALSXTCharacterSoundSettings.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
+#include "Interfaces/ALSXTCharacterCustomizationComponentInterface.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 
@@ -220,7 +221,7 @@ void UALSXTCharacterSoundComponent::PlayCharacterBreathEffectsImplementation(con
 		{
 			// Get and Set New Sounds
 			UALSXTCharacterSoundSettings* Settings = IALSXTCharacterSoundComponentInterface::Execute_SelectCharacterSoundSettings(GetOwner());
-			CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), IALSXTCharacterSoundComponentInterface::Execute_GetVoiceParameters(GetOwner()).Variant, IALSXTCharacterInterface::Execute_GetCharacterBreathState(GetOwner()).BreathType, StaminaOverride);
+			CurrentBreathSounds = SelectBreathSoundsNew(Settings, IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwner()), IALSXTCharacterCustomizationComponentInterface::Execute_GetVoiceParameters(GetOwner()).Variant, IALSXTCharacterInterface::Execute_GetCharacterBreathState(GetOwner()).BreathType, StaminaOverride);
 			TArray<FSound> Sounds;
 
 			for (FALSXTBreathSound BS : CurrentBreathSounds)
