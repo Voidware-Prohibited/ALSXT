@@ -4,6 +4,7 @@
 #include "Chaos/ChaosEngineInterface.h"
 #include "Settings/ALSXTCameraEffectsSettings.h"
 #include "Settings/ALSXTHeldItemSettings.h"
+#include "Settings/ALSXTStationaryModeSettings.h"
 #include "Settings/ALSXTFirearmSettings.h"
 #include "State/ALSXTPoseState.h"
 #include "State/ALSXTHeadLookAtState.h"
@@ -64,6 +65,9 @@ public:
   FALSXTFootwearDetails GetCharacterFootwearDetails() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FALSXTStationaryModeState GetCharacterStationaryModeState() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   UCapsuleComponent* GetCharacterCapsuleComponent() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
@@ -71,6 +75,9 @@ public:
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   bool IsBlocking() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  bool IsCharacterPlayerControlled() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterLocomotionAction() const;

@@ -90,6 +90,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		HeadLookAtState = IALSXTCharacterInterface::Execute_GetCharacterHeadLookAtState(GetOwningActor());
 		StatusState = IALSXTCharacterInterface::Execute_GetStatusState(GetOwningActor());
 		DefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwningActor());
+		StationaryModeState = IALSXTCharacterInterface::Execute_GetCharacterStationaryModeState(GetOwningActor());
 		WeaponObstruction = IALSXTCharacterInterface::Execute_GetCharacterWeaponObstruction(GetOwningActor());
 		BreathState = IALSXTCharacterInterface::Execute_GetCharacterBreathState(GetOwningActor());
 		// ReloadingType = IALSXTCharacterInterface::Execute_GetCharacterReloadingType(GetOwningActor());

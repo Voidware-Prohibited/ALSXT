@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameplayTagContainer.h"
 #include "ALSXTOverlaySettings.generated.h"
 
 USTRUCT(BlueprintType)

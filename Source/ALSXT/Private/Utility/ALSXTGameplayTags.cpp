@@ -470,9 +470,15 @@ namespace ALSXTWeaponReadyPositionTags
 	UE_DEFINE_GAMEPLAY_TAG(Hidden, TEXT("Als.Weapon Ready Position.Hidden"))
 }
 
+namespace ALSXTBumpPoseModeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Bump, TEXT("Als.Bump Pose Mode.Bump"))
+	UE_DEFINE_GAMEPLAY_TAG(CrowdNavigation, TEXT("Als.Bump Pose Mode.Crowd Navigation"))
+}
+
 namespace ALSXTDefensiveModeTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Als.Defensive Mode.None"))
+	UE_DEFINE_GAMEPLAY_TAG(CrowdNavigation, TEXT("Als.Defensive Mode.Crowd Navigation"))
 	UE_DEFINE_GAMEPLAY_TAG(Avoiding, TEXT("Als.Defensive Mode.Avoiding"))
 	UE_DEFINE_GAMEPLAY_TAG(Anticipation, TEXT("Als.Defensive Mode.Anticipation"))
 	UE_DEFINE_GAMEPLAY_TAG(Blocking, TEXT("Als.Defensive Mode.Blocking"))

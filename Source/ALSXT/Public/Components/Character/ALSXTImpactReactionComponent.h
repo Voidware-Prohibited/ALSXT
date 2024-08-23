@@ -123,6 +123,9 @@ protected:
 
 	void StopFallingAnticipationTimer();
 
+	// UPROPERTY(BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
+	// AActor* CurrentCrowdNavigation{ nullptr };
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -214,6 +217,9 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = "State", ReplicatedUsing = "OnReplicate_ObstacleImpactHistory", Meta = (AllowPrivateAccess))
 	TArray<FImpactHistoryEntry> ObstacleImpactHistory;
 
+	UPROPERTY(BlueprintReadOnly, Category = "State", ReplicatedUsing = "OnReplicate_AnticipationImpactHistory", Meta = (AllowPrivateAccess))
+	TArray<FImpactHistoryEntry> AnticipationImpactHistory;
+
 	void AnticipationTrace();
 
 	UFUNCTION()
@@ -224,6 +230,9 @@ private:
 
 	UFUNCTION()
 	void OnReplicate_ObstacleImpactHistory(const TArray<FImpactHistoryEntry> PreviousObstacleImpactHistory);
+
+	UFUNCTION()
+	void OnReplicate_AnticipationImpactHistory(const TArray<FImpactHistoryEntry> PreviousAnticipationImpactHistory);
 
 	UFUNCTION(Server, Unreliable)
 	void ServerSetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
@@ -244,6 +253,8 @@ private:
 	float GetBaseVelocityDamage();
 
 	bool ValidateNewHit(AActor* ActorToCheck);
+
+	bool ValidateNewAnticipationHit(AActor* ActorToCheck);
 
 	// BlendOut Delegates
 
@@ -474,6 +485,12 @@ protected:
 	FGameplayTag LocationToImpactSide(FVector Location);
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	FGameplayTag LocationToImpactHeight(FVector Location);
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	FGameplayTag LocationToImpactPosition(FVector Location);
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag LocationToActorImpactSide(AActor* Actor, FVector Location);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Convert Physical Surface to GameplayTag", Keywords = "physical, surface, material, gameplay, tag"), Category = "Physical Surface")
@@ -495,7 +512,7 @@ protected:
 	UAnimSequenceBase* SelectBumpPose(const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	FBumpReactionAnimation SelectCrowdNavigationReactionMontage(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
+	FBumpReactionAnimation SelectCrowdNavigationReactionMontage(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UAnimSequenceBase* SelectCrowdNavigationPose(const FGameplayTag& Side, const FGameplayTag& Form);
@@ -549,7 +566,7 @@ protected:
 	FActionMontageInfo SelectAttackFallMontage(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	UAnimSequenceBase* SelectBraceForImpactPose(const FGameplayTag& Side);
+	UAnimSequenceBase* SelectBraceForImpactPose(const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UAnimMontage* SelectImpactFallenPose(FDoubleHitResult Hit);
@@ -588,7 +605,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag GetCharacterVelocity();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
@@ -600,10 +617,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	TSubclassOf<AActor> GetImpactReactionParticleActor(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
-	FALSXTCharacterSound GetImpactReactionSound(FDoubleHitResult Hit);
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	FSound GetImpactReactionSound(FDoubleHitResult Hit);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FALSXTCharacterSound GetAttackReactionSound(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
@@ -614,6 +631,9 @@ public:
 
 	// Entry Events
 public:
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void OnStaticMeshAttackCollision(FAttackDoubleHitResult Hit);
+
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void SyncedAnticipationReaction(FVector AnticipationPoint);
 
@@ -632,6 +652,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void AttackReaction(FAttackDoubleHitResult Hit);
 
+	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
+	void OnStaticMeshAttackCollisionImplementation(FAttackDoubleHitResult Hit);
+	
 	UFUNCTION(BlueprintCallable, Category = "Impact Reaction")
 	void AttackReactionImplementation(FAttackDoubleHitResult Hit);
 
@@ -699,7 +722,7 @@ private:
 
 	void StartBumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
-	void StartCrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
+	// void StartCrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	void StartSyncedAnticipationReaction(FVector AnticipationPoint);
 
@@ -782,6 +805,12 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastImpactReaction(FDoubleHitResult Hit);
+
+	UFUNCTION(Server, Reliable)
+	void ServerOnStaticMeshAttackCollision(FAttackDoubleHitResult Hit);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastOnStaticMeshAttackCollision(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(Server, Reliable)
 	void ServerAttackReaction(FAttackDoubleHitResult Hit);
@@ -905,11 +934,11 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartBumpReaction(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartCrowdNavigationReaction(FActionMontageInfo Montage, USoundBase* Audio);
+	// UFUNCTION(Server, Reliable, WithValidation)
+	// void ServerStartCrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartCrowdNavigationReaction(FActionMontageInfo Montage, USoundBase* Audio);
+	// UFUNCTION(NetMulticast, Reliable)
+	// void MulticastStartCrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartSyncedAnticipationReaction(FVector AnticipationPoint);
@@ -1057,7 +1086,7 @@ private:
 
 	void StartDefensiveReactionImplementation(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint);
 
-	void StartCrowdNavigationReactionImplementation(FActionMontageInfo Montage, USoundBase* Audio);
+	void CrowdNavigationReactionImplementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	void StartBumpReactionImplementation(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 

@@ -142,6 +142,9 @@ class ALSXT_API UALSXTImpactReactionSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
+	FGameplayTagContainer BumpInterruptableLocomotionActions;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Defensive Modes", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
 	TArray<FAnticipationPose> DefensivePoses;
 
@@ -225,6 +228,18 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", meta = (TitleProperty = "{Location}", ForceInlineRow))
 	TMap<FName, FBoneLocationEntry> BoneLocationMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
+	FGameplayTagContainer LowThreatOverlayModes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
+	FGameplayTagContainer MediumThreatOverlayModes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
+	FGameplayTagContainer HighThreatOverlayModes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
+	FGameplayTagContainer VeryHighThreatOverlayModes;
 
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float ImpactHeight) const;

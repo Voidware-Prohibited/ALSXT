@@ -10,7 +10,7 @@ struct ALSXT_API FALSXTDefensiveModeState
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Mode{ ALSXTDefensiveModeTags::None };
+	FGameplayTag Mode {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAnimSequenceBase> Montage{ nullptr };

@@ -12,6 +12,7 @@
 #include "State/ALSXTBumpPoseState.h"
 #include "State/ALSXTHeadLookAtState.h"
 #include "Settings/ALSXTHeldItemSettings.h"
+#include "Settings/ALSXTStationaryModeSettings.h"
 #include "ALSXTCharacter.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
@@ -81,6 +82,9 @@ protected:
 	FALSXTAimState AimState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTStationaryModeState StationaryModeState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FALSXTFreelookState FreelookState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
@@ -96,7 +100,7 @@ protected:
 	FALSXTDefensiveModeState DefensiveModeState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag DefensiveMode{ALSXTDefensiveModeTags::None};
+	FGameplayTag DefensiveMode{ FGameplayTag::EmptyTag };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag StationaryMode{FGameplayTag::EmptyTag};

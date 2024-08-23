@@ -4,6 +4,7 @@
 #include "Utility/ALSXTStructs.h"
 #include "State/ALSXTImpactReactionState.h"
 #include "Settings/ALSXTCollisionSettings.h"
+#include "State/ALSXTBumpPoseState.h"
 #include "State/ALSXTDefensiveModeState.h"
 #include "Settings/ALSXTElementalInteractionSettings.h"
 #include "ALSXTCollisionInterface.generated.h"
@@ -159,13 +160,16 @@ public:
 
 	// States
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|State")
-	FALSXTBumpPoseState GetCrowdNavigationPoseState();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|State")
+	FALSXTBumpPoseState GetCrowdNavigationPoseState() const;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|State")
 	FALSXTBumpPoseState GetBumpPoseState();
 
 	// Reaction
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Reactions")
+	void BallisticImpact(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Reactions")
 	void BumpReaction(FDoubleHitResult Hit, FGameplayTag Gait, FGameplayTag Side, FGameplayTag Form);
@@ -180,6 +184,9 @@ public:
 	void GetImpactFallLocation(FVector& Location, FDoubleHitResult Hit);
 
 	// Events
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Reactions")
+	void OnStaticMeshAttackCollision(FAttackDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Events")
 	void PerformSurfaceInteraction(const FGameplayTag& PhysicalMaterial);

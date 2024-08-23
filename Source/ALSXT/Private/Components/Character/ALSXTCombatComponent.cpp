@@ -21,6 +21,7 @@
 #include "Interfaces/ALSXTCharacterSoundComponentInterface.h"
 #include "Interfaces/ALSXTCharacterCustomizationComponentInterface.h"
 #include "ALSXTBlueprintFunctionLibrary.h"
+#include "Landscape.h"
 
 // Sets default values for this component's properties
 UALSXTCombatComponent::UALSXTCombatComponent()
@@ -502,7 +503,13 @@ void UALSXTCombatComponent::EndMoveToTarget()
 
 void UALSXTCombatComponent::BeginAttackCollisionTrace(FALSXTCombatAttackTraceSettings TraceSettings)
 {
+	if (TraceSettings.UnarmedAttackType == FGameplayTag::EmptyTag)
+	{
+		TraceSettings.UnarmedAttackType = ALSXTUnarmedAttackTypeTags::RightFist;
+	}
+
 	CurrentAttackTraceSettings = TraceSettings;
+
 	GetWorld()->GetTimerManager().SetTimer(AttackTraceTimerHandle, AttackTraceTimerDelegate, 0.001f, true);
 }
 
@@ -516,9 +523,14 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 	// Setup Initial Trace
 	IALSXTCombatInterface::Execute_GetCombatUnarmedTraceLocations(GetOwner(), CurrentAttackTraceSettings.AttackType, CurrentAttackTraceSettings.Start, CurrentAttackTraceSettings.End, CurrentAttackTraceSettings.Radius);
 	TArray<TEnumAsByte<EObjectTypeQuery>> AttackTraceObjectTypes = CombatSettings.AttackTraceObjectTypes;
+	
+	// TArray<AActor*> Landscape;
+	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALandscape::StaticClass(), Landscape);
+
 	TArray<AActor*> InitialIgnoredActors;
 	TArray<AActor*> OriginTraceIgnoredActors;
 	TArray<FHitResult> HitResults;
+	// InitialIgnoredActors.Append(Landscape);
 	InitialIgnoredActors.Add(GetOwner());	// Add Self to Initial Trace Ignored Actors
 	EDrawDebugTrace::Type ShowDebugTrace {EDrawDebugTrace::None};
 	CombatSettings.DebugMode ? ShowDebugTrace = EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
@@ -539,7 +551,7 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 				FGameplayTag ImpactLoc;
 				FGameplayTag ImpactStrength;
 				// FGameplayTag ImpactSide;
-				FGameplayTag ImpactForm;
+				FGameplayTag ImpactForm = GetCombatState().CombatParameters.Form;
 				AActor* HitActor = HitResult.GetActor();
 				FString HitActorname;
 				FVector HitActorVelocity{ FVector::ZeroVector };
@@ -550,11 +562,14 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 				// Populate Hit
 				CurrentHitResult.DoubleHitResult.HitResult.HitResult = HitResult;
 				CurrentHitResult.Type = CurrentAttackTraceSettings.AttackType;
+				CurrentHitResult.DoubleHitResult.ImpactForm = CurrentAttackTraceSettings.ImpactForm;
+				CurrentHitResult.DoubleHitResult.HitResult.ImpactForm = CurrentAttackTraceSettings.ImpactForm;
 				CurrentHitResult.Strength = CurrentAttackTraceSettings.AttackStrength;
 				CurrentHitResult.DoubleHitResult.HitResult.ImpactStrength = CurrentAttackTraceSettings.AttackStrength;
 				HitActor = CurrentHitResult.DoubleHitResult.HitResult.HitResult.GetActor();
 				HitActorname = HitActor->GetName();
-
+				
+				
 				// Physics
 				if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCharacterInterface::StaticClass()))
 				{
@@ -586,6 +601,7 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 				// Setup Origin Trace
 				FHitResult OriginHitResult;
 				OriginTraceIgnoredActors.Add(HitResult.GetActor());	// Add Hit Actor to Origin Trace Ignored Actors
+				// OriginTraceIgnoredActors.Append(Landscape);
 
 				// Perform Origin Hit Trace to get PhysMat etc for ImpactLocation
 				bool isOriginHit {false};
@@ -615,6 +631,13 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 				if (UKismetSystemLibrary::DoesImplementInterface(HitActor, UALSXTCollisionInterface::StaticClass()))
 				{
 					IALSXTCollisionInterface::Execute_OnActorAttackCollision(HitActor, CurrentHitResult);
+				}
+				else
+				{
+					if (!HitActor->IsA(ALandscape::StaticClass())) 
+					{
+						IALSXTCollisionInterface::Execute_OnStaticMeshAttackCollision(GetOwner(), CurrentHitResult);
+					}					
 				}
 
 				// Play Effects for Attacker 

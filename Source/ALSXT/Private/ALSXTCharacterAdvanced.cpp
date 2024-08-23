@@ -234,14 +234,14 @@ void AALSXTCharacterAdvanced::SetDesiredHoldingBreath(const FGameplayTag& NewHol
 
 		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredHoldingBreath, this)
 
-			FALSXTBreathState NewBreathState = GetBreathState();
-			NewBreathState.HoldingBreath = NewHoldingBreathTag;
-			SetBreathState(NewBreathState);
+		FALSXTBreathState NewBreathState = GetBreathState();
+		NewBreathState.HoldingBreath = NewHoldingBreathTag;
+		SetBreathState(NewBreathState);
 
-			if (GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerSetDesiredHoldingBreath(NewHoldingBreathTag);
-			}
+		if (GetLocalRole() == ROLE_AutonomousProxy)
+		{
+			ServerSetDesiredHoldingBreath(NewHoldingBreathTag);
+		}
 	}
 }
 

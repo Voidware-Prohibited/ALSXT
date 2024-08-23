@@ -3,7 +3,50 @@
 #include "Utility/ALSXTStructs.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
+#include "GameplayTagContainer.h"
+#include "Animation/AnimSequenceBase.h"
 #include "ALSXTStationaryModeSettings.generated.h"
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTStationaryModeState
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	TObjectPtr<UAnimSequenceBase> Pose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TWeakObjectPtr<UPrimitiveComponent> TargetPrimitive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTag Mode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector MountPoint{ ForceInit };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTagContainer VehicleSide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTag VehicleWindowSide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector2D AimYawRange{ -180.0f, 180.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector2D AimPitchRange{ -180.0f, 180.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector2D CameraYawRange{ -180.0f, 180.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FVector2D CameraPitchRange{ -180.0f, 180.0f };
+
+	bool operator==(const FALSXTStationaryModeState& other) const
+	{
+		return (other.Pose == Pose) && (other.TargetPrimitive == TargetPrimitive) && (other.Mode == Mode) && (other.MountPoint == MountPoint) && (other.VehicleSide == VehicleSide) && (other.VehicleWindowSide == VehicleWindowSide);
+	}
+};
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTStationaryModeParameters

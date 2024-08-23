@@ -24,6 +24,7 @@
 #include "State/ALSXTFootstepState.h"
 #include "State/ALSXTAimState.h"
 #include "State/ALSXTDefensiveModeState.h"
+#include "Settings/ALSXTStationaryModeSettings.h"
 #include "State/ALSXTFreelookState.h"
 #include "State/ALSXTHeadLookAtState.h"
 #include "State/ALSXTSlidingState.h"
@@ -335,7 +336,29 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void ServerProcessNewVaultingState(const FALSXTVaultingState& NewVaultingState);
 
+	// Stationary Mode State
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|State|Vaulting", Meta = (AllowPrivateAccess), Transient)
+	FALSXTStationaryModeState StationaryModeState;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTStationaryModeState& GetStationaryModeState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewStationaryModeState"))
+	void SetStationaryModeState(const FALSXTStationaryModeState& NewStationaryModeState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewStationaryModeState"))
+	FALSXTStationaryModeState ProcessNewStationaryModeState(const FALSXTStationaryModeState& NewStationaryModeState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewStationaryModeState(const FALSXTStationaryModeState& NewStationaryModeState);
+
 private:
+	UFUNCTION(Server, Unreliable)
+	void ServerSetStationaryModeState(const FALSXTStationaryModeState& NewStationaryModeState);
+
+	UFUNCTION()
+	void OnReplicate_StationaryModeState(const FALSXTStationaryModeState& PreviousStationaryModeState);
+	
 	UFUNCTION(Server, Unreliable)
 	void ServerSetALSXTPoseState(const FALSXTPoseState& NewALSXTPoseState);
 
@@ -362,6 +385,9 @@ private:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnALSXTPoseStateChanged(const FALSXTPoseState& PreviousALSXTPoseState);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnStationaryModeStateChanged(const FALSXTStationaryModeState& PreviousStationaryModeState);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnBreathStateChanged(const FALSXTBreathState& PreviousBreathState);
@@ -629,10 +655,10 @@ protected:
 	// Defensive Mode
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredDefensiveMode{ALSXTDefensiveModeTags::None};
+	FGameplayTag DesiredDefensiveMode{FGameplayTag::EmptyTag};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag DefensiveMode {ALSXTDefensiveModeTags::None};
+	FGameplayTag DefensiveMode {FGameplayTag::EmptyTag};
 
 	// Emote
 
@@ -1821,9 +1847,11 @@ protected:
 	virtual AALSXTCharacter* GetCharacter_Implementation() override;
 	virtual UALSXTAnimationInstance* GetCharacterAnimInstance_Implementation() const override;
 	virtual UALSXTCharacterSettings* GetCharacterSettings_Implementation() const override;
+	virtual bool IsCharacterPlayerControlled_Implementation() const override;
 
 	virtual void SetCharacterLocomotionVariant_Implementation(const FGameplayTag& NewLocomotionVariant) override;
 
+	virtual FALSXTStationaryModeState GetCharacterStationaryModeState_Implementation() const override;
 	virtual void GetCharacterGesture_Implementation(FGameplayTag& NewGesture, FGameplayTag& NewGestureHand) const override;
 	virtual void SetCharacterGesture_Implementation(const FGameplayTag& NewGesture, const FGameplayTag& NewGestureHand) override;
 
@@ -1840,8 +1868,10 @@ protected:
 	virtual FALSXTFootwearDetails GetCharacterFootwearDetails_Implementation() const override;
 
 	// Collision Interface Functions
+	virtual void OnStaticMeshAttackCollision_Implementation(FAttackDoubleHitResult Hit) override;
 	virtual void OnActorAttackCollision_Implementation(FAttackDoubleHitResult Hit) override;
 	virtual FALSXTDefensiveModeState GetCharacterDefensiveModeState_Implementation() const override;
+	virtual FALSXTBumpPoseState GetCrowdNavigationPoseState_Implementation() const override;
 
 	// State Interface Functions
 	virtual void SetCharacterStatus_Implementation(const FGameplayTag& NewStatus) override;
@@ -1949,6 +1979,11 @@ inline const FALSXTBreathState& AALSXTCharacter::GetBreathState() const
 inline const FALSXTPoseState& AALSXTCharacter::GetALSXTPoseState() const
 {
 	return ALSXTPoseState;
+}
+
+inline const FALSXTStationaryModeState& AALSXTCharacter::GetStationaryModeState() const
+{
+	return StationaryModeState;
 }
 
 inline const FALSXTVaultingState& AALSXTCharacter::GetVaultingState() const

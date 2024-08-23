@@ -132,6 +132,9 @@ struct ALSXT_API FImpactHistoryEntry
 	AActor* Actor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
+	float Distance{ 1000.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
 	double Time {0.0f};
 
 	bool operator==(const FImpactHistoryEntry& other) const
@@ -321,7 +324,7 @@ struct ALSXT_API FStaticStationaryModeAnimation
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", TitleProperty = "{AttackStrengths}", AllowPrivateAccess))
-	TArray<FGameplayTag> StaticStationaryMode;
+	FGameplayTagContainer StaticStationaryMode;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo EnterMontage;
@@ -344,7 +347,7 @@ struct ALSXT_API FVehicleStationaryModeAnimation
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Action Strength", TitleProperty = "{AttackStrengths}", AllowPrivateAccess))
-	TArray<FGameplayTag> StationarySeatSide;
+	FGameplayTagContainer StationarySeatSide;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	FActionMontageInfo EnterMontage;
@@ -1189,9 +1192,12 @@ struct ALSXT_API FALSXTImpactParticleActor
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TSubclassOf<AActor> ParticleActor;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TSubclassOf<AActor> BackParticleActor;
+
 	bool operator==(const FALSXTImpactParticleActor& other) const
 	{
-		return (other.Velocity == Velocity) && (other.Form == Form) && (other.ParticleActor == ParticleActor);
+		return (other.Velocity == Velocity) && (other.Form == Form) && (other.ParticleActor == ParticleActor) && (other.BackParticleActor == BackParticleActor);
 	}
 };
 
@@ -1246,9 +1252,12 @@ struct ALSXT_API FALSXTImpactParticle
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	UNiagaraSystem* ImpactParticle{ nullptr };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UNiagaraSystem* ImpactBackParticle{ nullptr };
+
 	bool operator==(const FALSXTImpactParticle& other) const
 	{
-		return (other.PhysicalMaterials == PhysicalMaterials) && (other.Velocity == Velocity) && (other.Form == Form) && (other.ImpactParticle == ImpactParticle);
+		return (other.PhysicalMaterials == PhysicalMaterials) && (other.Velocity == Velocity) && (other.Form == Form) && (other.ImpactParticle == ImpactParticle) && (other.ImpactBackParticle == ImpactBackParticle);
 	}
 };
 
@@ -1278,6 +1287,20 @@ struct ALSXT_API FALSXTImpactParticles
 	{
 		return (other.Particles == Particles);
 	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactParticleMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTImpactParticles> Particles;
+
+	// bool operator==(const FALSXTImpactParticleMap& other) const
+	// {
+	// 	return (other.Particles == Particles);
+	// }
 };
 
 USTRUCT(BlueprintType)
@@ -1324,20 +1347,6 @@ struct ALSXT_API FALSXTResponseVocalization
 	{
 		return (other.Sex == Sex) && (other.Variant == Variant) && (other.Velocity == Velocity) && (other.Form == Form) && (other.Health == Health) && (other.Mature == Mature) && (other.ResponseVocalization == ResponseVocalization);
 	}
-};
-
-USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTImpactParticleMap
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTImpactParticle> Particles;
-
-	// bool operator==(const FALSXTImpactParticleMap& other) const
-	// {
-	// 	return (other.Particles == Particles);
-	// }
 };
 
 USTRUCT(BlueprintType)
