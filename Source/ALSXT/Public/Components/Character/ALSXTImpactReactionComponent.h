@@ -349,7 +349,7 @@ private:
 	bool IsAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsSyncedAttackReactionAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsClutchImpactPointAllowedToStart(const UAnimSequenceBase* Montage) const;
-	bool IsStabilizeAllowedToStart(const UAnimSequenceBase* Montage) const;
+	bool IsStabilizeAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsBraceForImpactAllowedToStart(const UAnimSequenceBase* Montage) const;
 	bool IsCrowdNavigationFallAllowedToStart(const UAnimMontage* Montage) const;
 	bool IsImpactFallAllowedToStart(const UAnimMontage* Montage) const;
@@ -975,10 +975,10 @@ private:
 	void MulticastStartSyncedAttackReaction(FActionMontageInfo Montage);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartStabilize(UAnimSequenceBase* Pose, FVector ImpactPoint);
+	void ServerStartStabilize(UAnimMontage* Pose, FVector ImpactPoint);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartStabilize(UAnimSequenceBase* Pose, FVector ImpactPoint);
+	void MulticastStartStabilize(UAnimMontage* Pose, FVector ImpactPoint);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartClutchImpactPoint(UAnimSequenceBase* Pose, FVector ImpactPoint);
@@ -1100,7 +1100,7 @@ private:
 
 	void StartSyncedAttackReactionImplementation(FActionMontageInfo Montage);
 
-	void StartStabilizeImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint);
+	void StartStabilizeImplementation(UAnimMontage* Montage, FVector ImpactPoint);
 
 	void StartClutchImpactPointImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint);
 

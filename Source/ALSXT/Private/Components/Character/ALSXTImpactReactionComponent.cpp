@@ -3019,7 +3019,7 @@ bool UALSXTImpactReactionComponent::IsClutchImpactPointAllowedToStart(const UAni
 	return (Montage != nullptr);
 }
 
-bool UALSXTImpactReactionComponent::IsStabilizeAllowedToStart(const UAnimSequenceBase* Montage) const
+bool UALSXTImpactReactionComponent::IsStabilizeAllowedToStart(const UAnimMontage* Montage) const
 {
 	return (Montage != nullptr);
 }
@@ -4653,7 +4653,7 @@ FStabilizationMontage UALSXTImpactReactionComponent::SelectStabilizationMontage_
 	TArray<FStabilizationMontage> FilteredStabilizationMontages;
 	FStabilizationMontage SelectedMontage;
 	const FGameplayTag Health = HealthToHealthTag(IALSXTCharacterInterface::Execute_GetHealth(GetOwner()));
-	TArray<FGameplayTag> TagsArray = { Hit.ImpactSide, Health };
+	TArray<FGameplayTag> TagsArray = { ALSXTImpactSideTags::Left, Health };
 	FGameplayTagContainer TagsContainer = FGameplayTagContainer::CreateFromArray(TagsArray);
 
 	// Return is there are no Montages
@@ -5652,7 +5652,7 @@ void UALSXTImpactReactionComponent::MulticastStartSyncedAttackReaction_Implement
 	StartSyncedAttackReactionImplementation(Montage);
 }
 
-void UALSXTImpactReactionComponent::ServerStartStabilize_Implementation(UAnimSequenceBase* Pose, FVector ImpactPoint)
+void UALSXTImpactReactionComponent::ServerStartStabilize_Implementation(UAnimMontage* Pose, FVector ImpactPoint)
 {
 	if (IsStabilizeAllowedToStart(Pose))
 	{
@@ -5661,12 +5661,12 @@ void UALSXTImpactReactionComponent::ServerStartStabilize_Implementation(UAnimSeq
 	}
 }
 
-bool UALSXTImpactReactionComponent::ServerStartStabilize_Validate(UAnimSequenceBase* Pose, FVector ImpactPoint)
+bool UALSXTImpactReactionComponent::ServerStartStabilize_Validate(UAnimMontage* Pose, FVector ImpactPoint)
 {
 	return true;
 }
 
-void UALSXTImpactReactionComponent::MulticastStartStabilize_Implementation(UAnimSequenceBase* Pose, FVector ImpactPoint)
+void UALSXTImpactReactionComponent::MulticastStartStabilize_Implementation(UAnimMontage* Pose, FVector ImpactPoint)
 {
 	StartStabilizeImplementation(Pose, ImpactPoint);
 }
@@ -6246,7 +6246,7 @@ void UALSXTImpactReactionComponent::StartSyncedAttackReactionImplementation(FAct
 	// ...
 }
 
-void UALSXTImpactReactionComponent::StartStabilizeImplementation(UAnimSequenceBase* Montage, FVector ImpactPoint)
+void UALSXTImpactReactionComponent::StartStabilizeImplementation(UAnimMontage* Montage, FVector ImpactPoint)
 {
 	if (IsStabilizeAllowedToStart(Montage))
 	{
