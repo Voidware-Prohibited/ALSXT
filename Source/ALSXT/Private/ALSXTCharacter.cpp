@@ -19,6 +19,7 @@
 #include "Components/Character/ALSXTEmoteComponent.h"
 #include "Components/Character/ALSXTGestureComponent.h"
 #include "Settings/ALSXTCharacterSettings.h"
+#include "Settings/ALSXTLocomotionActionSettings.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTCombatSettings.h"
 #include "Interfaces/ALSXTCollisionInterface.h"
@@ -538,6 +539,17 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		
 		OnSetupPlayerInputComponentUpdated.Broadcast();
 	}
+}
+
+// TODO: Implement requiring holding down Jump to Mantle and Vault
+bool AALSXTCharacter::IsMantlingAllowedToStart_Implementation() const
+{
+	// if (ALSXTSettings->LocomotionActionSettings.bHoldJumpToMantle && JumpAction->Value)
+	// {
+	// 	return Super::IsMantlingAllowedToStart();
+	// }
+
+	return !LocomotionAction.IsValid();
 }
 
 void AALSXTCharacter::DisableInputMovement(const bool Disable)

@@ -82,6 +82,9 @@ public:
 	bool CanGetUp();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
+	bool CanImpactFall();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")
 	bool CanAttackFall();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Criteria")

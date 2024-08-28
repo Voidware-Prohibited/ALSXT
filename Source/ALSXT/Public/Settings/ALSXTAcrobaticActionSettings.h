@@ -49,9 +49,6 @@ struct ALSXT_API FALSXTGeneralAcrobaticActionSettings
 	bool bAcrobaticActions { true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
-	bool bHoldJumpToMantle{ false };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
 	bool bEnableWallJump { true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")

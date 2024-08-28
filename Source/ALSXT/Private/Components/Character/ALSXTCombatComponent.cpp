@@ -634,7 +634,10 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 				}
 				else
 				{
-					if (!HitActor->IsA(ALandscape::StaticClass())) 
+					FGameplayTagContainer UnarmedAttackTypesLansdcapeIgnore;
+					UnarmedAttackTypesLansdcapeIgnore.AddTag(ALSXTUnarmedAttackTypeTags::LeftFoot);
+					UnarmedAttackTypesLansdcapeIgnore.AddTag(ALSXTUnarmedAttackTypeTags::RightFoot);
+					if (!HitActor->IsA(ALandscape::StaticClass()) && (!CurrentAttackTraceSettings.UnarmedAttackType.MatchesAny(UnarmedAttackTypesLansdcapeIgnore)))
 					{
 						IALSXTCollisionInterface::Execute_OnStaticMeshAttackCollision(GetOwner(), CurrentHitResult);
 					}					

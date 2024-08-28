@@ -155,7 +155,7 @@ public:
 	TArray<FAnticipationPose> AttackAnticipationPoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Defensive Modes", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
-	TArray<FAnticipationPose> StablizationPoses;
+	TArray<FStabilizationMontage> StabilizationMontages;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Crowd Navigation", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
 	TArray<FBumpReactionAnimation> CrowdNavigationReactionAnimations;
@@ -218,6 +218,9 @@ public:
 	FALSXTImpactParticleMap ImpactParticles;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
+	FALSXTImpactDecalMap ImpactDecals;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
 	TArray <FALSXTImpactParticleActorMap> ImpactParticleActors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particle}", AllowPrivateAccess))
@@ -261,6 +264,9 @@ USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTGeneralImpactReactionSettings
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableStaticMeshImpacts{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableImpactReactions{ true };

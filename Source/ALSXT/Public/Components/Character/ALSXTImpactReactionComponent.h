@@ -300,6 +300,7 @@ private:
 
 	void OnCrowdNavigationReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnBumpReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	void OnStabilizationBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnImpactReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnAttackReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnSyncedAttackReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
@@ -545,7 +546,7 @@ protected:
 	FSyncedAttackAnimation GetSyncedMontage(int Index);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	FAnticipationPose SelectStablizationPose(FDoubleHitResult Hit);
+	FStabilizationMontage SelectStabilizationMontage(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FClutchImpactLocationAnimation SelectClutchImpactPointMontage(FDoubleHitResult Hit);
@@ -604,6 +605,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag GetCharacterVelocity();
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	UMaterialInterface* GetImpactDecal(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	UNiagaraSystem* GetImpactReactionParticle(FDoubleHitResult Hit);

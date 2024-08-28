@@ -233,6 +233,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void DisableLookAt(const bool Disable);
+
+	virtual bool IsMantlingAllowedToStart_Implementation() const override;
 	
 	//Character Interface
 	virtual FRotator GetCharacterControlRotation_Implementation() const override;

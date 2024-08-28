@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Settings/AlsCharacterSettings.h"
+#include "Settings/ALSXTLocomotionActionSettings.h"
 #include "Settings/ALSXTOverlaySettings.h"
 #include "Settings/ALSXTDefensiveModeSettings.h"
 #include "Settings/ALSXTStatusSettings.h"
@@ -26,6 +27,9 @@ class ALSXT_API UALSXTCharacterSettings : public UAlsCharacterSettings
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
+	FALSXTLocomotionActionSettings LocomotionActionSettings;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
 	FALSXTOverlaySettings OverlaySettings;
 

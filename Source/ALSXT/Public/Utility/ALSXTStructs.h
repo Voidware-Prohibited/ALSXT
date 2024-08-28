@@ -755,6 +755,35 @@ struct ALSXT_API FClutchImpactLocationAnimation
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FStabilizationMontage
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Velocity", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", AllowPrivateAccess))
+	FGameplayTagContainer Stance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTagContainer Side;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Game.Health", AllowPrivateAccess))
+	FGameplayTagContainer Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	FActionMontageInfo Montage;
+
+	bool operator==(const FStabilizationMontage& other) const
+	{
+		return (other.Velocity == Velocity) && (other.Stance == Stance) && (other.Side == Side) && (other.Form == Form) && (other.Health == Health) && (other.Montage == Montage);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FResponseAnimation
 {
 	GENERATED_BODY()
@@ -1166,9 +1195,6 @@ struct ALSXT_API FALSXTImpactSound
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<FSound> Sounds;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FALSXTCharacterSound ImpactSound;
-
 	bool operator==(const FALSXTImpactSound& other) const
 	{
 		return (other.PhysicalMaterials == PhysicalMaterials) && (other.Velocity == Velocity) && (other.Form == Form) && (other.Sounds == Sounds);
@@ -1243,6 +1269,9 @@ struct ALSXT_API FALSXTImpactParticle
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TArray<TEnumAsByte<EPhysicalSurface>> PhysicalMaterials;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	bool Mature {false};
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Velocity", TitleProperty = "{Velocity}", AllowPrivateAccess))
 	FGameplayTagContainer Velocity;
 
@@ -1291,6 +1320,74 @@ struct ALSXT_API FALSXTImpactParticles
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTImpactParticleMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTImpactParticles> Particles;
+
+	// bool operator==(const FALSXTImpactParticleMap& other) const
+	// {
+	// 	return (other.Particles == Particles);
+	// }
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactDecal
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<TEnumAsByte<EPhysicalSurface>> PhysicalMaterials;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Velocity", TitleProperty = "{Velocity}", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UMaterialInterface* ImpactDecal{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	UMaterialInterface* ImpactBackDecal{ nullptr };
+
+	bool operator==(const FALSXTImpactDecal& other) const
+	{
+		return (other.PhysicalMaterials == PhysicalMaterials) && (other.Velocity == Velocity) && (other.Form == Form) && (other.ImpactDecal == ImpactDecal) && (other.ImpactBackDecal == ImpactBackDecal);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactDecals
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TArray<FALSXTImpactDecal> Decals;
+
+	bool operator==(const FALSXTImpactDecals& other) const
+	{
+		return (other.Decals == Decals);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTImpactDecalMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	TMap<TEnumAsByte<EPhysicalSurface>, FALSXTImpactDecals> Decals;
+
+	// bool operator==(const FALSXTImpactParticleMap& other) const
+	// {
+	// 	return (other.Particles == Particles);
+	// }
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTBallisticDecalMap
 {
 	GENERATED_BODY()
 
