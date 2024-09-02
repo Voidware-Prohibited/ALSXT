@@ -35,9 +35,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	void OnRagdollingStarted();
 
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	void OnRagdollingEnded();
+
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable)
 	void OnCapsuleHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
@@ -157,6 +161,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewImpactReactionState"))
 	void SetImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void SetImpactReactionStateImplementation(const FALSXTImpactReactionState& NewImpactReactionState);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewImpactReactionState"))
 	FALSXTImpactReactionState ProcessNewImpactReactionState(const FALSXTImpactReactionState& NewImpactReactionState);
 
@@ -251,6 +258,12 @@ private:
 
 	UFUNCTION(BlueprintCallable, Category = "Vitals") 
 	float GetBaseVelocityDamage();
+
+	UFUNCTION(BlueprintCallable)
+	void OnCapsuleHitTimer();
+
+	UFUNCTION(BlueprintCallable)
+	void ClearObstacleImpactHistory();
 
 	bool ValidateNewHit(AActor* ActorToCheck);
 
@@ -437,6 +450,10 @@ public:
 
 	// Parameters
 private:
+	
+	FTimerHandle OnCapsuleHitTimerHandle;
+	FTimerDelegate OnCapsuleHitTimerDelegate;
+	
 	FTimeline ImpactTimeline;
 	FImpactReactionAnimation LastImpactReactionAnimation;
 	FAttackReactionAnimation LastAttackReactionAnimation;
@@ -510,7 +527,7 @@ protected:
 	FBumpReactionAnimation SelectBumpReactionMontage(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	UAnimSequenceBase* SelectBumpPose(const FGameplayTag& Side, const FGameplayTag& Form);
+	UAnimSequenceBase* SelectBumpAnticipationPose(const FGameplayTag& Side, const FGameplayTag& Form);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FBumpReactionAnimation SelectCrowdNavigationReactionMontage(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
@@ -724,7 +741,7 @@ public:
 
 private:
 
-	void StartBumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
+	void BumpReactionImplementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
 	// void StartCrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 

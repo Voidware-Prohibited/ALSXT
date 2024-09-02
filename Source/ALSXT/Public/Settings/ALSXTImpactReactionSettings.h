@@ -167,7 +167,7 @@ public:
 	TArray<FBumpReactionAnimation> BumpReactionAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
-	TArray<FBumpPose> BumpPoses;
+	TArray<FBumpPose> BumpAnticipationPoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Impact", Meta = (TitleProperty = "{ImpactVelocity} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
 	TArray<FImpactReactionAnimation> ImpactReactionAnimations;
@@ -351,6 +351,9 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TArray<TEnumAsByte<EObjectTypeQuery>> BumpTraceObjectTypes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TArray<TEnumAsByte<EObjectTypeQuery>> OriginTraceObjectTypes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TArray<TEnumAsByte<EObjectTypeQuery>> ImpactTraceObjectTypes;

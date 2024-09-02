@@ -372,6 +372,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	AddOwnedComponent(Gestures);
 
 	OnRagdollingStartedDelegate.BindUFunction(ImpactReaction, "OnRagdollingStarted");
+	OnRagdollingEndedDelegate.BindUFunction(ImpactReaction, "OnRagdollingEnded");
 }
 
 void AALSXTCharacter::Tick(const float DeltaTime)
@@ -478,6 +479,9 @@ void AALSXTCharacter::BeginPlay()
 {
 	AlsCharacter = Cast<AAlsCharacter>(GetParentActor());
 	Super::BeginPlay();
+
+	// GetCapsuleComponent()->OnComponentHit.AddUniqueDynamic(ImpactReaction, &UALSXTImpactReactionComponent::OnCapsuleHit);
+	// CharacterCapsule->OnComponentHit.AddDynamic(this, &UALSXTImpactReactionComponent::OnCapsuleHit);
 
 	PhysicalAnimation->SetSkeletalMeshComponent(GetMesh());
 	SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "pelvis");
@@ -3197,6 +3201,17 @@ FGameplayTag AALSXTCharacter::GetCharacterEmote_Implementation() const
 	return DesiredEmote;
 }
 
+void AALSXTCharacter::SetCharacterRagdoll_Implementation(const bool NewRagdoll)
+{
+	if (NewRagdoll)
+	{
+		StartRagdolling();
+	}
+	else
+	{
+		StopRagdolling();
+	}
+}
 
 void AALSXTCharacter::SetCharacterEmote_Implementation(const FGameplayTag& NewEmote)
 {

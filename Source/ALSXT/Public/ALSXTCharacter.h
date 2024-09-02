@@ -80,6 +80,7 @@ public:
 	AAlsCharacter* AlsCharacter{Cast<AAlsCharacter>(GetParentActor())};
 
 	FScriptDelegate OnRagdollingStartedDelegate;
+	FScriptDelegate OnRagdollingEndedDelegate;
 
 	// Components
 
@@ -247,6 +248,7 @@ public:
 	virtual FGameplayTag GetCharacterCombatStance_Implementation() const override;
 	virtual FGameplayTag GetCharacterWeaponReadyPosition_Implementation() const override;
 	virtual FGameplayTag GetCharacterEmote_Implementation() const override;
+	virtual void SetCharacterRagdoll_Implementation(const bool NewRagdoll) override;
 	virtual void SetCharacterEmote_Implementation(const FGameplayTag& NewEmote) override;
 
 	// Mesh Painting Interface

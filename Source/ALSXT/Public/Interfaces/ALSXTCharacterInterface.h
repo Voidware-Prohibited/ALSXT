@@ -47,6 +47,9 @@ public:
   FGameplayTag GetCharacterEmote() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterRagdoll(const bool NewRagdoll);
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   void SetCharacterEmote(const FGameplayTag& NewEmote);
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
