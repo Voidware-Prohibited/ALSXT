@@ -2299,7 +2299,8 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										// Crowd Nav
 										Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 										DefensiveModeState.Montage = Montage.Pose;
-										DefensiveMode = ALSXTDefensiveModeTags::CrowdNavigation;
+										DefensiveModeState.Mode = ALSXTDefensiveModeTags::CrowdNavigation;
+										DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
 									}
 									IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 									IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -6378,7 +6379,7 @@ void UALSXTImpactReactionComponent::CrowdNavigationReactionImplementation(const 
 
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.BoneName);
 		IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
-		IALSXTCollisionInterface::Execute_AddCollisionImpulse(GetOwner(), ((GetOwner()->GetVelocity() * -1) + CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.GetActor()->GetVelocity()));
+		// IALSXTCollisionInterface::Execute_AddCollisionImpulse(GetOwner(), ((GetOwner()->GetVelocity() * -1) + CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.GetActor()->GetVelocity()));
 		// IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
 		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseToAllBodiesBelow(CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.BoneName, false, true);
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "pelvis");
