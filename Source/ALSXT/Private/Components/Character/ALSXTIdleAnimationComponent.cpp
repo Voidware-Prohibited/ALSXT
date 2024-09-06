@@ -184,10 +184,10 @@ void UALSXTIdleAnimationComponent::StartIdleCounterTimer()
 
 void UALSXTIdleAnimationComponent::IdleCounterTimer()
 {
-	if (GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
-	{
-		return;
-	}
+	// if (GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
+	// {
+	// 	return;
+	// }
 
 	if (IsPlayerInputIdle())
 	{

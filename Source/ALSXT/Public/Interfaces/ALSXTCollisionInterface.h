@@ -53,7 +53,7 @@ public:
 	// Impact Reaction
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Impact Reaction")
-	void AddCollisionImpulse(FVector NewImpulse) const;
+	void AddCollisionImpulse(FVector NewImpulse);
 
 	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Impact Reaction")
 	// void AddCollisionForce(FVector NewImpulse) const;

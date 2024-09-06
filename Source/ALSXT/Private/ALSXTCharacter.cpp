@@ -2491,6 +2491,11 @@ void AALSXTCharacter::SetFocus(const FGameplayTag& NewFocusTag)
 
 void AALSXTCharacter::OnFocusChanged_Implementation(const FGameplayTag& PreviousFocusTag) {}
 
+void AALSXTCharacter::AddCollisionImpulse_Implementation(FVector NewImpulse)
+{
+	LaunchCharacter(NewImpulse, false, false);
+}
+
 // Attack Hit
 
 void AALSXTCharacter::OnStaticMeshAttackCollision_Implementation(FAttackDoubleHitResult Hit)

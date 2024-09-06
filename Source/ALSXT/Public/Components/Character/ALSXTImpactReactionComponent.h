@@ -962,12 +962,6 @@ private:
 
 	// Start RPCs
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartBumpReaction(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartBumpReaction(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
-
 	// UFUNCTION(Server, Reliable, WithValidation)
 	// void ServerStartCrowdNavigationReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
@@ -1121,8 +1115,6 @@ private:
 	void StartDefensiveReactionImplementation(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint);
 
 	void CrowdNavigationReactionImplementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
-
-	void StartBumpReactionImplementation(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
 

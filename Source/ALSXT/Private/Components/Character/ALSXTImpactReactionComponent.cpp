@@ -376,9 +376,8 @@ void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, A
 				//NewImpactReactionState.ImpactReactionParameters.CrowdNavigationHit
 				// NewImpactReactionState.ImpactReactionParameters.BumpHit
 
-				NewImpactReactionState.ImpactReactionParameters.BumpHit = NewDoubleHitResult;
-				
-				SetImpactReactionState(NewImpactReactionState);
+				// NewImpactReactionState.ImpactReactionParameters.BumpHit = NewDoubleHitResult;		
+				// SetImpactReactionState(NewImpactReactionState);
 
 				if (UKismetSystemLibrary::DoesImplementInterface(OtherActor, UALSXTCharacterInterface::StaticClass()))
 				{
@@ -386,8 +385,12 @@ void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, A
 					{
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I Hit: %s"), *OtherActor->GetName()));
 					}
-					BumpReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), LocationToImpactSide(Hit.Location), HitForm);
+					// BumpReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), LocationToImpactSide(Hit.Location), HitForm);
 					// BumpReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), LocationToImpactSide(Hit.Location), ConvertPhysicalSurfaceToFormTag(Hit.PhysMaterial->SurfaceType));
+					IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
+					NewImpactReactionState.ImpactReactionParameters.CrowdNavigationHit = NewDoubleHitResult;
+					SetImpactReactionState(NewImpactReactionState);
+					CrowdNavigationReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), LocationToImpactSide(Hit.Location), HitForm);
 					// CrowdNav
 				}
 				else if (UKismetSystemLibrary::DoesImplementInterface(OtherActor, UALSXTCollisionInterface::StaticClass()))
@@ -396,6 +399,9 @@ void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, A
 					{
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I Hit: %s"), *OtherActor->GetName()));
 					}
+					IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
+					NewImpactReactionState.ImpactReactionParameters.BumpHit = NewDoubleHitResult;
+					SetImpactReactionState(NewImpactReactionState);
 					BumpReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), LocationToImpactSide(Hit.Location), HitForm);
 				}
 				else
@@ -404,6 +410,9 @@ void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, A
 					{
 						// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I Hit: %s"), *OtherActor->GetName()));
 					}
+					IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
+					NewImpactReactionState.ImpactReactionParameters.BumpHit = NewDoubleHitResult;
+					SetImpactReactionState(NewImpactReactionState);
 					BumpReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), LocationToImpactSide(Hit.Location), HitForm);
 					// BumpReactionImplementation(AlsGaitTags::Running, ALSXTImpactSideTags::Left, ALSXTImpactFormTags::Blunt);
 				}
@@ -3389,7 +3398,7 @@ void UALSXTImpactReactionComponent::BumpReactionImplementation(const FGameplayTa
 		// const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(GetOwner()->GetActorRotation().Yaw)) };
 		IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->FlushServerMoves();
 		IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
-		
+		IALSXTCollisionInterface::Execute_AddCollisionImpulse(GetOwner(), ((GetOwner()->GetVelocity() * -1) + CurrentBumpHit.HitResult.HitResult.GetActor()->GetVelocity()));
 		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetAnimInstance()->Montage_Play(Montage, 1.0f);
 		OnBumpReactionStarted();
 
@@ -5905,25 +5914,6 @@ void UALSXTImpactReactionComponent::MulticastStartDefensiveReaction_Implementati
 	StartDefensiveReactionImplementation(Montage, Audio, AnticipationPoint);
 }
 
-void UALSXTImpactReactionComponent::ServerStartBumpReaction_Implementation(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
-{
-	if (IsBumpReactionAllowedToStart(Montage.Montage))
-	{
-	MulticastStartBumpReaction(Montage, ParticleActor, Particle, Audio);
-	GetOwner()->ForceNetUpdate();
-	}
-}
-
-bool UALSXTImpactReactionComponent::ServerStartBumpReaction_Validate(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
-{
-	return true;
-}
-
-void UALSXTImpactReactionComponent::MulticastStartBumpReaction_Implementation(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
-{
-	StartBumpReactionImplementation(Montage, ParticleActor, Particle, Audio);
-}
-
 // void UALSXTImpactReactionComponent::ServerCrowdNavigationReaction_Implementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 // {
 // 	MulticastCrowdNavigationReaction(Gait, Side, Form);
@@ -6314,113 +6304,6 @@ void UALSXTImpactReactionComponent::StartDefensiveReactionImplementation(FAction
 	// ...
 }
 
-void UALSXTImpactReactionComponent::StartBumpReactionImplementation(FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio)
-{
-	
-	// FBumpReactionAnimation SelectedBumpReaction = SelectBumpReactionMontage(Gait, Side, Form);
-	// UAnimMontage* Montage = SelectedBumpReaction.Montage.Montage;
-
-	// if ((!(IsValid(Montage) || !IsBumpReactionAllowedToStart(Montage)) && ImpactReactionSettings.DebugMode))
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Bump Montage Invalid"));
-	// 	return;
-	// }
-	// 
-	// if (IsValid(GetImpactReactionState().ImpactReactionParameters.BumpHit.HitResult.HitResult.GetComponent()))
-	// {
-	// 	TSubclassOf<AActor> ParticleActor = GetImpactReactionParticleActor(GetImpactReactionState().ImpactReactionParameters.BumpHit);
-	// 	UNiagaraSystem* Particle = GetImpactReactionParticle(GetImpactReactionState().ImpactReactionParameters.BumpHit);
-	// 	USoundBase* Audio = GetImpactReactionSound(GetImpactReactionState().ImpactReactionParameters.BumpHit).Sound;
-	// 	const auto StartYawAngle{ UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(GetOwner()->GetActorRotation().Yaw)) };
-	// 
-	// 	if (GetOwner()->GetLocalRole() >= ROLE_Authority)
-	// 	{
-	// 		ServerStartBumpReaction(SelectedBumpReaction.Montage, ParticleActor, Particle, Audio);
-	// 	}
-	// 	else
-	// 	{
-	// 		IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->FlushServerMoves();
-	// 		MulticastStartBumpReaction(SelectedBumpReaction.Montage, ParticleActor, Particle, Audio);
-	// 		OnBumpReactionStarted();
-	// 	}
-	// }
-
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("StartBumpReactionImplementation"));
-
-	
-	if (IsBumpReactionAllowedToStart(Montage.Montage) && IsValid(GetImpactReactionState().ImpactReactionParameters.BumpHit.HitResult.HitResult.GetActor()))
-	{
-		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetAnimInstance()->Montage_Play(Montage.Montage, 1.0f);
-
-		// Set Timer to Pause Animation if Velocity Stops
-		// GetWorld()->GetTimerManager().SetTimer(BumpVelocityTimerHandle, BumpVelocityTimerDelegate, 0.1f, true);
-
-		if (AnimInstance)
-		{
-			OnBumpReactionBlendOutDelegate.BindUObject(this, &UALSXTImpactReactionComponent::OnBumpReactionBlendOut);
-			AnimInstance->Montage_SetBlendingOutDelegate(OnBumpReactionBlendOutDelegate);
-		}
-
-		// ImpactReactionState.TargetYawAngle = TargetYawAngle;
-		FALSXTImpactReactionState CurrentImpactReactionState = GetImpactReactionState();
-		// CurrentImpactReactionState.ImpactReactionParameters.TargetYawAngle = TargetYawAngle;
-		// CurrentImpactReactionState.ImpactReactionParameters.Target = PotentialAttackTarget;
-
-		UAudioComponent* AudioComponent{ nullptr };
-
-		//Calculate Rotation from Normal Vector
-		FVector UpVector = CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.GetActor()->GetRootComponent()->GetUpVector();
-		FVector NormalVector = CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.ImpactNormal;
-		FVector RotationAxis = FVector::CrossProduct(UpVector, NormalVector);
-		RotationAxis.Normalize();
-		float DotProduct = FVector::DotProduct(UpVector, NormalVector);
-		float RotationAngle = acosf(DotProduct);
-		FQuat Quat = FQuat(RotationAxis, RotationAngle);
-		FQuat RootQuat = CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.GetActor()->GetRootComponent()->GetComponentQuat();
-		FQuat NewQuat = Quat * RootQuat;
-		FRotator NewRotation = NewQuat.Rotator();
-
-		if (Audio)
-		{
-			if (GetWorld()->WorldType == EWorldType::EditorPreview)
-			{
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), Audio, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.ImpactPoint,
-					1.0f, 1.0f);
-			}
-			else
-			{
-				AudioComponent = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Audio, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.ImpactPoint,
-					NewRotation,
-					1.0f, 1.0f);
-			}
-		}
-
-		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.BoneName);
-		IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
-		// IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
-		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseToAllBodiesBelow(CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.BoneName, false, true);
-		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "pelvis");
-
-		if (IALSXTCollisionInterface::Execute_ShouldClutchImpactPoint(GetOwner()))
-		{
-			ClutchImpactPoint(CurrentImpactReactionState.ImpactReactionParameters.BumpHit);
-		}
-		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
-	}
-	else
-	{
-		if (!IsValid(GetImpactReactionState().ImpactReactionParameters.BumpHit.HitResult.HitResult.GetActor()))
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("BumpHit Actor Invalid"));
-		}
-		if (!IsBumpReactionAllowedToStart(Montage.Montage))
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("!IsBumpReactionAllowedToStart"));
-		}	
-		return;
-	}
-}
-
 void UALSXTImpactReactionComponent::CrowdNavigationReactionImplementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 {
 	FALSXTImpactReactionState IRState = GetImpactReactionState();
@@ -6495,6 +6378,7 @@ void UALSXTImpactReactionComponent::CrowdNavigationReactionImplementation(const 
 
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.BoneName);
 		IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
+		IALSXTCollisionInterface::Execute_AddCollisionImpulse(GetOwner(), ((GetOwner()->GetVelocity() * -1) + CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.GetActor()->GetVelocity()));
 		// IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
 		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseToAllBodiesBelow(CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.BoneName, false, true);
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "pelvis");

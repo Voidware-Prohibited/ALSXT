@@ -1872,6 +1872,7 @@ protected:
 	virtual FALSXTFootwearDetails GetCharacterFootwearDetails_Implementation() const override;
 
 	// Collision Interface Functions
+	virtual void AddCollisionImpulse_Implementation(FVector NewImpulse) override;
 	virtual void OnStaticMeshAttackCollision_Implementation(FAttackDoubleHitResult Hit) override;
 	virtual void OnActorAttackCollision_Implementation(FAttackDoubleHitResult Hit) override;
 	virtual FALSXTDefensiveModeState GetCharacterDefensiveModeState_Implementation() const override;
