@@ -1346,6 +1346,9 @@ struct ALSXT_API FALSXTImpactDecal
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Form;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (Categories = "Als.Impact Size", AllowPrivateAccess))
+	FGameplayTagContainer Size;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	UMaterialInterface* ImpactDecal{ nullptr };
 

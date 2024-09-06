@@ -1990,14 +1990,14 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 												if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 												{
 													Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
-													DefensiveMode == ALSXTDefensiveModeTags::Blocking;
+													DefensiveMode = ALSXTDefensiveModeTags::Blocking;
 													DefensiveModeState.Mode = DefensiveMode;
 													DefensiveModeState.Montage = Montage.Pose;
 												}
 												else
 												{
 													Montage = SelectDefensiveMontage(ALSXTActionStrengthTags::Medium, Stance, Side, Form, Health);
-													DefensiveMode == ALSXTDefensiveModeTags::Blocking;
+													DefensiveMode = ALSXTDefensiveModeTags::Blocking;
 													DefensiveModeState.Mode = DefensiveMode;
 													DefensiveModeState.Montage = Montage.Pose;
 												}
@@ -2009,16 +2009,24 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 											{
 												if (IALSXTCharacterInterface::Execute_GetCharacterGait(HitResult.GetActor()) == AlsGaitTags::Sprinting)
 												{
+													FString ClientName = GetOwner()->GetDebugName(GetOwner());
+													ClientName.Append(": BraceForImpact");
+													GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, ClientName);
 													Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 													DefensiveModeState.Montage = Montage.Pose;
-													DefensiveMode == ALSXTDefensiveModeTags::BraceForImpact;
+													DefensiveModeState.Mode = ALSXTDefensiveModeTags::BraceForImpact;
+													DefensiveMode = ALSXTDefensiveModeTags::BraceForImpact;
 												}
 												else
 												{
+													FString ClientName = GetOwner()->GetDebugName(GetOwner());
+													ClientName.Append(": Crowd Nav");
+													GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, ClientName);
 													// Crowd Nav
 													Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 													DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
-													DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
+													DefensiveModeState.Mode = ALSXTDefensiveModeTags::CrowdNavigation;
+													DefensiveMode = ALSXTDefensiveModeTags::CrowdNavigation;
 												}
 
 												DefensiveModeState.Mode = DefensiveMode;
@@ -2073,22 +2081,23 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										else // Not Blocking
 										{
 											// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Not Blocking");
+											return;
 											
-											if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
-											{
-												// Bump
-												DefensiveModeState.Location = HitResult.Location;
-												Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
-												DefensiveModeState.Montage = Montage.Pose;
-												IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
-												IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
-												return;
-											}
-											else
-											{
-												// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Do Nothing");
-												return;
-											}
+											// if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
+											// {
+											// 	// Bump
+											// 	DefensiveModeState.Location = HitResult.Location;
+											// 	Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
+											// 	DefensiveModeState.Montage = Montage.Pose;
+											// 	IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
+											// 	IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
+											// 	return;
+											// }
+											// else
+											// {
+											// 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Do Nothing");
+											// 	return;
+											// }
 										}
 									}
 									else // Combat Neutral
@@ -2141,12 +2150,19 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 											{
 												Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 												DefensiveModeState.Montage = Montage.Pose;
+												DefensiveModeState.Mode = ALSXTDefensiveModeTags::BraceForImpact;
+												DefensiveMode = ALSXTDefensiveModeTags::BraceForImpact;
 											}
 											else
 											{
+												FString ClientName = GetOwner()->GetDebugName(GetOwner());
+												ClientName.Append(": Crowd Nav");
+												GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, ClientName);
 												// Crowd Nav
 												Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 												DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
+												DefensiveModeState.Mode = ALSXTDefensiveModeTags::CrowdNavigation;
+												DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
 											}
 											IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 											IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -2473,14 +2489,17 @@ void UALSXTImpactReactionComponent::CrowdNavigationReaction(const FGameplayTag& 
 // Bump Reaction
 void UALSXTImpactReactionComponent::BumpReaction(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 {
+	FString ClientName = GetOwner()->GetDebugName(GetOwner());
 	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "ServerBumpReaction");
+		ClientName.Append(": ServerBumpReaction");
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, ClientName);
 		ServerBumpReaction(Gait, Side, Form);
 	}
 	else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
 	{
-		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "StartBumpReaction");
+		ClientName.Append(": StartBumpReaction");
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, ClientName);
 		BumpReactionImplementation(Gait, Side, Form);
 	}
 }
@@ -3236,6 +3255,78 @@ bool UALSXTImpactReactionComponent::IsAttackResponseAllowedToStart(const UAnimMo
 	return (Montage != nullptr);
 }
 
+bool UALSXTImpactReactionComponent::ShouldSpawnImpactParticle(FDoubleHitResult Hit)
+{
+	float CombinedVelocity = (Hit.HitResult.Velocity + Hit.OriginHitResult.Velocity).Length();
+	
+	if (Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blunt && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blunt)
+	{
+		return CombinedVelocity > 1000;
+	}
+	if ((Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blade && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blunt) || (Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blunt && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blade))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool UALSXTImpactReactionComponent::ShouldSpawnRearImpactParticle(FDoubleHitResult Hit)
+{
+	float CombinedVelocity = (Hit.HitResult.Velocity + Hit.OriginHitResult.Velocity).Length();
+
+	if (Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blunt && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blunt)
+	{
+		return CombinedVelocity > 1000;
+	}
+	if ((Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blade && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blunt) || (Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blunt && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blade))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool UALSXTImpactReactionComponent::ShouldSpawnFrontImpactDecal(FDoubleHitResult Hit)
+{
+	float CombinedVelocity = (Hit.HitResult.Velocity + Hit.OriginHitResult.Velocity).Length();
+
+	if (Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blunt && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blunt)
+	{
+		return CombinedVelocity > 1000;
+	}
+	if ((Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blade && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blunt) || (Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blunt && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blade))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool UALSXTImpactReactionComponent::ShouldSpawnRearImpactDecal(FDoubleHitResult Hit)
+{
+	float CombinedVelocity = (Hit.HitResult.Velocity + Hit.OriginHitResult.Velocity).Length();
+
+	if (Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blunt && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blunt)
+	{
+		return CombinedVelocity > 1000;
+	}
+	if ((Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blade && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blunt) || (Hit.HitResult.ImpactForm == ALSXTImpactFormTags::Blunt && Hit.OriginHitResult.ImpactForm == ALSXTImpactFormTags::Blade))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 // Start Events
 void UALSXTImpactReactionComponent::StartSyncedAnticipationReaction(FVector AnticipationPoint)
 {
@@ -3284,9 +3375,14 @@ void UALSXTImpactReactionComponent::BumpReactionImplementation(const FGameplayTa
 		TSubclassOf<AActor> ParticleActor = nullptr;
 		// TSubclassOf<AActor> ParticleActor = { (VelocityShouldAllowParticleActor) ? GetImpactReactionParticleActor(GetImpactReactionState().ImpactReactionParameters.BumpHit) : nullptr };
 		UNiagaraSystem* Particle = {nullptr};
+		if (ShouldSpawnImpactParticle(CurrentBumpHit))
+		{
+			Particle = GetImpactReactionParticle(GetImpactReactionState().ImpactReactionParameters.BumpHit);
+		}
+
 		// UNiagaraSystem* Particle = { (VelocityShouldAllowParticle) ? GetImpactReactionParticle(GetImpactReactionState().ImpactReactionParameters.BumpHit) : nullptr };
 		USoundBase* Audio = nullptr;
-		// Particle = GetImpactReactionParticle(GetImpactReactionState().ImpactReactionParameters.BumpHit);
+		
 		UMaterialInterface* FrontDecal = nullptr;
 		// UMaterialInterface* FrontDecal = GetImpactDecal(GetImpactReactionState().ImpactReactionParameters.BumpHit);
 		Audio = GetImpactReactionSound(CurrentBumpHit).Sound;
@@ -3320,7 +3416,7 @@ void UALSXTImpactReactionComponent::BumpReactionImplementation(const FGameplayTa
 		FQuat NewQuat = Quat * RootQuat;
 		FRotator NewRotation = NewQuat.Rotator();
 
-		if (Audio)
+		if (Audio->IsValidLowLevelFast())
 		{
 			if (GetWorld()->WorldType == EWorldType::EditorPreview)
 			{
@@ -3336,24 +3432,24 @@ void UALSXTImpactReactionComponent::BumpReactionImplementation(const FGameplayTa
 			}
 		}
 
-		if (FrontDecal->IsValidLowLevelFast())
+		if (FrontDecal->IsValidLowLevelFast() && ShouldSpawnFrontImpactDecal(CurrentBumpHit))
 		{
 			UDecalComponent* FrontDecalComponent;
 			FrontDecalComponent = UGameplayStatics::SpawnDecalAttached(FrontDecal, { 10.0f, 20.0f, 20.0f },
 				CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.GetComponent(), NAME_None, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.ImpactPoint,
 				UKismetMathLibrary::MakeRotFromX(CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.ImpactNormal), EAttachLocation::KeepWorldPosition, 5.0);
-
+		
 			if (FrontDecalComponent->IsValidLowLevelFast())
 			{
 				FrontDecalComponent->SetFadeOut(5.0, 2.0, false);
 			}
-
+		
 		}
 
 
-		if (Particle->IsValidLowLevelFast())
+		if (Particle->IsValidLowLevelFast() && ShouldSpawnImpactParticle(CurrentBumpHit))
 		{
-			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GetImpactReactionParticle(CurrentImpactReactionState.ImpactReactionParameters.BumpHit), CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.ImpactPoint, NewRotation, { 1.0f, 1.0f, 1.0f }, true, true, ENCPoolMethod::None, true);
+			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Particle, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.ImpactPoint, NewRotation, { 1.0f, 1.0f, 1.0f }, true, true, ENCPoolMethod::None, true);
 		}
 
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.BoneName);
@@ -3993,21 +4089,23 @@ UNiagaraSystem* UALSXTImpactReactionComponent::GetImpactReactionParticle(FDouble
 {
 	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
 	FALSXTImpactParticleMap ImpactParticleMap = SelectedImpactReactionSettings->ImpactParticles;
-	TEnumAsByte<EPhysicalSurface> HitSurface = (Hit.HitResult.HitResult.PhysMaterial.IsValid()) ? Hit.HitResult.HitResult.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType_Default;
-	TEnumAsByte<EPhysicalSurface> OriginHitSurface = (Hit.OriginHitResult.HitResult.PhysMaterial.IsValid()) ? Hit.HitResult.HitResult.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType_Default;
 	UNiagaraSystem* FoundImpactParticle{ nullptr };
 	FGameplayTagContainer HitTags;
 	HitTags.AddTagFast(ALSXTImpactVelocityTags::Moderate);
 	HitTags.AddTagFast(Hit.ImpactForm);
+	TEnumAsByte<EPhysicalSurface> HitSurface = (Hit.HitResult.HitResult.PhysMaterial.IsValid()) ? Hit.HitResult.HitResult.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType_Default;
 	TArray<FALSXTImpactParticle> FilteredImpactParticles = ImpactParticleMap.Particles.Find(HitSurface)->Particles;
+	
+	TEnumAsByte<EPhysicalSurface> OriginHitSurface = (Hit.OriginHitResult.HitResult.PhysMaterial.IsValid()) ? Hit.OriginHitResult.HitResult.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType_Default;
 
 	if (FilteredImpactParticles.Num() > 0)
 	{
 		for (FALSXTImpactParticle Entry : FilteredImpactParticles)
 		{
 			FGameplayTagContainer EntryTags;
-			EntryTags.AppendTags(Entry.Velocity);
 			EntryTags.AppendTags(Entry.Form);
+			EntryTags.AppendTags(Entry.Velocity);
+
 			if (EntryTags.HasAll(HitTags))
 			{
 				if (Entry.PhysicalMaterials.Contains(OriginHitSurface))
@@ -4073,9 +4171,7 @@ FSound UALSXTImpactReactionComponent::GetImpactReactionSound(FDoubleHitResult Hi
 
 			if (EntryTags.HasAll(HitTags))
 			{
-				// FoundImpactSound = Entry.Sounds;
 				FoundImpactSounds.Append(Entry.Sounds);
-				// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "ImpactPointParticle Found");
 			}
 		}
 	}

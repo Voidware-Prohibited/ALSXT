@@ -111,8 +111,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void AttackFallenTimer();
 
-
-
 	void StartAnticipationTimer();
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
@@ -193,7 +191,7 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void ServerProcessNewCrowdNavigationPoseState(const FALSXTBumpPoseState& NewCrowdNavigationPoseState);
 
-	//
+	// Bump Pose State
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FALSXTBumpPoseState& GetBumpPoseState() const;
@@ -273,7 +271,6 @@ private:
 
 	FOnMontageBlendingOutStarted OnCrowdNavigationReactionBlendOutDelegate;
 	FOnMontageEnded OnCrowdNavigationReactionEndedDelegate;
-
 	FOnMontageBlendingOutStarted OnBumpReactionBlendOutDelegate;
 	FOnMontageEnded OnBumpReactionEndedDelegate;
 	FOnMontageBlendingOutStarted OnImpactReactionBlendOutDelegate;
@@ -282,10 +279,8 @@ private:
 	FOnMontageEnded OnAttackReactionEndedDelegate;
 	FOnMontageBlendingOutStarted OnSyncedAttackReactionBlendOutDelegate;
 	FOnMontageEnded OnSyncedAttackReactionEndedDelegate;
-
 	FOnMontageBlendingOutStarted OnStabilizeBlendOutDelegate;
 	FOnMontageEnded OnStabilizeEndedDelegate;
-
 	FOnMontageBlendingOutStarted OnClutchImpactPointBlendOutDelegate;
 	FOnMontageEnded OnClutchImpactPointEndedDelegate;
 	FOnMontageBlendingOutStarted OnCrowdNavigationFallBlendOutDelegate;
@@ -311,6 +306,7 @@ private:
 	FOnMontageBlendingOutStarted OnAttackResponseBlendOutDelegate;
 	FOnMontageEnded OnAttackResponseEndedDelegate;
 
+	// Blend Out Functions
 	void OnCrowdNavigationReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnBumpReactionBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnStabilizationBlendOut(UAnimMontage* Montage, bool bInterrupted);
@@ -330,6 +326,7 @@ private:
 	void OnImpactResponseBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	void OnAttackResponseBlendOut(UAnimMontage* Montage, bool bInterrupted);
 
+	// On Ended Functions
 	void OnCrowdNavigationReactionEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnBumpReactionEnded(UAnimMontage* Montage, bool bInterrupted);
 	void OnImpactReactionEnded(UAnimMontage* Montage, bool bInterrupted);
@@ -374,6 +371,18 @@ private:
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldSpawnParticleActor(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	bool ShouldSpawnImpactParticle(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	bool ShouldSpawnRearImpactParticle(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	bool ShouldSpawnFrontImpactDecal(FDoubleHitResult Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	bool ShouldSpawnRearImpactDecal(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool ShouldSpawnParticleActorModeration(FDoubleHitResult Hit);
@@ -451,32 +460,32 @@ public:
 	// Parameters
 private:
 	
-	FTimerHandle OnCapsuleHitTimerHandle;
-	FTimerDelegate OnCapsuleHitTimerDelegate;
 	
-	FTimeline ImpactTimeline;
+	
+	
 	FImpactReactionAnimation LastImpactReactionAnimation;
 	FAttackReactionAnimation LastAttackReactionAnimation;
 	FSyncedAttackAnimation LastSyncedAttackReactionAnimation;
+	
+
+	// Timers and Timelines
+	FTimeline ImpactTimeline;
 	FTimerHandle TimeSinceLastRecoveryTimerHandle;
 	float TimeSinceLastRecovery;
 	FTimerHandle TimeSinceLastResponseTimerHandle;
 	float TimeSinceLastResponse;
-
+	FTimerHandle OnCapsuleHitTimerHandle;
+	FTimerDelegate OnCapsuleHitTimerDelegate;
 	FTimerHandle DefensiveTimerHandle;	// Timer Handle for Freelook Trace
 	FTimerDelegate DefensiveTimerDelegate; // Delegate to bind function with parameters
-
 	FTimerHandle AnticipationTimerHandle;	// Timer Handle for Freelook Trace
 	FTimerDelegate AnticipationTimerDelegate; // Delegate to bind function with parameters
-
 	FTimerHandle FallingAnticipationTimerHandle;	// Timer Handle for Falling
 	FTimerDelegate FallingAnticipationTimerDelegate; // Delegate to bind function with parameters
-
 	FTimerHandle CrowdNavigationVelocityTimerHandle;
 	FTimerDelegate CrowdNavigationVelocityTimerDelegate;
 	FTimerHandle BumpVelocityTimerHandle;
 	FTimerDelegate BumpVelocityTimerDelegate;
-
 	FTimerHandle StabilizeTimerHandle;
 	FTimerDelegate StabilizeTimerDelegate;
 	FTimerHandle ClutchImpactPointTimerHandle;
@@ -496,6 +505,8 @@ private:
 	void ImpactTimelineUpdate(float Value);
 
 protected:
+
+	// Utility Functions
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag HealthToHealthTag(float Health);
 	
@@ -523,6 +534,23 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag ConvertVelocityTagToStrength(UPARAM(meta = (Categories = "Als.Action Strength")) FGameplayTag Velocity);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
+	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveMode(const FGameplayTag& Form);
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveModeFromCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance);
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveModeFromAttackingCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance);
+
+	// Select Settings
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	UALSXTImpactReactionSettings* SelectImpactReactionSettings();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
+	UALSXTElementalInteractionSettings* GetElementalInteractionSettings();
+
+	// Select Montages and Poses
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FBumpReactionAnimation SelectBumpReactionMontage(const FGameplayTag& Velocity, const FGameplayTag& Side, const FGameplayTag& Form);
 
@@ -534,15 +562,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	UAnimSequenceBase* SelectCrowdNavigationPose(const FGameplayTag& Side, const FGameplayTag& Form);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
-	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveMode(const FGameplayTag& Form);
-
-	UFUNCTION(BlueprintCallable, Category = "Parameters")
-	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveModeFromCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance);
-
-	UFUNCTION(BlueprintCallable, Category = "Parameters")
-	UPARAM(meta = (Categories = "Als.Defensive Mode")) FGameplayTag DetermineDefensiveModeFromAttackingCharacter(const FGameplayTag& Form, const FGameplayTag& CombatStance);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FAnticipationPose SelectImpactAnticipationMontage(UPARAM(meta = (Categories = "Als.Impact Velocity")) const FGameplayTag& Velocity, UPARAM(meta = (Categories = "Als.Stance")) const FGameplayTag& Stance, UPARAM(meta = (Categories = "Als.Impact Side")) const FGameplayTag& Side, UPARAM(meta = (Categories = "Als.Impact Form")) const FGameplayTag& Form, UPARAM(meta = (Categories = "Als.Health")) const FGameplayTag& Health);
@@ -603,12 +622,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
 	FResponseAnimation SelectAttackResponseMontage(FAttackDoubleHitResult Hit);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	UALSXTImpactReactionSettings* SelectImpactReactionSettings();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Parameters")
-	UALSXTElementalInteractionSettings* GetElementalInteractionSettings();
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Impact Reaction Timeline")

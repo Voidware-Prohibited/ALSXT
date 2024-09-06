@@ -295,6 +295,16 @@ namespace ALSXTImpactSideTags
 	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Impact Side.Low"))
 }
 
+namespace ALSXTImpactSizeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(VerySmall, TEXT("Als.Impact Size.Very Small"))
+	UE_DEFINE_GAMEPLAY_TAG(Small, TEXT("Als.Impact Size.Small"))
+	UE_DEFINE_GAMEPLAY_TAG(Medium, TEXT("Als.Impact Size.Medium"))
+	UE_DEFINE_GAMEPLAY_TAG(Large, TEXT("Als.Impact Size.Large"))
+	UE_DEFINE_GAMEPLAY_TAG(VeryLarge, TEXT("Als.Impact Size.Very Large"))
+	UE_DEFINE_GAMEPLAY_TAG(Huge, TEXT("Als.Impact Size.Huge"))
+}
+
 namespace ALSXTReboundTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(False, TEXT("Als.Rebound.False"))

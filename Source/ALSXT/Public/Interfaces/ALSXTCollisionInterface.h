@@ -52,6 +52,12 @@ public:
 
 	// Impact Reaction
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Impact Reaction")
+	void AddCollisionImpulse(FVector NewImpulse) const;
+
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Impact Reaction")
+	// void AddCollisionForce(FVector NewImpulse) const;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Collision Interface|Impact Reaction")
 	UPARAM(meta = (Categories = "Als.Impact Form")) FGameplayTag GetCurrentBumpForm();
 
