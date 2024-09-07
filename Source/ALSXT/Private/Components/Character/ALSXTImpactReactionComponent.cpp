@@ -161,12 +161,12 @@ FGameplayTag UALSXTImpactReactionComponent::LocationToImpactSide(FVector Locatio
 	float LocationDotProduct = FVector::DotProduct(GetOwner()->GetActorForwardVector(), (GetOwner()->GetActorLocation() - Location));
 	if (LocationDotProduct > 0)
 	{
-		return ALSXTImpactSideTags::Right;
+		return ALSXTImpactSideTags::Left;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Right");
 	}
 	else
 	{
-		return ALSXTImpactSideTags::Left;
+		return ALSXTImpactSideTags::Right;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Left");
 	}
 }
@@ -194,11 +194,11 @@ FGameplayTag UALSXTImpactReactionComponent::LocationToActorImpactSide(AActor* Ac
 	float LocationDotProduct = FVector::DotProduct(Actor->GetActorForwardVector(), (Actor->GetActorLocation() - Location));
 	if (LocationDotProduct > 0)
 	{
-		return ALSXTImpactSideTags::Right;
+		return ALSXTImpactSideTags::Left;
 	}
 	else
 	{
-		return ALSXTImpactSideTags::Left;
+		return ALSXTImpactSideTags::Right;
 	}
 }
 

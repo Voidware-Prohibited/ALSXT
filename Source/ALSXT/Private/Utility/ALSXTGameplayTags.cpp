@@ -235,6 +235,7 @@ namespace ALSXTObjectCollisionTypeTags
 
 namespace ALSXTImpactTypeTags
 {
+	UE_DEFINE_GAMEPLAY_TAG(ObstacleNavigation, TEXT("Als.Impact Type.Obstacle Navigation"))
 	UE_DEFINE_GAMEPLAY_TAG(CrowdNavigation, TEXT("Als.Impact Type.Crowd Navigation"))
 	UE_DEFINE_GAMEPLAY_TAG(Bump, TEXT("Als.Impact Type.Bump"))
 	UE_DEFINE_GAMEPLAY_TAG(Impact, TEXT("Als.Impact Type.Impact"))
