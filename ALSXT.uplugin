@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": ".1",
+	"VersionName": ".2",
 	"FriendlyName": "Advanced Locomotion System Refactored XT",
 	"Description": "Extends ALS by adding additional States, Improved Footprint system, and Sliding and Vaulting.",
 	"Category": "Animation",
@@ -10,7 +10,7 @@
 	"DocsURL": "https://github.com/Voidware-Prohibited/ALSXT",
 	"MarketplaceURL": "",
 	"SupportURL": "https://github.com/Voidware-Prohibited/ALSXT/discussions",
-	"EngineVersion": "5.3.0",
+	"EngineVersion": "5.4.0",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
 	"IsExperimentalVersion": false,

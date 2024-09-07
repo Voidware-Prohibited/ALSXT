@@ -188,7 +188,7 @@ bool AALSXTCharacter::TryStartVaulting(const FALSXTVaultingTraceSettings& TraceS
 	// Trace forward to find an obstacle object
 
 	float ForwardTraceAngle;
-	if (LocomotionState.bHasSpeed)
+	if (LocomotionState.bHasVelocity)
 	{
 		ForwardTraceAngle = LocomotionState.bHasInput
 			? LocomotionState.VelocityYawAngle +
