@@ -35,6 +35,9 @@ public:
   UALSXTAnimationInstance* GetCharacterAnimInstance() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  UInputComponent* GetCharacterInputComponent() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterLocomotionMode() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")

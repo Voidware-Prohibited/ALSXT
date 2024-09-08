@@ -517,6 +517,7 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(WalkAction, ETriggerEvent::Triggered, this, &ThisClass::InputWalk);
 		EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::InputCrouch);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ThisClass::InputJump);
+		EnhancedInput->BindAction(MantleAction, ETriggerEvent::Triggered, this, &ThisClass::InputMantle);
 		EnhancedInput->BindAction(AimAction, ETriggerEvent::Triggered, this, &ThisClass::InputAim);
 		EnhancedInput->BindAction(FocusAction, ETriggerEvent::Triggered, this, &ThisClass::InputFocus);
 		EnhancedInput->BindAction(RagdollAction, ETriggerEvent::Triggered, this, &ThisClass::InputRagdoll);
@@ -540,6 +541,8 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SwitchForegripPositionAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchForegripPosition);
 		EnhancedInput->BindAction(SelectEmoteAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectEmote);
 		EnhancedInput->BindAction(SelectGestureAction, ETriggerEvent::Triggered, this, &ThisClass::InputSelectGesture);
+
+		InputMantleValue = EnhancedInput->GetBoundActionValue(MantleAction);
 		
 		OnSetupPlayerInputComponentUpdated.Broadcast();
 	}
@@ -548,12 +551,23 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 // TODO: Implement requiring holding down Jump to Mantle and Vault
 bool AALSXTCharacter::IsMantlingAllowedToStart_Implementation() const
 {
-	// if (ALSXTSettings->LocomotionActionSettings.bHoldJumpToMantle && JumpAction->Value)
-	// {
-	// 	return Super::IsMantlingAllowedToStart();
-	// }
+	if (IsLocallyControlled())
+	{
+		if (ALSXTSettings->LocomotionActionSettings.bHoldJumpToMantle)
+		{
+			return Super::IsMantlingAllowedToStart() && InputMantleValue.Get<bool>();
+		}
+		else
+		{
+			return !LocomotionAction.IsValid();
+		}
+	}
+	else
+	{
+		return !LocomotionAction.IsValid();
+	}
 
-	return !LocomotionAction.IsValid();
+	// return Super::IsMantlingAllowedToStart();
 }
 
 void AALSXTCharacter::DisableInputMovement(const bool Disable)
@@ -738,6 +752,18 @@ void AALSXTCharacter::InputJump(const FInputActionValue& ActionValue)
 	else
 	{
 		StopJumping();
+	}
+}
+
+void AALSXTCharacter::InputMantle(const FInputActionValue& ActionValue)
+{
+	if (ActionValue.Get<bool>())
+	{
+		// RefreshMantle();
+	}
+	else
+	{
+
 	}
 }
 
@@ -3022,6 +3048,11 @@ UALSXTAnimationInstance* AALSXTCharacter::GetCharacterAnimInstance_Implementatio
 UALSXTCharacterSettings* AALSXTCharacter::GetCharacterSettings_Implementation() const
 {
 	return ALSXTSettings;
+}
+
+UInputComponent* AALSXTCharacter::GetCharacterInputComponent_Implementation() const
+{
+	return InputComponent;
 }
 
 USkeletalMeshComponent* AALSXTCharacter::GetCharacterMesh_Implementation() const

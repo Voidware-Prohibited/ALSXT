@@ -41,12 +41,12 @@ void UALSXTCombatComponent::BeginPlay()
 
 	Character = IALSXTCharacterInterface::Execute_GetCharacter(GetOwner());
 
-	UEnhancedInputComponent* EnhancedInput{ Cast<UEnhancedInputComponent>(Character) };
-	if (IsValid(EnhancedInput))
-	{
-		//FSetupPlayerInputComponentDelegate Del = Character->OnSetupPlayerInputComponentUpdated;
-		//Del.AddUniqueDynamic(this, &UALSXTCombatComponent::SetupInputComponent(EnhancedInput));
-	}
+	// UEnhancedInputComponent* EnhancedInput{ Cast<UEnhancedInputComponent>(GetOwner()) };
+	// if (IsValid(EnhancedInput))
+	// {
+	// 	//FSetupPlayerInputComponentDelegate Del = Character->OnSetupPlayerInputComponentUpdated;
+	// 	//Del.AddUniqueDynamic(this, &UALSXTCombatComponent::SetupInputComponent(EnhancedInput));
+	// }
 	TargetTraceTimerDelegate.BindUFunction(this, "TryTraceForTargets");
 	AttackTraceTimerDelegate.BindUFunction(this, "AttackCollisionTrace");
 	MoveToTargetTimerDelegate.BindUFunction(this, "UpdateMoveToTarget");

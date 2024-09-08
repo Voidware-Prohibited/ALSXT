@@ -27,12 +27,12 @@ void UALSXTSlidingActionComponent::BeginPlay()
 	Character = Cast<AALSXTCharacter>(GetOwner());
 	AlsCharacter = Cast<AAlsCharacter>(GetOwner());
 	
-	auto* EnhancedInput{ Cast<UEnhancedInputComponent>(Character) };
-	if (IsValid(EnhancedInput))
-	{
-		//FSetupPlayerInputComponentDelegate Del = Character->OnSetupPlayerInputComponentUpdated;
-		//Del.AddUniqueDynamic(this, &USlidingActionComponent::SetupInputComponent(EnhancedInput));
-	}
+	// auto* EnhancedInput{ Cast<UEnhancedInputComponent>(Character) };
+	// if (IsValid(EnhancedInput))
+	// {
+	// 	//FSetupPlayerInputComponentDelegate Del = Character->OnSetupPlayerInputComponentUpdated;
+	// 	//Del.AddUniqueDynamic(this, &USlidingActionComponent::SetupInputComponent(EnhancedInput));
+	// }
 }
 
 

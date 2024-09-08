@@ -49,6 +49,7 @@
 #include "Interfaces/ALSXTIdleAnimationComponentInterface.h"
 #include "Notifies/AlsAnimNotify_FootstepEffects.h"
 #include "State/ALSXTFootstepState.h"
+#include "InputActionValue.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
@@ -918,6 +919,9 @@ public:
 	TObjectPtr<UInputAction> JumpAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
+	TObjectPtr<UInputAction> MantleAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> AimAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
@@ -1045,6 +1049,8 @@ public:
 public:
 	void InputBlock(const FInputActionValue& ActionValue);
 
+	FInputActionValue InputMantleValue;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
 	void InputPrimaryInteraction();
 
@@ -1063,6 +1069,8 @@ private:
 	void InputWalk();
 
 	void InputJump(const FInputActionValue& ActionValue);
+
+	void InputMantle(const FInputActionValue& ActionValue);
 
 	void InputAim(const FInputActionValue& ActionValue);
 
@@ -1851,6 +1859,7 @@ protected:
 	virtual AALSXTCharacter* GetCharacter_Implementation() override;
 	virtual UALSXTAnimationInstance* GetCharacterAnimInstance_Implementation() const override;
 	virtual UALSXTCharacterSettings* GetCharacterSettings_Implementation() const override;
+	virtual UInputComponent* GetCharacterInputComponent_Implementation() const override;
 	virtual bool IsCharacterPlayerControlled_Implementation() const override;
 
 	virtual void SetCharacterLocomotionVariant_Implementation(const FGameplayTag& NewLocomotionVariant) override;
