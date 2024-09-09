@@ -23,6 +23,7 @@
 #include "Utility/AlsVector.h"
 #include "Utility/AlsRotation.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "RootMotionSources/ALSXTRootMotionSource_Vaulting.h"
 
 void AALSXTCharacter::TryStartSliding(const float PlayRate)
 {

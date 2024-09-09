@@ -2,6 +2,7 @@
 
 #include "Components/Character/ALSXTCharacterCameraEffectsComponent.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTCharacterCameraEffectsComponentInterface.h"
 #include "Engine/Scene.h"
 #include "Kismet/GameplayStatics.h"
 #include "Curves/CurveVector.h"

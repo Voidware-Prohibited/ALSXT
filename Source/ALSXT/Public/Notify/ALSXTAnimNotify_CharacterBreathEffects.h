@@ -5,6 +5,7 @@
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "NiagaraSystem.h"
 #include "Components/AudioComponent.h"
+#include "GameplayTagContainer.h"
 #include "ALSXTAnimNotify_CharacterBreathEffects.generated.h"
 
 /**

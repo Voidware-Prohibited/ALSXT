@@ -2,6 +2,7 @@
 
 #include "AlsCharacter.h"
 #include "GameFramework/Character.h"
+#include "AlsCameraComponent.h"
 #include "ALSXTCharacterMovementComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/Mesh/ALSXTPaintableSkeletalMeshComponent.h"
@@ -50,6 +51,7 @@
 #include "Notifies/AlsAnimNotify_FootstepEffects.h"
 #include "State/ALSXTFootstepState.h"
 #include "InputActionValue.h"
+// #include "ALSXTAnimationInstance.h"
 #include "ALSXTCharacter.generated.h"
 
 class UALSXTAnimationInstance;
