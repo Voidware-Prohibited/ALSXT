@@ -1,7 +1,8 @@
 #pragma once
 
-#include "NativeGameplayTags.h"
+#include "GameplayTagContainer.h"
 #include "Runtime/PhysicsCore/Public/Chaos/ChaosEngineInterface.h"
+#include "Settings/ALSXTMeshPaintingSettings.h"
 #include "ALSXTMeshPaintingInterface.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)

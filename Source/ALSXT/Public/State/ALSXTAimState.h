@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameplayTagContainer.h"
 #include "ALSXTAimState.generated.h"
 
 USTRUCT(BlueprintType)

@@ -6,8 +6,10 @@ public class ALSXT : ModuleRules
 {
 	public ALSXT(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
+		bUseUnity = false;
+
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
@@ -25,7 +27,7 @@ public class ALSXT : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "Landscape", "CoreUObject", "NetCore", "Engine", "PhysicsCore", "AudioExtensions", "UMG", "GameplayTags", "GameplayCameras", "CinematicCamera", "AIModule", "AnimGraphRuntime", "ControlRig", "Niagara", "EnhancedInput", "ALS", "ALSCamera",
+				"Core", "Landscape", "CoreUObject", "Engine", "AudioExtensions", "UMG", "GameplayTags", "GameplayCameras", "CinematicCamera", "AIModule", "AnimGraphRuntime", "RigVM", "ControlRig", "EnhancedInput", "ALS", "ALSCamera", "Niagara",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -34,11 +36,11 @@ public class ALSXT : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"EngineSettings",
+				"NetCore",
+				"PhysicsCore",
 				"Slate",
 				"SlateCore",
-				"EnhancedInput",
-				"ALS",
-				"ALSCamera",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
@@ -50,5 +52,15 @@ public class ALSXT : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
+
+		if (Target.Type == TargetRules.TargetType.Editor)
+		{
+			PrivateDependencyModuleNames.AddRange(new[]
+			{
+				"MessageLog"
+			});
+		}
+
+		SetupIrisSupport(Target);
 	}
 }

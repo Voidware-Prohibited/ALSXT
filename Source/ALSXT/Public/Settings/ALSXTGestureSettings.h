@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameplayTagContainer.h"
 #include "ALSXTGestureSettings.generated.h"
 
 USTRUCT(BlueprintType)
