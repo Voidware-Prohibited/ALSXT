@@ -1,4 +1,5 @@
 #include "ALSXTCharacter.h"
+#include "ALSXTAnimationInstance.h"
 
 #include "AlsCharacter.h"
 #include "AlsCharacterMovementComponent.h"
