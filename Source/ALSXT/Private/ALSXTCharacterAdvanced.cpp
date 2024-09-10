@@ -12,6 +12,7 @@
 #include "Math/Vector.h"
 #include "ALSXTBlueprintFunctionLibrary.h"
 #include "Engine/World.h"
+#include "Net/Core/PushModel/PushModel.h"
 
 AALSXTCharacterAdvanced::AALSXTCharacterAdvanced(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
