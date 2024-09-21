@@ -23,6 +23,12 @@ void UALSXTPaintableSkeletalMeshComponent::BeginPlay()
 		if (IsMeshPaintingEnabled())
 		{
 			// InitializeMaterials();
+			MaterialInstanceDynamic = CreateAndSetMaterialInstanceDynamic(0);
+
+			if (RenderTargetAsset)
+			{
+				MaterialInstanceDynamic->SetTextureParameterValue("RT_Effects", RenderTargetAsset);
+			}
 		}
 	}
 }
@@ -330,13 +336,13 @@ bool UALSXTPaintableSkeletalMeshComponent::ShouldBePainted(TEnumAsByte<EPhysical
 	}
 }
 
-void UALSXTPaintableSkeletalMeshComponent::GetMaterialsForPaintType(const FGameplayTag PaintType, UMaterialInstanceDynamic*& MaterialInstance, UMaterialInstanceDynamic*& FadeMaterialInstance, UTextureRenderTarget2D*& RenderTarget, UTextureRenderTarget2D*& FadeRenderTarget, FName& ParamName)
+void UALSXTPaintableSkeletalMeshComponent::GetMaterialsForPaintType(const FGameplayTag PaintType, UMaterialInstanceDynamic*& MaterialInstance, UMaterialInstanceDynamic*& FadeMaterialInstance, UTextureRenderTarget2D*& CurrentRenderTarget, UTextureRenderTarget2D*& FadeRenderTarget, FName& ParamName)
 {
 	if (PaintType == ALSXTMeshPaintTypeTags::BloodDamage)
 	{
 		MaterialInstance = MIDBloodDamage;
 		FadeMaterialInstance = MIDBloodDamageFade;
-		RenderTarget = BloodDamageRenderTarget;
+		RenderTargetAsset = BloodDamageRenderTarget;
 		FadeRenderTarget = BloodDamageFadeRenderTarget;
 		ParamName = "BloodDamage";
 	}
@@ -344,7 +350,7 @@ void UALSXTPaintableSkeletalMeshComponent::GetMaterialsForPaintType(const FGamep
 	{
 		MaterialInstance = MIDSurfaceDamage;
 		FadeMaterialInstance = MIDSurfaceDamageFade;
-		RenderTarget = SurfaceDamageRenderTarget;
+		RenderTargetAsset = SurfaceDamageRenderTarget;
 		FadeRenderTarget = SurfaceDamageFadeRenderTarget;
 		ParamName = "SurfaceDamage";
 	}
@@ -352,7 +358,7 @@ void UALSXTPaintableSkeletalMeshComponent::GetMaterialsForPaintType(const FGamep
 	{
 		MaterialInstance = MIDBackSpatter;
 		FadeMaterialInstance = MIDBackSpatterFade;
-		RenderTarget = BackSpatterRenderTarget;
+		RenderTargetAsset = BackSpatterRenderTarget;
 		FadeRenderTarget = BackSpatterFadeRenderTarget;
 		ParamName = "BackSpatter";
 	}
@@ -360,7 +366,7 @@ void UALSXTPaintableSkeletalMeshComponent::GetMaterialsForPaintType(const FGamep
 	{
 		MaterialInstance = MIDSaturation;
 		FadeMaterialInstance = MIDSaturationFade;
-		RenderTarget = SaturationRenderTarget;
+		RenderTargetAsset = SaturationRenderTarget;
 		FadeRenderTarget = SaturationFadeRenderTarget;
 		ParamName = "Saturation";
 	}
@@ -368,7 +374,7 @@ void UALSXTPaintableSkeletalMeshComponent::GetMaterialsForPaintType(const FGamep
 	{
 		MaterialInstance = MIDBurn;
 		FadeMaterialInstance = MIDBurnFade;
-		RenderTarget = BurnRenderTarget;
+		RenderTargetAsset = BurnRenderTarget;
 		FadeRenderTarget = BurnFadeRenderTarget;
 		ParamName = "Burn";
 	}

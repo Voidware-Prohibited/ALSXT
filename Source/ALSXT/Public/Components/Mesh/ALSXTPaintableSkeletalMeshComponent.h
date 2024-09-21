@@ -63,8 +63,11 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeSkeletalMeshElementalConditionSignature OnChangeElementalCondition;
 
-	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Meta = (AllowPrivateAccess))
 	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Meta = (AllowPrivateAccess))
+	UTextureRenderTarget2D* RenderTargetAsset;
 
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	FALSXTGlobalGeneralMeshPaintingSettings GlobalGeneralMeshPaintingSettings;
@@ -94,6 +97,9 @@ public:
 	FGameplayTag ElementalCondition{ ALSXTElementalConditionTags::Dry };
 
 	// Dynamic Material Instances
+
+	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	UMaterialInstanceDynamic* MaterialInstanceDynamic;
 	
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	UMaterialInstanceDynamic* MIDOriginal;
@@ -226,7 +232,7 @@ public:
 	bool ShouldBePainted(TEnumAsByte<EPhysicalSurface> SurfaceType, TEnumAsByte<EPhysicalSurface> ElementSurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType);
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
-	void GetMaterialsForPaintType(UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, UMaterialInstanceDynamic*& MaterialInstance, UMaterialInstanceDynamic*& FadeMaterialInstance, UTextureRenderTarget2D*& RenderTarget, UTextureRenderTarget2D*& FadeRenderTarget, FName& ParamName);
+	void GetMaterialsForPaintType(UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, UMaterialInstanceDynamic*& MaterialInstance, UMaterialInstanceDynamic*& FadeMaterialInstance, UTextureRenderTarget2D*& CurrentRenderTarget, UTextureRenderTarget2D*& FadeRenderTarget, FName& ParamName);
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void PaintMesh(TEnumAsByte<EPhysicalSurface> SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Location, float Radius);

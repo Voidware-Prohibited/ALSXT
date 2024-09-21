@@ -37,12 +37,16 @@ void UALSXTEmoteComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UALSXTEmoteComponent::AddDesiredEmote(const FGameplayTag& Emote)
 {
-	if (CanEmote())
+	if (IALSXTCharacterInterface::Execute_CanEmote(GetOwner()))
 	{
-		if (Character->GetLocalRole() == ROLE_AutonomousProxy)
-			{
-				ServerAddDesiredEmote(Emote);
-			}
+		if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+		{
+			ServerAddDesiredEmote(Emote);
+		}
+		else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+		{
+			AddDesiredEmote(Emote);
+		}
 	}
 }
 
@@ -54,7 +58,7 @@ void UALSXTEmoteComponent::ServerAddDesiredEmote_Implementation(const FGameplayT
 void UALSXTEmoteComponent::AddEmote(const FGameplayTag& Emote)
 {
 
-	if (IsValid(EmoteSettings) && CanEmote())
+	if (IsValid(EmoteSettings) && IALSXTCharacterInterface::Execute_CanEmote(GetOwner()))
 	{
 		if (UAnimMontage* FoundMontage = EmoteSettings->Emotes.Find(Emote)->Montage)
 		{
@@ -62,6 +66,13 @@ void UALSXTEmoteComponent::AddEmote(const FGameplayTag& Emote)
 			OnEmote(Emote);
 		}
 	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "No Animation Found");
+	}
 }
 
-void UALSXTEmoteComponent::OnEmote_Implementation(const FGameplayTag& Emote) {}
+void UALSXTEmoteComponent::OnEmote_Implementation(const FGameplayTag& Emote) 
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "OnEmote");
+}

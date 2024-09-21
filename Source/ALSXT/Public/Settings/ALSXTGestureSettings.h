@@ -22,5 +22,8 @@ class ALSXT_API UALSXTGestureSettings : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName ExitSectionName{ "Exit" };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGameplayTag, FALSXTGestureMontages> Gestures;
 };

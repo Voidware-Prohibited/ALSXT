@@ -25,6 +25,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	FRotator PreviousControlRotation;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Replicated, Category = "State", Meta = (AllowPrivateAccess))
 	bool bIsIdle;
 
 	TArray<TObjectPtr<UAnimMontage>> PreviousMontages;
@@ -62,6 +64,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Replicated, Category = "State", Meta = (AllowPrivateAccess))
 	float IdleCounterTarget{ 0.0f };
 
+	FTimerHandle PreCountIdleCounterTimerHandle;
 	FTimerHandle IdleCounterTimerHandle;
 	FTimerHandle DelayBetweenAnimationsTimerHandle;
 	FTimerDelegate DelayBetweenAnimationsTimerDelegate;
@@ -70,10 +73,13 @@ public:
 	FTimerDelegate CameraRotationTimerDelegate;
 	FVector CameraOffset{ FVector::ZeroVector };
 
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Parameters")
+	void SetIdleCounterTarget();
+
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	bool IsPlayerIdle();
 
-	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Parameters")
 	void SetPlayerIdle(bool NewIdle);
 
 	bool IsPlayerInputIdle();

@@ -20,6 +20,8 @@ public:
 	// Sets default values for this component's properties
 	UALSXTGestureComponent();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -38,12 +40,18 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	bool CanGesture();
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Replicated, Category = "State", Meta = (AllowPrivateAccess))
+	UAnimMontage* CurrentGestureMontage;
 	
 	// Desired Gesture
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Gesture", Meta = (AutoCreateRefTerm = "NewGestureTag"))
 	void AddDesiredGesture(const FGameplayTag& Gesture, const FGameplayTag& GestureHand);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Gesture")
+	void ExitGesture(bool Immediate);
 
 private:
 	UFUNCTION(Server, Reliable)

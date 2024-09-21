@@ -1,7 +1,7 @@
 // MIT
 
-
 #include "Components/Character/ALSXTGestureComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
 UALSXTGestureComponent::UALSXTGestureComponent()
@@ -13,6 +13,16 @@ UALSXTGestureComponent::UALSXTGestureComponent()
 	// ...
 }
 
+void UALSXTGestureComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams Parameters;
+	Parameters.bIsPushBased = true;
+
+	Parameters.Condition = COND_SkipOwner;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CurrentGestureMontage, Parameters)
+}
 
 // Called when the game starts
 void UALSXTGestureComponent::BeginPlay()
@@ -37,12 +47,28 @@ void UALSXTGestureComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UALSXTGestureComponent::AddDesiredGesture(const FGameplayTag& Gesture, const FGameplayTag& GestureHand)
 {
-	if (CanGesture())
+	if (IALSXTCharacterInterface::Execute_CanGesture(GetOwner()))
 	{
 		if (Character->GetLocalRole() == ROLE_AutonomousProxy)
 		{
 			ServerAddDesiredGesture(Gesture, GestureHand);
 		}
+		else
+		{
+			AddGesture(Gesture, GestureHand);
+		}
+	}
+}
+
+void UALSXTGestureComponent::ExitGesture(bool Immediate)
+{
+	if (Immediate)
+	{
+		Character->GetMesh()->GetAnimInstance()->Montage_Stop(0.5f, CurrentGestureMontage);
+	}
+	else
+	{
+		Character->GetMesh()->GetAnimInstance()->Montage_JumpToSection(GestureSettings->ExitSectionName, CurrentGestureMontage);
 	}
 }
 
@@ -53,7 +79,7 @@ void UALSXTGestureComponent::ServerAddDesiredGesture_Implementation(const FGamep
 
 void UALSXTGestureComponent::AddGesture(const FGameplayTag& Gesture, const FGameplayTag& GestureHand)
 {
-	if (IsValid(GestureSettings) && CanGesture())
+	if (IsValid(GestureSettings) && IALSXTCharacterInterface::Execute_CanGesture(GetOwner()))
 	{
 		FALSXTGestureMontages* FoundMontages = GestureSettings->Gestures.Find(Gesture);
 		if (GestureHand == ALSXTHandTags::Left && IsValid(FoundMontages->LeftMontage))

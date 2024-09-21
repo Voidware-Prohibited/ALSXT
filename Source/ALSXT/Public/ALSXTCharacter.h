@@ -257,13 +257,13 @@ public:
 	// Mesh Painting Interface
 	virtual FALSXTGlobalGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings_Implementation() const override;
 	virtual USceneCaptureComponent2D* GetSceneCaptureComponent_Implementation() const override;
-	virtual void GetElementalCondition_Implementation(USceneComponent* Component, UPARAM(meta = (Categories = "Als.Elemental Condition"))FGameplayTag& ElementalCondition) const override;
-	virtual void PaintMesh_Implementation(USceneComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Location, float Radius) const override;
-	virtual void VolumePaintMesh_Implementation(USceneComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Origin, FVector Extent) const override;
-	virtual void ResetPaintTypeOnComponent_Implementation(USceneComponent* Component, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType) const override;
-	virtual void ResetPaintOnComponent_Implementation(USceneComponent* Component) const override;
-	virtual void ResetPaintTypeOnAllComponents_Implementation(UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType) const override;
-	virtual void ResetPaintOnAllComponents_Implementation() const override;
+	virtual void GetElementalCondition_Implementation(UPrimitiveComponent* Component, UPARAM(meta = (Categories = "Als.Elemental Condition"))FGameplayTag& ElementalCondition) const override;
+	virtual void PaintMesh_Implementation(UPrimitiveComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Location, float Radius) override;
+	virtual void VolumePaintMesh_Implementation(UPrimitiveComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Origin, FVector Extent) override;
+	virtual void ResetPaintTypeOnComponent_Implementation(UPrimitiveComponent* Component, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType) override;
+	virtual void ResetPaintOnComponent_Implementation(UPrimitiveComponent* Component) override;
+	virtual void ResetPaintTypeOnAllComponents_Implementation(UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType) override;
+	virtual void ResetPaintOnAllComponents_Implementation() override;
 
 protected:
 
@@ -418,7 +418,7 @@ private:
 
 	// Footstep State
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootprintsState", Meta = (AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_FootprintsState", Meta = (AllowPrivateAccess))
 	FALSXTFootprintsState FootprintsState;
 
 protected:
@@ -1863,6 +1863,8 @@ protected:
 	virtual UALSXTCharacterSettings* GetCharacterSettings_Implementation() const override;
 	virtual UInputComponent* GetCharacterInputComponent_Implementation() const override;
 	virtual bool IsCharacterPlayerControlled_Implementation() const override;
+	virtual bool CanEmote_Implementation() const override;
+	virtual bool CanGesture_Implementation() const override;
 
 	virtual void SetCharacterLocomotionVariant_Implementation(const FGameplayTag& NewLocomotionVariant) override;
 

@@ -4,6 +4,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Interfaces/ALSXTCharacterInterface.h"
 #include "Interfaces/ALSXTIdleAnimationComponentInterface.h"
+#include "ALSXTAnimationInstance.h"
 
 // Sets default values for this component's properties
 UALSXTIdleAnimationComponent::UALSXTIdleAnimationComponent()
@@ -25,6 +26,7 @@ void UALSXTIdleAnimationComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CurrentIdleMontage, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, IdleCounterCurrent, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, IdleCounterTarget, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, bIsIdle, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CurrentTimeBetweenAnimations, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, TargetTimeBetweenAnimations, Parameters)
 }
@@ -36,9 +38,12 @@ void UALSXTIdleAnimationComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// if (GetOwner() && GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+	// IdleCounterTarget = FMath::RandRange(IdleAnimationSettings.TimeDelayBeforeIdle.X, IdleAnimationSettings.TimeDelayBeforeIdle.Y);
+	SetIdleCounterTarget();
 	if (GetOwner())
 	{
-		StartIdleCounterTimer();
+		GetWorld()->GetTimerManager().SetTimer(PreCountIdleCounterTimerHandle, this, &UALSXTIdleAnimationComponent::StartIdleCounterTimer, 15.0f, false);
+		// StartIdleCounterTimer();
 	}
 }
 
@@ -54,12 +59,18 @@ void UALSXTIdleAnimationComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	}
 }
 
+void UALSXTIdleAnimationComponent::SetIdleCounterTarget_Implementation()
+{
+	IdleCounterTarget = FMath::RandRange(IdleAnimationSettings.TimeDelayBeforeIdle.X, IdleAnimationSettings.TimeDelayBeforeIdle.Y);
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::SanitizeFloat(IdleCounterTarget));
+}
+
 bool UALSXTIdleAnimationComponent::IsPlayerIdle()
 {
 	return bIsIdle;
 }
 
-void UALSXTIdleAnimationComponent::SetPlayerIdle(bool NewIdle)
+void UALSXTIdleAnimationComponent::SetPlayerIdle_Implementation(bool NewIdle)
 {
 	bIsIdle = NewIdle;
 }
@@ -102,6 +113,7 @@ TArray<FIdleAnimation> UALSXTIdleAnimationComponent::SelectIdleAnimations(const 
 
 		if (CurrentTagsContainer.HasAll(TagsContainer))
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Animation Found");
 			SelectedAnimations.Add(Animation);
 		}
 	}
@@ -177,8 +189,11 @@ void UALSXTIdleAnimationComponent::SetNewAnimation(UAnimMontage* Animation, int 
 
 void UALSXTIdleAnimationComponent::StartIdleCounterTimer()
 {
+	GetWorld()->GetTimerManager().ClearTimer(PreCountIdleCounterTimerHandle);
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "StartIdleCounterTimer");
 	IdleCounterCurrent = 0.0f;
 	IdleCounterTarget = FMath::RandRange(IdleAnimationSettings.TimeDelayBeforeIdle.X, IdleAnimationSettings.TimeDelayBeforeIdle.Y);
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::SanitizeFloat(IdleCounterTarget));
 	GetWorld()->GetTimerManager().SetTimer(IdleCounterTimerHandle, this, &UALSXTIdleAnimationComponent::IdleCounterTimer, 0.01f, true);
 }
 
@@ -191,6 +206,7 @@ void UALSXTIdleAnimationComponent::IdleCounterTimer()
 
 	if (IsPlayerInputIdle())
 	{
+		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(IdleCounterCurrent));
 		IdleCounterCurrent = IdleCounterCurrent + 0.01;
 		
 		if (IdleCounterCurrent >= IdleCounterTarget && IdleAnimationSettings.EligibleStaminaLevels.HasTag(StatusState.CurrentStaminaTag) && IALSXTIdleAnimationComponentInterface::Execute_ShouldIdle(GetOwner()))
@@ -203,8 +219,8 @@ void UALSXTIdleAnimationComponent::IdleCounterTimer()
 	}
 	else
 	{
-		//StopIdle();
-		SetPlayerIdle(false);
+		StopIdle();
+		// SetPlayerIdle(false);
 		StartIdleCounterTimer();
 	}	
 }
@@ -212,6 +228,7 @@ void UALSXTIdleAnimationComponent::IdleCounterTimer()
 void UALSXTIdleAnimationComponent::ResetIdleCounterTimer()
 {
 	GetWorld()->GetTimerManager().ClearTimer(IdleCounterTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(DelayBetweenAnimationsTimerHandle);
 	IdleCounterCurrent = 0.0f;
 	IdleCounterTarget = 0.0f;
 }
@@ -241,8 +258,8 @@ void UALSXTIdleAnimationComponent::DelayBetweenAnimationsTimer()
 	}
 	else
 	{
-		//StopIdle();
-		SetPlayerIdle(false);
+		StopIdle();
+		// SetPlayerIdle(false);
 		StartIdleCounterTimer();
 	}	
 }
@@ -278,7 +295,7 @@ void UALSXTIdleAnimationComponent::StartIdle()
 	float MontageLength {0.0f};
 	if (IsValid(CurrentIdleMontage))
 	{
-		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetAnimInstance()->Montage_Play(CurrentIdleMontage, 1.0f);
+		IALSXTCharacterInterface::Execute_GetCharacterAnimInstance(GetOwner())->Montage_Play(CurrentIdleMontage, 1.0f);
 		MontageLength = CurrentIdleMontage->GetPlayLength();
 	}
 	GetWorld()->GetTimerManager().ClearTimer(IdleCounterTimerHandle);
@@ -290,7 +307,7 @@ void UALSXTIdleAnimationComponent::StopIdle()
 {
 	if (IsValid(CurrentIdleMontage))
 	{
-		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetAnimInstance()->Montage_Stop(0.5f, CurrentIdleMontage);
+		IALSXTCharacterInterface::Execute_GetCharacterAnimInstance(GetOwner())->Montage_Stop(0.5f, CurrentIdleMontage);
 		SetPlayerIdle(false);
 	}
 }

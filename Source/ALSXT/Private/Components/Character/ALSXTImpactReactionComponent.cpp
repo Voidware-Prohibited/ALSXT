@@ -1708,12 +1708,34 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 // Grounded Bump and Crowd Navigation
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
+	if (IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner()) != AlsStanceTags::Standing)
+	{
+		IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
+		IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), FGameplayTag::EmptyTag);
+		return;
+	}
+
 	const auto* Capsule{ IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(GetOwner()) };
 	const auto CapsuleScale{ Capsule->GetComponentScale().Z };
 	auto CapsuleRadius{ ImpactReactionSettings.BumpDetectionRadius };
 	const auto CapsuleHalfHeight{ Capsule->GetScaledCapsuleHalfHeight() };
 	const FVector UpVector{ GetOwner()->GetActorUpVector() };
-	float TraceDistance{ 100.0f };
+	float TraceDistance{ 0.0f };
+	float CharacterVelocity = GetOwner()->GetVelocity().Length();
+
+	if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Walking)
+	{
+		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, 175.0f), FVector2D(0.0f, 40.0f), CharacterVelocity);
+	}
+	if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Running)
+	{
+		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, 375.0f), FVector2D(0.0f, 80.0f), CharacterVelocity);
+	}
+	if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
+	{
+		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, 650.0f), FVector2D(0.0f, 120.0f), CharacterVelocity);
+	}
+
 	const FVector StartLocation{ GetOwner()->GetActorLocation() + (UpVector * CapsuleHalfHeight / 2) };
 	const FVector EndLocation{ StartLocation + (GetOwner()->GetActorForwardVector() * TraceDistance) };
 	TEnumAsByte<EDrawDebugTrace::Type> BumpDebugMode;
@@ -1749,7 +1771,8 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 
 
 	// Check Status
-	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) == AlsLocomotionModeTags::Grounded && (IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::Normal || IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::KnockedDown))
+
+	if (IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner()) == AlsStanceTags::Standing && IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) == AlsLocomotionModeTags::Grounded && (IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::Normal || IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::KnockedDown))
 	{
 		// Not if performing Action or already in certain Defensive Modes
 		if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == FGameplayTag::EmptyTag && (IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()).Mode != ALSXTDefensiveModeTags::Anticipation || IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()).Mode != ALSXTDefensiveModeTags::BraceForImpact || IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()).Mode != ALSXTDefensiveModeTags::ClutchImpactPoint))
@@ -1790,7 +1813,10 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 							FGameplayTag CharacterCombatStance = IALSXTCharacterInterface::Execute_GetCombatStance(GetOwner());
 							IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), ActorMass);
 							IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), ActorVelocity);
-							IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationPoint);
+
+							FTransform AnticipationTransform{ UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal), HitResult.ImpactPoint, {1.0f, 1.0f, 1.0f} };
+
+							IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationTransform, AnticipationPoint);
 							DefensiveModeState.Location = AnticipationPoint;
 							FGameplayTag ImpactStrength = ConvertVelocityToStrength(GetOwner()->GetVelocity() + HitResult.GetActor()->GetVelocity());							
 
@@ -1800,7 +1826,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 								// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Facing Each Other");
 								//Is Current Character AI?
 								if (!IALSXTCharacterInterface::Execute_IsCharacterPlayerControlled(GetOwner()))
-								{									
+								{													
 									// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Is AI");
 									// Determine how AI should respond based on Overlay and Combat Stance
 
@@ -2227,27 +2253,53 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 							// Collision Interface
 							if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCollisionInterface::StaticClass()))
 							{
-								// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Collision Interface");
-								// Mass, Velocity, AnticipationPoint, Side
-								IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), ActorMass);
-								IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), ActorVelocity);
-								IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationPoint);
+								
+								if (IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) != ALSXTCombatStanceTags::Neutral)
+								{
+									return;
+								}
+								else
+								{
+									if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
+									{
+										// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Collision Interface");
+										// Mass, Velocity, AnticipationPoint, Side
+										IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), ActorMass);
+										IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), ActorVelocity);
 
-								// Defensive Mode
-								DefensiveMode = DetermineDefensiveMode(Form);
-								Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
-								DefensiveModeState.Mode = DefensiveMode;
-								DefensiveModeState.Montage = Montage.Pose;
-								IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
-								IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
-								return;
+										FTransform AnticipationTransform{ UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal), HitResult.ImpactPoint, {1.0f, 1.0f, 1.0f} };
+
+										IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationTransform, AnticipationPoint);
+
+										// Bump
+										// Montage.Pose = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
+										Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
+										// DefensiveModeState.Velocity
+										DefensiveModeState.Location = AnticipationPoint;
+										DefensiveModeState.Montage = Montage.Pose;
+										DefensiveMode = ALSXTDefensiveModeTags::BraceForImpact;
+										DefensiveModeState.Mode = DefensiveMode;
+										DefensiveModeState.Montage = Montage.Pose;
+									}
+									else
+									{
+										// Crowd Nav
+										Montage.Pose = SelectCrowdNavigationPose(Side, Form);
+										DefensiveModeState.Montage = Montage.Pose;
+										DefensiveModeState.Mode = ALSXTDefensiveModeTags::CrowdNavigation;
+										DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
+									}
+									IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
+									IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
+									return;
+								}								
 							}
 							else
 							{
 								if (IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) == ALSXTCombatStanceTags::Neutral || IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) != ALSXTCombatStanceTags::Neutral && IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 								{
 									// Mass, Velocity, AnticipationPoint, Side
-									if (HitResult.GetComponent()->Mobility)
+									if (HitResult.GetComponent()->Mobility == EComponentMobility::Movable)
 									{
 										ActorMass = HitResult.GetComponent()->GetMass();
 									}

@@ -532,12 +532,15 @@ namespace ALSXTVehicleSeatSideTags
 
 namespace ALSXTEmoteTags
 {
+	UE_DEFINE_GAMEPLAY_TAG(Wave, TEXT("Als.Emote.Wave"))
 	UE_DEFINE_GAMEPLAY_TAG(RunningMan, TEXT("Als.Emote.Running Man"))
+	UE_DEFINE_GAMEPLAY_TAG(Twerk, TEXT("Als.Emote.Twerk"))
 }
 
 namespace ALSXTGestureTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Point, TEXT("Als.Gesture.Point"))
+	UE_DEFINE_GAMEPLAY_TAG(Signal, TEXT("Als.Gesture.Signal"))
 }
 
 namespace ALSXTHandTags

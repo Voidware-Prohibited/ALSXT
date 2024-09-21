@@ -27,23 +27,23 @@ public:
 	USceneCaptureComponent2D* GetSceneCaptureComponent() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")
-	void GetElementalCondition(USceneComponent* Component, UPARAM(meta = (Categories = "Als.Elemental Condition"))FGameplayTag& ElementalCondition) const;
+	void GetElementalCondition(UPrimitiveComponent* Component, UPARAM(meta = (Categories = "Als.Elemental Condition"))FGameplayTag& ElementalCondition) const;
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")
-	void PaintMesh(USceneComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Location, float Radius) const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface", Meta = (ForceAsFunction))
+	void PaintMesh(UPrimitiveComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Location, float Size);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface", Meta = (ForceAsFunction))
+	void VolumePaintMesh(UPrimitiveComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Origin, FVector Extent);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")
-	void VolumePaintMesh(USceneComponent* Component, EPhysicalSurface SurfaceType, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType, FVector Origin, FVector Extent) const;
+	void ResetPaintTypeOnComponent(UPrimitiveComponent* Component, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")
-	void ResetPaintTypeOnComponent(USceneComponent* Component, UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType) const;
+	void ResetPaintOnComponent(UPrimitiveComponent* Component);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")
-	void ResetPaintOnComponent(USceneComponent* Component) const;
+	void ResetPaintTypeOnAllComponents(UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")
-	void ResetPaintTypeOnAllComponents(UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType) const;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mesh Painting Interface")
-	void ResetPaintOnAllComponents() const;
+	void ResetPaintOnAllComponents() ;
 };

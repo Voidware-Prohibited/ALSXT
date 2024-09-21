@@ -65,7 +65,7 @@ public:
 	FALSXTImpactReactionState GetImpactReactionState();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Impact Reaction")
-	void GetAnticipationInfo(FGameplayTag& Velocity, FGameplayTag& Form, FVector& AnticipationPoint);
+	void GetAnticipationInfo(FGameplayTag& Velocity, FGameplayTag& Form, FTransform& AnticipationTransform, FVector& AnticipationPoint);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Collision Interface|Impact Reaction")
 	void GetLocationFromBoneName(FName Hit, FGameplayTag& Location);
