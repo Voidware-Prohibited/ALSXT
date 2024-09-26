@@ -59,6 +59,16 @@ struct ALSXT_API FALSXTGeneralMeshPaintingSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPreserveRatio))
 	FVector2D RenderTargetSize{ 1024, 1024 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableFadeInOpacity{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableFadeOutOpacity{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName FadeOutOpacityParameterName{ FName("Opacity") };
+
 };
 
 USTRUCT(BlueprintType)
@@ -67,7 +77,7 @@ struct ALSXT_API FALSXTGlobalGeneralMeshPaintingSettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMaterialInterface* FadeMeterial;
+	UMaterialInterface* FadeMaterial;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FALSXTGeneralMeshPaintingSettings GeneralSettings;

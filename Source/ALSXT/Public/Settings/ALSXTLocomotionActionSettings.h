@@ -12,4 +12,7 @@ struct ALSXT_API FALSXTLocomotionActionSettings
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Vaulting")
 	bool bHoldJumpToVault{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Vaulting")
+	bool bHoldJumpToWallRun{ false };
 };

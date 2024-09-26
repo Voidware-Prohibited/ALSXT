@@ -366,7 +366,7 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	MeshPaintingSceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Mesh Painting Scene Capture"));
 	MeshPaintingSceneCapture->SetupAttachment(GetMesh());
 	MeshPaintingSceneCapture->SetRelativeRotation_Direct({ -90.0f, 90.0f, 0.0f });
-	MeshPaintingSceneCapture->SetRelativeLocation_Direct({ 0.0f, 0.0f, 250.0f });
+	MeshPaintingSceneCapture->SetRelativeLocation_Direct({ 0.0f, 0.0f, 200.0f });
 	MeshPaintingSceneCapture->ProjectionType = ECameraProjectionMode::Orthographic;
 	MeshPaintingSceneCapture->CompositeMode = ESceneCaptureCompositeMode::SCCM_Additive;
 

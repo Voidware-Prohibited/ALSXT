@@ -1708,6 +1708,12 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 // Grounded Bump and Crowd Navigation
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
+
+	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) != AlsLocomotionActionTags::Stabilization)
+	{
+		return;
+	}
+	
 	if (IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner()) != AlsStanceTags::Standing)
 	{
 		IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
@@ -2299,7 +2305,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 								if (IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) == ALSXTCombatStanceTags::Neutral || IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) != ALSXTCombatStanceTags::Neutral && IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 								{
 									// Mass, Velocity, AnticipationPoint, Side
-									if (HitResult.GetComponent()->Mobility == EComponentMobility::Movable)
+									if (HitResult.GetComponent()->Mobility == EComponentMobility::Movable && HitResult.GetComponent()->IsSimulatingPhysics())
 									{
 										ActorMass = HitResult.GetComponent()->GetMass();
 									}
@@ -3654,9 +3660,11 @@ void UALSXTImpactReactionComponent::StartStabilize(FDoubleHitResult Hit)
 		OnStabilizeBlendOutDelegate.BindUObject(this, &UALSXTImpactReactionComponent::OnStabilizationBlendOut);
 		AnimInstance->Montage_SetBlendingOutDelegate(OnStabilizeBlendOutDelegate);
 	}
+	IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
+	IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::Stabilization);
 
-	IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
-	IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), ALSXTDefensiveModeTags::ClutchImpactPoint);
+	// IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
+	// IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), ALSXTDefensiveModeTags::ClutchImpactPoint);
 }
 
 void UALSXTImpactReactionComponent::StartClutchImpactPoint(FDoubleHitResult Hit)
@@ -4156,24 +4164,28 @@ UNiagaraSystem* UALSXTImpactReactionComponent::GetImpactReactionParticle(FDouble
 	HitTags.AddTagFast(ALSXTImpactVelocityTags::Moderate);
 	HitTags.AddTagFast(Hit.ImpactForm);
 	TEnumAsByte<EPhysicalSurface> HitSurface = (Hit.HitResult.HitResult.PhysMaterial.IsValid()) ? Hit.HitResult.HitResult.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType_Default;
-	TArray<FALSXTImpactParticle> FilteredImpactParticles = ImpactParticleMap.Particles.Find(HitSurface)->Particles;
-	
-	TEnumAsByte<EPhysicalSurface> OriginHitSurface = (Hit.OriginHitResult.HitResult.PhysMaterial.IsValid()) ? Hit.OriginHitResult.HitResult.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType_Default;
 
-	if (FilteredImpactParticles.Num() > 0)
+	if (HitSurface)
 	{
-		for (FALSXTImpactParticle Entry : FilteredImpactParticles)
-		{
-			FGameplayTagContainer EntryTags;
-			EntryTags.AppendTags(Entry.Form);
-			EntryTags.AppendTags(Entry.Velocity);
+		TArray<FALSXTImpactParticle> FilteredImpactParticles = ImpactParticleMap.Particles.Find(HitSurface)->Particles;
 
-			if (EntryTags.HasAll(HitTags))
+		TEnumAsByte<EPhysicalSurface> OriginHitSurface = (Hit.OriginHitResult.HitResult.PhysMaterial.IsValid()) ? Hit.OriginHitResult.HitResult.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType_Default;
+
+		if (FilteredImpactParticles.Num() > 0)
+		{
+			for (FALSXTImpactParticle Entry : FilteredImpactParticles)
 			{
-				if (Entry.PhysicalMaterials.Contains(OriginHitSurface))
+				FGameplayTagContainer EntryTags;
+				EntryTags.AppendTags(Entry.Form);
+				EntryTags.AppendTags(Entry.Velocity);
+
+				if (EntryTags.HasAll(HitTags))
 				{
-					FoundImpactParticle = Entry.ImpactParticle;
-					return FoundImpactParticle;
+					if (Entry.PhysicalMaterials.Contains(OriginHitSurface))
+					{
+						FoundImpactParticle = Entry.ImpactParticle;
+						return FoundImpactParticle;
+					}
 				}
 			}
 		}
@@ -6524,20 +6536,24 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 		if (IALSXTCollisionInterface::Execute_CanImpactFall(GetOwner()) && IALSXTCollisionInterface::Execute_ShouldImpactFall(GetOwner()))
 		{
 			ImpactFall(Hit);
+			return;
 		}
-		if (IALSXTCollisionInterface::Execute_ShouldStabilize(GetOwner()))
-		{
-			Stabilize(Hit);
-		}
-		if (IALSXTCollisionInterface::Execute_ShouldClutchImpactPoint(GetOwner()))
-		{
-			ClutchImpactPoint(Hit);
-		}
+		// if (IALSXTCollisionInterface::Execute_ShouldStabilize(GetOwner()))
+		// {
+		// 	Stabilize(Hit);
+		// 	return;
+		// }
+		// if (IALSXTCollisionInterface::Execute_ShouldClutchImpactPoint(GetOwner()))
+		// {
+		// 	ClutchImpactPoint(Hit);
+		// 	return;
+		// }
 		else
 		{
 			if (IALSXTCollisionInterface::Execute_ShouldPerformImpactResponse(GetOwner()))
 			{
 				ImpactResponse(Hit);
+				return;
 			}
 
 		}

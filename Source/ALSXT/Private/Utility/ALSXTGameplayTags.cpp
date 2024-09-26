@@ -32,6 +32,7 @@ namespace AlsLocomotionActionTags
 	UE_DEFINE_GAMEPLAY_TAG(CrowdNavigationReaction, TEXT("Als.LocomotionAction.Crowd Navigation Reaction"))
 	UE_DEFINE_GAMEPLAY_TAG(DefensiveReaction, TEXT("Als.LocomotionAction.Defensive Reaction"))
 	UE_DEFINE_GAMEPLAY_TAG(ImpactReaction, TEXT("Als.LocomotionAction.Impact Reaction"))
+	UE_DEFINE_GAMEPLAY_TAG(Stabilization, TEXT("Als.LocomotionAction.Stabilization"))
 	UE_DEFINE_GAMEPLAY_TAG(ClutchImpactPoint, TEXT("Als.LocomotionAction.Clutch Impact Point"))
 	UE_DEFINE_GAMEPLAY_TAG(SyncedAttackReaction, TEXT("Als.LocomotionAction.Synced Attack Reaction"))
 	UE_DEFINE_GAMEPLAY_TAG(ImpactFall, TEXT("Als.LocomotionAction.Impact Fall"))
