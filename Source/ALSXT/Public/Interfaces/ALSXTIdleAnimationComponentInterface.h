@@ -12,8 +12,8 @@ class ALSXT_API IALSXTIdleAnimationComponentInterface {
 	GENERATED_BODY()
 
 public:
-  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
-  bool ShouldIdle();
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
+  bool ShouldIdle() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
   UALSXTIdleAnimationSettings* SelectIdleSettings();

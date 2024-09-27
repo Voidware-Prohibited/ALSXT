@@ -62,7 +62,7 @@ void UALSXTIdleAnimationComponent::TickComponent(float DeltaTime, ELevelTick Tic
 void UALSXTIdleAnimationComponent::SetIdleCounterTarget_Implementation()
 {
 	IdleCounterTarget = FMath::RandRange(IdleAnimationSettings.TimeDelayBeforeIdle.X, IdleAnimationSettings.TimeDelayBeforeIdle.Y);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::SanitizeFloat(IdleCounterTarget));
+	// GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Yellow, FString::SanitizeFloat(IdleCounterTarget));
 }
 
 bool UALSXTIdleAnimationComponent::IsPlayerIdle()
@@ -78,8 +78,10 @@ void UALSXTIdleAnimationComponent::SetPlayerIdle_Implementation(bool NewIdle)
 bool UALSXTIdleAnimationComponent::IsPlayerInputIdle()
 {
 	bool bIsInputIdle = (GetOwner()->GetVelocity().Size() == 0.0) && (IALSXTCharacterInterface::Execute_GetCharacterControlRotation(GetOwner()) == PreviousControlRotation);
+	bool bIsMovementIdle = IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) == AlsLocomotionModeTags::Grounded;
+	bool bIsActionIdle = IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == FGameplayTag::EmptyTag;
 	PreviousControlRotation = IALSXTCharacterInterface::Execute_GetCharacterControlRotation(GetOwner());
-	return bIsInputIdle;
+	return bIsInputIdle && bIsMovementIdle && bIsActionIdle;
 }
 
 TArray<FIdleAnimation> UALSXTIdleAnimationComponent::SelectIdleAnimations(const FGameplayTag& Sex, const FGameplayTag& Stance, const FGameplayTag& Overlay, const FGameplayTag& Injury, const FGameplayTag& CombatStance)
@@ -193,7 +195,7 @@ void UALSXTIdleAnimationComponent::StartIdleCounterTimer()
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "StartIdleCounterTimer");
 	IdleCounterCurrent = 0.0f;
 	IdleCounterTarget = FMath::RandRange(IdleAnimationSettings.TimeDelayBeforeIdle.X, IdleAnimationSettings.TimeDelayBeforeIdle.Y);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::SanitizeFloat(IdleCounterTarget));
+	// GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, FString::SanitizeFloat(IdleCounterTarget));
 	GetWorld()->GetTimerManager().SetTimer(IdleCounterTimerHandle, this, &UALSXTIdleAnimationComponent::IdleCounterTimer, 0.01f, true);
 }
 
@@ -211,6 +213,7 @@ void UALSXTIdleAnimationComponent::IdleCounterTimer()
 		
 		if (IdleCounterCurrent >= IdleCounterTarget && IdleAnimationSettings.EligibleStaminaLevels.HasTag(StatusState.CurrentStaminaTag) && IALSXTIdleAnimationComponentInterface::Execute_ShouldIdle(GetOwner()))
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Start Idle");
 			GetWorld()->GetTimerManager().ClearTimer(DelayBetweenAnimationsTimerHandle);
 			ResetIdleCounterTimer();
 			SetPlayerIdle(true);
@@ -221,12 +224,14 @@ void UALSXTIdleAnimationComponent::IdleCounterTimer()
 	{
 		StopIdle();
 		// SetPlayerIdle(false);
+		SetIdleCounterTarget();
 		StartIdleCounterTimer();
 	}	
 }
 
 void UALSXTIdleAnimationComponent::ResetIdleCounterTimer()
 {
+	GetWorld()->GetTimerManager().ClearTimer(PreCountIdleCounterTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(IdleCounterTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(DelayBetweenAnimationsTimerHandle);
 	IdleCounterCurrent = 0.0f;

@@ -1941,6 +1941,9 @@ protected:
 	virtual FGameplayTag GetCharacterWeaponCarryPosition_Implementation() const override;
 	virtual FTransform GetCharacterCurrentForegripTransform_Implementation() const override;
 	virtual FALSXTAimState GetCharacterAimState_Implementation() const override;
+
+	// Idle Animation Component
+	virtual bool ShouldIdle_Implementation() const override;
 };
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredEmote() const

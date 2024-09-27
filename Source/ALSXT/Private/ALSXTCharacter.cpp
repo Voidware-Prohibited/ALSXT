@@ -3495,3 +3495,8 @@ FString AALSXTCharacter::GetCurrentVocalization_Implementation() const
 	}
 	
 }
+
+bool AALSXTCharacter::ShouldIdle_Implementation() const
+{
+	return true;
+}
