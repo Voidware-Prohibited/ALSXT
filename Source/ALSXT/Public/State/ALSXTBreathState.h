@@ -18,17 +18,13 @@ struct ALSXT_API FALSXTTargetBreathState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
 	float Alpha{ 0.33 };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-	int ReleaseBreaths{ 0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-	float ReleaseStartRate{ 0.33f };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-	int RecoveryBreaths{ 0 };
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 100))
 	float TransitionRate{ 1 };
+
+	bool operator==(const FALSXTTargetBreathState& other) const
+	{
+		return (other.HoldingBreath == HoldingBreath) && (other.Rate == Rate) && (other.Alpha == Alpha) && (other.TransitionRate == TransitionRate);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -42,19 +38,16 @@ struct ALSXT_API FALSXTBreathState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Holding Breath"))
 	FGameplayTag HoldingBreath{ ALSXTHoldingBreathTags::False };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 3))
-	float MaxHoldBreathTime{ 2.0 };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 30))
+	float CurrentMaxHoldBreathTime{ 6.0 };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 3))
-	float CurrentMaxHoldBreathTime{ 2.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 3))
-	float CurrentHoldBreathTime{ 2.0 };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 30))
+	float CurrentHoldBreathTime{ 6.0 };
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 3))
 	float CurrentBreathRate { 1.0 };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 3))
 	float PreviousBreathRate{ 1.0 };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
@@ -63,19 +56,18 @@ struct ALSXT_API FALSXTBreathState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
 	float PreviousBreathAlpha{ 0.75 };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 5))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 30))
 	float BreathRecoveryTime{ 0.0 };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 5))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 30))
 	float CurrentBreathRecoveryTime{ 0.0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-	int CurrentReleaseBreaths{ 0 };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
-	int CurrentRecoveryBreaths{ 0 };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FALSXTTargetBreathState TargetState;
+
+	bool operator==(const FALSXTBreathState& other) const
+	{
+		return (other.BreathType == BreathType) && (other.HoldingBreath == HoldingBreath) && (other.CurrentMaxHoldBreathTime == CurrentMaxHoldBreathTime) && (other.CurrentHoldBreathTime == CurrentHoldBreathTime) && (other.CurrentBreathRate == CurrentBreathRate) && (other.PreviousBreathRate == PreviousBreathRate) && (other.CurrentBreathAlpha == CurrentBreathAlpha) && (other.PreviousBreathAlpha == PreviousBreathAlpha) && (other.BreathRecoveryTime == BreathRecoveryTime) && (other.CurrentBreathRecoveryTime == CurrentBreathRecoveryTime) && (other.TargetState == TargetState);
+	}
 };
 

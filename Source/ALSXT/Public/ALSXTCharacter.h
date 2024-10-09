@@ -287,6 +287,12 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Overlay", Meta = (ForceAsFunction))
 	void ClearOverlayObject();
 
+	FOnMontageBlendingOutStarted OnEnterStationaryModeBlendOutDelegate;
+	// FOnMontageBlendingOutStarted OnExitStationaryModeBlendOutDelegate;
+
+	void OnEnterStationaryModeBlendOut(UAnimMontage* Montage, bool bInterrupted);
+	// void OnExitStationaryModeBlendOut(UAnimMontage* Montage, bool bInterrupted);
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character", Meta = (ForceAsFunction))
 	void OnFirstPersonOverrideChanged(float FirstPersonOverride);
@@ -802,6 +808,12 @@ private:
 	UFUNCTION()
 	void OnReplicate_DefensiveModeState(const FALSXTDefensiveModeState& PreviousDefensiveModeState);
 
+	UFUNCTION(BlueprintCallable, Category = "Settings|Als Character|Defensive Mode State")
+	void ClientSetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Settings|Als Character|Defensive Mode State")
+	void MulticastSetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
+
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnDefensiveModeStateChanged(const FALSXTDefensiveModeState& PreviousDefensiveModeState);
@@ -925,6 +937,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> AimAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
+	TObjectPtr<UInputAction> AimToggleAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> FocusAction;
@@ -1075,6 +1090,8 @@ private:
 	void InputMantle(const FInputActionValue& ActionValue);
 
 	void InputAim(const FInputActionValue& ActionValue);
+
+	void InputToggleAim();
 
 	void InputFocus(const FInputActionValue& ActionValue);
 
@@ -1944,6 +1961,7 @@ protected:
 
 	// Idle Animation Component
 	virtual bool ShouldIdle_Implementation() const override;
+	virtual FALSXTIdleState GetIdleState_Implementation() const override;
 };
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredEmote() const

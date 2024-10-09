@@ -26,10 +26,16 @@ public:
   void IsInFrontOf(bool& IsInFrontOf, FVector LookAtActorLocation) const;
 
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
-  float GetScore() const;
+  FALSXTHeadLookAtActor GetHeadLookAtActor(FVector FromLocation) const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
   FVector GetHeadLookAtLocation();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
+  FTransform GetHeadLookAtTransform();
+
+  UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Head Look At Interface")
+  FALSXTHeadLookAtSettings GetLookAtSettings();
 
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
   void AddHeadLookAtEntry(FALSXTHeadLookAtEntry HeadLookAtEntry);
@@ -42,6 +48,9 @@ public:
 
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
   FALSXTHeadLookAtEntry GetBestHeadLookAtEntry() const;
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
+  FALSXTHeadLookAtEntry GetNewBestGazeHeadLookAtEntry() const;
 
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Head Look At Interface")
   void BeginHeadLookAt(FALSXTHeadLookAtEntry HeadLookAtEntry);

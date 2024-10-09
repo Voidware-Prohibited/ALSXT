@@ -129,7 +129,7 @@ struct ALSXT_API FImpactHistoryEntry
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
-	AActor* Actor;
+	AActor* Actor  {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State", Meta = (AllowPrivateAccess))
 	float Distance{ 1000.0f };

@@ -9,6 +9,7 @@ UALSXTEmoteComponent::UALSXTEmoteComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 
 	// ...
 }
@@ -39,20 +40,81 @@ void UALSXTEmoteComponent::AddDesiredEmote(const FGameplayTag& Emote)
 {
 	if (IALSXTCharacterInterface::Execute_CanEmote(GetOwner()))
 	{
+		if (EmoteSettings->bDebugMode)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "AddEmote");
+		}
+
+		// AddEmote(Emote);
+		// MulticastAddDesiredEmote(Emote);
+		// ServerAddDesiredEmote(Emote);
+
+		// if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+		// {
+		// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "ServerAddDesiredEmote");
+		// 	MulticastAddDesiredEmote(Emote);
+		// 	ServerAddDesiredEmote(Emote);
+		// }
+		// else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
+		// {
+		// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "AddDesiredEmote");
+		// 	AddEmote(Emote);
+		// 	MulticastAddDesiredEmote(Emote);
+		// }
+
 		if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
 		{
+			// Server
+			if (EmoteSettings->bDebugMode)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Server");
+			}
 			ServerAddDesiredEmote(Emote);
 		}
 		else if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy && GetOwner()->GetRemoteRole() == ROLE_Authority)
 		{
-			AddDesiredEmote(Emote);
+			// Reg
+			if (EmoteSettings->bDebugMode)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Reg");
+			}
+			AddEmote(Emote);
+		}
+		else if (GetOwner()->GetLocalRole() == ROLE_Authority && GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
+		{
+			// AI
+			if (EmoteSettings->bDebugMode)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "AI");
+			}
+			ServerAddDesiredEmote(Emote);
+		}
+	}
+	else
+	{
+		if (EmoteSettings->bDebugMode)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Cannot Emote");
 		}
 	}
 }
 
 void UALSXTEmoteComponent::ServerAddDesiredEmote_Implementation(const FGameplayTag& Emote)
 {
+	if (EmoteSettings->bDebugMode)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "ServerAddDesiredEmote");
+	}
 	AddDesiredEmote(Emote);
+}
+
+void UALSXTEmoteComponent::MulticastAddDesiredEmote_Implementation(const FGameplayTag& Emote)
+{
+	if (EmoteSettings->bDebugMode)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "MulticastAddDesiredEmote");
+	}
+	AddEmote(Emote);
 }
 
 void UALSXTEmoteComponent::AddEmote(const FGameplayTag& Emote)
@@ -60,19 +122,31 @@ void UALSXTEmoteComponent::AddEmote(const FGameplayTag& Emote)
 
 	if (IsValid(EmoteSettings) && IALSXTCharacterInterface::Execute_CanEmote(GetOwner()))
 	{
+		// for (Emote : EmoteSettings->Emotes)
+		
 		if (UAnimMontage* FoundMontage = EmoteSettings->Emotes.Find(Emote)->Montage)
 		{
-			Character->GetMesh()->GetAnimInstance()->Montage_Play(FoundMontage);
+			if (EmoteSettings->bDebugMode)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FoundMontage->GetName());
+			}
+			IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetAnimInstance()->Montage_Play(FoundMontage);
 			OnEmote(Emote);
 		}
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "No Animation Found");
+		if (EmoteSettings->bDebugMode)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Cannot Emote");
+		}
 	}
 }
 
 void UALSXTEmoteComponent::OnEmote_Implementation(const FGameplayTag& Emote) 
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "OnEmote");
+	if (EmoteSettings->bDebugMode)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "OnEmote");
+	}	
 }

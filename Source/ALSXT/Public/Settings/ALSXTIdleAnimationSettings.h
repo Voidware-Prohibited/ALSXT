@@ -11,9 +11,42 @@ class ALSXT_API UALSXTIdleAnimationSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (TitleProperty = "{Sex}  {Overlay} {Stance} {Injury} {Variant} {Montage}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", Meta = (TitleProperty = "{Sex} {Overlay} {Stance} {Injury} {Variant} {Montage}", AllowPrivateAccess))
 	TArray<FIdleAnimation> IdleAnimations;
 
+};
+
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTIdleState
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIdle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Idle Mode"))
+	FGameplayTag Mode{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* CurrentIdleMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float TargetTime{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float CurrentTime{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float TargetTimeBeforeNext{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float CurrentTimeBeforeNext{ 0.0f };
+
+	bool operator==(const FALSXTIdleState& other) const
+	{
+		return (other.bIdle == bIdle) && (other.Mode == Mode) && (other.CurrentIdleMontage == CurrentIdleMontage) && (other.TargetTime == TargetTime) && (other.CurrentTime == CurrentTime) && (other.TargetTimeBeforeNext == TargetTimeBeforeNext) && (other.CurrentTimeBeforeNext == CurrentTimeBeforeNext);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -45,4 +78,12 @@ struct ALSXT_API FALSXTALSXTGeneralIdleAnimationSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinimumSpectacleScoreForGazing{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bDebugMode{ false };
+
+	bool operator==(const FALSXTALSXTGeneralIdleAnimationSettings& other) const
+	{
+		return (other.EnableIdleAnimations == EnableIdleAnimations) && (other.EligibleStaminaLevels == EligibleStaminaLevels) && (other.TimeDelayBeforeIdle == TimeDelayBeforeIdle) && (other.TimeDelayBetweenAnimations == TimeDelayBetweenAnimations) && (other.EnableIdleCameraRotation == EnableIdleCameraRotation) && (other.IdleCameraRotationSpeed == IdleCameraRotationSpeed) && (other.EnableIdleGazing == EnableIdleGazing) && (other.MinimumSpectacleScoreForGazing == MinimumSpectacleScoreForGazing) && (other.bDebugMode == bDebugMode);
+	}
 };

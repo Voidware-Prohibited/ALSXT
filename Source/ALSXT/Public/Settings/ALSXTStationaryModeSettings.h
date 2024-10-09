@@ -7,6 +7,205 @@
 #include "Animation/AnimSequenceBase.h"
 #include "ALSXTStationaryModeSettings.generated.h"
 
+//Stationary Animations and Poses
+
+// Synced Transitions
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTSyncedStationaryTransitionAnimationSet
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* InstigatorAnimation{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* ReceiverAnimation{ nullptr };
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTSyncedStationaryTransitionAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side"))
+	FGameplayTag Side{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait"))
+	FGameplayTag Gait{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Locomotion Variant"))
+	FGameplayTag LocomotionVariant{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <FALSXTSyncedStationaryTransitionAnimationSet> Animations;
+};
+
+// Transitions
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTStationaryTransitionAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side"))
+	FGameplayTag Side{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait"))
+	FGameplayTag Gait{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Locomotion Variant"))
+	FGameplayTag LocomotionVariant{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <UAnimMontage*> Animations;
+
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTStationaryTransition
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <FALSXTStationaryTransitionAnimation> EntryAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <FALSXTStationaryTransitionAnimation> ExitAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <FALSXTSyncedStationaryTransitionAnimation> SyncedAnimations;
+};
+
+
+// Poses
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTStationaryModePose
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
+	FGameplayTagContainer Overlays{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Locomotion Variant"))
+	FGameplayTagContainer LocomotionVariant{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <UAnimSequence*> Poses;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTStationaryModePoses
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <FALSXTStationaryModePose> Neutral;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <FALSXTStationaryModePose> Crouched;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <FALSXTStationaryModePose> Ready;
+};
+
+// Vehicle Poses
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTStationaryVehicleDynamicPoses
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <UAnimSequence*> LeanLeftPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <UAnimSequence*> LeanRightPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimSequence* AimLeftPose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimSequence* AimRightPose;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTStationaryVehicleModePoses
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Vehicle Seat"))
+	FGameplayTagContainer Positions{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTStationaryModePoses Regular;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTStationaryVehicleDynamicPoses Dynamic;
+};
+
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UALSXTVehicleAnimationSettings : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTStationaryVehicleModePoses Poses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTStationaryTransition Transistions;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTStationaryVehicleModeAnimations
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stationary Mode"))
+	FGameplayTagContainer StationaryMode{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr <UALSXTVehicleAnimationSettings> Poses;
+};
+
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UALSXTStationaryModeAnimationSettings : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTStationaryModePoses Animations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTStationaryTransition Transistions;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTStationaryModeAnimations
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stationary Mode"))
+	FGameplayTagContainer StationaryMode{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr <UALSXTStationaryModeAnimationSettings> Animations;
+
+};
+
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UALSXTStationaryAnimationSettings : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TArray <FALSXTStationaryModeAnimations> StationaryAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TArray <FALSXTStationaryVehicleModeAnimations> VehicleAnimations;
+};
+
 USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTStationaryModeState
 {
@@ -20,6 +219,9 @@ struct ALSXT_API FALSXTStationaryModeState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTag Mode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
+	FGameplayTag TargetMode;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FVector MountPoint{ ForceInit };

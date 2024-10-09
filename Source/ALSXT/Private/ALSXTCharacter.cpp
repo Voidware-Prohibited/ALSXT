@@ -545,6 +545,7 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ThisClass::InputJump);
 		EnhancedInput->BindAction(MantleAction, ETriggerEvent::Triggered, this, &ThisClass::InputMantle);
 		EnhancedInput->BindAction(AimAction, ETriggerEvent::Triggered, this, &ThisClass::InputAim);
+		EnhancedInput->BindAction(AimToggleAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleAim);
 		EnhancedInput->BindAction(FocusAction, ETriggerEvent::Triggered, this, &ThisClass::InputFocus);
 		EnhancedInput->BindAction(RagdollAction, ETriggerEvent::Triggered, this, &ThisClass::InputRagdoll);
 		EnhancedInput->BindAction(RollAction, ETriggerEvent::Triggered, this, &ThisClass::InputRoll);
@@ -838,6 +839,24 @@ void AALSXTCharacter::InputAim(const FInputActionValue& ActionValue)
 			{
 				SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 			}
+		}
+	}
+}
+
+void AALSXTCharacter::InputToggleAim()
+{
+	if (IALSXTHeldItemInterface::Execute_IsHoldingAimableItem(this)) 
+	{
+		if (GetDesiredRotationMode() == AlsRotationModeTags::Aiming)
+		{
+			SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
+			SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
+		}
+		if (CanAim())
+		{
+			SetViewMode(AlsViewModeTags::FirstPerson);
+			SetDesiredRotationMode(AlsRotationModeTags::Aiming);
+			SetDesiredCombatStance(ALSXTCombatStanceTags::Aiming);
 		}
 	}
 }
@@ -1738,6 +1757,7 @@ void AALSXTCharacter::ActivateFreelooking()
 	// LockRotation(GetActorRotation().Yaw);
 	SetDesiredFreelooking(ALSXTFreelookingTags::True);
 	FALSXTFreelookState NewFreelookState = GetFreelookState();
+	NewFreelookState.Freelooking = ALSXTFreelookingTags::True;
 	NewFreelookState.LockedControlRotation = GetControlRotation();
 	NewFreelookState.LockedViewState = GetViewState();
 	SetFreelookState(NewFreelookState);
@@ -1747,6 +1767,9 @@ void AALSXTCharacter::DeactivateFreelooking()
 {
 	// UnLockRotation();
 	SetDesiredFreelooking(ALSXTFreelookingTags::False);
+	FALSXTFreelookState NewFreelookState = GetFreelookState();
+	NewFreelookState.Freelooking = ALSXTFreelookingTags::False;
+	SetFreelookState(NewFreelookState);
 	// HeadLookAtState.LockedViewState.PreviousYawAngle = 0.0f;
 	// HeadLookAtState.LockedViewState.Rotation = FRotator(0.0f, 0.0f, 0.0f);
 	// HeadLookAtState.LockedViewState.YawSpeed = 0.0f;
@@ -2359,29 +2382,24 @@ void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewD
 	const auto PreviousDefensiveModeState{ DefensiveModeState };
 
 	DefensiveModeState = NewDefensiveModeState;
-	// ServerSetDefensiveModeState(NewDefensiveModeState);
 
 	OnDefensiveModeStateChanged(PreviousDefensiveModeState);
 
-	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
-	{
-		ServerSetDefensiveModeState(NewDefensiveModeState);
-	}
+	// if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	// {
+	// 	ServerSetDefensiveModeState(NewDefensiveModeState);
+	// }
 }
 
 void AALSXTCharacter::ResetDefensiveModeState()
 {
+	// Reset but keep Nontage
+	FALSXTDefensiveModeState NewDefensiveModeState = GetDefensiveModeState();
 	FALSXTDefensiveModeState PreviousDefensiveModeState = GetDefensiveModeState();
-	FALSXTDefensiveModeState NewDefensiveModeState = PreviousDefensiveModeState;
 	NewDefensiveModeState.Mode = FGameplayTag::EmptyTag;
-	NewDefensiveModeState.Side = FGameplayTag::EmptyTag;
 	NewDefensiveModeState.Form = FGameplayTag::EmptyTag;
 	NewDefensiveModeState.Velocity = FGameplayTag::EmptyTag;
-	NewDefensiveModeState.Location = FVector::ZeroVector;
-	// NewDefensiveModeState.Montage = nullptr;
-
 	DefensiveModeState = NewDefensiveModeState;
-
 	OnDefensiveModeStateChanged(PreviousDefensiveModeState);
 
 	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
@@ -2392,7 +2410,8 @@ void AALSXTCharacter::ResetDefensiveModeState()
 
 void AALSXTCharacter::ServerSetDefensiveModeState_Implementation(const FALSXTDefensiveModeState& NewDefensiveModeState)
 {
-	SetDefensiveModeState(NewDefensiveModeState);
+	// SetDefensiveModeState(NewDefensiveModeState);
+	MulticastSetDefensiveModeState(NewDefensiveModeState);
 }
 
 
@@ -2404,6 +2423,24 @@ void AALSXTCharacter::ServerProcessNewDefensiveModeState_Implementation(const FA
 void AALSXTCharacter::OnReplicate_DefensiveModeState(const FALSXTDefensiveModeState& PreviousDefensiveModeState)
 {
 	OnDefensiveModeStateChanged(PreviousDefensiveModeState);
+}
+
+// Defensive ModeState
+void AALSXTCharacter::ClientSetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState)
+{
+	if (HasAuthority())
+	{
+		ServerSetDefensiveModeState(NewDefensiveModeState);
+	}
+	else
+	{
+		MulticastSetDefensiveModeState(NewDefensiveModeState);
+	}
+}
+
+void AALSXTCharacter::MulticastSetDefensiveModeState_Implementation(const FALSXTDefensiveModeState& NewDefensiveModeState)
+{
+	SetDefensiveModeState(NewDefensiveModeState);
 }
 
 void AALSXTCharacter::OnDefensiveModeStateChanged_Implementation(const FALSXTDefensiveModeState& PreviousDefensiveModeState) {}
@@ -2965,8 +3002,7 @@ void AALSXTCharacter::UpdateBreathState()
 	if (this->Implements<UALSXTCharacterInterface>())
 	{
 		FGameplayTag BreathType = IALSXTCharacterInterface::Execute_GetBreathType(this);
-
-		if (ShouldTransitionBreathState() || BreathState.HoldingBreath == ALSXTHoldingBreathTags::False)
+		if (ShouldTransitionBreathState() && BreathState.HoldingBreath != ALSXTHoldingBreathTags::True)
 		{
 			FALSXTTargetBreathState NewTargetState = CalculateTargetBreathState();
 			BreathState.TargetState = NewTargetState;
@@ -3028,10 +3064,13 @@ FALSXTTargetBreathState AALSXTCharacter::CalculateTargetBreathState()
 
 void AALSXTCharacter::TransitionBreathState()
 {
-	BreathState.PreviousBreathAlpha = BreathState.CurrentBreathAlpha;
-	BreathState.PreviousBreathRate = BreathState.CurrentBreathRate;
-	BreathState.CurrentBreathAlpha = BreathState.TargetState.Alpha;
-	BreathState.CurrentBreathRate = BreathState.TargetState.Rate;
+	if (BreathState.HoldingBreath == ALSXTHoldingBreathTags::False)
+	{
+		BreathState.PreviousBreathAlpha = BreathState.CurrentBreathAlpha;
+		BreathState.PreviousBreathRate = BreathState.CurrentBreathRate;
+		BreathState.CurrentBreathAlpha = BreathState.TargetState.Alpha;
+		BreathState.CurrentBreathRate = BreathState.TargetState.Rate;
+	}
 }
 
 void AALSXTCharacter::OnAIJumpObstacle_Implementation()
@@ -3291,7 +3330,9 @@ void AALSXTCharacter::SetCharacterRagdoll_Implementation(const bool NewRagdoll)
 
 void AALSXTCharacter::SetCharacterEmote_Implementation(const FGameplayTag& NewEmote)
 {
+	// Emotes->MulticastAddDesiredEmote(NewEmote);
 	SetDesiredEmote(NewEmote);
+	// Emotes->AddDesiredEmote(NewEmote);
 }
 
 void AALSXTCharacter::GetCharacterGesture_Implementation(FGameplayTag& NewGesture, FGameplayTag& NewGestureHand) const
@@ -3355,15 +3396,15 @@ FALSXTHeadLookAtEntry AALSXTCharacter::GetBestHeadLookAtEntry_Implementation() c
 
 	for (auto HeadLookAtEntry : HeadLookAtEntries)
 	{
-		if (HeadLookAtEntry.Score > CurrentBestHeadLookAtEntry.Score)
+		if (HeadLookAtEntry.HeadLookAtActor.Score > CurrentBestHeadLookAtEntry.HeadLookAtActor.Score)
 		{
 			CurrentBestHeadLookAtEntry = HeadLookAtEntry;
 		}
-		if (HeadLookAtEntry.Score == CurrentBestHeadLookAtEntry.Score)
+		if (HeadLookAtEntry.HeadLookAtActor.Score == CurrentBestHeadLookAtEntry.HeadLookAtActor.Score)
 		{
-			if (HeadLookAtEntry.Distance < CurrentBestHeadLookAtEntry.Distance)
+			if (HeadLookAtEntry.HeadLookAtActor.Distance < CurrentBestHeadLookAtEntry.HeadLookAtActor.Distance)
 			{
-				if (HeadLookAtEntry.Score == CurrentBestHeadLookAtEntry.Score)
+				if (HeadLookAtEntry.HeadLookAtActor.Score == CurrentBestHeadLookAtEntry.HeadLookAtActor.Score)
 				{
 					CurrentBestHeadLookAtEntry = HeadLookAtEntry;
 				}
@@ -3500,3 +3541,17 @@ bool AALSXTCharacter::ShouldIdle_Implementation() const
 {
 	return true;
 }
+
+FALSXTIdleState AALSXTCharacter::GetIdleState_Implementation() const
+{
+	return IdleAnimation->GetIdleState();
+}
+
+void AALSXTCharacter::OnEnterStationaryModeBlendOut(UAnimMontage* Montage, bool bInterrupted)
+{
+	FALSXTStationaryModeState NewStationaryModeState = GetStationaryModeState();
+	NewStationaryModeState.Mode = NewStationaryModeState.TargetMode;
+	NewStationaryModeState.TargetMode = FGameplayTag::EmptyTag;
+	SetStationaryModeState(NewStationaryModeState);
+}
+// void AALSXTCharacter::OnExitStationaryModeBlendOut(UAnimMontage* Montage, bool bInterrupted) {}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GameplayTagContainer.h"
+#include "ALSXT/Public/Settings/ALSXTStationaryModeSettings.h"
 #include "ALS/Public/Settings/AlsFeetSettings.h"
 #include "ALS/Public/Settings/AlsGeneralAnimationSettings.h"
 #include "ALS/Public/Settings/AlsGroundedSettings.h"
@@ -17,6 +19,9 @@ class ALSXT_API UALSXTAnimationInstanceSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FALSXTStationaryModeAnimations StationaryMode;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FAlsGeneralAnimationSettings General;
 

@@ -18,6 +18,9 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
   UALSXTIdleAnimationSettings* SelectIdleSettings();
 
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
+  FALSXTIdleState GetIdleState() const;
+
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
   void EnableIdleAnimation(bool Enable);
 

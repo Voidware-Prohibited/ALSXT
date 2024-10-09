@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Emote", Meta = (AutoCreateRefTerm = "NewEmoteTag"))
 		void AddDesiredEmote(const FGameplayTag& Emote);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAddDesiredEmote(const FGameplayTag& Emote);
+
 private:
 	UFUNCTION(Server, Reliable)
 		void ServerAddDesiredEmote(const FGameplayTag& Emote);

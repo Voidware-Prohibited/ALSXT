@@ -184,6 +184,12 @@ namespace ALSXTFacialExpressionTags
 	UE_DEFINE_GAMEPLAY_TAG(Pain, TEXT("Als.Facial Expression.Pain"))
 }
 
+namespace ALSXTHeadLookAtModeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(LookAt, TEXT("Als.Head Look At Mode.Look At"))
+	UE_DEFINE_GAMEPLAY_TAG(Gaze, TEXT("Als.Head Look At Mode.Gaze"))
+}
+
 namespace ALSXTFreelookingTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(False, TEXT("Als.Freelooking.False"))
@@ -410,6 +416,12 @@ namespace ALSXTCombatStanceTags
 	UE_DEFINE_GAMEPLAY_TAG(Aiming, TEXT("Als.Combat Stance.Aiming"))
 }
 
+namespace ALSXTIdleModeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Neutral, TEXT("Als.Idle Mode.Idle"))
+	UE_DEFINE_GAMEPLAY_TAG(Smoking, TEXT("Als.Idle Mode.Gazing"))
+}
+
 namespace ALSXTIdleAnimationActivityTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Neutral, TEXT("Als.Idle Animation Activity.Neutral"))
@@ -506,29 +518,45 @@ namespace ALSXTBlockingTags
 
 namespace ALSXTStationaryModeTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Static, TEXT("Als.Stationary Mode.Static"))
-	UE_DEFINE_GAMEPLAY_TAG(Interaction, TEXT("Als.Stationary Mode.Interaction"))
-	UE_DEFINE_GAMEPLAY_TAG(VehicleDriver, TEXT("Als.Stationary Mode.Vehicle Driver"))
-	UE_DEFINE_GAMEPLAY_TAG(VehiclePassenger, TEXT("Als.Stationary Mode.Vehicle Passenger"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticDefault, TEXT("Als.Stationary Mode.Static"))
+	UE_DEFINE_GAMEPLAY_TAG(Vehicle, TEXT("Als.Stationary Mode.Vehicle"))
 }
 
-namespace ALSXTStaticStationaryModeTypeTags
+namespace ALSXTStationaryStaticModeTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Seat, TEXT("Als.Static Stationary Mode Type.Seat"))
-	UE_DEFINE_GAMEPLAY_TAG(Surface, TEXT("Als.Static Stationary Mode Type.Surface"))
-	UE_DEFINE_GAMEPLAY_TAG(Ground, TEXT("Als.Static Stationary Mode Type.Ground"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticDefault, TEXT("Als.Stationary Mode.Static Default"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticGround01, TEXT("Als.Stationary Mode.Static Ground 01"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticGround02, TEXT("Als.Stationary Mode.Static Ground 02"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticGround03, TEXT("Als.Stationary Mode.Static Ground 03"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticLedge01, TEXT("Als.Stationary Mode.Static Ledge 01"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticLedge02, TEXT("Als.Stationary Mode.Static Ledge 02"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticLedge03, TEXT("Als.Stationary Mode.Static Ledge 03"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticSeat01, TEXT("Als.Stationary Mode.Static Seat 01"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticSeat02, TEXT("Als.Stationary Mode.Static Seat 02"))
+	UE_DEFINE_GAMEPLAY_TAG(StaticSeat03, TEXT("Als.Stationary Mode.Static Seat 03"))
+	UE_DEFINE_GAMEPLAY_TAG(Interaction01, TEXT("Als.Stationary Mode.Interaction 01"))
+	UE_DEFINE_GAMEPLAY_TAG(Interaction02, TEXT("Als.Stationary Mode.Interaction 02"))
+	UE_DEFINE_GAMEPLAY_TAG(Interaction03, TEXT("Als.Stationary Mode.Interaction 03"))
 }
 
-namespace ALSXTVehicleStationaryModeTypeTags
+namespace ALSXTStationaryVehicleModeTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Driver, TEXT("Als.Vehicle Stationary Mode Type.Driver"))
-	UE_DEFINE_GAMEPLAY_TAG(Passenger, TEXT("Als.Vehicle Stationary Mode Type.Passenger"))
+	UE_DEFINE_GAMEPLAY_TAG(VehicleDefaultDriver, TEXT("Als.Stationary Mode.Vehicle Default Driver"))
+	UE_DEFINE_GAMEPLAY_TAG(VehicleDefaultPassenger, TEXT("Als.Stationary Mode.Vehicle Default Passenger"))
+	UE_DEFINE_GAMEPLAY_TAG(VehicleTruck01Driver, TEXT("Als.Stationary Mode.Vehicle Truck 01 Driver"))
+	UE_DEFINE_GAMEPLAY_TAG(VehicleTruck01Passenger, TEXT("Als.Stationary Mode.Vehicle Truck 01 Passenger"))
+	UE_DEFINE_GAMEPLAY_TAG(VehicleSports01Driver, TEXT("Als.Stationary Mode.Vehicle Sports 01 Driver"))
+	UE_DEFINE_GAMEPLAY_TAG(VehicleSports01Passenger, TEXT("Als.Stationary Mode.Vehicle Sports 01 Passenger"))
 }
 
-namespace ALSXTVehicleSeatSideTags
+namespace ALSXTVehicleSeatTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Vehicle Seat Side.Left"))
-	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Vehicle Seat Side.Right"))
+	UE_DEFINE_GAMEPLAY_TAG(Driver, TEXT("Als.Vehicle Seat.Driver"))
+	UE_DEFINE_GAMEPLAY_TAG(PassengerLeft, TEXT("Als.Vehicle Seat.Passenger Left"))
+	UE_DEFINE_GAMEPLAY_TAG(PassengerRight, TEXT("Als.Vehicle Seat.Passenger Right"))
+	UE_DEFINE_GAMEPLAY_TAG(Special01, TEXT("Als.Vehicle Seat.Special 01"))
+	UE_DEFINE_GAMEPLAY_TAG(Special02, TEXT("Als.Vehicle Seat.Special 02"))
+	UE_DEFINE_GAMEPLAY_TAG(Special03, TEXT("Als.Vehicle Seat.Special 03"))
 }
 
 namespace ALSXTEmoteTags

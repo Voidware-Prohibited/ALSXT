@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameplayTagContainer.h"
 #include "State/AlsViewState.h"
 #include "ALSXTHeadLookAtState.generated.h"
 
@@ -24,12 +25,12 @@ struct ALSXT_API FALSXTHeadLookAtSettings
 };
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FALSXTHeadLookAtEntry
+struct ALSXT_API FALSXTHeadLookAtActor
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* HeadLookAtActor{ nullptr };
+	TObjectPtr<AActor> HeadLookAtActor {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Score{ 0.0f };
@@ -40,12 +41,26 @@ struct ALSXT_API FALSXTHeadLookAtEntry
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FDateTime DateTime;
 
+	bool operator==(const FALSXTHeadLookAtActor& other) const
+	{
+		return (other.HeadLookAtActor == HeadLookAtActor) && (other.Score == Score) && (other.Distance == Distance) && (other.DateTime == DateTime);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTHeadLookAtEntry
+{
+	GENERATED_BODY()
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FALSXTHeadLookAtSettings LookAtSettings;
+	FALSXTHeadLookAtActor HeadLookAtActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector HeadLookAtTransform{ EForceInit::ForceInit };
 
 	bool operator==(const FALSXTHeadLookAtEntry& other) const
 	{
-		return (other.HeadLookAtActor == HeadLookAtActor) && (other.Score == Score) && (other.Distance == Distance) && (other.DateTime == DateTime) && (other.LookAtSettings == LookAtSettings);
+		return (other.HeadLookAtActor == HeadLookAtActor) && (other.HeadLookAtTransform == HeadLookAtTransform);
 	}
 };
 
@@ -57,8 +72,17 @@ struct ALSXT_API FALSXTHeadLookAtState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableHeadLookAt{ false };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Head Look At Mode"))
+	FGameplayTag HeadLookAtMode {FGameplayTag::EmptyTag};
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FALSXTHeadLookAtEntry HeadLookAtEntry;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTHeadLookAtSettings LookAtSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray <FALSXTHeadLookAtEntry> HeadLookAtEntries;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* HeadLookAtActor{ nullptr };
@@ -71,7 +95,7 @@ struct ALSXT_API FALSXTHeadLookAtState
 
 	bool operator==(const FALSXTHeadLookAtState& other) const
 	{
-		return (other.bEnableHeadLookAt == bEnableHeadLookAt) && (other.HeadLookAtEntry == HeadLookAtEntry) && (other.HeadLookAtActor == HeadLookAtActor) && (other.HeadLookAtLocation == HeadLookAtLocation) && (other.HeadLookAtRotation == HeadLookAtRotation);
+		return (other.bEnableHeadLookAt == bEnableHeadLookAt) && (other.HeadLookAtEntry == HeadLookAtEntry) && (other.LookAtSettings == LookAtSettings) && (other.HeadLookAtEntries == HeadLookAtEntries);
 	}
 };
 

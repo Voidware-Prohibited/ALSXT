@@ -77,7 +77,7 @@ struct ALSXT_API FALSXTGlobalGeneralMeshPaintingSettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMaterialInterface* FadeMaterial;
+	UMaterialInterface* FadeMaterial  {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FALSXTGeneralMeshPaintingSettings GeneralSettings;

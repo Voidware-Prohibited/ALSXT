@@ -1649,15 +1649,15 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 						TEnumAsByte<EPhysicalSurface> PhysSurf = HitResult.PhysMaterial->SurfaceType;
 						UAnimSequenceBase* SelectedAnimation{ nullptr };
 						SelectedAnimation = SelectBraceForImpactPose(SideTag, FormTag);
+						FTransform HitTransform{ UKismetMathLibrary::MakeRotFromX(HitResult.ImpactPoint), HitResult.ImpactPoint, {1.0, 1.0, 1.0} };
 
 						// Defensive Mode State
 						FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
 						NewDefensiveModeState.Form = FormTag;
-						NewDefensiveModeState.Location = HitResult.ImpactPoint;
 						NewDefensiveModeState.Mode = ALSXTDefensiveModeTags::BraceForImpact;
 						NewDefensiveModeState.Montage = SelectedAnimation;
 						NewDefensiveModeState.Side = SideTag;
-						// NewDefensiveModeState.Transform = HitTransform;
+						NewDefensiveModeState.Transform = HitTransform;
 						NewDefensiveModeState.Velocity = VelocityTag;
 
 						// Mass and Velocity
@@ -1709,7 +1709,7 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
 
-	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) != AlsLocomotionActionTags::Stabilization)
+	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == AlsLocomotionActionTags::Stabilization)
 	{
 		return;
 	}
@@ -1823,7 +1823,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 							FTransform AnticipationTransform{ UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal), HitResult.ImpactPoint, {1.0f, 1.0f, 1.0f} };
 
 							IALSXTCollisionInterface::Execute_GetAnticipationInfo(HitResult.GetActor(), Velocity, Form, AnticipationTransform, AnticipationPoint);
-							DefensiveModeState.Location = AnticipationPoint;
+							DefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(AnticipationPoint), AnticipationPoint, {1.0, 1.0, 1.0} };
 							FGameplayTag ImpactStrength = ConvertVelocityToStrength(GetOwner()->GetVelocity() + HitResult.GetActor()->GetVelocity());							
 
 							// Are Characters facing each other?
@@ -1977,8 +1977,6 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 											{
 												const FTransform ConstructedTransform{ UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal), HitResult.ImpactPoint, {1.0f, 1.0f, 1.0f} };
 												DefensiveModeState.Transform = ConstructedTransform;
-
-												DefensiveModeState.Location = HitResult.Location;
 												if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 												{
 													// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Sprinting");
@@ -2026,8 +2024,6 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 											{
 												const FTransform ConstructedTransform{ UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal), HitResult.ImpactPoint, {1.0f, 1.0f, 1.0f} };
 												DefensiveModeState.Transform = ConstructedTransform;
-
-												DefensiveModeState.Location = HitResult.Location;
 												if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 												{
 													Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
@@ -2098,7 +2094,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										if (DefensiveModeState.Mode == ALSXTDefensiveModeTags::Blocking)
 										{
 											// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Blocking");
-											DefensiveModeState.Location = HitResult.Location;
+											DefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal), HitResult.ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 											// IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), NewDefensiveModeState);
 											// update anim if necessary
 											// Check if still left/right top/middle/bottom
@@ -2161,7 +2157,6 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 											else
 											{
 												// Update Blocking
-												DefensiveModeState.Location = HitResult.Location;
 												const FTransform ConstructedTransform { UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal), HitResult.ImpactPoint, {1.0f, 1.0f, 1.0f} };
 												DefensiveModeState.Transform = ConstructedTransform;
 												
@@ -2183,7 +2178,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										else
 										{
 											//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Not Blocking");
-											DefensiveModeState.Location = HitResult.Location;
+											DefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal), HitResult.ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 											// IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), NewDefensiveModeState);
 											// update anim if necessary
 											// Check if still left/right top/middle/bottom
@@ -2281,7 +2276,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										// Montage.Pose = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
 										Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 										// DefensiveModeState.Velocity
-										DefensiveModeState.Location = AnticipationPoint;
+										DefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(AnticipationPoint), AnticipationPoint, { 1.0f, 1.0f, 1.0f } };
 										DefensiveModeState.Montage = Montage.Pose;
 										DefensiveMode = ALSXTDefensiveModeTags::BraceForImpact;
 										DefensiveModeState.Mode = DefensiveMode;
@@ -2869,7 +2864,7 @@ void UALSXTImpactReactionComponent::StartAttackReactionImplementation(FAttackDou
 		//Anticipation
 		FALSXTDefensiveModeState DefensiveModeState;
 		DefensiveModeState.Mode = IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner());
-		DefensiveModeState.Location = Hit.DoubleHitResult.HitResult.HitResult.Location;
+		DefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(Hit.DoubleHitResult.HitResult.HitResult.ImpactPoint), Hit.DoubleHitResult.HitResult.HitResult.ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 		// Character->SetFacialExpression();
 
@@ -3643,7 +3638,7 @@ void UALSXTImpactReactionComponent::StartStabilize(FDoubleHitResult Hit)
 	FGameplayTag Health = HealthToHealthTag(IALSXTCharacterInterface::Execute_GetHealth(GetOwner()));
 	
 	DefensiveModeState.Montage = Montage;
-	DefensiveModeState.Location = Hit.HitResult.HitResult.ImpactPoint;
+	DefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(Hit.HitResult.HitResult.ImpactPoint), Hit.HitResult.HitResult.ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 	float MontageLength = AnimInstance->Montage_Play(Montage, 1.0, EMontagePlayReturnType::MontageLength, 0.0f);
 
 	if (!IALSXTCharacterInterface::Execute_IsCharacterPlayerControlled(GetOwner()))
@@ -6475,7 +6470,7 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 		//Anticipation
 		FALSXTDefensiveModeState DefensiveModeState;
 		DefensiveModeState.Mode = IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner());
-		DefensiveModeState.Location = Hit.HitResult.HitResult.Location;
+		DefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(Hit.HitResult.HitResult.ImpactPoint), Hit.HitResult.HitResult.ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 		// Character->SetFacialExpression();
 
@@ -6574,7 +6569,7 @@ void UALSXTImpactReactionComponent::StartStabilizeImplementation(UAnimMontage* M
 		FALSXTDefensiveModeState CurrentDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
 		CurrentDefensiveModeState.Mode = ALSXTDefensiveModeTags::ClutchImpactPoint;
 		CurrentDefensiveModeState.Montage = Montage;
-		CurrentDefensiveModeState.Location = ImpactPoint;
+		CurrentDefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(ImpactPoint), ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), CurrentDefensiveModeState);
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), ALSXTDefensiveModeTags::ClutchImpactPoint);
 		// IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
@@ -6601,7 +6596,7 @@ void UALSXTImpactReactionComponent::StartClutchImpactPointImplementation(UAnimSe
 		FALSXTDefensiveModeState CurrentDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
 		CurrentDefensiveModeState.Mode = ALSXTDefensiveModeTags::ClutchImpactPoint;
 		CurrentDefensiveModeState.Montage = Montage;
-		CurrentDefensiveModeState.Location = ImpactPoint;
+		CurrentDefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(ImpactPoint), ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), CurrentDefensiveModeState);
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), ALSXTDefensiveModeTags::ClutchImpactPoint);
 		// IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);

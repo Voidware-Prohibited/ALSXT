@@ -10,28 +10,28 @@ struct ALSXT_API FALSXTBumpPoseState
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* Actor;
+	AActor* Actor {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Mode{ FGameplayTag::EmptyTag };
+	FGameplayTag Mode {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAnimSequenceBase> Pose{ nullptr };
+	TObjectPtr<UAnimSequenceBase> Pose {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Alpha{ 0.0f };
+	float Alpha {0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Velocity{ FGameplayTag::EmptyTag };
+	FGameplayTag Velocity {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Side{ FGameplayTag::EmptyTag };
+	FGameplayTag Side {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Form{ FGameplayTag::EmptyTag };
+	FGameplayTag Form {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector Location{ FVector::ZeroVector };
+	FVector Location {FVector::ZeroVector};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform Transform;

@@ -286,7 +286,7 @@ void AALSXTCharacterAdvanced::SetHoldingBreath(const FGameplayTag& NewHoldingBre
 
 void AALSXTCharacterAdvanced::OnHoldingBreathChanged_Implementation(const FGameplayTag& PreviousHoldingBreathTag) 
 {
-	CharacterSound->PlayHoldingBreathSound(GetBreathState().HoldingBreath, GetDesiredSex(), CharacterCustomization->VoiceParameters.Variant, IALSXTCharacterInterface::Execute_GetStamina(this));
+	// CharacterSound->PlayHoldingBreathSound(GetBreathState().HoldingBreath, GetDesiredSex(), CharacterCustomization->VoiceParameters.Variant, IALSXTCharacterInterface::Execute_GetStamina(this));
 }
 
 FGameplayTag AALSXTCharacterAdvanced::GetCharacterHoldingBreath_Implementation() const
@@ -381,7 +381,7 @@ void AALSXTCharacterAdvanced::InputHoldBreath(const FInputActionValue& ActionVal
 {
 	if (ActionValue.Get<bool>() == true)
 	{
-		if (CanHoldBreath())
+		if (GetBreathState().HoldingBreath == ALSXTHoldingBreathTags::False && CanHoldBreath())
 		{
 			// SetHoldingBreath(ALSXTHoldingBreathTags::True);
 			BeginHoldBreathTimer();
@@ -390,13 +390,17 @@ void AALSXTCharacterAdvanced::InputHoldBreath(const FInputActionValue& ActionVal
 	else
 	{
 		// SetHoldingBreath(CalculateBreathReleaseMode());
-		EndHoldBreathTimer();
+		if (GetBreathState().HoldingBreath == ALSXTHoldingBreathTags::True)
+		{
+			EndHoldBreathTimer();
+		}
+		
 	}
 }
 
 float AALSXTCharacterAdvanced::CalculateHoldBreathTimer()
 {
-	return BreathState.MaxHoldBreathTime * IALSXTCharacterInterface::Execute_GetStamina(this);
+	return FMath::FRandRange(ALSXTSettings->BreathEffects.BaseHoldingBreathRange.X, ALSXTSettings->BreathEffects.BaseHoldingBreathRange.Y) * IALSXTCharacterInterface::Execute_GetStamina(this);
 }
 
 void AALSXTCharacterAdvanced::BeginHoldBreathTimer()
@@ -409,6 +413,7 @@ void AALSXTCharacterAdvanced::BeginHoldBreathTimer()
 	NewBreathState.CurrentMaxHoldBreathTime = CalculateHoldBreathTimer();
 	SetBreathState(NewBreathState);
 	GetWorld()->GetTimerManager().SetTimer(HoldBreathTimerHandle, HoldBreathTimerDelegate, 0.1f, true);
+	CharacterSound->PlayHoldingBreathSound(ALSXTHoldingBreathTags::True, CharacterCustomization->GetVoiceParameters().Sex, CharacterCustomization->GetVoiceParameters().Variant, IALSXTCharacterInterface::Execute_GetStamina(this));
 }
 
 void AALSXTCharacterAdvanced::HoldBreathTimer()
@@ -426,45 +431,49 @@ void AALSXTCharacterAdvanced::HoldBreathTimer()
 
 void AALSXTCharacterAdvanced::EndHoldBreathTimer()
 {
+	FALSXTBreathState NewBreathState = GetBreathState();
 	FGameplayTag BreathReleaseMode;
 	BreathReleaseMode = CalculateBreathReleaseMode();
-	FALSXTBreathState NewBreathState = GetBreathState();
 	NewBreathState.CurrentHoldBreathTime = 0.0f;
 	NewBreathState.CurrentMaxHoldBreathTime = 0.0f;
 	NewBreathState.HoldingBreath = BreathReleaseMode;
+	NewBreathState.BreathRecoveryTime = CalculateBreathRecoveryTime();
 	SetDesiredHoldingBreath(BreathReleaseMode);
 	SetBreathState(NewBreathState);
+	CharacterSound->PlayHoldingBreathSound(BreathReleaseMode, CharacterCustomization->GetVoiceParameters().Sex, CharacterCustomization->GetVoiceParameters().Variant, IALSXTCharacterInterface::Execute_GetStamina(this));
 	GetWorld()->GetTimerManager().ClearTimer(HoldBreathTimerHandle);
+
 	BeginBreathRecoveryTimer();
+
 }
 
 //
 
 float AALSXTCharacterAdvanced::CalculateBreathRecoveryTime()
 {
-	if (GetHoldingBreath() == ALSXTHoldingBreathTags::Released)
+	if (GetBreathState().HoldingBreath == ALSXTHoldingBreathTags::Released)
 	{
-		return 0.5;
+		return FMath::FRandRange(ALSXTSettings->BreathEffects.BaseReleasedBreathRange.X, ALSXTSettings->BreathEffects.BaseReleasedBreathRange.Y);
 	}
-	if (GetHoldingBreath() == ALSXTHoldingBreathTags::Gasping)
+	if (GetBreathState().HoldingBreath == ALSXTHoldingBreathTags::Gasping)
 	{
-		return 1.25;
+		return FMath::FRandRange(ALSXTSettings->BreathEffects.BaseGaspingBreathRange.X, ALSXTSettings->BreathEffects.BaseGaspingBreathRange.Y);
 	}
-	if (GetHoldingBreath() == ALSXTHoldingBreathTags::Exhausted)
+	if (GetBreathState().HoldingBreath == ALSXTHoldingBreathTags::Exhausted)
 	{
-		return 1.75;
+		return FMath::FRandRange(ALSXTSettings->BreathEffects.BaseExhaustedBreathRange.X, ALSXTSettings->BreathEffects.BaseExhaustedBreathRange.Y);
 	}
 	else
 	{
-		return 0.25;
+		return FMath::FRandRange(ALSXTSettings->BreathEffects.BaseReleasedBreathRange.X, ALSXTSettings->BreathEffects.BaseReleasedBreathRange.Y);
 	}
 }
 
 void AALSXTCharacterAdvanced::BeginBreathRecoveryTimer()
 {
-	FALSXTBreathState NewBreathState = GetBreathState();
-	NewBreathState.BreathRecoveryTime = CalculateBreathRecoveryTime();
-	SetBreathState(NewBreathState);
+	// FALSXTBreathState NewBreathState = GetBreathState();
+	// NewBreathState.BreathRecoveryTime = CalculateBreathRecoveryTime();
+	// SetBreathState(NewBreathState);
 	GetWorld()->GetTimerManager().SetTimer(BreathRecoveryTimerHandle, BreathRecoveryTimerDelegate, 0.1f, true);
 }
 
@@ -484,11 +493,16 @@ void AALSXTCharacterAdvanced::EndBreathRecoveryTimer()
 {
 	FALSXTBreathState NewBreathState = GetBreathState();
 	FGameplayTag BreathReleaseMode;
-	BreathReleaseMode = CalculateBreathReleaseMode();
 	NewBreathState.HoldingBreath = ALSXTHoldingBreathTags::False;
 	NewBreathState.TargetState = CalculateTargetBreathState();
+	NewBreathState.BreathRecoveryTime = 0.0f;
+	NewBreathState.CurrentBreathRecoveryTime = 0.0f;
+	FALSXTTargetBreathState NewTargetBreathState;
+	NewTargetBreathState.Alpha = 0.75;
+	NewTargetBreathState.Rate = 1.0;
+	NewBreathState.TargetState = NewTargetBreathState;
 	SetBreathState(NewBreathState);
-	SetDesiredHoldingBreath(BreathReleaseMode);
+	SetDesiredHoldingBreath(ALSXTHoldingBreathTags::False);
 	GetWorld()->GetTimerManager().ClearTimer(BreathRecoveryTimerHandle);
 }
 

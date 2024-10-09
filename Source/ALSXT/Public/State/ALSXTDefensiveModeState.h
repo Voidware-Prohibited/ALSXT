@@ -13,6 +13,12 @@ struct ALSXT_API FALSXTDefensiveModeState
 	FGameplayTag Mode {FGameplayTag::EmptyTag};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAnimSequenceBase> AnticipationPose{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAnimSequenceBase> ObstaclePose{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAnimSequenceBase> Montage{ nullptr };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -27,7 +33,9 @@ struct ALSXT_API FALSXTDefensiveModeState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform Transform;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector Location{ FVector::ZeroVector };
+	bool operator==(const FALSXTDefensiveModeState& other) const
+	{
+		return (other.Mode == Mode) && (other.Montage == Montage) && (other.Side == Side) && (other.Form == Form) && (other.Velocity == Velocity) && (other.Transform.GetLocation() == Transform.GetLocation()) && (other.Transform.GetRotation() == Transform.GetRotation());
+	}
 };
 

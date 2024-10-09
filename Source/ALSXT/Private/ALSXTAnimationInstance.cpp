@@ -120,6 +120,23 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 
 
 	}
+
+	if (IALSXTCharacterInterface::Execute_GetCharacterStationaryModeState(GetOwningActor()).Mode != StationaryModeState.Mode && (IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwningActor()) != Stance || IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwningActor()) != CombatStance))
+	{
+
+	}
+
+	// for (FALSXTStationaryModeEntry StationaryModeAnimations : ALSXTSettings->StationaryMode.Animations)
+	// {
+	// 	FGameplayTagContainer CurrentStateContainer;
+	// 	CurrentStateContainer.AddTag(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwningActor()));
+	// 	CurrentStateContainer.AddTag(IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwningActor()));
+	// 	FGameplayTagContainer EntryContainer;
+	// 	if (StationaryModeAnimations.Overlays.HasTag(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwningActor())))
+	// 	{
+	// 
+	// 	}
+	// }
 }
 
 void UALSXTAnimationInstance::NativeThreadSafeUpdateAnimation(const float DeltaTime)

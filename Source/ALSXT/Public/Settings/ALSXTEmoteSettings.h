@@ -20,4 +20,7 @@ class ALSXT_API UALSXTEmoteSettings : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGameplayTag, FALSXTEmote> Emotes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bDebugMode {true};
 };

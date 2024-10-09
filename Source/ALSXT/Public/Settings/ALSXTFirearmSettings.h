@@ -176,7 +176,7 @@ struct ALSXT_API FALSXTFirearmSightsInfo
 	FGameplayTagContainer SightLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Format")
-	USceneComponent* Component;
+	USceneComponent* Component  {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	float BaseADSSpeed{ 1.0f };
