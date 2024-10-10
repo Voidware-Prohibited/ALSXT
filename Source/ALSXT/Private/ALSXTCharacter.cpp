@@ -1496,8 +1496,9 @@ void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
 			NewDefensiveModeState.Side = PreviousDefensiveModeState.Side == FGameplayTag::EmptyTag ? ALSXTImpactSideTags::Front : PreviousDefensiveModeState.Side;
 			NewDefensiveModeState.Form = PreviousDefensiveModeState.Form == FGameplayTag::EmptyTag ? ALSXTImpactFormTags::Blunt : PreviousDefensiveModeState.Form;
 			NewDefensiveModeState.Velocity = PreviousDefensiveModeState.Velocity == FGameplayTag::EmptyTag ? ALSXTImpactVelocityTags::Slow : PreviousDefensiveModeState.Velocity;
-			NewDefensiveMontage = SelectAttackAnticipationMontage(NewDefensiveModeState.Velocity, GetStance(), NewDefensiveModeState.Side, NewDefensiveModeState.Form);
-			NewDefensiveModeState.Montage = NewDefensiveMontage.Pose;
+			NewDefensiveMontage = SelectAttackAnticipationMontage(NewDefensiveModeState.Velocity, GetDesiredStance(), NewDefensiveModeState.Side, NewDefensiveModeState.Form);
+			NewDefensiveModeState.AnticipationPose = NewDefensiveMontage.Pose;
+			// NewDefensiveModeState.Montage = NewDefensiveMontage.Pose;
 			SetDefensiveModeState(NewDefensiveModeState);
 			SetDesiredDefensiveMode(ALSXTDefensiveModeTags::Blocking);
 		}
@@ -2616,6 +2617,32 @@ void AALSXTCharacter::OnActorAttackCollision_Implementation(FAttackDoubleHitResu
 	// FALSXTDamageResult DamageResult = GetActualDamage(Hit);
 	ImpactReaction->AttackReaction(Hit);
 	CharacterSound->PlayDamageSound(true, true, true, GetDesiredSex(), CharacterCustomization->VoiceParameters.Variant, GetOverlayMode(), ALSXTAttackMethodTags::Regular, Hit.Strength, Hit.DoubleHitResult.ImpactForm, Hit.BaseDamage);
+}
+
+
+void AALSXTCharacter::BeginAnticipationTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(AnticipationTimerHandle, AnticipationTimerDelegate, 0.1f, true);
+}
+
+void AALSXTCharacter::AnticipationTimer()
+{
+	// ImpactReaction->AnticipationTrace();
+	//
+	// FALSXTDefensiveModeState NewDefensiveModeState = GetDefensiveModeState();
+	// FAnticipationPose NewDefensiveMontage;
+	// NewDefensiveModeState.Mode = PreviousDefensiveModeState.Mode == FGameplayTag::EmptyTag ? ALSXTDefensiveModeTags::Blocking : PreviousDefensiveModeState.Mode;
+	// NewDefensiveModeState.Side = PreviousDefensiveModeState.Side == FGameplayTag::EmptyTag ? ALSXTImpactSideTags::Front : PreviousDefensiveModeState.Side;
+	// NewDefensiveModeState.Form = PreviousDefensiveModeState.Form == FGameplayTag::EmptyTag ? ALSXTImpactFormTags::Blunt : PreviousDefensiveModeState.Form;
+	// NewDefensiveModeState.Velocity = PreviousDefensiveModeState.Velocity == FGameplayTag::EmptyTag ? ALSXTImpactVelocityTags::Slow : PreviousDefensiveModeState.Velocity;
+	// NewDefensiveMontage = SelectAttackAnticipationMontage(NewDefensiveModeState.Velocity, GetDesiredStance(), NewDefensiveModeState.Side, NewDefensiveModeState.Form);
+	// NewDefensiveModeState.AnticipationPose = NewDefensiveMontage.Pose;
+	// SetDefensiveModeState(NewDefensiveModeState);
+}
+
+void AALSXTCharacter::EndAnticipationTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(AnticipationTimerHandle);
 }
 
 void AALSXTCharacter::BeginFreelookTimer()

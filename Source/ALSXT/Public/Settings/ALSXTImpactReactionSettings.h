@@ -205,6 +205,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
 	TArray<FResponseAnimation> AttackResponseAnimations;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{DamageType} {Style} {Montage}", AllowPrivateAccess))
+	TArray<FFallenPleadingAnimation> FallenPleadingAnimations;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Death", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
 	TArray <FDeathAnimation> DeathAnimations;
 

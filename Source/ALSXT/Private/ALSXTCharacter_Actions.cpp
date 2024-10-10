@@ -106,7 +106,7 @@ void AALSXTCharacter::StartSlidingImplementation(UAnimMontage* Montage, const fl
 
 		SetLocomotionAction(AlsLocomotionActionTags::Sliding);
 		OnSlidingStarted();
-		GetMesh()->AddImpulse(GetActorForwardVector() * 2);
+		GetMesh()->AddImpulse(GetActorForwardVector() * 4);
 		// Crouch(); //Hack
 	}
 }
@@ -126,6 +126,11 @@ void AALSXTCharacter::RefreshSliding(const float DeltaTime)
 void AALSXTCharacter::RefreshSlidingPhysics(const float DeltaTime)
 {
 	if (GetLocomotionAction() != AlsLocomotionActionTags::Sliding)
+	{
+		return;
+	}
+
+	if (GetVelocity().Length() <= GetCharacterMovementComponent()->MaxWalkSpeed)
 	{
 		return;
 	}

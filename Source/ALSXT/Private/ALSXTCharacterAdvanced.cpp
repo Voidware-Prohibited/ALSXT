@@ -447,8 +447,6 @@ void AALSXTCharacterAdvanced::EndHoldBreathTimer()
 
 }
 
-//
-
 float AALSXTCharacterAdvanced::CalculateBreathRecoveryTime()
 {
 	if (GetBreathState().HoldingBreath == ALSXTHoldingBreathTags::Released)
@@ -471,9 +469,18 @@ float AALSXTCharacterAdvanced::CalculateBreathRecoveryTime()
 
 void AALSXTCharacterAdvanced::BeginBreathRecoveryTimer()
 {
-	// FALSXTBreathState NewBreathState = GetBreathState();
-	// NewBreathState.BreathRecoveryTime = CalculateBreathRecoveryTime();
-	// SetBreathState(NewBreathState);
+	if (GetBreathState().HoldingBreath == ALSXTHoldingBreathTags::Gasping)
+	{
+		IALSXTCharacterInterface::Execute_SubtractStamina(this, FMath::FRandRange(ALSXTSettings->BreathEffects.BaseGaspingBreathStaminaCost.X, ALSXTSettings->BreathEffects.BaseGaspingBreathStaminaCost.Y));
+	}
+	if (GetBreathState().HoldingBreath == ALSXTHoldingBreathTags::Exhausted)
+	{
+		IALSXTCharacterInterface::Execute_SubtractStamina(this, FMath::FRandRange(ALSXTSettings->BreathEffects.BaseExhaustedBreathStaminaCost.X, ALSXTSettings->BreathEffects.BaseExhaustedBreathStaminaCost.Y));
+	}
+
+	FALSXTBreathState NewBreathState = GetBreathState();
+	NewBreathState.BreathRecoveryTime = CalculateBreathRecoveryTime();
+	SetBreathState(NewBreathState);
 	GetWorld()->GetTimerManager().SetTimer(BreathRecoveryTimerHandle, BreathRecoveryTimerDelegate, 0.1f, true);
 }
 

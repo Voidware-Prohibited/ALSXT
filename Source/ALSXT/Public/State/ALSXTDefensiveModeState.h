@@ -22,6 +22,12 @@ struct ALSXT_API FALSXTDefensiveModeState
 	TObjectPtr<UAnimSequenceBase> Montage{ nullptr };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTagContainer ObstacleSide{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTagContainer AnticipationSide{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag Side{ FGameplayTag::EmptyTag };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

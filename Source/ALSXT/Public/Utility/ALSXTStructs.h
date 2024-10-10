@@ -704,8 +704,8 @@ struct ALSXT_API FAnticipationPose
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Velocity", AllowPrivateAccess))
-	FGameplayTagContainer Velocity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode", AllowPrivateAccess))
+	FGameplayTagContainer Overlay;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", AllowPrivateAccess))
 	FGameplayTagContainer Stance;
@@ -716,6 +716,9 @@ struct ALSXT_API FAnticipationPose
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Form;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Velocity", AllowPrivateAccess))
+	FGameplayTagContainer Velocity;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Game.Health", AllowPrivateAccess))
 	FGameplayTagContainer Health;
 
@@ -724,7 +727,7 @@ struct ALSXT_API FAnticipationPose
 
 	bool operator==(const FAnticipationPose& other) const
 	{
-		return (other.Velocity == Velocity) && (other.Stance == Stance) && (other.Side == Side) && (other.Form == Form) && (other.Health == Health) && (other.Pose == Pose);
+		return (other.Overlay == Overlay) && (other.Velocity == Velocity) && (other.Stance == Stance) && (other.Side == Side) && (other.Form == Form) && (other.Health == Health) && (other.Pose == Pose);
 	}
 };
 
@@ -780,6 +783,26 @@ struct ALSXT_API FStabilizationMontage
 	bool operator==(const FStabilizationMontage& other) const
 	{
 		return (other.Velocity == Velocity) && (other.Stance == Stance) && (other.Side == Side) && (other.Form == Form) && (other.Health == Health) && (other.Montage == Montage);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FFallenPleadingAnimation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer DamageType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Style;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	TObjectPtr<UAnimMontage> Montage{ nullptr };
+
+	bool operator==(const FFallenPleadingAnimation& other) const
+	{
+		return (other.DamageType == DamageType) && (other.Style == Style) && (other.Montage == Montage);
 	}
 };
 

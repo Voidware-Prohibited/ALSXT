@@ -848,8 +848,11 @@ protected:
 	FTimerHandle FreelookTimerHandle;	// Timer Handle for Freelook Trace
 	FTimerDelegate FreelookTimerDelegate; // Delegate to bind function with parameters
 
-	FTimerHandle ThreatPointTimerHandle;	// Timer Handle for Freelook Trace
-	FTimerDelegate ThreatPointTimerDelegate; // Delegate to bind function with parameters
+	FTimerHandle AnticipationTimerHandle;	// Timer Handle for Freelook Trace
+	FTimerDelegate AnticipationTimerDelegate; // Delegate to bind function with parameters
+
+	FTimerHandle SlidingTimerHandle;	// Timer Handle for Freelook Trace
+	FTimerDelegate SlidingTimerDelegate; // Delegate to bind function with parameters
 
 	FTimerHandle FallingTimerHandle;	// Timer Handle for Falling
 	FTimerDelegate FallingTimerDelegate; // Delegate to bind function with parameters
@@ -1694,6 +1697,17 @@ protected:
 
 	
 public:
+	// Freelook
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void BeginAnticipationTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void AnticipationTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
+	void EndAnticipationTimer();
+
+
 	// Freelook
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Category = "ALS|Als Character")
 	void BeginFreelookTimer();

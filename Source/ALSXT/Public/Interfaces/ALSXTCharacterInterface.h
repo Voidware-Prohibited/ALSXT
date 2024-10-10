@@ -217,6 +217,9 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   float GetStamina() const;
 
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALSXTCharacter Interface")
+  void SubtractStamina(const float& Stamina);
+
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   FGameplayTag GetStaminaTag();
 
