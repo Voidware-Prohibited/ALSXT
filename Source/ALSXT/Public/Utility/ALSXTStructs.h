@@ -543,6 +543,12 @@ struct ALSXT_API FBumpReactionAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTagContainer Side;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
+	FGameplayTagContainer Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
+	FGameplayTagContainer Height;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Form;
 
@@ -565,6 +571,12 @@ struct ALSXT_API FCrowdBumpReactionAnimation
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTagContainer Side;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
+	FGameplayTagContainer Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
+	FGameplayTagContainer Height;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Form;
@@ -589,6 +601,12 @@ struct ALSXT_API FBumpPose
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTagContainer Side;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
+	FGameplayTagContainer Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
+	FGameplayTagContainer Height;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Form;
 
@@ -612,6 +630,12 @@ struct ALSXT_API FImpactReactionAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", TitleProperty = "{Impact Side}", AllowPrivateAccess))
 	FGameplayTagContainer ImpactSide;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
+	FGameplayTagContainer Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
+	FGameplayTagContainer Height;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", TitleProperty = "{Impact Form}", AllowPrivateAccess))
 	FGameplayTagContainer ImpactForm;
 
@@ -634,6 +658,12 @@ struct ALSXT_API FAttackReactionAnimation
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTagContainer ImpactSide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
+	FGameplayTagContainer Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
+	FGameplayTagContainer Height;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer ImpactForm;
@@ -661,6 +691,12 @@ struct ALSXT_API FFallenAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer ImpactForm;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
+	FGameplayTagContainer Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
+	FGameplayTagContainer Height;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
 	TArray<FActionMontageInfo> FallingMontages;
 
@@ -687,6 +723,12 @@ struct ALSXT_API FDeathAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTagContainer ImpactSide;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
+	FGameplayTagContainer Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
+	FGameplayTagContainer Height;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer ImpactForm;
 
@@ -712,6 +754,12 @@ struct ALSXT_API FAnticipationPose
 		
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTagContainer Side;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
+	FGameplayTagContainer Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
+	FGameplayTagContainer Height;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Form;
@@ -770,6 +818,12 @@ struct ALSXT_API FStabilizationMontage
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTagContainer Side;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
+	FGameplayTagContainer Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
+	FGameplayTagContainer Height;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTagContainer Form;

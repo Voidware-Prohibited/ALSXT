@@ -28,11 +28,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "ALS|Als Character", Meta = (AllowPrivateAccess))
-	AALSXTCharacter* Character{ Cast<AALSXTCharacter>(GetOwner()) };
-
-	AAlsCharacter* AlsCharacter{ Cast<AAlsCharacter>(GetOwner()) };
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	TObjectPtr<UALSXTEmoteSettings> EmoteSettings;
 
@@ -41,23 +36,33 @@ public:
 
 	// Desired Emote
 
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag Emote{ FGameplayTag::EmptyTag };
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Emote", Meta = (AutoCreateRefTerm = "NewEmoteTag"))
-		void AddDesiredEmote(const FGameplayTag& Emote);
+	void AddDesiredEmote(const FGameplayTag& NewEmote);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastAddDesiredEmote(const FGameplayTag& Emote);
+	void MulticastAddDesiredEmote(const FGameplayTag& NewEmote);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	FGameplayTag GetEmote() const;
+
+	// UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewFreelookState"))
+	// FALSXTFreelookState ProcessNewFreelookState(const FALSXTFreelookState& NewFreelookState);
 
 private:
 	UFUNCTION(Server, Reliable)
-		void ServerAddDesiredEmote(const FGameplayTag& Emote);
+		void ServerAddDesiredEmote(const FGameplayTag& NewEmote);
 
 	// Emote
 
 private:
-	void AddEmote(const FGameplayTag& Emote);
+	void AddEmote(const FGameplayTag& NewEmote);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Emote")
-	void OnEmote(const FGameplayTag& Emote);
+	void OnEmote(const FGameplayTag& NewEmote);
 };

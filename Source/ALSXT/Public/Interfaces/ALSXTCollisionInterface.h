@@ -36,10 +36,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Physics")
 	void GetActorVelocity(FVector& Velocity);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Physics")
-	FGameplayTag GetCharacterPhysicalAnimationMode();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Physics")
+	FGameplayTag GetCharacterPhysicalAnimationMode() const;
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Collision Interface|Physics")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Physics")
 	void SetCharacterPhysicalAnimationMode(const FGameplayTag& PhysicalAnimationmode, FName BelowBoneName);
 
 	// Defensive Mode

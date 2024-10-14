@@ -24,7 +24,7 @@ public:
 
   // Get which current Modes, Positions and Stances for the Held Item
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
-  FALSXTHeldItemState GetHeldItemState() const;
+  FALSXTHeldItemState GetCharacterHeldItemState() const;
 
   // Get the current Transform, Socket Names and Positions for the Held Item
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")

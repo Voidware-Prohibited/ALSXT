@@ -16,6 +16,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Settings/ALSXTVaultingSettings.h"
 #include "Settings/ALSXTImpactReactionSettings.h"
+#include "Settings/ALSXTOverlaySettings.h"
 #include "State/AlsLocomotionState.h"
 #include "Utility/ALSXTGameplayTags.h"
 #include "Utility/ALSXTFirearmGameplayTags.h"
@@ -231,6 +232,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient)
 	int32 VaultingRootMotionSourceId;
 
+	FALSXTCameraShakeSetting SelectMovementCameraShakeAsset();
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void DisableInputMovement(const bool Disable);
@@ -250,6 +253,7 @@ public:
 	virtual FGameplayTag GetCharacterInjury_Implementation() const override;
 	virtual FGameplayTag GetCharacterCombatStance_Implementation() const override;
 	virtual FGameplayTag GetCharacterWeaponReadyPosition_Implementation() const override;
+	virtual FGameplayTag GetCharacterWeaponFirearmStance_Implementation() const override;
 	virtual FGameplayTag GetCharacterEmote_Implementation() const override;
 	virtual void SetCharacterRagdoll_Implementation(const bool NewRagdoll) override;
 	virtual void SetCharacterEmote_Implementation(const FGameplayTag& NewEmote) override;
@@ -287,13 +291,51 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Overlay", Meta = (ForceAsFunction))
 	void ClearOverlayObject();
 
+	FOnMontageBlendingOutStarted OnSlidingStartedBlendOutDelegate;
+	FOnMontageEnded OnSlidingStartedEndedDelegate;
+
+	void OnSlidingStartedBlendOut(UAnimMontage* Montage, bool bInterrupted);
+
 	FOnMontageBlendingOutStarted OnEnterStationaryModeBlendOutDelegate;
 	// FOnMontageBlendingOutStarted OnExitStationaryModeBlendOutDelegate;
 
 	void OnEnterStationaryModeBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	// void OnExitStationaryModeBlendOut(UAnimMontage* Montage, bool bInterrupted);
 
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess), Transient)
+	FALSXTHeldItemState HeldItemState;
+
+protected:
+
+	UFUNCTION(Client, Reliable, BlueprintCallable, Category = "Settings|Als Character|Footstep State")
+	void ClientSetHeldItemState(const FALSXTHeldItemState& NewHeldItemState);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Settings|Als Character|Footstep State")
+	void MulticastSetHeldItemState(const FALSXTHeldItemState& NewHeldItemState);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Settings|Als Character|Footstep State")
+	void ServerSetHeldItemState(const FALSXTHeldItemState& NewHeldItemState);
+
+	UFUNCTION()
+	void OnReplicate_HeldItemState(const FALSXTHeldItemState& PreviousHeldItemState);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewHeldItemState(const FALSXTHeldItemState& NewALSXTHeldItemState);
+
 public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTHeldItemState& GetHeldItemState() const;
+
+	UFUNCTION()
+	void OnHeldItemStateChanged(const FALSXTHeldItemState& PreviousHeldItemState);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHeldItemState"))
+	void SetHeldItemState(const FALSXTHeldItemState& NewHeldItemState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewHeldItemState"))
+	FALSXTHeldItemState ProcessNewHeldItemState(const FALSXTHeldItemState& NewHeldItemState);
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALS|Als Character", Meta = (ForceAsFunction))
 	void OnFirstPersonOverrideChanged(float FirstPersonOverride);
 
@@ -787,6 +829,38 @@ private:
 
 public:	
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTSlidingState& GetSlidingState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewSlidingState"))
+	void SetSlidingState(const FALSXTSlidingState& NewSlidingState);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewSlidingState"))
+	FALSXTSlidingState ProcessNewSlidingState(const FALSXTSlidingState& NewSlidingState);
+
+	UFUNCTION(Server, Reliable)
+	void ServerProcessNewSlidingState(const FALSXTSlidingState& NewSlidingState);
+
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetSlidingState(const FALSXTSlidingState& NewSlidingState);
+
+	UFUNCTION()
+	void OnReplicate_SlidingState(const FALSXTSlidingState& PreviousSlidingState);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Als Character|Sliding State")
+	void ClientSetSlidingState(const FALSXTSlidingState& NewSlidingState);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Settings|Als Character|Sliding State")
+	void MulticastSetSlidingState(const FALSXTSlidingState& NewSlidingState);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnSlidingStateChanged(const FALSXTSlidingState& PreviousSlidingState);
+
+	/////
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FALSXTDefensiveModeState& GetDefensiveModeState() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
@@ -1255,6 +1329,8 @@ private:
 	void RefreshSliding(float DeltaTime);
 
 	void RefreshSlidingPhysics(float DeltaTime);
+
+	void StopSliding();
 
 public:
 	// Footstep Values
@@ -1752,6 +1828,8 @@ private:
 	void SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName);
 
 protected:
+	void PhysicalAnimationBlendOut();
+
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnPhysicalAnimationModeChanged(const FGameplayTag& PreviousPhysicalAnimationModeTag);
 
@@ -1919,8 +1997,12 @@ protected:
 	virtual void AddCollisionImpulse_Implementation(FVector NewImpulse) override;
 	virtual void OnStaticMeshAttackCollision_Implementation(FAttackDoubleHitResult Hit) override;
 	virtual void OnActorAttackCollision_Implementation(FAttackDoubleHitResult Hit) override;
+	virtual FALSXTSlidingState GetCharacterSlidingState_Implementation() const override;
 	virtual FALSXTDefensiveModeState GetCharacterDefensiveModeState_Implementation() const override;
 	virtual FALSXTBumpPoseState GetCrowdNavigationPoseState_Implementation() const override;
+
+	virtual FGameplayTag GetCharacterPhysicalAnimationMode_Implementation() const override;
+	virtual void SetCharacterPhysicalAnimationMode_Implementation(const FGameplayTag& PhysicalAnimationmode, FName BelowBoneName)override;
 
 	// State Interface Functions
 	virtual void SetCharacterStatus_Implementation(const FGameplayTag& NewStatus) override;
@@ -1972,6 +2054,7 @@ protected:
 	virtual FGameplayTag GetCharacterWeaponCarryPosition_Implementation() const override;
 	virtual FTransform GetCharacterCurrentForegripTransform_Implementation() const override;
 	virtual FALSXTAimState GetCharacterAimState_Implementation() const override;
+	virtual FALSXTHeldItemState GetCharacterHeldItemState_Implementation() const override;
 
 	// Idle Animation Component
 	virtual bool ShouldIdle_Implementation() const override;
@@ -2064,9 +2147,19 @@ inline const FALSXTAimState& AALSXTCharacter::GetAimState() const
 	return AimState;
 }
 
+inline const FALSXTSlidingState& AALSXTCharacter::GetSlidingState() const
+{
+	return SlidingState;
+}
+
 inline const FALSXTDefensiveModeState& AALSXTCharacter::GetDefensiveModeState() const
 {
 	return DefensiveModeState;
+}
+
+inline const FALSXTHeldItemState& AALSXTCharacter::GetHeldItemState() const
+{
+	return HeldItemState;
 }
 
 inline const FGameplayTag& AALSXTCharacter::GetDesiredFreelooking() const

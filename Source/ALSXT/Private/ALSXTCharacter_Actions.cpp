@@ -98,6 +98,10 @@ void AALSXTCharacter::MulticastStartSliding_Implementation(UAnimMontage* Montage
 void AALSXTCharacter::StartSlidingImplementation(UAnimMontage* Montage, const float PlayRate,
 	const float StartYawAngle, const float TargetYawAngle)
 {
+	FALSXTSlidingState NewSlidingState;
+	NewSlidingState.Montage = Montage;
+	SetSlidingState(NewSlidingState);
+	
 	if (IsSlidingAllowedToStart(Montage) && GetMesh()->GetAnimInstance()->Montage_Play(Montage, PlayRate))
 	{
 		SlidingState.TargetYawAngle = TargetYawAngle;
@@ -106,8 +110,15 @@ void AALSXTCharacter::StartSlidingImplementation(UAnimMontage* Montage, const fl
 
 		SetLocomotionAction(AlsLocomotionActionTags::Sliding);
 		OnSlidingStarted();
-		GetMesh()->AddImpulse(GetActorForwardVector() * 4);
+		LaunchCharacter(GetActorForwardVector() * 1000, false, false);
+		// GetMesh()->AddImpulse(GetActorForwardVector() * 100);
 		// Crouch(); //Hack
+
+		if (GetMesh()->GetAnimInstance())
+		{
+			OnSlidingStartedBlendOutDelegate.BindUObject(this, &AALSXTCharacter::OnSlidingStartedBlendOut);
+			GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnSlidingStartedBlendOutDelegate);
+		}
 	}
 }
 
@@ -132,6 +143,7 @@ void AALSXTCharacter::RefreshSlidingPhysics(const float DeltaTime)
 
 	if (GetVelocity().Length() <= GetCharacterMovementComponent()->MaxWalkSpeed)
 	{
+		StopSliding();
 		return;
 	}
 
@@ -151,6 +163,11 @@ void AALSXTCharacter::RefreshSlidingPhysics(const float DeltaTime)
 
 		GetCharacterMovement()->MoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false);
 	}
+}
+
+void AALSXTCharacter::StopSliding()
+{
+	GetMesh()->GetAnimInstance()->Montage_JumpToSection("Exit", GetSlidingState().Montage);
 }
 
 bool AALSXTCharacter::TryStartVaultingGrounded()

@@ -161,19 +161,38 @@ FGameplayTag UALSXTImpactReactionComponent::LocationToImpactSide(FVector Locatio
 	float LocationDotProduct = FVector::DotProduct(GetOwner()->GetActorForwardVector(), (GetOwner()->GetActorLocation() - Location));
 	if (LocationDotProduct > 0)
 	{
-		return ALSXTImpactSideTags::Left;
+		return ALSXTImpactSideTags::Right;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Right");
 	}
 	else
 	{
-		return ALSXTImpactSideTags::Right;
+		return ALSXTImpactSideTags::Left;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Left");
 	}
 }
 
 FGameplayTag UALSXTImpactReactionComponent::LocationToImpactHeight(FVector Location)
 {
-	return ALSXTImpactSideTags::Middle;
+	
+	float Range = IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->Bounds.GetBox().Max.Z - IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->Bounds.GetBox().Min.Z;
+	float RangeDivisor = Range / 3;
+
+	if (Location.Z >= RangeDivisor)
+	{
+		return ALSXTImpactHeightTags::Low;
+	}
+	if (Location.Z >= RangeDivisor * 2)
+	{
+		return ALSXTImpactHeightTags::Middle;
+	}
+	if (Location.Z >= RangeDivisor * 2)
+	{
+		return ALSXTImpactHeightTags::High;
+	}
+	else
+	{
+		return ALSXTImpactHeightTags::Middle;
+	}
 }
 
 FGameplayTag UALSXTImpactReactionComponent::LocationToImpactPosition(FVector Location)
@@ -181,11 +200,11 @@ FGameplayTag UALSXTImpactReactionComponent::LocationToImpactPosition(FVector Loc
 	float LocationDotProduct = FVector::DotProduct((Location - GetOwner()->GetActorLocation()).GetSafeNormal(), GetOwner()->GetActorForwardVector());
 	if (LocationDotProduct > 0)
 	{
-		return ALSXTImpactSideTags::Front;
+		return ALSXTImpactPositionTags::Front;
 	}
 	else
 	{
-		return ALSXTImpactSideTags::Back;
+		return ALSXTImpactPositionTags::Back;
 	}
 }
 
@@ -387,7 +406,9 @@ void UALSXTImpactReactionComponent::OnCapsuleHit(UPrimitiveComponent* HitComp, A
 					}
 					// BumpReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), LocationToImpactSide(Hit.Location), HitForm);
 					// BumpReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), LocationToImpactSide(Hit.Location), ConvertPhysicalSurfaceToFormTag(Hit.PhysMaterial->SurfaceType));
-					IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
+					// IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
+					// FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
+					// LocationToImpactHeight(Hit.Location);
 					NewImpactReactionState.ImpactReactionParameters.CrowdNavigationHit = NewDoubleHitResult;
 					SetImpactReactionState(NewImpactReactionState);
 					CrowdNavigationReaction(IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()), LocationToImpactSide(Hit.Location), HitForm);
@@ -683,6 +704,10 @@ void UALSXTImpactReactionComponent::StartDefensiveTimer()
 
 void UALSXTImpactReactionComponent::DefensiveTimer()
 {
+	FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
+	NewDefensiveModeState.AnticipationPose = SelectDefensiveMontage(ALSXTActionStrengthTags::Light, IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner()), NewDefensiveModeState.Side, NewDefensiveModeState.Form, ALSXTHealthTags::All).Pose;
+	IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), NewDefensiveModeState);
+	
 	if (IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner()) != ALSXTDefensiveModeTags::Blocking )
 	{
 		StopDefensiveTimer();
@@ -1635,6 +1660,12 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 			TraceDistance = ImpactReactionSettings.MaxBumpDetectionDistance;
 			const FVector EndLocation{ StartLocation + (GetOwner()->GetVelocity() * TraceDistance) };
 
+			if (GEngine && ImpactReactionSettings.DebugMode)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(HitResults.Num()));
+			}
+			
+
 			// Trace
 			if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight / 2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, BumpDebugMode,HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
 			{
@@ -1653,11 +1684,15 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 
 						// Defensive Mode State
 						FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
-						NewDefensiveModeState.Form = FormTag;
-						NewDefensiveModeState.Mode = ALSXTDefensiveModeTags::BraceForImpact;
-						NewDefensiveModeState.ObstaclePose = SelectedAnimation;
-						NewDefensiveModeState.Montage = SelectedAnimation;
-						NewDefensiveModeState.AnticipationSide.AddTagFast(SideTag);
+						// NewDefensiveModeState.Form = FormTag;
+						// NewDefensiveModeState.Mode = ALSXTDefensiveModeTags::BraceForImpact;
+						NewDefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::BraceForImpact;
+						// NewDefensiveModeState.ObstaclePose = SelectedAnimation;
+						NewDefensiveModeState.AnticipationPose = SelectedAnimation;
+						// NewDefensiveModeState.AnticipationSide = SideTag;
+						// NewDefensiveModeState.AnticipationHeight = LocationToImpactHeight(HitResult.ImpactPoint);
+						// NewDefensiveModeState.AnticipationPosition = LocationToImpactPosition(HitResult.ImpactPoint);
+						NewDefensiveModeState.AnticipationTransform = HitTransform;
 						NewDefensiveModeState.Transform = HitTransform;
 						NewDefensiveModeState.Velocity = VelocityTag;
 
@@ -1709,12 +1744,6 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 // Grounded Bump and Crowd Navigation
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
-
-	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == AlsLocomotionActionTags::Stabilization)
-	{
-		return;
-	}
-	
 	if (IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner()) != AlsStanceTags::Standing)
 	{
 		IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
@@ -1722,25 +1751,32 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 		return;
 	}
 
+	if (IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner()) != FGameplayTag::EmptyTag || IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == AlsLocomotionActionTags::Stabilization)
+	{
+		return;
+	}
+	
+	
+
 	const auto* Capsule{ IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(GetOwner()) };
 	const auto CapsuleScale{ Capsule->GetComponentScale().Z };
 	auto CapsuleRadius{ ImpactReactionSettings.BumpDetectionRadius };
 	const auto CapsuleHalfHeight{ Capsule->GetScaledCapsuleHalfHeight() };
 	const FVector UpVector{ GetOwner()->GetActorUpVector() };
-	float TraceDistance{ 0.0f };
+	float TraceDistance{ 5.0f };
 	float CharacterVelocity = GetOwner()->GetVelocity().Length();
 
 	if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Walking)
 	{
-		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, 175.0f), FVector2D(0.0f, 40.0f), CharacterVelocity);
+		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(5.0f, 175.0f), FVector2D(5.0f, 40.0f), CharacterVelocity);
 	}
 	if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Running)
 	{
-		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, 375.0f), FVector2D(0.0f, 80.0f), CharacterVelocity);
+		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(5.0f, 375.0f), FVector2D(5.0f, 80.0f), CharacterVelocity);
 	}
 	if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 	{
-		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(0.0f, 650.0f), FVector2D(0.0f, 120.0f), CharacterVelocity);
+		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(5.0f, 650.0f), FVector2D(5.0f, 120.0f), CharacterVelocity);
 	}
 
 	const FVector StartLocation{ GetOwner()->GetActorLocation() + (UpVector * CapsuleHalfHeight / 2) };
@@ -1802,9 +1838,16 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 						FGameplayTag Health = HealthToHealthTag(IALSXTCharacterInterface::Execute_GetHealth(GetOwner()));
 						FGameplayTag Stance = IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner());
 						FGameplayTag Side = LocationToImpactSide(AnticipationPoint);
-						DefensiveModeState.ObstacleSide.AddTagFast(Side);
+						FGameplayTag Height = LocationToImpactHeight(AnticipationPoint);
 						float LocationDotProduct = FVector::DotProduct(GetOwner()->GetActorForwardVector(), (HitResult.GetActor()->GetActorForwardVector()));
-						FGameplayTag SideFB = LocationDotProduct >= 0 ? ALSXTImpactSideTags::Front : ALSXTImpactSideTags::Back;
+						FGameplayTag SideFB = LocationDotProduct >= 0 ? ALSXTImpactPositionTags::Front : ALSXTImpactPositionTags::Back;
+						SideFB = LocationToImpactPosition(AnticipationPoint);
+						DefensiveModeState.ObstacleSide = LocationToImpactSide(AnticipationPoint);
+						DefensiveModeState.ObstacleHeight = LocationToImpactHeight(AnticipationPoint);
+						DefensiveModeState.ObstaclePosition = LocationToImpactPosition(AnticipationPoint);
+						
+						// DefensiveModeState.ObstacleSide.AddTagFast(Height);
+						// DefensiveModeState.ObstacleSide.AddTagFast(SideFB);
 						float CapsuleHeight = IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(GetOwner())->GetScaledCapsuleHalfHeight();
 						float BottomZ = GetOwner()->GetActorLocation().Z - CapsuleHeight;
 						float TopZ = GetOwner()->GetActorLocation().Z + CapsuleHeight;
@@ -1869,7 +1912,8 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 																DefensiveMode == ALSXTDefensiveModeTags::Blocking;
 															}
 															DefensiveModeState.Mode = DefensiveMode;
-															DefensiveModeState.Montage = Montage.Pose;
+															DefensiveModeState.AnticipationMode = DefensiveMode;
+															// DefensiveModeState.Montage = Montage.Pose;
 															DefensiveModeState.AnticipationPose = Montage.Pose;
 															IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 															IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -1894,7 +1938,8 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 																DefensiveMode == ALSXTDefensiveModeTags::Blocking;
 															}
 															DefensiveModeState.Mode = DefensiveMode;
-															DefensiveModeState.Montage = Montage.Pose;
+															DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::BraceForImpact;
+															// DefensiveModeState.Montage = Montage.Pose;
 															DefensiveModeState.AnticipationPose = Montage.Pose;
 															IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 															IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -1921,7 +1966,8 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 															DefensiveMode == ALSXTDefensiveModeTags::Blocking;
 														}
 														DefensiveModeState.Mode = DefensiveMode;
-														DefensiveModeState.Montage = Montage.Pose;
+														DefensiveModeState.AnticipationMode = DefensiveMode;
+														// DefensiveModeState.Montage = Montage.Pose;
 														DefensiveModeState.AnticipationPose = Montage.Pose;
 														IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 														IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -1934,19 +1980,20 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 													{
 														Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 														DefensiveModeState.AnticipationPose = Montage.Pose;
-														DefensiveModeState.Montage = Montage.Pose;
+														// DefensiveModeState.Montage = Montage.Pose;
 														DefensiveMode == ALSXTDefensiveModeTags::BraceForImpact;
 													}
 													else
 													{
 														// Crowd Nav
 														Montage.Pose = SelectCrowdNavigationPose(Side, Form);
-														DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
+														// DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
 														DefensiveModeState.ObstaclePose = Montage.Pose;
 														DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
 													}
 
 													DefensiveModeState.Mode = DefensiveMode;
+													DefensiveModeState.AnticipationMode = DefensiveMode;
 													IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 													IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
 													return;
@@ -1965,11 +2012,12 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 													// Crowd Nav
 													Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 													DefensiveModeState.ObstaclePose = Montage.Pose;
-													DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
+													// DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
 													DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
 												}
 
 												DefensiveModeState.Mode = DefensiveMode;
+												DefensiveModeState.AnticipationMode = DefensiveMode;
 												IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 												IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
 												return;
@@ -1990,16 +2038,18 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 													Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 													DefensiveMode == ALSXTDefensiveModeTags::Blocking;
 													DefensiveModeState.Mode = DefensiveMode;
+													DefensiveModeState.AnticipationMode = DefensiveMode;
 													DefensiveModeState.AnticipationPose = Montage.Pose;
-													DefensiveModeState.Montage = Montage.Pose;
+													// DefensiveModeState.Montage = Montage.Pose;
 												}
 												else
 												{
 													Montage = SelectDefensiveMontage(ALSXTActionStrengthTags::Medium, Stance, Side, Form, Health);
 													DefensiveMode == ALSXTDefensiveModeTags::Blocking;
 													DefensiveModeState.Mode = DefensiveMode;
+													DefensiveModeState.AnticipationMode = DefensiveMode;
 													DefensiveModeState.AnticipationPose = Montage.Pose;
-													DefensiveModeState.Montage = Montage.Pose;
+													// DefensiveModeState.Montage = Montage.Pose;
 												}
 												IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 												IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -2011,10 +2061,11 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 												{
 													// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Sprinting");
 													Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
-													DefensiveModeState.Montage = Montage.Pose;
+													// DefensiveModeState.Montage = Montage.Pose;
 													DefensiveModeState.AnticipationPose = Montage.Pose;
 													DefensiveMode == ALSXTDefensiveModeTags::BraceForImpact;
 													DefensiveModeState.Mode = DefensiveMode;
+													DefensiveModeState.AnticipationMode = DefensiveMode;
 													IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 													IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
 													return;
@@ -2040,7 +2091,8 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 													DefensiveMode = ALSXTDefensiveModeTags::Blocking;
 													DefensiveModeState.AnticipationPose = Montage.Pose;
 													DefensiveModeState.Mode = DefensiveMode;
-													DefensiveModeState.Montage = Montage.Pose;
+													DefensiveModeState.AnticipationMode = DefensiveMode;
+													// DefensiveModeState.Montage = Montage.Pose;
 												}
 												else
 												{
@@ -2048,7 +2100,8 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 													DefensiveMode = ALSXTDefensiveModeTags::Blocking;
 													DefensiveModeState.AnticipationPose = Montage.Pose;
 													DefensiveModeState.Mode = DefensiveMode;
-													DefensiveModeState.Montage = Montage.Pose;
+													DefensiveModeState.AnticipationMode = DefensiveMode;
+													// DefensiveModeState.Montage = Montage.Pose;
 												}
 												IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 												IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -2062,9 +2115,10 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 													ClientName.Append(": BraceForImpact");
 													GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, ClientName);
 													Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
-													DefensiveModeState.Montage = Montage.Pose;
+													// DefensiveModeState.Montage = Montage.Pose;
 													DefensiveModeState.ObstaclePose = Montage.Pose;
 													DefensiveModeState.Mode = ALSXTDefensiveModeTags::BraceForImpact;
+													DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::BraceForImpact;
 													DefensiveMode = ALSXTDefensiveModeTags::BraceForImpact;
 												}
 												else
@@ -2074,13 +2128,15 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 													GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, ClientName);
 													// Crowd Nav
 													Montage.Pose = SelectCrowdNavigationPose(Side, Form);
-													DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
+													// DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
 													DefensiveModeState.ObstaclePose = Montage.Pose;
 													DefensiveModeState.Mode = ALSXTDefensiveModeTags::CrowdNavigation;
+													DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::BraceForImpact;
 													DefensiveMode = ALSXTDefensiveModeTags::CrowdNavigation;
 												}
 
 												DefensiveModeState.Mode = DefensiveMode;
+												DefensiveModeState.AnticipationMode = DefensiveMode;
 												IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 												IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
 												return;
@@ -2117,7 +2173,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 												// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Sprinting");
 												Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 												// DefensiveModeState.Montage = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
-												DefensiveModeState.Montage = Montage.Pose;
+												// DefensiveModeState.Montage = Montage.Pose;
 												DefensiveModeState.AnticipationPose = Montage.Pose;
 											}
 											else
@@ -2125,7 +2181,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 												// Crowd Nav
 												Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 												DefensiveModeState.ObstaclePose = Montage.Pose;
-												DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
+												// DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
 											}
 											IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 											IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -2168,7 +2224,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 												// Montage.Pose = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
 												Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 												// DefensiveModeState.Montage = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
-												DefensiveModeState.Montage = Montage.Pose;
+												// DefensiveModeState.Montage = Montage.Pose;
 												DefensiveModeState.AnticipationPose = Montage.Pose;
 											}
 											else
@@ -2186,7 +2242,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 												{
 													Montage = SelectDefensiveMontage(ALSXTActionStrengthTags::Medium, Stance, Side, Form, Health);
 													DefensiveModeState.AnticipationPose = Montage.Pose;
-													DefensiveModeState.Montage = Montage.Pose;
+													// DefensiveModeState.Montage = Montage.Pose;
 												}												
 											}
 											IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
@@ -2203,9 +2259,10 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 											if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 											{
 												Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
-												DefensiveModeState.Montage = Montage.Pose;
+												// DefensiveModeState.Montage = Montage.Pose;
 												DefensiveModeState.AnticipationPose = Montage.Pose;
 												DefensiveModeState.Mode = ALSXTDefensiveModeTags::BraceForImpact;
+												DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::BraceForImpact;
 												DefensiveMode = ALSXTDefensiveModeTags::BraceForImpact;
 											}
 											else
@@ -2215,9 +2272,10 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 												GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, ClientName);
 												// Crowd Nav
 												Montage.Pose = SelectCrowdNavigationPose(Side, Form);
-												DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
+												// DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
 												DefensiveModeState.ObstaclePose = Montage.Pose;
 												DefensiveModeState.Mode = ALSXTDefensiveModeTags::CrowdNavigation;
+												DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::CrowdNavigation;
 												DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
 											}
 											IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
@@ -2236,7 +2294,8 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 									if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 									{
 										Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
-										DefensiveModeState.Montage = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
+										DefensiveModeState.AnticipationPose = Montage.Pose;
+										// DefensiveModeState.Montage = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
 										IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 										IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
 									}
@@ -2253,14 +2312,15 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										// Bump
 										// Montage.Pose = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
 										Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
-										DefensiveModeState.Montage = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
+										DefensiveModeState.AnticipationPose = Montage.Pose;
+										// DefensiveModeState.Montage = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
 									}
 									else
 									{
 										// Crowd Nav
 										Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 										DefensiveModeState.ObstaclePose = Montage.Pose;
-										DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
+										// DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
 									}
 									IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 									IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -2298,19 +2358,21 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 										// DefensiveModeState.Velocity
 										DefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(AnticipationPoint), AnticipationPoint, { 1.0f, 1.0f, 1.0f } };
-										DefensiveModeState.Montage = Montage.Pose;
+										// DefensiveModeState.Montage = Montage.Pose;
 										DefensiveModeState.AnticipationPose = Montage.Pose;
 										DefensiveMode = ALSXTDefensiveModeTags::BraceForImpact;
 										DefensiveModeState.Mode = DefensiveMode;
-										DefensiveModeState.Montage = Montage.Pose;
+										DefensiveModeState.AnticipationMode = DefensiveMode;
+										// DefensiveModeState.Montage = Montage.Pose;
 									}
 									else
 									{
 										// Crowd Nav
 										Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 										DefensiveModeState.ObstaclePose = Montage.Pose;
-										DefensiveModeState.Montage = Montage.Pose;
+										// DefensiveModeState.Montage = Montage.Pose;
 										DefensiveModeState.Mode = ALSXTDefensiveModeTags::CrowdNavigation;
+										DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::CrowdNavigation;
 										DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
 									}
 									IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
@@ -2368,7 +2430,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 										// DefensiveModeState.Montage = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
 										DefensiveModeState.AnticipationPose = Montage.Pose;
-										DefensiveModeState.Montage = Montage.Pose;
+										// DefensiveModeState.Montage = Montage.Pose;
 										DefensiveMode = ALSXTDefensiveModeTags::BraceForImpact;
 									}
 									else
@@ -2376,9 +2438,10 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										// Crowd Nav
 										Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 										DefensiveModeState.ObstaclePose = Montage.Pose;
-										DefensiveModeState.Montage = Montage.Pose;
+										// DefensiveModeState.Montage = Montage.Pose;
 										DefensiveModeState.Mode = ALSXTDefensiveModeTags::CrowdNavigation;
 										DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
+										DefensiveModeState.AnticipationMode = DefensiveMode;
 									}
 									IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 									IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -2996,6 +3059,7 @@ void UALSXTImpactReactionComponent::StartAttackReactionImplementation(FAttackDou
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, Hit.DoubleHitResult.HitResult.HitResult.BoneName);
 		IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
 		// IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
+		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
 		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseToAllBodiesBelow(Hit.DoubleHitResult.HitResult.Impulse * 1000, Hit.DoubleHitResult.HitResult.HitResult.BoneName, false, true);
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "pelvis");
 
@@ -3541,6 +3605,7 @@ void UALSXTImpactReactionComponent::BumpReactionImplementation(const FGameplayTa
 		}
 
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.BoneName);
+		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
 		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseToAllBodiesBelow(CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.BumpHit.HitResult.HitResult.BoneName, false, true);
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "pelvis");
 	}
@@ -3958,7 +4023,7 @@ void UALSXTImpactReactionComponent::StartSyncedAttackFallIdle(int32 Index)
 
 void UALSXTImpactReactionComponent::StartBraceForImpact()
 {
-	const FGameplayTag Side{ALSXTImpactSideTags::Front};
+	const FGameplayTag Side{ALSXTImpactPositionTags::Front};
 	UAnimSequenceBase* Montage = SelectBraceForImpactPose(Side, ALSXTImpactFormTags::Blunt);
 	FALSXTDefensiveModeState DefensiveModeState;
 
@@ -3969,6 +4034,7 @@ void UALSXTImpactReactionComponent::StartBraceForImpact()
 	}
 	
 	DefensiveModeState.Mode = ALSXTDefensiveModeTags::BraceForImpact;
+	DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::BraceForImpact;
 	DefensiveModeState.Montage = Montage;
 	IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 	IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), ALSXTDefensiveModeTags::BraceForImpact);
@@ -6444,8 +6510,12 @@ void UALSXTImpactReactionComponent::CrowdNavigationReactionImplementation(const 
 		NewCrowdNavigationPoseState.Side = Side;
 		NewCrowdNavigationPoseState.Location = GetImpactReactionState().ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.Location;
 		FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
-		NewDefensiveModeState.AnticipationPose = SelectedAnimation;
-		NewDefensiveModeState.ObstacleSide.AddTagFast(Side);
+		// NewDefensiveModeState.AnticipationPose = SelectedAnimation;
+		NewDefensiveModeState.ObstacleMode = ALSXTBumpPoseModeTags::CrowdNavigation;
+		NewDefensiveModeState.ObstaclePose = SelectedAnimation;
+		NewDefensiveModeState.ObstacleSide = Side;
+
+		
 		SetBumpPoseState(NewCrowdNavigationPoseState);
 		SetCrowdNavigationPoseState(NewCrowdNavigationPoseState);
 
@@ -6468,6 +6538,7 @@ void UALSXTImpactReactionComponent::CrowdNavigationReactionImplementation(const 
 		IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
 		// IALSXTCollisionInterface::Execute_AddCollisionImpulse(GetOwner(), ((GetOwner()->GetVelocity() * -1) + CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.GetActor()->GetVelocity()));
 		// IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
+		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
 		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseToAllBodiesBelow(CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.CrowdNavigationHit.HitResult.HitResult.BoneName, false, true);
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "pelvis");
 
@@ -6498,6 +6569,7 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 		//Anticipation
 		FALSXTDefensiveModeState DefensiveModeState;
 		DefensiveModeState.Mode = IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner());
+		DefensiveModeState.AnticipationMode = IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner());
 		DefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(Hit.HitResult.HitResult.ImpactPoint), Hit.HitResult.HitResult.ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 		// Character->SetFacialExpression();
@@ -6552,6 +6624,7 @@ void UALSXTImpactReactionComponent::StartImpactReactionImplementation(FDoubleHit
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, Hit.HitResult.HitResult.BoneName);
 		IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
 		// IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
+		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
 		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseToAllBodiesBelow(Hit.HitResult.Impulse * 1000, Hit.HitResult.HitResult.BoneName, false, true);
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "pelvis");
 		// Character->ALSXTRefreshRotationInstant(StartYawAngle, ETeleportType::None);
@@ -6595,7 +6668,7 @@ void UALSXTImpactReactionComponent::StartStabilizeImplementation(UAnimMontage* M
 		// Character->SetFacialExpression();
 
 		FALSXTDefensiveModeState CurrentDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
-		CurrentDefensiveModeState.Mode = ALSXTDefensiveModeTags::ClutchImpactPoint;
+		CurrentDefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::ClutchImpactPoint;
 		CurrentDefensiveModeState.Montage = Montage;
 		CurrentDefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(ImpactPoint), ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), CurrentDefensiveModeState);
@@ -6623,7 +6696,9 @@ void UALSXTImpactReactionComponent::StartClutchImpactPointImplementation(UAnimSe
 
 		FALSXTDefensiveModeState CurrentDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
 		CurrentDefensiveModeState.Mode = ALSXTDefensiveModeTags::ClutchImpactPoint;
-		CurrentDefensiveModeState.Montage = Montage;
+		CurrentDefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::ClutchImpactPoint;
+		CurrentDefensiveModeState.AnticipationPose = Montage;
+		// CurrentDefensiveModeState.Montage = Montage;
 		CurrentDefensiveModeState.Transform = { UKismetMathLibrary::MakeRotFromX(ImpactPoint), ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), CurrentDefensiveModeState);
 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), ALSXTDefensiveModeTags::ClutchImpactPoint);
@@ -6676,6 +6751,7 @@ void UALSXTImpactReactionComponent::StartImpactFallImplementation(FDoubleHitResu
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, CurrentImpactReactionState.ImpactReactionParameters.ImpactHit.HitResult.HitResult.BoneName);
 		IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactFall);
 		// IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
+		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
 		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseToAllBodiesBelow(Hit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.ImpactHit.HitResult.HitResult.BoneName, false, true);
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "pelvis");
 
@@ -6720,6 +6796,7 @@ void UALSXTImpactReactionComponent::StartImpactFallIdleImplementation(FDoubleHit
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, CurrentImpactReactionState.ImpactReactionParameters.ImpactHit.HitResult.HitResult.BoneName);
 		IALSXTCharacterInterface::Execute_SetCharacterLocomotionAction(GetOwner(), AlsLocomotionActionTags::ImpactReaction);
 		// IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseAtLocation(Hit.HitResult.Impulse, Hit.HitResult.HitResult.ImpactPoint, Hit.HitResult.HitResult.BoneName);
+		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
 		IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->AddImpulseToAllBodiesBelow(Hit.HitResult.Impulse * 1000, CurrentImpactReactionState.ImpactReactionParameters.ImpactHit.HitResult.HitResult.BoneName, false, true);
 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "pelvis");
 

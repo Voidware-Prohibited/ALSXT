@@ -107,7 +107,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	if (GetOwningActor()->Implements<UALSXTHeldItemInterface>())
 	{
 		HeldItemSettings = IALSXTHeldItemInterface::Execute_GetHeldItemSettings(GetOwningActor());
-		HeldItemState = IALSXTHeldItemInterface::Execute_GetHeldItemState(GetOwningActor());
+		HeldItemState = IALSXTHeldItemInterface::Execute_GetCharacterHeldItemState(GetOwningActor());
 		DoesOverlayObjectUseLeftHandIK = IALSXTHeldItemInterface::Execute_GetHeldItemSettings(GetOwningActor()).UsesLeftHandIK;
 	}
 

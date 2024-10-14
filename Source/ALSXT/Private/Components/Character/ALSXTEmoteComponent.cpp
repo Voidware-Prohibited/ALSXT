@@ -1,6 +1,6 @@
 // MIT
 
-
+#include "Net/UnrealNetwork.h"
 #include "Components/Character/ALSXTEmoteComponent.h"
 
 // Sets default values for this component's properties
@@ -19,9 +19,6 @@ UALSXTEmoteComponent::UALSXTEmoteComponent()
 void UALSXTEmoteComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	Character = IALSXTCharacterInterface::Execute_GetCharacter(GetOwner());
-	AlsCharacter = Cast<AAlsCharacter>(GetOwner());
 	
 }
 
@@ -34,9 +31,25 @@ void UALSXTEmoteComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// ...
 }
 
+void UALSXTEmoteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams Parameters;
+	Parameters.bIsPushBased = true;
+
+	Parameters.Condition = COND_SkipOwner;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, Emote, Parameters)
+}
+
 // Emote
 
-void UALSXTEmoteComponent::AddDesiredEmote(const FGameplayTag& Emote)
+FGameplayTag UALSXTEmoteComponent::GetEmote() const
+{
+	return Emote;
+}
+
+void UALSXTEmoteComponent::AddDesiredEmote(const FGameplayTag& NewEmote)
 {
 	if (IALSXTCharacterInterface::Execute_CanEmote(GetOwner()))
 	{
@@ -99,7 +112,7 @@ void UALSXTEmoteComponent::AddDesiredEmote(const FGameplayTag& Emote)
 	}
 }
 
-void UALSXTEmoteComponent::ServerAddDesiredEmote_Implementation(const FGameplayTag& Emote)
+void UALSXTEmoteComponent::ServerAddDesiredEmote_Implementation(const FGameplayTag& NewEmote)
 {
 	if (EmoteSettings->bDebugMode)
 	{
@@ -108,7 +121,7 @@ void UALSXTEmoteComponent::ServerAddDesiredEmote_Implementation(const FGameplayT
 	AddDesiredEmote(Emote);
 }
 
-void UALSXTEmoteComponent::MulticastAddDesiredEmote_Implementation(const FGameplayTag& Emote)
+void UALSXTEmoteComponent::MulticastAddDesiredEmote_Implementation(const FGameplayTag& NewEmote)
 {
 	if (EmoteSettings->bDebugMode)
 	{
@@ -117,7 +130,7 @@ void UALSXTEmoteComponent::MulticastAddDesiredEmote_Implementation(const FGamepl
 	AddEmote(Emote);
 }
 
-void UALSXTEmoteComponent::AddEmote(const FGameplayTag& Emote)
+void UALSXTEmoteComponent::AddEmote(const FGameplayTag& NewEmote)
 {
 
 	if (IsValid(EmoteSettings) && IALSXTCharacterInterface::Execute_CanEmote(GetOwner()))
@@ -143,7 +156,7 @@ void UALSXTEmoteComponent::AddEmote(const FGameplayTag& Emote)
 	}
 }
 
-void UALSXTEmoteComponent::OnEmote_Implementation(const FGameplayTag& Emote) 
+void UALSXTEmoteComponent::OnEmote_Implementation(const FGameplayTag& NewEmote)
 {
 	if (EmoteSettings->bDebugMode)
 	{

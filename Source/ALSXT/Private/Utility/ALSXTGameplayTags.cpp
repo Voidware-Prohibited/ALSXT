@@ -294,13 +294,22 @@ namespace ALSXTImpactLocationTags
 
 namespace ALSXTImpactSideTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Front, TEXT("Als.Impact Side.Front"))
-	UE_DEFINE_GAMEPLAY_TAG(Back, TEXT("Als.Impact Side.Back"))
 	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Impact Side.Left"))
 	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Impact Side.Right"))
-	UE_DEFINE_GAMEPLAY_TAG(High, TEXT("Als.Impact Side.High"))
-	UE_DEFINE_GAMEPLAY_TAG(Middle, TEXT("Als.Impact Side.Middle"))
-	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Impact Side.Low"))
+	UE_DEFINE_GAMEPLAY_TAG(Center, TEXT("Als.Impact Side.Center"))
+}
+
+namespace ALSXTImpactHeightTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(High, TEXT("Als.Impact Height.High"))
+	UE_DEFINE_GAMEPLAY_TAG(Middle, TEXT("Als.Impact Height.Middle"))
+	UE_DEFINE_GAMEPLAY_TAG(Low, TEXT("Als.Impact Height.Low"))
+}
+
+namespace ALSXTImpactPositionTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Front, TEXT("Als.Impact Position.Front"))
+	UE_DEFINE_GAMEPLAY_TAG(Back, TEXT("Als.Impact Position.Back"))
 }
 
 namespace ALSXTImpactSizeTags

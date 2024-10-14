@@ -13,6 +13,7 @@
 #include "State/ALSXTDefensiveModeState.h"
 #include "State/ALSXTFootstepState.h"
 #include "State/ALSXTBreathState.h"
+#include "State/ALSXTSlidingState.h"
 #include "AlsCharacterMovementComponent.h"
 #include "ALSXTCharacterInterface.generated.h"
 
@@ -60,6 +61,9 @@ public:
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   void SetCharacterGesture(const FGameplayTag& NewGesture, const FGameplayTag& NewGestureHand);
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FALSXTSlidingState GetCharacterSlidingState() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FALSXTDefensiveModeState GetCharacterDefensiveModeState() const;

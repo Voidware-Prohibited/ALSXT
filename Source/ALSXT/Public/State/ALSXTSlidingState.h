@@ -7,7 +7,10 @@ struct ALSXT_API FALSXTSlidingState
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
-		float TargetYawAngle{ 0.0f };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* Montage{ nullptr };
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
+	float TargetYawAngle{ 0.0f };
 };
 

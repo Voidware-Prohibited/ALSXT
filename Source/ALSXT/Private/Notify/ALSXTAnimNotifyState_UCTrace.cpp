@@ -37,6 +37,8 @@ void UALSXTAnimNotifyState_UCTrace::NotifyBegin(USkeletalMeshComponent* Mesh, UA
 			if (Mesh->GetOwner()->Implements<UALSXTCharacterInterface>())
 			{
 				TraceSettings.Overlay = IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(Mesh->GetOwner());
+
+				IALSXTCharacterInterface::Execute_SetCharacterMovementModeLocked(Mesh->GetOwner(), true);
 			}
 			if (Mesh->GetOwner()->Implements<UALSXTCombatInterface>())
 			{
@@ -66,6 +68,10 @@ void UALSXTAnimNotifyState_UCTrace::NotifyEnd(USkeletalMeshComponent* Mesh, UAni
 			if (Mesh->GetOwner()->Implements<UALSXTCombatInterface>())
 			{
 				IALSXTCombatInterface::Execute_EndCombatAttackCollisionTrace(Mesh->GetOwner());
+			}
+			if (Mesh->GetOwner()->Implements<UALSXTCharacterInterface>())
+			{
+				IALSXTCharacterInterface::Execute_SetCharacterMovementModeLocked(Mesh->GetOwner(), false);
 			}
 		}
 	}
