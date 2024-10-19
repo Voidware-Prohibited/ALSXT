@@ -247,6 +247,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
 	FGameplayTagContainer VeryHighThreatOverlayModes;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Impact", Meta = (AllowPrivateAccess))
+	float ImpactSideDetectionRange {90.5f};
+
 public:
 	float CalculateStartTime(FVector2D ReferenceHeight, FVector2D StartTime, float ImpactHeight) const;
 

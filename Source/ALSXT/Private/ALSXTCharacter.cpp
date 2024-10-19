@@ -470,6 +470,7 @@ void AALSXTCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Parameters.bIsPushBased = true;
 	Parameters.Condition = COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FootprintsState, Parameters)
+	// DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PhysicalAnimationState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredLean, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DefensiveModeState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredFreelooking, Parameters)
@@ -1287,7 +1288,45 @@ void AALSXTCharacter::ResetPaintOnAllComponents_Implementation()
 	
 }
 
-// Breath State
+// PhysicalAnimation State
+void AALSXTCharacter::SetPhysicalAnimationState(const FALSXTPhysicalAnimationState& NewPhysicalAnimationState)
+{
+	const auto PreviousPhysicalAnimationState{ PhysicalAnimationState };
+	PhysicalAnimationState = NewPhysicalAnimationState;
+	OnPhysicalAnimationStateChanged(PreviousPhysicalAnimationState);
+
+	if ((GetLocalRole() == ROLE_AutonomousProxy) && IsLocallyControlled())
+	{
+		ServerSetPhysicalAnimationState(NewPhysicalAnimationState);
+	}
+}
+
+void AALSXTCharacter::OnPhysicalAnimationStateChanged(const FALSXTPhysicalAnimationState& PreviousPhysicalAnimationState)
+{
+
+}
+
+void AALSXTCharacter::ServerSetPhysicalAnimationState_Implementation(const FALSXTPhysicalAnimationState& NewPhysicalAnimationState)
+{
+	MulticastSetPhysicalAnimationState(NewPhysicalAnimationState);
+}
+
+void AALSXTCharacter::MulticastSetPhysicalAnimationState_Implementation(const FALSXTPhysicalAnimationState& NewPhysicalAnimationState)
+{
+	SetPhysicalAnimationState(NewPhysicalAnimationState);
+}
+
+void AALSXTCharacter::ServerProcessNewPhysicalAnimationState_Implementation(const FALSXTPhysicalAnimationState& NewPhysicalAnimationState)
+{
+	ProcessNewPhysicalAnimationState(NewPhysicalAnimationState);
+}
+
+// void AALSXTCharacter::OnReplicate_PhysicalAnimationState(const FALSXTPhysicalAnimationState& PreviousPhysicalAnimationState)
+// {
+// 	OnPhysicalAnimationStateChanged(PreviousPhysicalAnimationState);
+// }
+
+// Held Item State
 void AALSXTCharacter::SetHeldItemState(const FALSXTHeldItemState& NewHeldItemState)
 {
 	const auto PreviousHeldItemState{ HeldItemState };
@@ -1307,13 +1346,7 @@ void AALSXTCharacter::OnHeldItemStateChanged(const FALSXTHeldItemState& Previous
 
 void AALSXTCharacter::ServerSetHeldItemState_Implementation(const FALSXTHeldItemState& NewHeldItemState)
 {
-	// SetHeldItemState(NewHeldItemState);
 	MulticastSetHeldItemState(NewHeldItemState);
-}
-
-void AALSXTCharacter::ClientSetHeldItemState_Implementation(const FALSXTHeldItemState& NewHeldItemState)
-{
-	SetHeldItemState(NewHeldItemState);
 }
 
 void AALSXTCharacter::MulticastSetHeldItemState_Implementation(const FALSXTHeldItemState& NewHeldItemState)
@@ -1592,10 +1625,10 @@ void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
 			FALSXTDefensiveModeState NewDefensiveModeState = PreviousDefensiveModeState;
 			FAnticipationPose NewDefensiveMontage;
 			NewDefensiveModeState.AnticipationMode = PreviousDefensiveModeState.AnticipationMode == FGameplayTag::EmptyTag ? ALSXTDefensiveModeTags::Blocking : PreviousDefensiveModeState.AnticipationMode;
-			NewDefensiveModeState.AnticipationSide = PreviousDefensiveModeState.AnticipationSide == FGameplayTag::EmptyTag ? ALSXTImpactSideTags::Center : PreviousDefensiveModeState.AnticipationSide;
+			NewDefensiveModeState.AnticipationSide = PreviousDefensiveModeState.AnticipationSide == FGameplayTag::EmptyTag ? ALSXTImpactSideTags::Front : PreviousDefensiveModeState.AnticipationSide;
 			NewDefensiveModeState.AnticipationHeight = PreviousDefensiveModeState.AnticipationHeight == FGameplayTag::EmptyTag ? ALSXTImpactHeightTags::Middle : PreviousDefensiveModeState.AnticipationHeight;
 			NewDefensiveModeState.AnticipationPosition = PreviousDefensiveModeState.AnticipationPosition == FGameplayTag::EmptyTag ? ALSXTImpactPositionTags::Front : PreviousDefensiveModeState.AnticipationPosition;
-			NewDefensiveModeState.AnticipationPose = SelectAttackAnticipationMontage(NewDefensiveModeState.Velocity, AlsStanceTags::Crouching, ALSXTImpactSideTags::Center, ALSXTImpactFormTags::Blunt).Pose;
+			NewDefensiveModeState.AnticipationPose = SelectAttackAnticipationMontage(NewDefensiveModeState.Velocity, AlsStanceTags::Crouching, ALSXTImpactSideTags::Front, ALSXTImpactFormTags::Blunt).Pose;
 			// NewDefensiveModeState.AnticipationPose = SelectBlockingMontage(NewDefensiveModeState.Velocity, AlsStanceTags::Crouching, ALSXTImpactSideTags::Center, ALSXTImpactFormTags::Blunt).Pose;
 			SetDefensiveModeState(NewDefensiveModeState);
 			SetDesiredDefensiveMode(ALSXTDefensiveModeTags::Blocking);
@@ -2772,6 +2805,16 @@ void AALSXTCharacter::OnActorAttackCollision_Implementation(FAttackDoubleHitResu
 	CharacterSound->PlayDamageSound(true, true, true, GetDesiredSex(), CharacterCustomization->VoiceParameters.Variant, GetOverlayMode(), ALSXTAttackMethodTags::Regular, Hit.Strength, Hit.DoubleHitResult.ImpactForm, Hit.BaseDamage);
 }
 
+FALSXTPhysicalAnimationState AALSXTCharacter::GetCharacterPhysicalAnimationState_Implementation() const
+{
+	return GetPhysicalAnimationState();
+}
+
+void AALSXTCharacter::SetCharacterPhysicalAnimationState_Implementation(FALSXTPhysicalAnimationState NewPhysicalAnimationState)
+{
+	SetPhysicalAnimationState(NewPhysicalAnimationState);
+}
+
 FGameplayTag AALSXTCharacter::GetCharacterPhysicalAnimationMode_Implementation() const
 {
 	return GetPhysicalAnimationMode();
@@ -2779,7 +2822,7 @@ FGameplayTag AALSXTCharacter::GetCharacterPhysicalAnimationMode_Implementation()
 
 void AALSXTCharacter::SetCharacterPhysicalAnimationMode_Implementation(const FGameplayTag& PhysicalAnimationmode, FName BelowBoneName)
 {
-	// SetPhysicalAnimationMode(PhysicalAnimationmode, BelowBoneName);
+		SetPhysicalAnimationMode(PhysicalAnimationmode, BelowBoneName);
 }
 
 
@@ -2893,6 +2936,72 @@ void AALSXTCharacter::ServerSetDesiredPhysicalAnimationMode_Implementation(const
 
 void AALSXTCharacter::SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName)
 {
+	if (NewPhysicalAnimationModeTag == PhysicalAnimationMode)
+	{
+		return;
+	}
+
+	// TArray<FName> AffectedBones;
+	// if (Side == ALSXTImpactSideTags::Left)
+	// {
+	// 	if (Height == ALSXTImpactHeightTags::Low)
+	// 	{
+	// 		AffectedBones.Add("thigh_l");
+	// 	}
+	// 	if (Height == ALSXTImpactHeightTags::Middle)
+	// 	{
+	// 		AffectedBones.Add("lowerarm_l");
+	// 		AffectedBones.Add("spine_01");
+	// 	}
+	// 	if (Height == ALSXTImpactHeightTags::High)
+	// 	{
+	// 		AffectedBones.Add("clavicle_l");
+	// 		AffectedBones.Add("spine_03");
+	// 	}
+	// }
+	// if (Side == ALSXTImpactSideTags::Left)
+	// {
+	// 	if (Height == ALSXTImpactHeightTags::Low)
+	// 	{
+	// 		AffectedBones.Add("thigh_r");
+	// 	}
+	// 	if (Height == ALSXTImpactHeightTags::Middle)
+	// 	{
+	// 		AffectedBones.Add("lowerarm_r");
+	// 		AffectedBones.Add("spine_01");
+	// 	}
+	// 	if (Height == ALSXTImpactHeightTags::High)
+	// 	{
+	// 		AffectedBones.Add("clavicle_r");
+	// 		AffectedBones.Add("spine_03");
+	// 	}
+	// }
+	// if (Side == ALSXTImpactSideTags::Front || Side == ALSXTImpactSideTags::Back)
+	// {
+	// 	if (Height == ALSXTImpactHeightTags::Low)
+	// 	{
+	// 		AffectedBones.Add("thigh_l");
+	// 		AffectedBones.Add("thigh_r");
+	// 	}
+	// 	if (Height == ALSXTImpactHeightTags::Middle)
+	// 	{
+	// 		AffectedBones.Add("lowerarm_l");
+	// 		AffectedBones.Add("lowerarm_r");
+	// 		AffectedBones.Add("spine_01");
+	// 	}
+	// 	if (Height == ALSXTImpactHeightTags::High)
+	// 	{
+	// 		AffectedBones.Add("head");
+	// 		AffectedBones.Add("spine_03");
+	// 	}
+	// }
+	// 
+	// for (FName AffectBone : AffectedBones)
+	// {
+	// 	PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("pelvis", "Bump", true, false);
+	// 	GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneName, true, false);
+	// }
+	
 
 	if (PhysicalAnimationMode != NewPhysicalAnimationModeTag)
 	{
@@ -2902,40 +3011,70 @@ void AALSXTCharacter::SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAn
 		{
 			
 			GetMesh()->SetCollisionProfileName("CharacterMesh");
-			// GetMesh()->UpdateCollisionProfile();
 			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("pelvis", "Default", true, false);
-			GetCapsuleComponent()->SetCapsuleRadius(25);
-			GetMesh()->SetAllBodiesSimulatePhysics(false);
-			GetMesh()->ResetAllBodiesSimulatePhysics();
-			GetMesh()->SetAllBodiesPhysicsBlendWeight(0.0f, false);
-			GetMesh()->SetPhysicsBlendWeight(0);
+			// GetMesh()->SetSimulatePhysics(false);
 			// GetMesh()->SetAllBodiesSimulatePhysics(false);
+			GetCapsuleComponent()->SetCapsuleRadius(25);		
+			// GetMesh()->SetAllBodiesPhysicsBlendWeight(0.0f, false);
+			// GetMesh()->SetPhysicsBlendWeight(0);
+			FALSXTPhysicalAnimationState NewPhysicalAnimationState;
+			NewPhysicalAnimationState.Mode = ALSXTPhysicalAnimationModeTags::None;
+			NewPhysicalAnimationState.ProfileName = "CharacterMesh";
+			NewPhysicalAnimationState.AffectedBonesBelow.Empty();
+			NewPhysicalAnimationState.Below = "pelvis";
+			NewPhysicalAnimationState.Alpha = 0.0f;
+			SetPhysicalAnimationState(NewPhysicalAnimationState);
+
+			// GetMesh()->SetAllBodiesSimulatePhysics(false);
+		}
+		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::Navigation)
+		{
+			GetMesh()->SetCollisionProfileName("PhysicalAnimation");
+			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow(BoneName, "Bump", false, false);
+			GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneName, true, false);
+			// GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 0.5f, false, true);
+			GetCapsuleComponent()->SetCapsuleRadius(14);
+			FALSXTPhysicalAnimationState NewPhysicalAnimationState;
+			NewPhysicalAnimationState.Mode = ALSXTPhysicalAnimationModeTags::Navigation;
+			NewPhysicalAnimationState.ProfileName = "PhysicalAnimation";
+			// NewPhysicalAnimationState.AffectedBonesBelow = AffectedBones;
+			NewPhysicalAnimationState.Below = BoneName;
+			NewPhysicalAnimationState.Alpha = 0.5f;
+			SetPhysicalAnimationState(NewPhysicalAnimationState);
 		}
 		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::Bump)
 		{
 			GetMesh()->SetCollisionProfileName("PhysicalAnimation");
-			// GetMesh()->UpdateCollisionProfile();
-			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow(BoneName, "Bump", true, false);
-			GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 0.5f, false, true);
+			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow(BoneName, "Bump", false, false);
+			GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneName, true, false);
 			GetCapsuleComponent()->SetCapsuleRadius(14);
+			FALSXTPhysicalAnimationState NewPhysicalAnimationState;
+			NewPhysicalAnimationState.Mode = ALSXTPhysicalAnimationModeTags::Bump;
+			NewPhysicalAnimationState.ProfileName = "PhysicalAnimation";
+			// NewPhysicalAnimationState.AffectedBonesBelow = AffectedBones;
+			NewPhysicalAnimationState.Below = BoneName;
+			NewPhysicalAnimationState.Alpha = 0.5f;
+			SetPhysicalAnimationState(NewPhysicalAnimationState);
 		}
 		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::Hit)
 		{
 			GetMesh()->SetCollisionProfileName("PhysicalAnimation");
-			
-			GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow(BoneName, "Hit", true, false);
-			GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 0.5f, false, true);
+			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow(BoneName, "Hit", false, false);
+			//GetMesh()->SetSimulatePhysics(true);
+			GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneName, true, false);
 			GetCapsuleComponent()->SetCapsuleRadius(8);
-			GetMesh()->WakeAllRigidBodies();			
-			// GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneName, true, true);			
-			
+			// GetMesh()->WakeAllRigidBodies();
+			FALSXTPhysicalAnimationState NewPhysicalAnimationState;
+			NewPhysicalAnimationState.Mode = ALSXTPhysicalAnimationModeTags::Hit;
+			NewPhysicalAnimationState.ProfileName = "PhysicalAnimation";
+			// NewPhysicalAnimationState.AffectedBonesBelow = AffectedBones;
+			NewPhysicalAnimationState.Below = BoneName;
+			NewPhysicalAnimationState.Alpha = 0.5f;
+			SetPhysicalAnimationState(NewPhysicalAnimationState);
 		}
 
 		PhysicalAnimationMode = NewPhysicalAnimationModeTag;
-
 		OnPhysicalAnimationModeChanged(PreviousPhysicalAnimationMode);
-
 		// GetMesh()->Weight
 		// GetMesh()->SetAllBodiesBelowPhysicsBlendWeight(BoneName, 0.5f, false, true);
 	}
@@ -2943,9 +3082,10 @@ void AALSXTCharacter::SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAn
 
 void AALSXTCharacter::PhysicalAnimationBlendOut() 
 {
-	float Alpha = 0.0;
-	Alpha = Alpha + 0.1;
-	if (Alpha >= 10.0)
+	FALSXTPhysicalAnimationState NewPhysicalAnimationState = GetPhysicalAnimationState();
+	NewPhysicalAnimationState.Alpha = GetPhysicalAnimationState().Alpha - 0.1;
+	SetPhysicalAnimationState(NewPhysicalAnimationState);
+	if (GetPhysicalAnimationState().Alpha <= 0.0)
 	{
 		SetDesiredPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, "none");
 	}

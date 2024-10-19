@@ -2,6 +2,7 @@
 
 #include "GameplayTagContainer.h"
 #include "Camera/CameraShakeBase.h"
+#include "Animation/AnimInstance.h"
 #include "ALSXTOverlaySettings.generated.h"
 
 USTRUCT(BlueprintType)
@@ -13,7 +14,7 @@ struct ALSXT_API FALSXTCameraShakeSetting
 	TSubclassOf<UCameraShakeBase> CameraShake;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Magnitude{ 0.0 };
+	float BaseMagnitude{ 1.0f };
 };
 
 USTRUCT(BlueprintType)
@@ -52,7 +53,7 @@ struct ALSXT_API FALSXTOverlaySettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
-	TMap<FGameplayTagContainer, TSubclassOf<UAnimInstance>> OverlayAnimationInstanceClasses;
+	TMap<FGameplayTag, TSubclassOf<UAnimInstance>> OverlayAnimationInstanceClasses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTagContainer AimableOverlayModes;

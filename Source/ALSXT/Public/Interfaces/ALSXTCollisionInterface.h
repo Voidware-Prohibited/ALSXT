@@ -37,6 +37,12 @@ public:
 	void GetActorVelocity(FVector& Velocity);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Physics")
+	FALSXTPhysicalAnimationState GetCharacterPhysicalAnimationState() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Physics")
+	void SetCharacterPhysicalAnimationState(FALSXTPhysicalAnimationState NewPhysicalAnimationState);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Physics")
 	FGameplayTag GetCharacterPhysicalAnimationMode() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Physics")

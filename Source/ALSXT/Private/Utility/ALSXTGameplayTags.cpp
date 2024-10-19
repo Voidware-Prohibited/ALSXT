@@ -113,6 +113,7 @@ namespace ALSXTAcrobaticActionTypeTags
 namespace ALSXTPhysicalAnimationModeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Game.Physical Animation Mode.None"))
+	UE_DEFINE_GAMEPLAY_TAG(Navigation, TEXT("Game.Physical Animation Mode.Navigation"))
 	UE_DEFINE_GAMEPLAY_TAG(Bump, TEXT("Game.Physical Animation Mode.Bump"))
 	UE_DEFINE_GAMEPLAY_TAG(Hit, TEXT("Game.Physical Animation Mode.Hit"))
 }
@@ -294,9 +295,10 @@ namespace ALSXTImpactLocationTags
 
 namespace ALSXTImpactSideTags
 {
+	UE_DEFINE_GAMEPLAY_TAG(Front, TEXT("Als.Impact Side.Front"))
+	UE_DEFINE_GAMEPLAY_TAG(Back, TEXT("Als.Impact Side.Back"))
 	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Impact Side.Left"))
 	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Impact Side.Right"))
-	UE_DEFINE_GAMEPLAY_TAG(Center, TEXT("Als.Impact Side.Center"))
 }
 
 namespace ALSXTImpactHeightTags
@@ -511,6 +513,7 @@ namespace ALSXTBumpPoseModeTags
 
 namespace ALSXTDefensiveModeTags
 {
+	UE_DEFINE_GAMEPLAY_TAG(ObstacleNavigation, TEXT("Als.Defensive Mode.Obstacle Navigation"))
 	UE_DEFINE_GAMEPLAY_TAG(CrowdNavigation, TEXT("Als.Defensive Mode.Crowd Navigation"))
 	UE_DEFINE_GAMEPLAY_TAG(Avoiding, TEXT("Als.Defensive Mode.Avoiding"))
 	UE_DEFINE_GAMEPLAY_TAG(Anticipation, TEXT("Als.Defensive Mode.Anticipation"))

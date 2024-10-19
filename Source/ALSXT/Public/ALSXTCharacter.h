@@ -302,15 +302,50 @@ protected:
 	void OnEnterStationaryModeBlendOut(UAnimMontage* Montage, bool bInterrupted);
 	// void OnExitStationaryModeBlendOut(UAnimMontage* Montage, bool bInterrupted);
 
+// PhysicalAnimationState
+private:
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", ReplicatedUsing = "OnReplicate_PhysicalAnimationState", Meta = (AllowPrivateAccess), Transient)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess), Transient)
+	FALSXTPhysicalAnimationState PhysicalAnimationState;
+
+protected:
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Settings|Als Character|Footstep State")
+	void MulticastSetPhysicalAnimationState(const FALSXTPhysicalAnimationState& NewPhysicalAnimationState);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Settings|Als Character|Footstep State")
+	void ServerSetPhysicalAnimationState(const FALSXTPhysicalAnimationState& NewPhysicalAnimationState);
+
+	//
+	// UFUNCTION()
+	// void OnReplicate_PhysicalAnimationState(const FALSXTPhysicalAnimationState& PreviousPhysicalAnimationState);
+
+	//
+	UFUNCTION(Server, Unreliable)
+	void ServerProcessNewPhysicalAnimationState(const FALSXTPhysicalAnimationState& NewALSXTPhysicalAnimationState);
+
+public:
+	//
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTPhysicalAnimationState GetPhysicalAnimationState() const;
+
+	//
+	UFUNCTION()
+	void OnPhysicalAnimationStateChanged(const FALSXTPhysicalAnimationState& PreviousPhysicalAnimationState);
+
+	//
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewPhysicalAnimationState"))
+	void SetPhysicalAnimationState(const FALSXTPhysicalAnimationState& NewPhysicalAnimationState);
+
+	//
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewPhysicalAnimationState"))
+	FALSXTPhysicalAnimationState ProcessNewPhysicalAnimationState(const FALSXTPhysicalAnimationState& NewPhysicalAnimationState);
+
+// HeldItemState
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess), Transient)
 	FALSXTHeldItemState HeldItemState;
 
 protected:
-
-	UFUNCTION(Client, Reliable, BlueprintCallable, Category = "Settings|Als Character|Footstep State")
-	void ClientSetHeldItemState(const FALSXTHeldItemState& NewHeldItemState);
-
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Settings|Als Character|Footstep State")
 	void MulticastSetHeldItemState(const FALSXTHeldItemState& NewHeldItemState);
 
@@ -2001,6 +2036,9 @@ protected:
 	virtual FALSXTDefensiveModeState GetCharacterDefensiveModeState_Implementation() const override;
 	virtual FALSXTBumpPoseState GetCrowdNavigationPoseState_Implementation() const override;
 
+	virtual FALSXTPhysicalAnimationState GetCharacterPhysicalAnimationState_Implementation() const override;
+	virtual void SetCharacterPhysicalAnimationState_Implementation(FALSXTPhysicalAnimationState NewPhysicalAnimationState) override;
+
 	virtual FGameplayTag GetCharacterPhysicalAnimationMode_Implementation() const override;
 	virtual void SetCharacterPhysicalAnimationMode_Implementation(const FGameplayTag& PhysicalAnimationmode, FName BelowBoneName)override;
 
@@ -2275,6 +2313,11 @@ inline const FGameplayTag& AALSXTCharacter::GetFocus() const
 inline const FGameplayTag& AALSXTCharacter::GetDesiredPhysicalAnimationMode() const
 {
 	return DesiredPhysicalAnimationMode;
+}
+
+inline const FALSXTPhysicalAnimationState AALSXTCharacter::GetPhysicalAnimationState() const
+{
+	return PhysicalAnimationState;
 }
 
 inline const FGameplayTag& AALSXTCharacter::GetPhysicalAnimationMode() const

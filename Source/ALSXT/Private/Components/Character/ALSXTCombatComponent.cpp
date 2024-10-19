@@ -1160,7 +1160,8 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 				//vector from our current location to the target which is slightly further away from the target
 				FVector SmoothMoveVector = NewLocation - Character->GetActorLocation();
 				FStepDownResult StepdownResult;
-				IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MoveSmooth(SmoothMoveVector, MovementSpeed, &StepdownResult);
+				// IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MoveSmooth(SmoothMoveVector, MovementSpeed, &StepdownResult);
+				IALSXTCharacterInterface::Execute_GetCharacter(GetOwner())->LaunchCharacter(SmoothMoveVector * 1000, true, true);
 			}
 		}
 		

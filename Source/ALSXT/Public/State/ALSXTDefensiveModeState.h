@@ -29,6 +29,12 @@ struct ALSXT_API FALSXTDefensiveModeState
 	TObjectPtr<UAnimSequenceBase> AnticipationPose{ nullptr };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAnimSequenceBase> AnticipationCrouchedPose{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAnimSequenceBase> AnticipationInAirPose{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAnimSequenceBase> ObstaclePose{ nullptr };
 
 	// Deprecate

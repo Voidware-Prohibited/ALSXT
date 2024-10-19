@@ -369,9 +369,6 @@ private:
 	bool IsAttackResponseAllowedToStart(const UAnimMontage* Montage) const;
 
 protected:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldSpawnParticleActor(FDoubleHitResult Hit);
-
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	bool ShouldSpawnImpactParticle(FDoubleHitResult Hit);
 
@@ -385,7 +382,7 @@ protected:
 	bool ShouldSpawnRearImpactDecal(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
-	bool ShouldSpawnParticleActorModeration(FDoubleHitResult Hit);
+	bool ShouldSpawnParticleModeration(FDoubleHitResult Hit);
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
@@ -517,9 +514,6 @@ protected:
 	FGameplayTag LocationToImpactHeight(FVector Location);
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
-	FGameplayTag LocationToImpactPosition(FVector Location);
-
-	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag LocationToActorImpactSide(AActor* Actor, FVector Location);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Convert Physical Surface to GameplayTag", Keywords = "physical, surface, material, gameplay, tag"), Category = "Physical Surface")
@@ -647,9 +641,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Parameters")
 	UNiagaraSystem* GetBodyFallParticle(FDoubleHitResult Hit);
-
-	UFUNCTION(BlueprintCallable, Category = "Parameters")
-	TSubclassOf<AActor> GetImpactReactionParticleActor(FDoubleHitResult Hit);
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FSound GetImpactReactionSound(FDoubleHitResult Hit);
@@ -981,16 +972,16 @@ private:
 	void MulticastStartDefensiveReaction(FActionMontageInfo Montage, USoundBase* Audio, FVector AnticipationPoint);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void ServerStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void MulticastStartImpactReaction(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(Server, Reliable)
-	void ServerStartAttackReaction(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void ServerStartAttackReaction(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartAttackReaction(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void MulticastStartAttackReaction(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartSyncedAttackReaction(FActionMontageInfo Montage);
@@ -1100,14 +1091,6 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartAttackResponse(FAttackDoubleHitResult Hit, FActionMontageInfo Montage);
 
-	// Particle Actor RPCs
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSpawnParticleActor(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSpawnParticleActor(FDoubleHitResult Hit, TSubclassOf<AActor> ParticleActor);
-
 	// Implementations
 
 	void StartSyncedAnticipationReactionImplementation(FActionMontageInfo Montage, FVector AnticipationPoint);
@@ -1116,9 +1099,9 @@ private:
 
 	void CrowdNavigationReactionImplementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form);
 
-	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void StartImpactReactionImplementation(FDoubleHitResult Hit, UAnimMontage* Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
-	void StartAttackReactionImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, TSubclassOf<AActor> ParticleActor, UNiagaraSystem* Particle, USoundBase* Audio);
+	void StartAttackReactionImplementation(FAttackDoubleHitResult Hit, FActionMontageInfo Montage, UNiagaraSystem* Particle, USoundBase* Audio);
 
 	void StartSyncedAttackReactionImplementation(FActionMontageInfo Montage);
 
@@ -1238,10 +1221,6 @@ public:
 
 protected:
 	// Hooks 
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
-	void OnSpawnParticleActor(const FDoubleHitResult& Hit);
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hooks")
 	void OnSyncedAnticipationReactionStarted();
 
