@@ -46,7 +46,10 @@ public:
 	FGameplayTag GetCharacterPhysicalAnimationMode() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Physics")
-	void SetCharacterPhysicalAnimationMode(const FGameplayTag& PhysicalAnimationmode, FName BelowBoneName);
+	void SetCharacterPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationMode, const TArray<FName>& BelowBoneNames);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Collision Interface|Physics")
+	void ResetCharacterPhysicalAnimationMode();
 
 	// Defensive Mode
 

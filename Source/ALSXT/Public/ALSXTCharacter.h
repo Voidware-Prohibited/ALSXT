@@ -1848,11 +1848,11 @@ public:
 	const FGameplayTag& GetDesiredPhysicalAnimationMode() const;
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewPhysicalAnimationModeTag"))
-	void SetDesiredPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName);
+	void SetDesiredPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const TArray<FName>& BoneNames);
 
 private:
 	UFUNCTION(Server, Reliable)
-	void ServerSetDesiredPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName);
+	void ServerSetDesiredPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const TArray<FName>& BoneNames);
 
 	// PhysicalAnimationMode
 
@@ -1860,7 +1860,9 @@ public:
 	const FGameplayTag& GetPhysicalAnimationMode() const;
 
 private:
-	void SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const FName& BoneName);
+	void SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAnimationModeTag, const TArray<FName>& BoneNames);
+
+	void ResetPhysicalAnimationMode();
 
 protected:
 	void PhysicalAnimationBlendOut();
@@ -2040,7 +2042,8 @@ protected:
 	virtual void SetCharacterPhysicalAnimationState_Implementation(FALSXTPhysicalAnimationState NewPhysicalAnimationState) override;
 
 	virtual FGameplayTag GetCharacterPhysicalAnimationMode_Implementation() const override;
-	virtual void SetCharacterPhysicalAnimationMode_Implementation(const FGameplayTag& PhysicalAnimationmode, FName BelowBoneName)override;
+	virtual void SetCharacterPhysicalAnimationMode_Implementation(const FGameplayTag& NewPhysicalAnimationMode, const TArray<FName>& BelowBoneNames) override;
+	virtual void ResetCharacterPhysicalAnimationMode_Implementation() override;
 
 	// State Interface Functions
 	virtual void SetCharacterStatus_Implementation(const FGameplayTag& NewStatus) override;
