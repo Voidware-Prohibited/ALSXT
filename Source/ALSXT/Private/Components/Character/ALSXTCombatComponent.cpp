@@ -610,7 +610,7 @@ void UALSXTCombatComponent::AttackCollisionTrace()
 				{
 					// Populate Origin Hit
 					CurrentHitResult.DoubleHitResult.OriginHitResult.HitResult = OriginHitResult;
-					UALSXTBlueprintFunctionLibrary::GetSideFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.ImpactSide);
+					UALSXTBlueprintFunctionLibrary::GetSideFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.DoubleHitResult.HitResult.ImpactSide);
 					UALSXTBlueprintFunctionLibrary::GetStrengthFromHit(CurrentHitResult.DoubleHitResult, CurrentHitResult.Strength);
 					CurrentHitResult.DoubleHitResult.HitResult.ImpactStrength = CurrentAttackTraceSettings.AttackStrength;
 					FString OriginHitActorname = OriginHitResult.GetActor()->GetName();
@@ -1161,7 +1161,7 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 				FVector SmoothMoveVector = NewLocation - Character->GetActorLocation();
 				FStepDownResult StepdownResult;
 				// IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MoveSmooth(SmoothMoveVector, MovementSpeed, &StepdownResult);
-				IALSXTCharacterInterface::Execute_GetCharacter(GetOwner())->LaunchCharacter(SmoothMoveVector * 1000, true, true);
+				IALSXTCharacterInterface::Execute_GetCharacter(GetOwner())->LaunchCharacter(SmoothMoveVector * 100, true, true);
 			}
 		}
 		

@@ -174,6 +174,9 @@ struct ALSXT_API FExtendedHitResult
 	FGameplayTag ImpactSide; // Calculated from Get Side from Hit
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FGameplayTag ImpactHeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag ImpactStrength; // Calculated by Mass and Volume
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
@@ -206,9 +209,6 @@ struct ALSXT_API FDoubleHitResult
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag ImpactLocation; // Calculated from Get Location from Bone Name
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	FGameplayTag ImpactSide; // Calculated from Get Side from Hit
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FGameplayTag Strength; // Calculated by Mass and Volume
@@ -794,9 +794,6 @@ struct ALSXT_API FStabilizationMontage
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Side", AllowPrivateAccess))
 	FGameplayTagContainer Side;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
-	FGameplayTagContainer Position;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
 	FGameplayTagContainer Height;

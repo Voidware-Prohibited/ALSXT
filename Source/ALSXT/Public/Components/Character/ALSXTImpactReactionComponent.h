@@ -514,6 +514,9 @@ protected:
 	FGameplayTag LocationToImpactHeight(FVector Location);
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	TArray<FName> GetAffectedBones(UPARAM(meta = (Categories = "Als.Impact Side")) const FGameplayTag& ImpactSide, const FGameplayTag& Height);
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FGameplayTag LocationToActorImpactSide(AActor* Actor, FVector Location);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Convert Physical Surface to GameplayTag", Keywords = "physical, surface, material, gameplay, tag"), Category = "Physical Surface")

@@ -23,9 +23,6 @@ struct ALSXT_API FALSXTPhysicalAnimationState
 	FName ProfileName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")
-	FName Below;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")
 	TArray<FName> AffectedBonesBelow;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")

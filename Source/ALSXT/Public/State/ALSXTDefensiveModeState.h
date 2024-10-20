@@ -50,9 +50,6 @@ struct ALSXT_API FALSXTDefensiveModeState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
 	FGameplayTag ObstacleHeight{ FGameplayTag::EmptyTag };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
-	FGameplayTag ObstaclePosition{ FGameplayTag::EmptyTag };
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform AnticipationTransform;
 
@@ -61,9 +58,6 @@ struct ALSXT_API FALSXTDefensiveModeState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
 	FGameplayTag AnticipationHeight{ FGameplayTag::EmptyTag };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
-	FGameplayTag AnticipationPosition{ FGameplayTag::EmptyTag };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTag AnticipationForm{ FGameplayTag::EmptyTag };
@@ -76,9 +70,6 @@ struct ALSXT_API FALSXTDefensiveModeState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Height", AllowPrivateAccess))
 	FGameplayTag ImpactHeight{ FGameplayTag::EmptyTag };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Position", AllowPrivateAccess))
-	FGameplayTag ImpactPosition{ FGameplayTag::EmptyTag };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
 	FGameplayTag ImpactForm{ FGameplayTag::EmptyTag };
