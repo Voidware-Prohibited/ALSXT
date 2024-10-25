@@ -20,6 +20,9 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/DecalActor.h"
 #include "Components/DecalComponent.h"
+#include "ALSXTCharacter.h"
+#include "Utility/ALSXTCollisionStructs.h"
+#include "Settings/ALSXTDefensiveModeSettings.h"
 #include "Landscape.h"
 
 // Sets default values for this component's properties
@@ -1774,6 +1777,97 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 	}
 }
 
+void UALSXTImpactReactionComponent::RefreshObstacleNavigationPoses()
+{
+	FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
+	NewDefensiveModeState.ObstaclePoseSet = SelectObstacleNavigationPoses(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), HealthToHealthTag(IALSXTCharacterInterface::Execute_GetHealth(GetOwner())));
+	IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), NewDefensiveModeState);
+}
+
+void UALSXTImpactReactionComponent::RefreshCrowdNavigationPoses()
+{
+	FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
+	NewDefensiveModeState.CrowdNavigationPoseSet =	SelectCrowdNavigationPoses(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()));
+	IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), NewDefensiveModeState);
+}
+
+void UALSXTImpactReactionComponent::RefreshBlockingPoses()
+{
+	FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
+	NewDefensiveModeState.AnticipationPoseSet = SelectBlockingPoses(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), ALSXTImpactFormTags::Blunt, ALSXTImpactVelocityTags::Moderate);
+	IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), NewDefensiveModeState);
+}
+
+FALSXTDefensivePoseSet UALSXTImpactReactionComponent::SelectObstacleNavigationPoses(const FGameplayTag& Overlay, const FGameplayTag& Health)
+{
+	FALSXTDefensivePoseSet DefensivePoseStanceSet;
+	TArray<FObstaclePose> ObstaclePoses = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner())->ObstacleNavigationPoses;
+	FGameplayTagContainer ParameterTagContainer;
+	ParameterTagContainer.AddTagFast(Overlay);
+	ParameterTagContainer.AddTagFast(Health);
+	
+	for (FObstaclePose ObstaclePose : ObstaclePoses)
+	{
+		FGameplayTagContainer EntryTagContainer;
+		EntryTagContainer.AppendTags(ObstaclePose.Overlay);
+		EntryTagContainer.AppendTags(ObstaclePose.Health);
+	
+		if (EntryTagContainer.HasAll(ParameterTagContainer))
+		{
+			DefensivePoseStanceSet = ObstaclePose.Poses;
+			return DefensivePoseStanceSet;
+		}
+	}
+	return DefensivePoseStanceSet;
+}
+
+FALSXTDefensivePoseStanceSet UALSXTImpactReactionComponent::SelectCrowdNavigationPoses(const FGameplayTag& Overlay)
+{
+	FALSXTDefensivePoseStanceSet DefensivePoseStanceSet;
+	TArray<FCrowdNavigationPoses> CrowdNavigationPoses = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner())->CrowdNavigationPosesNew;
+	
+	for (FCrowdNavigationPoses CrowdNavigationPose : CrowdNavigationPoses)
+	{
+		FGameplayTagContainer EntryTagContainer;
+		EntryTagContainer.AppendTags(CrowdNavigationPose.Overlay);
+	
+		if (EntryTagContainer.HasTag(Overlay))
+		{
+			DefensivePoseStanceSet = CrowdNavigationPose.Poses;
+			return DefensivePoseStanceSet;
+		}
+	}
+
+	return DefensivePoseStanceSet;
+}
+
+FALSXTDefensivePoseSet UALSXTImpactReactionComponent::SelectBlockingPoses(const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Variant)
+{
+	FALSXTDefensivePoseSet DefensivePoseSet;
+	TArray<FAnticipationPoses> BlockingPoses = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner())->BlockingPoses;
+	FGameplayTagContainer ParameterTagContainer;
+	ParameterTagContainer.AddTagFast(Overlay);
+	ParameterTagContainer.AddTagFast(Form);
+	ParameterTagContainer.AddTagFast(Variant);
+
+
+	for (FAnticipationPoses BlockingPose : BlockingPoses)
+	{
+		FGameplayTagContainer EntryTagContainer;
+		EntryTagContainer.AppendTags(BlockingPose.Overlay);
+		EntryTagContainer.AppendTags(BlockingPose.Form);
+		EntryTagContainer.AppendTags(BlockingPose.Variant);
+
+		if (EntryTagContainer.HasAll(ParameterTagContainer))
+		{
+			DefensivePoseSet = BlockingPose.Poses;
+			return DefensivePoseSet;
+		}
+	}
+
+	return DefensivePoseSet;
+}
+
 // Grounded Bump and Crowd Navigation
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
@@ -1818,20 +1912,6 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 	TArray<FHitResult> HitResults;
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(GetOwner());
-
-	// if (IALSXTCollisionInterface::Execute_ShouldPerformImpactResponse(GetOwner()))
-	// {
-	// 
-	// }
-	// else
-	// {
-	// 	TraceDistance = 0.0f;
-	// 	if (IALSXTCollisionInterface::Execute_GetCharacterPhysicalAnimationMode(GetOwner()) != ALSXTPhysicalAnimationModeTags::None)
-	// 	{
-	// 		IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, "head");
-	// 	}
-	// 	return;
-	// }
 
 	// if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == AlsLocomotionActionTags::Sliding)
 	// {
@@ -2001,7 +2081,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 													{
 														// Crowd Nav
 														Montage.Pose = SelectCrowdNavigationPose(Side, Form);
-														// DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
+														// DefensiveModeState.ObstaclePoseSet = SelectObstacleNavigationPoses(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), CharacterCombatStance, Health);
 														DefensiveModeState.ObstaclePose = Montage.Pose;
 														DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
 													}
@@ -2026,6 +2106,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 													// Crowd Nav
 													Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 													DefensiveModeState.ObstaclePose = Montage.Pose;
+													// DefensiveModeState.ObstaclePoseSet = SelectObstacleNavigationPoses(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), CharacterCombatStance, Health);
 													// DefensiveModeState.Montage = SelectCrowdNavigationPose(Side, Form);
 													DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
 												}
@@ -2412,6 +2493,7 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										// ObstacleNav
 										Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 										DefensiveModeState.ObstaclePose = Montage.Pose;
+										// DefensiveModeState.ObstaclePoseSet = SelectObstacleNavigationPoses(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), CharacterCombatStance, Health);
 										DefensiveModeState.ObstacleMode = ALSXTDefensiveModeTags::ObstacleNavigation;
 										DefensiveModeState.ObstacleSide = Side;
 										DefensiveModeState.ObstacleHeight = Height;
@@ -4765,7 +4847,7 @@ UAnimSequenceBase* UALSXTImpactReactionComponent::SelectCrowdNavigationPose_Impl
 FBumpReactionAnimation UALSXTImpactReactionComponent::SelectCrowdNavigationReactionMontage_Implementation(const FGameplayTag& Gait, const FGameplayTag& Side, const FGameplayTag& Form)
 {
 	UALSXTImpactReactionSettings* SelectedImpactReactionSettings = IALSXTCollisionInterface::Execute_SelectImpactReactionSettings(GetOwner());
-	TArray<FBumpReactionAnimation> Montages = SelectedImpactReactionSettings->CrowdNavigationReactionAnimations;
+	TArray<FBumpReactionAnimation> Montages = SelectedImpactReactionSettings->CrowdNavigationBumpReactions;
 	TArray<FBumpReactionAnimation> FilteredMontages;
 	FBumpReactionAnimation SelectedCrowdNavigationReactionAnimation;
 	TArray<FGameplayTag> TagsArray = { Gait, Side, ALSXTImpactFormTags::Blunt };

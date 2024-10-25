@@ -17,6 +17,7 @@
 #include "State/ALSXTBumpPoseState.h"
 #include "State/ALSXTImpactReactionState.h" 
 #include "Components/TimelineComponent.h"
+#include "Settings/ALSXTDefensiveModeSettings.h"
 #include "ALSXTImpactReactionComponent.generated.h"
 
 class AALSXTCharacter;
@@ -150,6 +151,25 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTag DefensiveMode;
+
+	// Select Montages and Poses
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	void RefreshObstacleNavigationPoses();
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	void RefreshCrowdNavigationPoses();
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	void RefreshBlockingPoses();
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	FALSXTDefensivePoseSet SelectObstacleNavigationPoses(const FGameplayTag& Overlay, const FGameplayTag& Health);
+	
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	FALSXTDefensivePoseStanceSet SelectCrowdNavigationPoses(const FGameplayTag& Overlay);
+	
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	FALSXTDefensivePoseSet SelectBlockingPoses(const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Variant);
 
 	void ObstacleTrace();
 

@@ -33,6 +33,7 @@
 #include "Utility/AlsUtility.h"
 #include "Utility/AlsVector.h"
 #include "Utility/ALSXTGameplayTags.h"
+#include "Utility/ALSXTCollisionGameplayTags.h"
 #include "Utility/ALSXTStructs.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -576,6 +577,11 @@ void AALSXTCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 	}
 }
 
+void AALSXTCharacter::OnStanceChanged_Implementation(const FGameplayTag& PreviousStance)
+{
+	ImpactReaction->RefreshObstacleNavigationPoses();
+}
+
 FALSXTCameraShakeSetting AALSXTCharacter::SelectMovementCameraShakeAsset()
 {
 	FALSXTCameraShakeSetting FoundCameraShakeSetting;
@@ -1105,6 +1111,7 @@ void AALSXTCharacter::ALSXTRefreshRotationInstant(const float TargetYawAngle, co
 
 void AALSXTCharacter::SetMovementModeLocked(bool bNewMovementModeLocked)
 {
+	bMovementEnabled = !bNewMovementModeLocked;
 	// bNewMovementModeLocked ? ALSXTCharacterMovement->SetMovementModeLocked(true), ALSXTCharacterMovement->SetMovementMode(MOVE_Custom) : ALSXTCharacterMovement->SetMovementModeLocked(false), ALSXTCharacterMovement->SetMovementMode(MOVE_Walking);
 	ForceNetUpdate();
 	
@@ -1139,6 +1146,8 @@ void AALSXTCharacter::Crouch(const bool bClientSimulation)
 void AALSXTCharacter::OnOverlayModeChanged_Implementation(const FGameplayTag& PreviousOverlayMode)
 {
 	// Super::OnOverlayModeChanged(PreviousOverlayMode);
+	ImpactReaction->RefreshBlockingPoses();
+	ImpactReaction->RefreshCrowdNavigationPoses();
 	RefreshOverlayLinkedAnimationLayer();
 	RefreshOverlayObject();
 }
@@ -1624,12 +1633,13 @@ void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
 			FALSXTDefensiveModeState PreviousDefensiveModeState = GetDefensiveModeState();
 			FALSXTDefensiveModeState NewDefensiveModeState = PreviousDefensiveModeState;
 			FAnticipationPose NewDefensiveMontage;
-			NewDefensiveModeState.AnticipationMode = PreviousDefensiveModeState.AnticipationMode == FGameplayTag::EmptyTag ? ALSXTDefensiveModeTags::Blocking : PreviousDefensiveModeState.AnticipationMode;
+			NewDefensiveModeState.AnticipationMode = PreviousDefensiveModeState.AnticipationMode == FGameplayTag::EmptyTag ? ALSXTDefensiveModeTags::Anticipation : PreviousDefensiveModeState.AnticipationMode;
 			NewDefensiveModeState.AnticipationSide = PreviousDefensiveModeState.AnticipationSide == FGameplayTag::EmptyTag ? ALSXTImpactSideTags::Front : PreviousDefensiveModeState.AnticipationSide;
 			NewDefensiveModeState.AnticipationHeight = PreviousDefensiveModeState.AnticipationHeight == FGameplayTag::EmptyTag ? ALSXTImpactHeightTags::Middle : PreviousDefensiveModeState.AnticipationHeight;
 			NewDefensiveModeState.AnticipationPose = SelectAttackAnticipationMontage(NewDefensiveModeState.Velocity, AlsStanceTags::Crouching, ALSXTImpactSideTags::Front, ALSXTImpactFormTags::Blunt).Pose;
 			// NewDefensiveModeState.AnticipationPose = SelectBlockingMontage(NewDefensiveModeState.Velocity, AlsStanceTags::Crouching, ALSXTImpactSideTags::Center, ALSXTImpactFormTags::Blunt).Pose;
 			SetDefensiveModeState(NewDefensiveModeState);
+			ImpactReaction->RefreshBlockingPoses();
 			SetDesiredDefensiveMode(ALSXTDefensiveModeTags::Blocking);
 		}
 		else 
@@ -1886,6 +1896,7 @@ void AALSXTCharacter::ActivateFreelooking()
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("%f"), GetControlRotation().Yaw));
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), PreviousYaw));
 	// LockRotation(GetActorRotation().Yaw);
+	SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 	SetDesiredFreelooking(ALSXTFreelookingTags::True);
 	FALSXTFreelookState NewFreelookState = GetFreelookState();
 	NewFreelookState.Freelooking = ALSXTFreelookingTags::True;
@@ -3037,18 +3048,16 @@ void AALSXTCharacter::ResetPhysicalAnimationMode()
 {
 	const auto PreviousPhysicalAnimationMode{ PhysicalAnimationMode };
 	GetMesh()->SetCollisionProfileName("CharacterMesh");
-	PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("pelvis", "Default", true, false);
-	// GetMesh()->SetSimulatePhysics(false);
-	// GetMesh()->SetAllBodiesSimulatePhysics(false);
+	PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("", "None", true, true);
+	GetMesh()->SetAllBodiesBelowPhysicsBlendWeight("", 0.0f, false, true);
 	GetCapsuleComponent()->SetCapsuleRadius(25);
-	// GetMesh()->SetAllBodiesPhysicsBlendWeight(0.0f, false);
-	// GetMesh()->SetPhysicsBlendWeight(0);
+	TArray<FName> AffectedBonesBelowNames;
 	FALSXTPhysicalAnimationState NewPhysicalAnimationState;
-	NewPhysicalAnimationState.Mode = ALSXTPhysicalAnimationModeTags::None;
-	NewPhysicalAnimationState.ProfileName = "CharacterMesh";
-	NewPhysicalAnimationState.AffectedBonesBelow.Empty();
-	NewPhysicalAnimationState.Alpha = 0.0f;
-	SetPhysicalAnimationState(NewPhysicalAnimationState);
+	// NewPhysicalAnimationState.Mode = ALSXTPhysicalAnimationModeTags::None;
+	// NewPhysicalAnimationState.ProfileName = "CharacterMesh";
+	// NewPhysicalAnimationState.AffectedBonesBelow = AffectedBonesBelowNames;
+	// NewPhysicalAnimationState.Alpha = 0.0f;
+	// SetPhysicalAnimationState(NewPhysicalAnimationState);
 	OnPhysicalAnimationModeChanged(PreviousPhysicalAnimationMode);
 	PhysicalAnimationMode = ALSXTPhysicalAnimationModeTags::None;
 }

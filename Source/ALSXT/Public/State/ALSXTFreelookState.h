@@ -29,5 +29,11 @@ struct ALSXT_API FALSXTFreelookState
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
 		float LockedPitchAngle { 0.0f };
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
+		float FreelookYawAngle{ 0.0f };
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = -90, ClampMax = 90, ForceUnits = "deg"))
+		float FreelookPitchAngle{ 0.0f };
 };
 

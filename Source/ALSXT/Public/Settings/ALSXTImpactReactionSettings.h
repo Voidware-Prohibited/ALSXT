@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utility/ALSXTStructs.h"
+#include "Utility/ALSXTCollisionStructs.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
 #include "ALSXTImpactReactionSettings.generated.h"
@@ -142,109 +143,136 @@ class ALSXT_API UALSXTImpactReactionSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
-	FGameplayTagContainer BumpInterruptableLocomotionActions;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Defensive Modes", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defensive|Poses", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
 	TArray<FAnticipationPose> DefensivePoses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Defensive Modes", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
-	TArray<FAnticipationPose> ImpactAnticipationPoses;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defensive|Poses", Meta = (TitleProperty = "{Poses}", AllowPrivateAccess))
+	TArray<FAnticipationPoses> DefensivePosesNew;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Defensive Modes", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
-	TArray<FAnticipationPose> AttackAnticipationPoses;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defensive|Poses", Meta = (TitleProperty = "{Poses}", AllowPrivateAccess))
+	TArray<FAnticipationPoses> BlockingPoses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Defensive Modes", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
-	TArray<FStabilizationMontage> StabilizationMontages;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defensive|Poses", Meta = (TitleProperty = "{Poses}", AllowPrivateAccess))
+	TArray<FAnticipationPoses> AvoidingPoses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Crowd Navigation", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
-	TArray<FBumpReactionAnimation> CrowdNavigationReactionAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Crowd Navigation", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
-	TArray<FBumpPose> CrowdNavigationPoses;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
-	TArray<FBumpReactionAnimation> BumpReactionAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
-	TArray<FBumpPose> BumpAnticipationPoses;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Impact", Meta = (TitleProperty = "{ImpactVelocity} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
-	TArray<FImpactReactionAnimation> ImpactReactionAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Attack", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
-	TArray<FAttackReactionAnimation> AttackReactionAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Pose}", AllowPrivateAccess))
-	TArray<FClutchImpactLocationAnimation> ClutchImpactPointAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling|Crowd Navigation", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
-	TArray <FFallenAnimation> CrowdNavigationFallenAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling|Impact", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
-	TArray <FFallenAnimation> ImpactFallenAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling|Attack", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
-	TArray <FFallenAnimation> AttackFallenAnimations;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Falling", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defensive|Poses", Meta = (TitleProperty = "{Poses}", AllowPrivateAccess))
 	TArray<FAnticipationPose> BraceForImpactPoses;
 
-	UPROPERTY(EditAnywhere, Category = "Animations|Falling|Settings", BlueprintReadWrite, Meta = (TitleProperty = "{FallenMinimumTime}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defensive|Poses", Meta = (TitleProperty = "{Poses}", AllowPrivateAccess))
+	TArray<FBraceForImpactPoses> BraceForImpactPosesNew;
+
+	// Obstacle
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle Navigation|Poses", Meta = (TitleProperty = "{Poses}", AllowPrivateAccess))
+	TArray<FObstaclePose> ObstacleNavigationPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle Navigation|Poses", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
+	TArray<FBumpPose> BumpAnticipationPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle Navigation|Animations", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
+	TArray<FBumpReactionAnimation> ObstacleBumpAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle Navigation|Animations", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
+	TArray<FBumpReactionAnimation> BumpReactionAnimations;
+
+	// Crowd Navigation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crowd Navigation|Poses", Meta = (TitleProperty = "{Poses}", AllowPrivateAccess))
+	TArray<FBumpPose> CrowdNavigationPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crowd Navigation|Poses", Meta = (TitleProperty = "{Poses}", AllowPrivateAccess))
+	TArray<FCrowdNavigationPoses> CrowdNavigationPosesNew;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crowd Navigation|Animations", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
+	TArray<FBumpReactionAnimation> CrowdNavigationBumpReactions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crowd Navigation|Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
+	TArray<FResponseAnimation> CrowdNavigationBumpResponses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crowd Navigation|Poses", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
+	TArray <FFallenAnimation> CrowdNavigationFallenAnimations;	
+
+	//Impact
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact|Poses", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
+	TArray<FAnticipationPose> ImpactAnticipationPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact|Animations", Meta = (TitleProperty = "{ImpactVelocity} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
+	TArray<FImpactReactionAnimation> ImpactReactionAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact|Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
+	TArray<FResponseAnimation> ImpactResponseAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact|Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
+	TArray <FFallenAnimation> ImpactFallenAnimations;
+
+	UPROPERTY(EditAnywhere, Category = "Fallen", BlueprintReadWrite, Meta = (TitleProperty = "{FallenMinimumTime}", AllowPrivateAccess))
 	float ImpactFallenMinimumTime { 0.0f };
 
-	UPROPERTY(EditAnywhere, Category = "Animations|Falling|Settings", BlueprintReadWrite, Meta = (TitleProperty = "{AttackFallenMinimumTime}", AllowPrivateAccess))
-	float AttackFallenMinimumTime { 0.0f };
+	// Attack
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack|Poses", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
+	TArray<FAnticipationPose> AttackAnticipationPoses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
-	TArray<FResponseAnimation> CrowdNavigationResponseAnimations;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack|Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
+	TArray<FAttackReactionAnimation> AttackReactionAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
-	TArray<FResponseAnimation> ImpactResponseAnimations;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack|Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Montage}", AllowPrivateAccess))
 	TArray<FResponseAnimation> AttackResponseAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Response", Meta = (TitleProperty = "{DamageType} {Style} {Montage}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack|Poses", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
+	TArray <FFallenAnimation> AttackFallenAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack|Animations", Meta = (TitleProperty = "{DamageType} {Style} {Montage}", AllowPrivateAccess))
 	TArray<FFallenPleadingAnimation> FallenPleadingAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Death", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Attack|Fallen", BlueprintReadWrite, Meta = (TitleProperty = "{AttackFallenMinimumTime}", AllowPrivateAccess))
+	float AttackFallenMinimumTime { 0.0f };
+
+	// Post Impact
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Post Impact|Poses", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Health} {Pose}", AllowPrivateAccess))
+	TArray<FClutchImpactLocationAnimation> ClutchImpactPointAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Post Impact|Animations", Meta = (TitleProperty = "{Velocity} {Stance} {Side} {Form} {Health} {Pose}", AllowPrivateAccess))
+	TArray<FStabilizationMontage> StabilizationMontages;
+
+	// Death
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fallen|Animations", Meta = (TitleProperty = "{ImpactStrength} {ImpactSide} {ImpactForm} {Montage}", AllowPrivateAccess))
 	TArray <FDeathAnimation> DeathAnimations;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Impact", Meta = (TitleProperty = "{Sounds}", AllowPrivateAccess))
+	// Sounds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sounds|Impact", Meta = (TitleProperty = "{Sounds}", AllowPrivateAccess))
 	FALSXTImpactSoundMap ImpactSounds;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds|Falling", Meta = (TitleProperty = "{Sounds}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sounds|Falling", Meta = (TitleProperty = "{Sounds}", AllowPrivateAccess))
 	FALSXTImpactSoundMap BodyFallSounds;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
+	// Particles
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
 	FALSXTImpactParticleMap ImpactParticles;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
-	FALSXTImpactDecalMap ImpactDecals;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
-	TArray <FALSXTImpactParticleActorMap> ImpactParticleActors;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles|Impact", Meta = (TitleProperty = "{Particle}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Particles|Impact", Meta = (TitleProperty = "{Particle}", AllowPrivateAccess))
 	TArray<FALSXTImpactPointParticle> ImpactPointParticles;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (TitleProperty = "{Form} {Surfaces}", AllowPrivateAccess))
+	// Decals
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Decals", Meta = (TitleProperty = "{Particles}", AllowPrivateAccess))
+	FALSXTImpactDecalMap ImpactDecals;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (TitleProperty = "{Form} {Surfaces}", AllowPrivateAccess))
 	TArray<FALSXTFormSurfaces> FormSurfaces;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Bump", Meta = (AllowPrivateAccess))
+	FGameplayTagContainer BumpInterruptableLocomotionActions;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", meta = (TitleProperty = "{Location}", ForceInlineRow))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (TitleProperty = "{Location}", ForceInlineRow))
 	TMap<FName, FBoneLocationEntry> BoneLocationMap;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTagContainer LowThreatOverlayModes;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTagContainer MediumThreatOverlayModes;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTagContainer HighThreatOverlayModes;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations|Impact Reaction|Bump", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
 	FGameplayTagContainer VeryHighThreatOverlayModes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Impact", Meta = (AllowPrivateAccess))
@@ -293,16 +321,10 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 	bool EnableImpactSounds{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool EnableParticleActors{ true };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableParticles{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableImpactParticles{ true };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool EnableImpactParticleActors{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableImpactPointParticles{ true };

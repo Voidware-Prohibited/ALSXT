@@ -23,13 +23,13 @@ struct ALSXT_API FALSXTIdleState
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bIdle;
+	bool bIdle {false};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Idle Mode"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Alss.Idle Mode"))
 	FGameplayTag Mode{ FGameplayTag::EmptyTag };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAnimMontage* CurrentIdleMontage;
+	UAnimMontage* CurrentIdleMontage {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
 	float TargetTime{ 0.0f };

@@ -214,6 +214,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
 	TObjectPtr<UALSXTCharacterMovementComponent> ALSXTCharacterMovement;
 
+	virtual void OnStanceChanged_Implementation(const FGameplayTag& PreviousStance) override;
+
 	// Breath State
 	void UpdateBreathState();
 	bool ShouldUpdateBreathState() const;

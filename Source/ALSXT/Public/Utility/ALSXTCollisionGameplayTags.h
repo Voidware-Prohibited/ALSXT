@@ -1,0 +1,11 @@
+#pragma once
+
+#include "NativeGameplayTags.h"
+
+namespace ALSXTPhysicalAnimationModeTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(None)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Navigation)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Bump)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Hit)
+}

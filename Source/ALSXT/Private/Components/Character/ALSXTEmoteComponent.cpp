@@ -1,7 +1,8 @@
 // MIT
 
-#include "Net/UnrealNetwork.h"
 #include "Components/Character/ALSXTEmoteComponent.h"
+#include "Net/UnrealNetwork.h"
+
 
 // Sets default values for this component's properties
 UALSXTEmoteComponent::UALSXTEmoteComponent()

@@ -2,6 +2,7 @@
 
 #include "NativeGameplayTags.h"
 #include "Utility/ALSXTGameplayTags.h"
+#include "Settings/ALSXTDefensiveModeSettings.h"
 #include "ALSXTDefensiveModeState.generated.h"
 
 USTRUCT(BlueprintType)
@@ -36,6 +37,15 @@ struct ALSXT_API FALSXTDefensiveModeState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAnimSequenceBase> ObstaclePose{ nullptr };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTDefensivePoseSet ObstaclePoseSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTDefensivePoseStanceSet CrowdNavigationPoseSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTDefensivePoseSet AnticipationPoseSet;
 
 	// Deprecate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

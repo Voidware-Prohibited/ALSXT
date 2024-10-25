@@ -121,10 +121,10 @@ struct ALSXT_API FALSXTStationaryVehicleDynamicPoses
 	TArray <UAnimSequence*> LeanRightPoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAnimSequence* AimLeftPose;
+	UAnimSequence* AimLeftPose {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAnimSequence* AimRightPose;
+	UAnimSequence* AimRightPose {nullptr};
 };
 
 USTRUCT(BlueprintType)

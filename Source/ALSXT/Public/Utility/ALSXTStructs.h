@@ -746,7 +746,7 @@ struct ALSXT_API FAnticipationPose
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Game.Health", AllowPrivateAccess))
 	FGameplayTagContainer Health;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAnimSequenceBase> Pose;
 
 	bool operator==(const FAnticipationPose& other) const
@@ -754,6 +754,7 @@ struct ALSXT_API FAnticipationPose
 		return (other.Overlay == Overlay) && (other.Velocity == Velocity) && (other.Stance == Stance) && (other.Side == Side) && (other.Form == Form) && (other.Health == Health) && (other.Pose == Pose);
 	}
 };
+
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FClutchImpactLocationAnimation
@@ -772,7 +773,7 @@ struct ALSXT_API FClutchImpactLocationAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Game.Health", AllowPrivateAccess))
 	FGameplayTagContainer Health;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Montage}", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAnimSequenceBase> Pose;
 
 	bool operator==(const FClutchImpactLocationAnimation& other) const
