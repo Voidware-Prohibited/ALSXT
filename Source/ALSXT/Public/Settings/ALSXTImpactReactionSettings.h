@@ -166,6 +166,9 @@ public:
 	TArray<FObstaclePose> ObstacleNavigationPoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle Navigation|Poses", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
+	TArray<FObstacleCollisionAnticipationPoses> ObstacleCollisionAnticipationPoses;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle Navigation|Poses", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))
 	TArray<FBumpPose> BumpAnticipationPoses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle Navigation|Animations", Meta = (TitleProperty = "{Velocity} {Side} {Form} {Montage}", AllowPrivateAccess))

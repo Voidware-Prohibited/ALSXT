@@ -60,6 +60,23 @@ struct ALSXT_API FALSXTAnticipationMovementModePoseSet
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTObstacleCollisionAnticipationPoseSet
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	FALSXTDefensivePoseStanceSet Standing;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", Meta = (AllowPrivateAccess))
+	FALSXTDefensivePoseStanceSet Crouched;
+
+	bool operator==(const FALSXTObstacleCollisionAnticipationPoseSet& other) const
+	{
+		return (other.Standing == Standing) && (other.Crouched == Crouched);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTDefensivePoseSet
 {
 	GENERATED_BODY()
@@ -108,7 +125,7 @@ struct ALSXT_API FAnticipationPoses
 	FGameplayTagContainer Variant;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Standing} {Crouched} {InAir}", AllowPrivateAccess))
-	FALSXTDefensivePoseSet Poses;
+	FALSXTAnticipationPoseSet Poses;
 
 	bool operator==(const FAnticipationPoses& other) const
 	{
@@ -134,6 +151,29 @@ struct ALSXT_API FBraceForImpactPoses
 	FALSXTAnticipationMovementModePoseSet Poses;
 
 	bool operator==(const FBraceForImpactPoses& other) const
+	{
+		return (other.Overlay == Overlay) && (other.Form == Form) && (other.Variant == Variant) && (other.Poses == Poses);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FObstacleCollisionAnticipationPoses
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode", AllowPrivateAccess))
+	FGameplayTagContainer Overlay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Locomotion Variant", AllowPrivateAccess))
+	FGameplayTagContainer Variant;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{High} {Middle} {Low}", AllowPrivateAccess))
+	FALSXTObstacleCollisionAnticipationPoseSet Poses;
+
+	bool operator==(const FObstacleCollisionAnticipationPoses& other) const
 	{
 		return (other.Overlay == Overlay) && (other.Form == Form) && (other.Variant == Variant) && (other.Poses == Poses);
 	}

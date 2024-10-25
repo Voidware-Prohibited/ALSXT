@@ -1633,10 +1633,16 @@ void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
 			FALSXTDefensiveModeState PreviousDefensiveModeState = GetDefensiveModeState();
 			FALSXTDefensiveModeState NewDefensiveModeState = PreviousDefensiveModeState;
 			FAnticipationPose NewDefensiveMontage;
-			NewDefensiveModeState.AnticipationMode = PreviousDefensiveModeState.AnticipationMode == FGameplayTag::EmptyTag ? ALSXTDefensiveModeTags::Anticipation : PreviousDefensiveModeState.AnticipationMode;
+			// NewDefensiveModeState.Mode = PreviousDefensiveModeState.Mode == FGameplayTag::EmptyTag ? ALSXTDefensiveModeTags::Anticipation : PreviousDefensiveModeState.Mode;
+			NewDefensiveModeState.Mode = ALSXTDefensiveModeTags::Anticipation;
+			// NewDefensiveModeState.AnticipationMode = PreviousDefensiveModeState.AnticipationMode == FGameplayTag::EmptyTag ? ALSXTDefensiveModeTags::Anticipation : PreviousDefensiveModeState.AnticipationMode;
+			NewDefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::Anticipation;
 			NewDefensiveModeState.AnticipationSide = PreviousDefensiveModeState.AnticipationSide == FGameplayTag::EmptyTag ? ALSXTImpactSideTags::Front : PreviousDefensiveModeState.AnticipationSide;
 			NewDefensiveModeState.AnticipationHeight = PreviousDefensiveModeState.AnticipationHeight == FGameplayTag::EmptyTag ? ALSXTImpactHeightTags::Middle : PreviousDefensiveModeState.AnticipationHeight;
-			NewDefensiveModeState.AnticipationPose = SelectAttackAnticipationMontage(NewDefensiveModeState.Velocity, AlsStanceTags::Crouching, ALSXTImpactSideTags::Front, ALSXTImpactFormTags::Blunt).Pose;
+			NewDefensiveModeState.ObstacleMode = FGameplayTag::EmptyTag;
+			NewDefensiveModeState.ObstacleSide = FGameplayTag::EmptyTag;
+			NewDefensiveModeState.ObstacleHeight = FGameplayTag::EmptyTag;
+			//NewDefensiveModeState.AnticipationPose = SelectAttackAnticipationMontage(NewDefensiveModeState.Velocity, AlsStanceTags::Crouching, ALSXTImpactSideTags::Front, ALSXTImpactFormTags::Blunt).Pose;
 			// NewDefensiveModeState.AnticipationPose = SelectBlockingMontage(NewDefensiveModeState.Velocity, AlsStanceTags::Crouching, ALSXTImpactSideTags::Center, ALSXTImpactFormTags::Blunt).Pose;
 			SetDefensiveModeState(NewDefensiveModeState);
 			ImpactReaction->RefreshBlockingPoses();

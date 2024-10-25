@@ -1161,7 +1161,7 @@ void UALSXTCombatComponent::StartAttackImplementation(UAnimMontage* Montage, con
 				FVector SmoothMoveVector = NewLocation - Character->GetActorLocation();
 				FStepDownResult StepdownResult;
 				// IALSXTCharacterInterface::Execute_GetCharacterMovementComponent(GetOwner())->MoveSmooth(SmoothMoveVector, MovementSpeed, &StepdownResult);
-				IALSXTCharacterInterface::Execute_GetCharacter(GetOwner())->LaunchCharacter(SmoothMoveVector * 100, true, true);
+				IALSXTCharacterInterface::Execute_GetCharacter(GetOwner())->LaunchCharacter(SmoothMoveVector * 1.25, true, true);
 			}
 		}
 		

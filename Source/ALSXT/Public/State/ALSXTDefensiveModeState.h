@@ -45,7 +45,7 @@ struct ALSXT_API FALSXTDefensiveModeState
 	FALSXTDefensivePoseStanceSet CrowdNavigationPoseSet;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FALSXTDefensivePoseSet AnticipationPoseSet;
+	FALSXTAnticipationPoseSet AnticipationPoseSet;
 
 	// Deprecate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
