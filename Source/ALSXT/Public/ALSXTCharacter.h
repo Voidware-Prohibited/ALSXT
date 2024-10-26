@@ -254,6 +254,7 @@ public:
 	virtual FGameplayTag GetCharacterOverlayMode_Implementation() const override;
 	virtual FGameplayTag GetCharacterInjury_Implementation() const override;
 	virtual FGameplayTag GetCharacterCombatStance_Implementation() const override;
+	virtual void SetCharacterCombatStance_Implementation(UPARAM(meta = (Categories = "Als.Combat Stance"))const FGameplayTag& NewCombatStance) override;
 	virtual FGameplayTag GetCharacterWeaponReadyPosition_Implementation() const override;
 	virtual FGameplayTag GetCharacterWeaponFirearmStance_Implementation() const override;
 	virtual FGameplayTag GetCharacterEmote_Implementation() const override;
@@ -329,6 +330,15 @@ public:
 	//
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FALSXTPhysicalAnimationState GetPhysicalAnimationState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	void StartBlendOutPhysicalAnimation();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	void BlendOutPhysicalAnimation();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	void EndBlendOutPhysicalAnimation();
 
 	//
 	UFUNCTION()
@@ -860,9 +870,12 @@ protected:
 	void OnGestureHandChanged(const FGameplayTag& PreviousGestureHandTag);
 
 	// Defensive Mode State
-private:
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_DefensiveModeState", Meta = (AllowPrivateAccess))
 	FALSXTDefensiveModeState DefensiveModeState;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Transient)
+	// FALSXTDefensiveModeState DefensiveModeState;
 
 public:	
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
@@ -902,6 +915,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
 	void SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
+	void SetDefensiveModeStateImplementation(const FALSXTDefensiveModeState& NewDefensiveModeState);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void ResetDefensiveModeState();
@@ -961,6 +977,9 @@ protected:
 
 	FTimerHandle AnticipationTimerHandle;	// Timer Handle for Freelook Trace
 	FTimerDelegate AnticipationTimerDelegate; // Delegate to bind function with parameters
+
+	FTimerHandle BlendOutPhysicalAnimationTimerHandle;
+	FTimerDelegate BlendOutPhysicalAnimationTimerDelegate;
 
 	FTimerHandle SlidingTimerHandle;	// Timer Handle for Freelook Trace
 	FTimerDelegate SlidingTimerDelegate; // Delegate to bind function with parameters
@@ -1476,12 +1495,12 @@ public:
 private:
 	void SetLean(const FGameplayTag& NewLeanTag);
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void ServerSetDesiredLean(const FGameplayTag& NewLeanTag);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
-	void OnLeanChanged(const FGameplayTag& PreviousLeanTag);		
+	void OnLeanChanged(const FGameplayTag& PreviousLeanTag);
 
 	// Desired Freelooking
 
@@ -1607,7 +1626,7 @@ public:
 	void SetDesiredCombatStance(const FGameplayTag& NewCombatStanceTag);
 
 private:
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void ServerSetDesiredCombatStance(const FGameplayTag& NewCombatStanceTag);
 
 	// CombatStance

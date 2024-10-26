@@ -2052,12 +2052,18 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 															}
 															if (IALSXTAIInterface::Execute_ShouldAIEnterCombatReadyMode(GetOwner()))
 															{
-
+																DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::Blocking;
+																// DefensiveModeState.AnticipationPoseSet = SelectBlockingPoses(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), Form, IALSXTCharacterInterface::Execute_GetCharacterLocomotionVariant(GetOwner()));															
+																IALSXTCharacterInterface::Execute_SetCharacterCombatStance(GetOwner(), ALSXTCombatStanceTags::Ready);
+																DefensiveMode == ALSXTDefensiveModeTags::Anticipation;
 															}
 
 															if (IALSXTAIInterface::Execute_ShouldAIBlock(GetOwner()))
 															{
 																Montage = SelectDefensiveMontage(ALSXTActionStrengthTags::Light, IALSXTCharacterInterface::Execute_GetCharacterStance(GetOwner()), Side, Form, Health);
+																DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::Blocking;
+																// DefensiveModeState.AnticipationPoseSet = SelectBlockingPoses(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), Form, IALSXTCharacterInterface::Execute_GetCharacterLocomotionVariant(GetOwner()));															
+																IALSXTCharacterInterface::Execute_SetCharacterCombatStance(GetOwner(), ALSXTCombatStanceTags::Ready);
 																DefensiveMode == ALSXTDefensiveModeTags::Anticipation;
 															}
 															DefensiveModeState.Mode = DefensiveMode;
@@ -2562,9 +2568,27 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 			}
 			else
 			{
+				FALSXTDefensiveModeState EmptyDefensiveModeState;
+
+				FALSXTPhysicalAnimationState NewPhysicalAnimationState;
+				NewPhysicalAnimationState.Mode = ALSXTPhysicalAnimationModeTags::None;
+				NewPhysicalAnimationState.ProfileName = "CharacterMesh";
+				NewPhysicalAnimationState.Alpha = 0.0f;
+				IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationState(GetOwner(),NewPhysicalAnimationState);
+
+				if (IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()) != EmptyDefensiveModeState)
+				{
+					IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), EmptyDefensiveModeState);
+				}
+				
 				IALSXTCollisionInterface::Execute_ResetCharacterPhysicalAnimationMode(GetOwner());
 				if (!IALSXTCharacterInterface::Execute_IsBlocking(GetOwner()) || IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()).Mode != ALSXTDefensiveModeTags::ClutchImpactPoint)
 				{
+					if (IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()) != EmptyDefensiveModeState)
+					{
+						IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), EmptyDefensiveModeState);
+					}
+					
 					IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
 				}
 

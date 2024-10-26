@@ -105,6 +105,9 @@ protected:
 	FGameplayTag DefensiveMode{ FGameplayTag::EmptyTag };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Lean{ FGameplayTag::EmptyTag };
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag StationaryMode{FGameplayTag::EmptyTag};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))

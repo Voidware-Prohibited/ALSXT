@@ -204,6 +204,9 @@ public:
   FGameplayTag GetCharacterCombatStance() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterCombatStance(UPARAM(meta = (Categories = "Als.Combat Stance"))const FGameplayTag& NewCombatStance);
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterInjury() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")

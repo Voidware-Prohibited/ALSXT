@@ -70,6 +70,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		Freelooking = IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor());
 		Sex = IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwningActor());
 		DefensiveMode = IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwningActor());
+		Lean = IALSXTCharacterInterface::Execute_GetCharacterLean(GetOwningActor());
 		LocomotionVariant = IALSXTCharacterInterface::Execute_GetCharacterLocomotionVariant(GetOwningActor());
 		Injury = IALSXTCharacterInterface::Execute_GetCharacterInjury(GetOwningActor());
 		CombatStance = IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwningActor());
