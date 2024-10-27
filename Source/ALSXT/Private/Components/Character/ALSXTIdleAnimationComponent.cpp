@@ -116,6 +116,8 @@ void UALSXTIdleAnimationComponent::SetIdleCounterTarget_Implementation()
 	FALSXTIdleState NewIdleState = GetIdleState();
 	NewIdleState.TargetTime = FMath::RandRange(IdleAnimationSettings.TimeDelayBeforeIdle.X, IdleAnimationSettings.TimeDelayBeforeIdle.Y);
 	NewIdleState.CurrentTime = 0.0f;
+	NewIdleState.GazingTargetTime = FMath::RandRange(IdleAnimationSettings.TimeDelayBeforeGazing.X, IdleAnimationSettings.TimeDelayBeforeGazing.Y);
+	NewIdleState.GazingCurrentTime = 0.0f;
 	SetIdleState(NewIdleState);	
 }
 
@@ -321,6 +323,7 @@ void UALSXTIdleAnimationComponent::StartIdleCounterTimerImplementation()
 	GetWorld()->GetTimerManager().ClearTimer(PreCountIdleCounterTimerHandle);
 	SetIdleCounterTarget();
 	GetWorld()->GetTimerManager().SetTimer(IdleCounterTimerHandle, this, &UALSXTIdleAnimationComponent::IdleCounterTimer, 0.01f, true);
+	GetWorld()->GetTimerManager().SetTimer(GazingCounterTimerHandle, this, &UALSXTIdleAnimationComponent::IdleCounterTimer, 0.01f, true);
 }
 
 void UALSXTIdleAnimationComponent::IdleCounterTimer()
@@ -352,6 +355,35 @@ void UALSXTIdleAnimationComponent::IdleCounterTimer()
 	}	
 }
 
+void UALSXTIdleAnimationComponent::GazeCounterTimer()
+{
+	if (IsPlayerInputIdle())
+	{
+		FALSXTIdleState NewIdleState = GetIdleState();
+		NewIdleState.GazingTargetTime = NewIdleState.GazingTargetTime + 0.01;
+		SetIdleState(NewIdleState);
+
+		// if (IdleAnimationSettings.bDebugMode)
+		// {
+		// 	GEngine->AddOnScreenDebugMessage(-1, 0.001f, FColor::Yellow, FString::SanitizeFloat(GetIdleState().CurrentTime));
+		// }
+
+		if (GetIdleState().GazingTargetTime >= GetIdleState().GazingTargetTime && IdleAnimationSettings.EligibleStaminaLevels.HasTag(StatusState.CurrentStaminaTag) && IALSXTIdleAnimationComponentInterface::Execute_ShouldIdle(GetOwner()))
+		{
+			GetWorld()->GetTimerManager().ClearTimer(GazingCounterTimerHandle);
+			ResetIdleCounterTimer();
+			SetPlayerIdle(true);
+			StartIdle();
+		}
+	}
+	else
+	{
+		StopIdle();
+		SetIdleCounterTarget();
+		StartIdleCounterTimer();
+	}	
+}
+
 void UALSXTIdleAnimationComponent::ResetIdleCounterTimer()
 {
 	GetWorld()->GetTimerManager().ClearTimer(PreCountIdleCounterTimerHandle);
@@ -361,6 +393,8 @@ void UALSXTIdleAnimationComponent::ResetIdleCounterTimer()
 	FALSXTIdleState NewIdleState = GetIdleState();
 	NewIdleState.TargetTime = 0.0;
 	NewIdleState.CurrentTime = 0.0;
+	NewIdleState.GazingTargetTime = 0.0;
+	NewIdleState.GazingCurrentTime = 0.0;
 	SetIdleState(NewIdleState);
 
 	if (IALSXTIdleAnimationComponentInterface::Execute_ShouldIdle(GetOwner()))

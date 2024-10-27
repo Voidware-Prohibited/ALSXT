@@ -107,9 +107,11 @@ public:
 
 	FTimerHandle PreCountIdleCounterTimerHandle;
 	FTimerHandle IdleCounterTimerHandle;
+	FTimerDelegate IdleCounterTimerDelegate;
 	FTimerHandle DelayBetweenAnimationsTimerHandle;
 	FTimerDelegate DelayBetweenAnimationsTimerDelegate;
-	FTimerDelegate IdleCounterTimerDelegate;
+	FTimerHandle GazingCounterTimerHandle;
+	FTimerDelegate GazingCounterTimerDelegate;
 	FTimerHandle CameraRotationTimerHandle;
 	FTimerDelegate CameraRotationTimerDelegate;
 	FVector CameraOffset{ FVector::ZeroVector };
@@ -134,6 +136,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	void IdleCounterTimer();
+
+	UFUNCTION(BlueprintCallable, Category = "Parameters")
+	void GazeCounterTimer();
 
 	UFUNCTION(BlueprintCallable, Category = "Timerc")
 	void ResetIdleCounterTimer();

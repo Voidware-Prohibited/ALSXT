@@ -43,9 +43,15 @@ struct ALSXT_API FALSXTIdleState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
 	float CurrentTimeBeforeNext{ 0.0f };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float GazingTargetTime{ 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	float GazingCurrentTime{ 0.0f };
+
 	bool operator==(const FALSXTIdleState& other) const
 	{
-		return (other.bIdle == bIdle) && (other.Mode == Mode) && (other.CurrentIdleMontage == CurrentIdleMontage) && (other.TargetTime == TargetTime) && (other.CurrentTime == CurrentTime) && (other.TargetTimeBeforeNext == TargetTimeBeforeNext) && (other.CurrentTimeBeforeNext == CurrentTimeBeforeNext);
+		return (other.bIdle == bIdle) && (other.Mode == Mode) && (other.CurrentIdleMontage == CurrentIdleMontage) && (other.TargetTime == TargetTime) && (other.CurrentTime == CurrentTime) && (other.TargetTimeBeforeNext == TargetTimeBeforeNext) && (other.CurrentTimeBeforeNext == CurrentTimeBeforeNext)&& (other.GazingTargetTime == GazingTargetTime) && (other.GazingCurrentTime == GazingCurrentTime);
 	}
 };
 
@@ -66,6 +72,9 @@ struct ALSXT_API FALSXTALSXTGeneralIdleAnimationSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
 	FVector2D TimeDelayBetweenAnimations{ 10.0f, 20.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0))
+	FVector2D TimeDelayBeforeGazing{ 60.0f, 120.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableIdleCameraRotation{ true };
