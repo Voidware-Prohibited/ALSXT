@@ -102,6 +102,9 @@ protected:
 	FALSXTDefensiveModeState DefensiveModeState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FALSXTDefensiveModeAnimations DefensiveModeAnimations;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag DefensiveMode{ FGameplayTag::EmptyTag };
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))

@@ -21,7 +21,7 @@ struct ALSXT_API FALSXTPhysicalAnimationState
 	FGameplayTag Mode {ALSXTPhysicalAnimationModeTags::None };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")
-	FName ProfileName {"Character Mesh"};
+	FName ProfileName {"CharacterMesh"};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parameters")
 	TArray<FName> AffectedBonesBelow;

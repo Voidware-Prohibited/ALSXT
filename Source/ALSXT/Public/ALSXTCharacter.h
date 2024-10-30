@@ -871,8 +871,14 @@ protected:
 
 	// Defensive Mode State
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_DefensiveModeState", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State|Defensive Mode", ReplicatedUsing = "OnReplicate_DefensiveModeState", Meta = (AllowPrivateAccess))
 	FALSXTDefensiveModeState DefensiveModeState;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", ReplicatedUsing = "OnReplicate_DefensiveModeAnimations", Meta = (AllowPrivateAccess))
+	// DefensiveModeAnimations DefensiveModeAnimations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Meta = (AllowPrivateAccess))
+	FALSXTDefensiveModeAnimations DefensiveModeAnimations;
 
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Als Character|Footstep State", Transient)
 	// FALSXTDefensiveModeState DefensiveModeState;
@@ -913,8 +919,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FALSXTDefensiveModeState& GetDefensiveModeState() const;
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
+	const FALSXTDefensiveModeAnimations& GetDefensiveModeAnimations() const;
+
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
 	void SetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeAnimations"))
+	void SetDefensiveModeAnimations(const FALSXTDefensiveModeAnimations& NewDefensiveModeAnimations);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewDefensiveModeState"))
 	void SetDefensiveModeStateImplementation(const FALSXTDefensiveModeState& NewDefensiveModeState);
@@ -934,6 +946,9 @@ private:
 
 	UFUNCTION()
 	void OnReplicate_DefensiveModeState(const FALSXTDefensiveModeState& PreviousDefensiveModeState);
+
+	// UFUNCTION()
+	// void OnReplicate_DefensiveModeAnimations(const FALSXTDefensiveModeAnimations& PreviousDefensiveModeAnimations);
 
 	UFUNCTION(BlueprintCallable, Category = "Settings|Als Character|Defensive Mode State")
 	void ClientSetDefensiveModeState(const FALSXTDefensiveModeState& NewDefensiveModeState);
@@ -2057,6 +2072,7 @@ protected:
 	virtual void OnActorAttackCollision_Implementation(FAttackDoubleHitResult Hit) override;
 	virtual FALSXTSlidingState GetCharacterSlidingState_Implementation() const override;
 	virtual FALSXTDefensiveModeState GetCharacterDefensiveModeState_Implementation() const override;
+	virtual FALSXTDefensiveModeAnimations GetCharacterDefensiveModeAnimations_Implementation() const override;
 	virtual FALSXTBumpPoseState GetCrowdNavigationPoseState_Implementation() const override;
 
 	virtual FALSXTPhysicalAnimationState GetCharacterPhysicalAnimationState_Implementation() const override;
@@ -2109,6 +2125,7 @@ protected:
 	virtual bool IsBlocking_Implementation() const override;	
 	virtual void SetCharacterDefensiveMode_Implementation(const FGameplayTag& NewDefensiveMode) override;
 	virtual void SetCharacterDefensiveModeState_Implementation(FALSXTDefensiveModeState NewDefensiveModeState) override;
+	virtual void SetCharacterDefensiveModeAnimations_Implementation(FALSXTDefensiveModeAnimations NewDefensiveModeAnimations) override;
 	virtual void ResetCharacterDefensiveModeState_Implementation() override;
 
 	// Held Item Interface Functions
@@ -2217,6 +2234,11 @@ inline const FALSXTSlidingState& AALSXTCharacter::GetSlidingState() const
 inline const FALSXTDefensiveModeState& AALSXTCharacter::GetDefensiveModeState() const
 {
 	return DefensiveModeState;
+}
+
+inline const FALSXTDefensiveModeAnimations& AALSXTCharacter::GetDefensiveModeAnimations() const
+{
+	return DefensiveModeAnimations;
 }
 
 inline const FALSXTHeldItemState& AALSXTCharacter::GetHeldItemState() const

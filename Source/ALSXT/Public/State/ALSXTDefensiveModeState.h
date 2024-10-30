@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NativeGameplayTags.h"
-#include "Utility/ALSXTGameplayTags.h"
+#include "Utility/ALSXTCollisionGameplayTags.h"
 #include "Settings/ALSXTDefensiveModeSettings.h"
 #include "ALSXTDefensiveModeState.generated.h"
 
@@ -12,7 +12,7 @@ struct ALSXT_API FALSXTDefensiveModeState
 
 	// Deprecate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Mode {FGameplayTag::EmptyTag};
+	FGameplayTag Mode {ALSXTPhysicalAnimationModeTags::None};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag ImpactMode{ FGameplayTag::EmptyTag };
@@ -22,34 +22,6 @@ struct ALSXT_API FALSXTDefensiveModeState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag ObstacleMode{ FGameplayTag::EmptyTag };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAnimSequenceBase> ImpactMontage{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAnimSequenceBase> AnticipationPose{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAnimSequenceBase> AnticipationCrouchedPose{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAnimSequenceBase> AnticipationInAirPose{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAnimSequenceBase> ObstaclePose{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FALSXTDefensivePoseSet ObstaclePoseSet;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FALSXTDefensivePoseStanceSet CrowdNavigationPoseSet;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FALSXTAnticipationPoseSet AnticipationPoseSet;
-
-	// Deprecate
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAnimSequenceBase> Montage{ nullptr };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform ObstacleTransform;
@@ -87,25 +59,35 @@ struct ALSXT_API FALSXTDefensiveModeState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Velocity", AllowPrivateAccess))
 	FGameplayTag ImpactVelocity{ FGameplayTag::EmptyTag };
 
-	// Deprecate
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Side{ FGameplayTag::EmptyTag };
-
-	// Deprecate
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Form{ FGameplayTag::EmptyTag };
-
-	// Deprecate
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag Velocity{ FGameplayTag::EmptyTag };
-
-	// Deprecate
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FTransform Transform;
-
 	bool operator==(const FALSXTDefensiveModeState& other) const
 	{
-		return (other.Mode == Mode) && (other.Montage == Montage) && (other.Side == Side) && (other.Form == Form) && (other.Velocity == Velocity) && (other.Transform.GetLocation() == Transform.GetLocation()) && (other.Transform.GetRotation() == Transform.GetRotation());
+		return (other.Mode == Mode) && (other.AnticipationMode == AnticipationMode) && (other.ObstacleMode == ObstacleMode) && (other.ObstacleSide == ObstacleSide) && (other.ObstacleHeight == ObstacleHeight) && (other.ObstacleTransform.GetLocation() == ObstacleTransform.GetLocation()) && (other.AnticipationSide == AnticipationSide) && (other.AnticipationHeight == AnticipationHeight) && (other.AnticipationTransform.GetRotation() == AnticipationTransform.GetRotation()) && (other.ImpactSide == ImpactSide) && (other.ImpactHeight == ImpactHeight) && (other.ImpactTransform.GetRotation() == ImpactTransform.GetRotation());
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTDefensiveModeAnimations
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAnimSequenceBase> ImpactMontage {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTDefensivePoseSet ObstaclePoseSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTDefensivePoseStanceSet CrowdNavigationPoseSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTAnticipationPoseSet AnticipationPoseSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FALSXTDefensivePoseSet BraceForImpactPoseSet;
+
+	bool operator==(const FALSXTDefensiveModeAnimations& other) const
+	{
+		return (other.ImpactMontage == ImpactMontage) && (other.ObstaclePoseSet == ObstaclePoseSet) && (other.CrowdNavigationPoseSet == CrowdNavigationPoseSet) && (other.AnticipationPoseSet == AnticipationPoseSet) && (other.BraceForImpactPoseSet == BraceForImpactPoseSet);
 	}
 };
 

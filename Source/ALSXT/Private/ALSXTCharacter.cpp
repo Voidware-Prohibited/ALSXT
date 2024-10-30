@@ -1160,31 +1160,33 @@ void AALSXTCharacter::BlendOutPhysicalAnimation()
 
 void AALSXTCharacter::EndBlendOutPhysicalAnimation()
 {
+	GetWorld()->GetTimerManager().ClearTimer(BlendOutPhysicalAnimationTimerHandle);
 	FALSXTPhysicalAnimationState NewPhysicalAnimationState;
 	NewPhysicalAnimationState.Mode = FGameplayTag::EmptyTag;
 	NewPhysicalAnimationState.ProfileName = "CharacterMesh";
 	SetPhysicalAnimationState(NewPhysicalAnimationState);
 	FALSXTDefensiveModeState NewDefensiveModeState = GetDefensiveModeState();
-	NewDefensiveModeState.Mode = ALSXTPhysicalAnimationModeTags::None;
-	NewDefensiveModeState.AnticipationMode = FGameplayTag::EmptyTag;
 	NewDefensiveModeState.ObstacleMode = FGameplayTag::EmptyTag;
-	NewDefensiveModeState.AnticipationSide = FGameplayTag::EmptyTag;
-	NewDefensiveModeState.AnticipationHeight = FGameplayTag::EmptyTag;
 	NewDefensiveModeState.ObstacleSide = FGameplayTag::EmptyTag;
 	NewDefensiveModeState.ObstacleHeight = FGameplayTag::EmptyTag;
-	NewDefensiveModeState.AnticipationTransform = {{0, 0, 0}, {0, 0, 0}, { 0, 0, 0 }};
+
+	if (GetDefensiveModeState().AnticipationMode != ALSXTDefensiveModeTags::Anticipation)
+	{
+		NewDefensiveModeState.Mode = ALSXTPhysicalAnimationModeTags::None;
+		NewDefensiveModeState.AnticipationMode = FGameplayTag::EmptyTag;
+		NewDefensiveModeState.AnticipationSide = FGameplayTag::EmptyTag;
+		NewDefensiveModeState.AnticipationHeight = FGameplayTag::EmptyTag;
+		NewDefensiveModeState.AnticipationForm = FGameplayTag::EmptyTag;
+		NewDefensiveModeState.AnticipationTransform = {{0, 0, 0}, {0, 0, 0}, { 0, 0, 0 }};
+	}
+
 	NewDefensiveModeState.ObstacleTransform = {{0, 0, 0}, {0, 0, 0}, { 0, 0, 0 }};
-	NewDefensiveModeState.Transform = {{0, 0, 0}, {0, 0, 0}, { 0, 0, 0 }};
-	NewDefensiveModeState.Form = FGameplayTag::EmptyTag;
-	NewDefensiveModeState.AnticipationForm = FGameplayTag::EmptyTag;
 	SetDefensiveModeState(NewDefensiveModeState);
 	
 	// FALSXTPhysicalAnimationState NewPhysicalAnimationState;
 	// SetPhysicalAnimationState(NewPhysicalAnimationState);
 	TArray<FName> EmptyNames;
 	SetPhysicalAnimationMode(ALSXTPhysicalAnimationModeTags::None, EmptyNames);
-
-	GetWorld()->GetTimerManager().ClearTimer(BlendOutPhysicalAnimationTimerHandle);
 }
 
 void AALSXTCharacter::OnOverlayModeChanged_Implementation(const FGameplayTag& PreviousOverlayMode)
@@ -1695,6 +1697,7 @@ void AALSXTCharacter::InputBlock(const FInputActionValue& ActionValue)
 			NewDefensiveModeState.ObstacleHeight = FGameplayTag::EmptyTag;
 			SetDefensiveModeState(NewDefensiveModeState);
 			// SetDesiredDefensiveMode(ALSXTDefensiveModeTags::Blocking);
+
 		}
 		else 
 		{
@@ -2654,7 +2657,43 @@ void AALSXTCharacter::SetDefensiveModeState(const FALSXTDefensiveModeState& NewD
 	// 	OnDefensiveModeStateChanged(PreviousDefensiveModeState);
 	// }
 
-	ForceNetUpdate();
+	// ForceNetUpdate();
+}
+
+void AALSXTCharacter::SetDefensiveModeAnimations(const FALSXTDefensiveModeAnimations& NewDefensiveModeAnimations)
+{
+	// const auto PreviousDefensiveModeState{ DefensiveModeState };
+	// if (GetLocalRole() == ROLE_AutonomousProxy)
+	// {
+	// 	// MulticastSetDefensiveModeState(NewDefensiveModeState);
+	// 	ServerSetDefensiveModeState(NewDefensiveModeState);
+	// 
+	// }
+	// else if (GetLocalRole() == ROLE_Authority)
+	// {
+	// 	SetDefensiveModeStateImplementation(NewDefensiveModeState);
+	// 	// OnDefensiveModeStateChanged(PreviousDefensiveModeState);
+	// }
+	DefensiveModeAnimations = NewDefensiveModeAnimations;
+	const auto PreviousDefensiveModeState{ DefensiveModeAnimations };	
+	// OnDefensiveModeStateChanged(PreviousDefensiveModeState);
+	// MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DefensiveModeState, this);
+
+	// if (GetLocalRole() == ROLE_AutonomousProxy)
+	// {
+	// 	// MulticastSetDefensiveModeState(NewDefensiveModeState);
+	// 	ServerSetDefensiveModeState(NewDefensiveModeState);
+	// 
+	// }
+
+
+
+	// else if (GetLocalRole() == ROLE_Authority)
+	// {
+	// 	OnDefensiveModeStateChanged(PreviousDefensiveModeState);
+	// }
+
+	// ForceNetUpdate();
 }
 
 void AALSXTCharacter::SetDefensiveModeStateImplementation(const FALSXTDefensiveModeState& NewDefensiveModeState)
@@ -2932,7 +2971,7 @@ FGameplayTag AALSXTCharacter::GetCharacterPhysicalAnimationMode_Implementation()
 
 void AALSXTCharacter::SetCharacterPhysicalAnimationMode_Implementation(const FGameplayTag& NewPhysicalAnimationMode, const TArray<FName>& BelowBoneNames)
 {
-		SetPhysicalAnimationMode(NewPhysicalAnimationMode, BelowBoneNames);
+		SetDesiredPhysicalAnimationMode(NewPhysicalAnimationMode, BelowBoneNames);
 }
 
 void AALSXTCharacter::ResetCharacterPhysicalAnimationMode_Implementation()
@@ -3055,9 +3094,10 @@ void AALSXTCharacter::SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAn
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SetPhysicalAnimationMode"));
 		const auto PreviousPhysicalAnimationMode{ PhysicalAnimationMode };
 
-		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::None)
+		if (NewPhysicalAnimationModeTag == ALSXTPhysicalAnimationModeTags::None || NewPhysicalAnimationModeTag == FGameplayTag::EmptyTag)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("ALSXTPhysicalAnimationModeTags::None"));
+			PhysicalAnimationMode = ALSXTPhysicalAnimationModeTags::None;
 			GetMesh()->SetCollisionProfileName("CharacterMesh");
 			PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("pelvis", "Default", true, false);
 			GetCapsuleComponent()->SetCapsuleRadius(25);		
@@ -3075,13 +3115,10 @@ void AALSXTCharacter::SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAn
 			NewDefensiveModeState.ObstacleHeight = FGameplayTag::EmptyTag;
 			NewDefensiveModeState.AnticipationTransform = {{0, 0, 0}, {0, 0, 0}, { 0, 0, 0 }};
 			NewDefensiveModeState.ObstacleTransform = {{0, 0, 0}, {0, 0, 0}, { 0, 0, 0 }};
-			NewDefensiveModeState.Transform = {{0, 0, 0}, {0, 0, 0}, { 0, 0, 0 }};
-			NewDefensiveModeState.Form = FGameplayTag::EmptyTag;
 			NewDefensiveModeState.AnticipationForm = FGameplayTag::EmptyTag;
 			SetDefensiveModeState(NewDefensiveModeState);
-			StartBlendOutPhysicalAnimation();
-			PhysicalAnimationMode = NewPhysicalAnimationModeTag;
 			OnPhysicalAnimationModeChanged(PreviousPhysicalAnimationMode);
+			StartBlendOutPhysicalAnimation();
 			return;
 			// GetMesh()->SetAllBodiesSimulatePhysics(false);
 		}
@@ -3179,9 +3216,28 @@ void AALSXTCharacter::ResetPhysicalAnimationMode()
 	NewPhysicalAnimationState.Mode = ALSXTPhysicalAnimationModeTags::None;
 	NewPhysicalAnimationState.ProfileName = "CharacterMesh";
 	NewPhysicalAnimationState.AffectedBonesBelow = AffectedBonesBelowNames;
-	NewPhysicalAnimationState.Alpha = 0.0f;
+	// NewPhysicalAnimationState.Alpha = 0.0f;
+	StartBlendOutPhysicalAnimation();
 	SetPhysicalAnimationState(NewPhysicalAnimationState);
 	OnPhysicalAnimationModeChanged(PreviousPhysicalAnimationMode);
+	FALSXTDefensiveModeState NewDefensiveModeState = GetDefensiveModeState();
+	
+	NewDefensiveModeState.ObstacleMode = FGameplayTag::EmptyTag;
+	NewDefensiveModeState.ObstacleSide = FGameplayTag::EmptyTag;
+	NewDefensiveModeState.ObstacleHeight = FGameplayTag::EmptyTag;	
+	NewDefensiveModeState.ObstacleTransform = {{0, 0, 0}, {0, 0, 0}, { 0, 0, 0 }};
+
+	if (GetDefensiveModeState().AnticipationMode != ALSXTDefensiveModeTags::Anticipation)
+	{
+		NewDefensiveModeState.Mode = ALSXTPhysicalAnimationModeTags::None;
+		NewDefensiveModeState.AnticipationMode = FGameplayTag::EmptyTag;
+		NewDefensiveModeState.AnticipationSide = FGameplayTag::EmptyTag;
+		NewDefensiveModeState.AnticipationHeight = FGameplayTag::EmptyTag;
+		NewDefensiveModeState.AnticipationForm = FGameplayTag::EmptyTag;
+		NewDefensiveModeState.AnticipationTransform = {{0, 0, 0}, {0, 0, 0}, { 0, 0, 0 }};
+	}
+	
+	SetDefensiveModeState(NewDefensiveModeState);
 	PhysicalAnimationMode = ALSXTPhysicalAnimationModeTags::None;
 }
 
@@ -3673,6 +3729,11 @@ FALSXTDefensiveModeState AALSXTCharacter::GetCharacterDefensiveModeState_Impleme
 	return GetDefensiveModeState();
 }
 
+FALSXTDefensiveModeAnimations AALSXTCharacter::GetCharacterDefensiveModeAnimations_Implementation() const
+{
+	return GetDefensiveModeAnimations();
+}
+
 FALSXTBumpPoseState AALSXTCharacter::GetCrowdNavigationPoseState_Implementation() const
 {
 	return ImpactReaction->GetCrowdNavigationPoseState();
@@ -3758,6 +3819,11 @@ void AALSXTCharacter::SetViewportMask_Implementation(const FGameplayTag& Equipme
 void AALSXTCharacter::SetCharacterDefensiveModeState_Implementation(FALSXTDefensiveModeState NewDefensiveModeState)
 {
 	SetDefensiveModeState(NewDefensiveModeState);
+}
+
+void AALSXTCharacter::SetCharacterDefensiveModeAnimations_Implementation(FALSXTDefensiveModeAnimations NewDefensiveModeAnimations)
+{
+	SetDefensiveModeAnimations(NewDefensiveModeAnimations);
 }
 
 void AALSXTCharacter::SetCharacterMovementModeLocked_Implementation(bool NewLocked)

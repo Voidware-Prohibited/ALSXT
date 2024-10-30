@@ -172,7 +172,7 @@ public:
 	FALSXTAnticipationPoseSet SelectBlockingPoses(const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Variant);
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
-	FALSXTAnticipationMovementModePoseSet SelectBraceForImpactPoses(const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Variant);
+	FALSXTDefensivePoseSet SelectBraceForImpactPoses(const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Variant);
 
 	UFUNCTION(BlueprintCallable, Category = "Parameters")
 	FALSXTObstacleCollisionAnticipationPoseSet SelectObstacleCollisionAnticipationPoses(const FGameplayTag& Overlay, const FGameplayTag& Form, const FGameplayTag& Variant);

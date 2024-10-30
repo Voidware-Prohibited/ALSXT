@@ -134,6 +134,29 @@ struct ALSXT_API FAnticipationPoses
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FAvoidingPoses
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode", AllowPrivateAccess))
+	FGameplayTagContainer Overlay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Impact Form", AllowPrivateAccess))
+	FGameplayTagContainer Form;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Locomotion Variant", AllowPrivateAccess))
+	FGameplayTagContainer Variant;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{Standing} {Crouched}", AllowPrivateAccess))
+	FALSXTDefensivePoseSet Poses;
+
+	bool operator==(const FAvoidingPoses& other) const
+	{
+		return (other.Overlay == Overlay) && (other.Form == Form) && (other.Variant == Variant) && (other.Poses == Poses);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FBraceForImpactPoses
 {
 	GENERATED_BODY()
@@ -148,7 +171,7 @@ struct ALSXT_API FBraceForImpactPoses
 	FGameplayTagContainer Variant;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (TitleProperty = "{High} {Middle} {Low}", AllowPrivateAccess))
-	FALSXTAnticipationMovementModePoseSet Poses;
+	FALSXTDefensivePoseSet Poses;
 
 	bool operator==(const FBraceForImpactPoses& other) const
 	{

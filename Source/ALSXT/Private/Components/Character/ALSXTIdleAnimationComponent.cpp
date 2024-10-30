@@ -42,7 +42,7 @@ void UALSXTIdleAnimationComponent::BeginPlay()
 		AnimInstance = IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->GetAnimInstance();
 	}
 	
-	if (GetOwner())
+	if (GetOwner() && IdleAnimationSettings.EnableIdleAnimations)
 	{
 		SetIdleCounterTarget();
 		GetWorld()->GetTimerManager().SetTimer(PreCountIdleCounterTimerHandle, this, &UALSXTIdleAnimationComponent::StartIdleCounterTimer, GetIdleState().TargetTime, false);
@@ -53,10 +53,13 @@ void UALSXTIdleAnimationComponent::BeginPlay()
 void UALSXTIdleAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	StatusState = IALSXTCharacterInterface::Execute_GetStatusState(GetOwner());
-	if (IsValid(GetIdleState().CurrentIdleMontage) && !IsPlayerInputIdle())
+	if (IdleAnimationSettings.EnableIdleAnimations)
 	{
-		StopIdle();
+		StatusState = IALSXTCharacterInterface::Execute_GetStatusState(GetOwner());
+		if (IsValid(GetIdleState().CurrentIdleMontage) && !IsPlayerInputIdle())
+		{
+			StopIdle();
+		}
 	}
 }
 
@@ -323,7 +326,7 @@ void UALSXTIdleAnimationComponent::StartIdleCounterTimerImplementation()
 	GetWorld()->GetTimerManager().ClearTimer(PreCountIdleCounterTimerHandle);
 	SetIdleCounterTarget();
 	GetWorld()->GetTimerManager().SetTimer(IdleCounterTimerHandle, this, &UALSXTIdleAnimationComponent::IdleCounterTimer, 0.01f, true);
-	GetWorld()->GetTimerManager().SetTimer(GazingCounterTimerHandle, this, &UALSXTIdleAnimationComponent::IdleCounterTimer, 0.01f, true);
+	GetWorld()->GetTimerManager().SetTimer(GazingCounterTimerHandle, this, &UALSXTIdleAnimationComponent::GazeCounterTimer, 0.01f, true);
 }
 
 void UALSXTIdleAnimationComponent::IdleCounterTimer()

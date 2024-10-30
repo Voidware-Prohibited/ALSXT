@@ -69,6 +69,9 @@ public:
   FALSXTDefensiveModeState GetCharacterDefensiveModeState() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FALSXTDefensiveModeAnimations GetCharacterDefensiveModeAnimations() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FALSXTFootprintsState GetCharacterFootprintsState() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
@@ -117,6 +120,9 @@ public:
   void SetCharacterDefensiveModeState(FALSXTDefensiveModeState NewDefensiveModeState);
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterDefensiveModeAnimations(FALSXTDefensiveModeAnimations NewDefensiveModeAnimations);
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   void SetCharacterMovementModeLocked(bool NewLocked);
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
@@ -133,6 +139,9 @@ public:
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterHoldingBreath() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALSXTCharacter Interface")
+  FVector GetCharacterThreatPoint() const;
 
   // Firearm
 
