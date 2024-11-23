@@ -387,55 +387,69 @@ FGameplayTag UALSXTImpactReactionComponent::ConvertPhysicalSurfaceToFormTag(EPhy
 // Grounded Bump and Crowd Navigation
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
-	if (IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) != ALSXTCombatStanceTags::Neutral || IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner()) != FGameplayTag::EmptyTag)
-	{
-		return;
-	}
-	
-	if (IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner()) != FGameplayTag::EmptyTag || IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == AlsLocomotionActionTags::Stabilization)
+	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) != AlsLocomotionModeTags::Grounded || IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) != FGameplayTag::EmptyTag || (IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::Dead || IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::Unconscious))
 	{
 		return;
 	}
 
+
+	if (IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) == ALSXTCombatStanceTags::Neutral )
+	{
+		// Crowd Nav
+	}
+	if (IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) != ALSXTCombatStanceTags::Neutral )
+	{
+		// IALSXTCharacterInterface::Execute_IsCarryingWeapon
+		//		IsHoldingAimableWeapon
+		//			ShouldFlee
+		//				HitActor->AFlee
+		//			Should Avoid
+		//				HitActor->Avoid
+		//			ShouldAttack
+		//				HitActor-EnterCombat
+
+
+
+	}
+	if (IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) == ALSXTCombatStanceTags::Neutral )
+	{
+
+	}
+
+	// Setup Trace
 	const auto* Capsule{ IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(GetOwner()) };
 	const auto CapsuleScale{ Capsule->GetComponentScale().Z };
 	auto CapsuleRadius{ ImpactReactionSettings.BumpDetectionRadius };
-	const auto CapsuleHalfHeight{ Capsule->GetScaledCapsuleHalfHeight() };
-	const FVector UpVector{ GetOwner()->GetActorUpVector() };
-	float TraceDistance{ 5.0f };
 	float CharacterVelocity = GetOwner()->GetVelocity().Length();
-
-	if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Walking)
+	float TraceDistance{ 5.0f };
+	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == AlsLocomotionActionTags::Sliding)
 	{
-		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(5.0f, 175.0f), FVector2D(0.0f, 0.125f), CharacterVelocity);
+		CapsuleRadius = CapsuleRadius * 2.0;
+		TraceDistance = ImpactReactionSettings.MaxSlideToCoverDetectionDistance;
 	}
-	if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Running)
+	else if (!IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->IsPlayingNetworkedRootMotionMontage())
 	{
-		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(5.0f, 375.0f), FVector2D(0.125f, 0.14f), CharacterVelocity);
+		// TraceDistance = ImpactReactionSettings.MaxBumpDetectionDistance;
+		if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Walking)
+		{
+			TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(5.0f, 175.0f), FVector2D(0.0f, 0.125f), CharacterVelocity);
+		}
+		if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Running)
+		{
+			TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(5.0f, 375.0f), FVector2D(0.125f, 0.14f), CharacterVelocity);
+		}
+		if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
+		{
+			TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(5.0f, 650.0f), FVector2D(0.14f, 0.18f), CharacterVelocity);
+		}
 	}
-	if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
-	{
-		TraceDistance = FMath::GetMappedRangeValueClamped(FVector2D(5.0f, 650.0f), FVector2D(0.14f, 0.18f), CharacterVelocity);
-	}
-
-	const FVector StartLocation{ GetOwner()->GetActorLocation() + (UpVector * 20) };
+	const FVector StartLocation{ GetOwner()->GetActorLocation() + (GetOwner()->GetActorUpVector() * 20) };
 	const FVector EndLocation{ StartLocation + (GetOwner()->GetVelocity() * TraceDistance) };
 	TEnumAsByte<EDrawDebugTrace::Type> BumpDebugMode;
 	BumpDebugMode = (ImpactReactionSettings.DebugMode) ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
-	// BumpDebugMode = EDrawDebugTrace::ForOneFrame;
 	TArray<FHitResult> HitResults;
 	TArray<AActor*> IgnoreActors;
-	IgnoreActors.Add(GetOwner());
-
-	// if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) == AlsLocomotionActionTags::Sliding)
-	// {
-	// 	CapsuleRadius = CapsuleRadius * 2.0;
-	// 	TraceDistance = ImpactReactionSettings.MaxSlideToCoverDetectionDistance;
-	// }
-	// else if (!IALSXTCharacterInterface::Execute_GetCharacterMesh(GetOwner())->IsPlayingNetworkedRootMotionMontage())
-	// {
-	// 	TraceDistance = ImpactReactionSettings.MaxBumpDetectionDistance;
-	// }
+	IgnoreActors.Add(GetOwner());	
 
 	// Check Status
 	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) == AlsLocomotionModeTags::Grounded && (IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::Normal || IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::KnockedDown))
@@ -450,7 +464,6 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 				{
 					if (ValidateNewAnticipationHit(HitResult.GetActor()))
 					{
-
 						FVector MeshHitLocation{ ForceInit };
 						FVector ActorVelocity{ FVector::ZeroVector };
 						float ActorMass{ 0.0f };
@@ -849,11 +862,23 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 										{
 											// DefensiveModeState.Montage = SelectBumpReactionMontage(Velocity, Side, Form).Montage.Montage;
+											DefensiveModeState.Mode = ALSXTDefensiveModeTags::Anticipation;
+											DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::Anticipation; // Create Obstacle Impact Anticipation tag and use it here
+											DefensiveModeState.AnticipationSide = LocationToImpactSide(AnticipationPoint);
+											DefensiveModeState.AnticipationHeight = LocationToImpactHeight(AnticipationPoint);
 											IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 											IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
 										}
 										else
 										{
+											// Crowd Nav
+											Montage.Pose = SelectCrowdNavigationPose(Side, Form);
+											DefensiveModeState.Mode = ALSXTDefensiveModeTags::ObstacleNavigation;
+											DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::CrowdNavigation;
+											DefensiveModeState.ObstacleSide = LocationToImpactSide(AnticipationPoint);
+											DefensiveModeState.ObstacleHeight = LocationToImpactHeight(AnticipationPoint);
+											IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
+											IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
 											return;
 										}
 									}
@@ -863,12 +888,20 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 										{
 											// Bump
+											DefensiveModeState.Mode = ALSXTDefensiveModeTags::Anticipation;
+											DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::Anticipation; // Create Obstacle Impact Anticipation tag and use it here
+											DefensiveModeState.AnticipationSide = LocationToImpactSide(AnticipationPoint);
+											DefensiveModeState.AnticipationHeight = LocationToImpactHeight(AnticipationPoint);
 											Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 										}
 										else
 										{
 											// Crowd Nav
 											Montage.Pose = SelectCrowdNavigationPose(Side, Form);
+											DefensiveModeState.Mode = ALSXTDefensiveModeTags::ObstacleNavigation;
+											DefensiveModeState.ObstacleMode = ALSXTDefensiveModeTags::CrowdNavigation;
+											DefensiveModeState.ObstacleSide = LocationToImpactSide(AnticipationPoint);
+											DefensiveModeState.ObstacleHeight = LocationToImpactHeight(AnticipationPoint);
 										}
 										IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
 										IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), DefensiveMode);
@@ -909,8 +942,10 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										Montage = SelectImpactAnticipationMontage(Velocity, Stance, Side, Form, Health);
 										DefensiveModeState.ImpactTransform = { UKismetMathLibrary::MakeRotFromX(AnticipationPoint), AnticipationPoint, { 1.0f, 1.0f, 1.0f } };
 										DefensiveMode = ALSXTDefensiveModeTags::BraceForImpact;
-										DefensiveModeState.Mode = DefensiveMode;
-										DefensiveModeState.AnticipationMode = DefensiveMode;
+										DefensiveModeState.Mode = ALSXTDefensiveModeTags::Anticipation;
+										DefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::Anticipation; // Create Obstacle Impact Anticipation tag and use it here
+										DefensiveModeState.AnticipationSide = LocationToImpactSide(AnticipationPoint);
+										DefensiveModeState.AnticipationHeight = LocationToImpactHeight(AnticipationPoint);
 									}
 									else
 									{
@@ -918,6 +953,8 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 										DefensiveModeState.Mode = ALSXTDefensiveModeTags::ObstacleNavigation;
 										DefensiveModeState.ObstacleMode = ALSXTDefensiveModeTags::CrowdNavigation;
+										DefensiveModeState.ObstacleSide = LocationToImpactSide(AnticipationPoint);
+										DefensiveModeState.ObstacleHeight = LocationToImpactHeight(AnticipationPoint);
 										DefensiveMode == ALSXTDefensiveModeTags::CrowdNavigation;
 									}
 									IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), DefensiveModeState);
@@ -986,9 +1023,9 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										Montage.Pose = SelectCrowdNavigationPose(Side, Form);
 										// DefensiveModeState.ObstaclePoseSet = SelectObstacleNavigationPoses(IALSXTCharacterInterface::Execute_GetCharacterOverlayMode(GetOwner()), CharacterCombatStance, Health);
 										DefensiveModeState.Mode = ALSXTDefensiveModeTags::ObstacleNavigation;
-										DefensiveModeState.ObstacleMode = ALSXTDefensiveModeTags::ObstacleNavigation;
-										DefensiveModeState.ObstacleSide = Side;
-										DefensiveModeState.ObstacleHeight = Height;
+										DefensiveModeState.ObstacleMode = ALSXTDefensiveModeTags::CrowdNavigation;
+										DefensiveModeState.ObstacleSide = LocationToImpactSide(AnticipationPoint);
+										DefensiveModeState.ObstacleHeight = LocationToImpactHeight(AnticipationPoint);
 										DefensiveMode == ALSXTDefensiveModeTags::ObstacleNavigation;
 
 										FALSXTDefensiveModeState PreviousDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
@@ -1080,63 +1117,39 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 		{
 			FGameplayTag CharacterCombatStance = IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner());
 			const auto* Capsule{ IALSXTCharacterInterface::Execute_GetCharacterCapsuleComponent(GetOwner()) };
-			const auto CapsuleScale{ Capsule->GetComponentScale().Z };
-			auto CapsuleRadius{ ImpactReactionSettings.BumpDetectionRadius };
-			const auto CapsuleHalfHeight{ Capsule->GetScaledCapsuleHalfHeight() };
-			const FVector UpVector{ GetOwner()->GetActorUpVector() };
-			const FVector StartLocation{ GetOwner()->GetActorLocation() + (UpVector * CapsuleHalfHeight / 2) };
-			TEnumAsByte<EDrawDebugTrace::Type> BumpDebugMode;
-			BumpDebugMode = (ImpactReactionSettings.DebugMode) ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
+			const FVector StartLocation{ GetOwner()->GetActorLocation() + (GetOwner()->GetActorUpVector() * Capsule->GetScaledCapsuleHalfHeight() / 2) };
+			TEnumAsByte<EDrawDebugTrace::Type> BumpDebugMode = (ImpactReactionSettings.DebugMode) ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
 			TArray<FHitResult> HitResults;
 			TArray<AActor*> IgnoreActors;
 			IgnoreActors.Add(GetOwner());
-			float VelocityLength{ 0.0f };
-			float TraceDistance{ 0.0f };
 			FVector2D VelocityRange{ 199.0, 650.0 };
 			FVector2D ConversionRange{ 0.0, 1.0 };
-			FVector RangedVelocity = GetOwner()->GetVelocity();
-			VelocityLength = FMath::GetMappedRangeValueClamped(VelocityRange, ConversionRange, GetOwner()->GetVelocity().Length());
-			TraceDistance = ImpactReactionSettings.MaxBumpDetectionDistance;
+			float VelocityLength = FMath::GetMappedRangeValueClamped(VelocityRange, ConversionRange, GetOwner()->GetVelocity().Length());
+			float TraceDistance = ImpactReactionSettings.MaxBumpDetectionDistance;
 			const FVector EndLocation{ StartLocation + (GetOwner()->GetVelocity() * TraceDistance) };
 
-			if (GEngine && ImpactReactionSettings.DebugMode)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(HitResults.Num()));
-			}
-
-
 			// Trace
-			if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, CapsuleRadius, CapsuleHalfHeight / 2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, BumpDebugMode,HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
+			if (UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), StartLocation, EndLocation, ImpactReactionSettings.BumpDetectionRadius, Capsule->GetScaledCapsuleHalfHeight() / 2, ImpactReactionSettings.BumpTraceObjectTypes, false, IgnoreActors, BumpDebugMode,HitResults, true, FLinearColor::Green, FLinearColor::Red, 5.0f))
 			{
 				for (FHitResult HitResult : HitResults)
 				{
 					if (ValidateNewAnticipationHit(HitResult.GetActor()))
 					{
+						//Get All Paramaters
 						FGameplayTag FormTag = ConvertPhysicalSurfaceToFormTag(HitResult.PhysMaterial->SurfaceType);
 						FGameplayTag VelocityTag = ALSXTImpactVelocityTags::Moderate;
 						FGameplayTag HealthTag = HealthToHealthTag(IALSXTCharacterInterface::Execute_GetHealth(GetOwner()));
 						FGameplayTag SideTag = LocationToImpactSide(HitResult.ImpactPoint);
+						FGameplayTag ImpactHeight = LocationToImpactHeight(HitResult.ImpactPoint);
 						TEnumAsByte<EPhysicalSurface> PhysSurf = HitResult.PhysMaterial->SurfaceType;
-						UAnimSequenceBase* SelectedAnimation{ nullptr };
-						SelectedAnimation = SelectBraceForImpactPose(SideTag, FormTag);
 						FTransform HitTransform{ UKismetMathLibrary::MakeRotFromX(HitResult.ImpactPoint), HitResult.ImpactPoint, {1.0, 1.0, 1.0} };
-
-						// Defensive Mode State
-						FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
-						// NewDefensiveModeState.Form = FormTag;
-						// NewDefensiveModeState.Mode = ALSXTDefensiveModeTags::BraceForImpact;
-						NewDefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::BraceForImpact;
-						// NewDefensiveModeState.ObstaclePose = SelectedAnimation;
-						// NewDefensiveModeState.AnticipationSide = SideTag;
-						// NewDefensiveModeState.AnticipationHeight = LocationToImpactHeight(HitResult.ImpactPoint);
-						NewDefensiveModeState.AnticipationTransform = HitTransform;
-						NewDefensiveModeState.ImpactVelocity = VelocityTag;
-
+						float Mass {0.0};
+						FVector Velocity {ForceInit};
 						// Mass and Velocity
 						// if (UKismetSystemLibrary::DoesImplementInterface(HitResult.GetActor(), UALSXTCollisionInterface::StaticClass()))
 						// {
-						// 	IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), DoubleHitResult.HitResult.Mass);
-						// 	IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), DoubleHitResult.HitResult.Velocity);
+						// 	IALSXTCollisionInterface::Execute_GetActorMass(HitResult.GetActor(), Mass);
+						// 	IALSXTCollisionInterface::Execute_GetActorVelocity(HitResult.GetActor(), Velocity);
 						// }
 						// else
 						// {
@@ -1144,21 +1157,21 @@ void UALSXTImpactReactionComponent::AnticipationTrace()
 						// 	DoubleHitResult.HitResult.Velocity = HitResult.GetActor()->GetVelocity();
 						// }
 
-						// Populate NewImpactReactionState
-						FALSXTImpactReactionState NewImpactReactionState = IALSXTCollisionInterface::Execute_GetImpactReactionState(GetOwner());
-						NewImpactReactionState.ImpactReactionParameters.BraceForImpactPose.Pose = SelectedAnimation;
-						// NewImpactReactionState.ImpactReactionParameters.DefensivePose = SelectedAnimation;
-						NewImpactReactionState.ImpactReactionParameters.ImpactHeight = 0.5f;
-						//NewImpactReactionState.ImpactReactionParameters.ImpactLocation = HitResult.ImpactPoint;
-						NewImpactReactionState.ImpactReactionParameters.TargetRelativeLocation = HitResult.ImpactPoint;
+						// Defensive Mode State
+						FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
 
 
-						// FAnticipationPose NewAnticipationPose;
-						// NewAnticipationPose.Pose
+						NewDefensiveModeState.Mode = ALSXTDefensiveModeTags::Anticipation;
+						NewDefensiveModeState.AnticipationMode = ALSXTDefensiveModeTags::Blocking;
+						NewDefensiveModeState.AnticipationForm = ConvertPhysicalSurfaceToFormTag(HitResult.PhysMaterial->SurfaceType);
+						NewDefensiveModeState.AnticipationHeight =LocationToImpactHeight(HitResult.ImpactPoint);
+						NewDefensiveModeState.AnticipationSide = LocationToImpactSide(HitResult.ImpactPoint);
+						NewDefensiveModeState.AnticipationTransform = HitTransform;
+						NewDefensiveModeState.ImpactVelocity = VelocityTag;
 
 						IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), NewDefensiveModeState);
 						IALSXTCharacterInterface::Execute_SetCharacterDefensiveMode(GetOwner(), NewDefensiveModeState.Mode);
-						SetImpactReactionState(NewImpactReactionState);
+						
 
 						// Set Physical Animation Component Curves/Profile Here
 						// IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::Hit, DoubleHitResult.HitResult.HitResult.BoneName);
