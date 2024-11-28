@@ -27,6 +27,15 @@ public:
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Firearm Interface|State")
   FALSXTRecoilState GetRecoilState() const;
 
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Firearm Interface|State")
+  void InitializeFirearm();
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Firearm Interface|State")
+  void OnFirearmDischarge();
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Firearm Interface|State")
+  void OnFirearmDischargeEnd();
+
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Firearm Interface|State")
   FALSXTFirearmDischargeEffectsState GetFirearmDischargeEffectsState() const;
 

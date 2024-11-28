@@ -553,6 +553,21 @@ FALSXTFirearmAimState AALSXTCharacterAdvanced::GetFirearmAimState_Implementation
 	return FirearmAimState;
 }
 
+void AALSXTCharacterAdvanced::InitializeFirearm_Implementation()
+{
+	// 
+}
+
+void AALSXTCharacterAdvanced::OnFirearmDischarge_Implementation()
+{
+	// 
+}
+
+void AALSXTCharacterAdvanced::OnFirearmDischargeEnd_Implementation()
+{
+	// 
+}
+
 
 void AALSXTCharacterAdvanced::PlayAttackSound_Implementation(bool MovementSound, bool AccentSound, bool WeaponSound, const FGameplayTag& SoundSex, const FGameplayTag& Variant, const FGameplayTag& Overlay, const FGameplayTag& Strength, const FGameplayTag& AttackMode, const float Stamina)
 {

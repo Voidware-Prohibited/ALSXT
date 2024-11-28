@@ -354,6 +354,9 @@ public:
 
 	//Firearm Interface
 	virtual FALSXTFirearmAimState GetFirearmAimState_Implementation() const override;
+	virtual void InitializeFirearm_Implementation() override;
+	virtual void OnFirearmDischarge_Implementation() override;
+	virtual void OnFirearmDischargeEnd_Implementation() override;
 };
 
 inline const FGameplayTag& AALSXTCharacterAdvanced::GetDesiredReloadingType() const
