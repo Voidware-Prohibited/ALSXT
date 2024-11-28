@@ -2,7 +2,6 @@
 
 #include "NativeGameplayTags.h"
 #include "Animation/AnimMontage.h"
-#include "Engine/EngineTypes.h"
 #include "Sound/SoundBase.h"
 #include "NiagaraSystem.h"
 #include "Camera/CameraShakeBase.h"

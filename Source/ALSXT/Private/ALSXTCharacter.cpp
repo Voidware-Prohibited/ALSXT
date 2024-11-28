@@ -3206,6 +3206,11 @@ void AALSXTCharacter::SetPhysicalAnimationMode(const FGameplayTag& NewPhysicalAn
 
 void AALSXTCharacter::ResetPhysicalAnimationMode()
 {
+	// if (PhysicalAnimationMode == FGameplayTag::EmptyTag || PhysicalAnimationMode == ALSXTPhysicalAnimationModeTags::None)
+	// {
+	// 	return;
+	// }
+
 	const auto PreviousPhysicalAnimationMode{ PhysicalAnimationMode };
 	GetMesh()->SetCollisionProfileName("CharacterMesh");
 	PhysicalAnimation->ApplyPhysicalAnimationProfileBelow("", "None", true, true);

@@ -1052,55 +1052,18 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 			}
 			else
 			{
-				GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.25f, FColor::Yellow, TEXT("Reset PhysicalAnimationMode"), true);
-				IALSXTCollisionInterface::Execute_ResetCharacterPhysicalAnimationMode(GetOwner());
-
-				// if (IALSXTCollisionInterface::Execute_GetCharacterPhysicalAnimationState(GetOwner()).Mode != ALSXTPhysicalAnimationModeTags::None || IALSXTCollisionInterface::Execute_GetCharacterPhysicalAnimationMode(GetOwner()) != FGameplayTag::EmptyTag)
-				// {
-				// 	TArray<FName> EmptyNames;
-				// 	IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, EmptyNames);
-				// 	// FALSXTDefensiveModeState NewDefensiveModeState = IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner());
-				// 	// NewDefensiveModeState.
-				// 	// IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), NewDefensiveModeState);
-				// 	// StartBlendOut
-				// }				
+				if (IALSXTCollisionInterface::Execute_GetCharacterPhysicalAnimationMode(GetOwner()) != FGameplayTag::EmptyTag || IALSXTCollisionInterface::Execute_GetCharacterPhysicalAnimationMode(GetOwner()) != ALSXTPhysicalAnimationModeTags::None)
+				{
+					// GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.25f, FColor::Yellow, TEXT("Reset PhysicalAnimationMode"), true);
+					IALSXTCollisionInterface::Execute_ResetCharacterPhysicalAnimationMode(GetOwner());
+				}			
 				return;
-				// FALSXTDefensiveModeState EmptyDefensiveModeState;
-				// 
-				// FALSXTPhysicalAnimationState NewPhysicalAnimationState;
-				// NewPhysicalAnimationState.Mode = ALSXTPhysicalAnimationModeTags::None;
-				// NewPhysicalAnimationState.ProfileName = "CharacterMesh";
-				// NewPhysicalAnimationState.Alpha = 0.0f;
-				// IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationState(GetOwner(),NewPhysicalAnimationState);
-				// 
-				// if (IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()) != EmptyDefensiveModeState)
-				// {
-				// 	IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), EmptyDefensiveModeState);
-				// }
-				// 
-				// IALSXTCollisionInterface::Execute_ResetCharacterPhysicalAnimationMode(GetOwner());
-				// if (!IALSXTCharacterInterface::Execute_IsBlocking(GetOwner()) || IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()).Mode != ALSXTDefensiveModeTags::ClutchImpactPoint)
-				// {
-				// 	if (IALSXTCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwner()) != EmptyDefensiveModeState)
-				// 	{
-				// 		IALSXTCharacterInterface::Execute_SetCharacterDefensiveModeState(GetOwner(), EmptyDefensiveModeState);
-				// 	}
-				// 	
-				// 	IALSXTCharacterInterface::Execute_ResetCharacterDefensiveModeState(GetOwner());
-				// }
-
 			}
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Reset PhysicalAnimationMode 2"));
+			// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Reset PhysicalAnimationMode 2"));
 			IALSXTCollisionInterface::Execute_ResetCharacterPhysicalAnimationMode(GetOwner());
-
-			// if (IALSXTCollisionInterface::Execute_GetCharacterPhysicalAnimationState(GetOwner()).Mode != ALSXTPhysicalAnimationModeTags::None)
-			// {
-			// 	TArray<FName> EmptyNames;
-			// 	IALSXTCollisionInterface::Execute_SetCharacterPhysicalAnimationMode(GetOwner(), ALSXTPhysicalAnimationModeTags::None, EmptyNames);
-			// }				
 			return;
 		}
 	}

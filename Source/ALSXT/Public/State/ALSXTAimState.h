@@ -8,6 +8,9 @@ struct ALSXT_API FALSXTAimState
 {
 	GENERATED_BODY()
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+		bool CanAim {true};
+
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Origin")
 		FTransform CurrentHeadTargetTransform;
 
