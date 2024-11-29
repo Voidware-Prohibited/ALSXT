@@ -13,12 +13,30 @@
 #include "Engine/DataAsset.h"
 #include "ALSXTAnimationInstanceSettings.generated.h"
 
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTJigglePhysicsSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableBreastsJigglePhysics{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableButtJigglePhysics{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableBellyJigglePhysics{ false };
+};
+
 UCLASS(Blueprintable, BlueprintType)
 class ALSXT_API UALSXTAnimationInstanceSettings : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FALSXTJigglePhysicsSettings JigglePhysicsSettings;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FALSXTStationaryModeAnimations StationaryMode;
 
