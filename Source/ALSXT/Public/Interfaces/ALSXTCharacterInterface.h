@@ -17,6 +17,21 @@
 #include "AlsCharacterMovementComponent.h"
 #include "ALSXTCharacterInterface.generated.h"
 
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTJigglePhysicsSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableBreastsJigglePhysics{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableButtJigglePhysics{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnableBellyJigglePhysics{ false };
+};
+
 UINTERFACE(Blueprintable)
 class UALSXTCharacterInterface : public UInterface {
 	GENERATED_BODY()
@@ -34,6 +49,9 @@ public:
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   UALSXTAnimationInstance* GetCharacterAnimInstance() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FALSXTJigglePhysicsSettings GetCharacterJigglePhysicsSettings() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   UInputComponent* GetCharacterInputComponent() const;

@@ -2959,6 +2959,15 @@ FALSXTPhysicalAnimationState AALSXTCharacter::GetCharacterPhysicalAnimationState
 	return GetPhysicalAnimationState();
 }
 
+FALSXTJigglePhysicsSettings AALSXTCharacter::GetCharacterJigglePhysicsSettings_Implementation() const
+{
+	FALSXTJigglePhysicsSettings DefualtJigglePhysicsSettings;
+	DefualtJigglePhysicsSettings.EnableBellyJigglePhysics = false;
+	DefualtJigglePhysicsSettings.EnableBreastsJigglePhysics = true;
+	DefualtJigglePhysicsSettings.EnableButtJigglePhysics = true;	
+	return DefualtJigglePhysicsSettings;
+}
+
 void AALSXTCharacter::SetCharacterPhysicalAnimationState_Implementation(FALSXTPhysicalAnimationState NewPhysicalAnimationState)
 {
 	SetPhysicalAnimationState(NewPhysicalAnimationState);

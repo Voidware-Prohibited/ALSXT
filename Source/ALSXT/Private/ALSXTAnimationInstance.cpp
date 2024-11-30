@@ -67,6 +67,7 @@ void UALSXTAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	
 	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
 	{
+		JigglePhysicsSettings = IALSXTCharacterInterface::Execute_GetCharacterJigglePhysicsSettings(GetOwningActor());
 		Freelooking = IALSXTCharacterInterface::Execute_GetCharacterFreelooking(GetOwningActor());
 		Sex = IALSXTCharacterInterface::Execute_GetCharacterSex(GetOwningActor());
 		DefensiveMode = IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwningActor());

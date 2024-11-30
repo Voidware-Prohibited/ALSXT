@@ -2075,6 +2075,7 @@ protected:
 	virtual FALSXTDefensiveModeAnimations GetCharacterDefensiveModeAnimations_Implementation() const override;
 	virtual FALSXTBumpPoseState GetCrowdNavigationPoseState_Implementation() const override;
 
+	virtual FALSXTJigglePhysicsSettings GetCharacterJigglePhysicsSettings_Implementation() const override;
 	virtual FALSXTPhysicalAnimationState GetCharacterPhysicalAnimationState_Implementation() const override;
 	virtual void SetCharacterPhysicalAnimationState_Implementation(FALSXTPhysicalAnimationState NewPhysicalAnimationState) override;
 
