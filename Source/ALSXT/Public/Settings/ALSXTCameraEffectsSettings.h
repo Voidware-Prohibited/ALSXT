@@ -4,6 +4,7 @@
 #include "Engine/DataAsset.h"
 #include "Camera/CameraShakeBase.h"
 #include "Curves/CurveVector.h"
+#include "Settings/ALSXTFPEyeFocusSettings.h"
 #include "ALSXTCameraEffectsSettings.generated.h"
 
 USTRUCT(BlueprintType)
@@ -72,6 +73,12 @@ struct ALSXT_API FALSXTGeneralCameraEffectsSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features")
 	bool bEnableEffects { true };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Eye Focus")
+	bool bEnableEyeFocus{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Eye Focus")
+	bool bEnableFirstPersonEyeFocusVignette{ true };
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Camera Shake")
 	bool bEnableMovementCameraShake{ true };
 
@@ -122,6 +129,9 @@ struct ALSXT_API FALSXTGeneralCameraEffectsSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Debug")
 	bool bDebugMode { false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Eye Focus")
+	FALSXTFPEyeFocusSettings FirstPersonEyeFocusSettings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Depth Of Field")
 	float DepthOfFieldEffectAmount { 1.0 };

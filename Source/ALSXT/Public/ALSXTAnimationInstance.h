@@ -24,6 +24,37 @@
 class UALSXTLinkedAnimationInstance;
 class AALSXTCharacter;
 
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTControlRigInput
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALSXT")
+	bool bObstacleNavigation{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALSXT")
+	bool bCombatStance{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALSXT")
+	bool bEnableLeftHandIK{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALSXT")
+	bool bHeadLookAt{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALSXT")
+	bool bFreelooking{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALSXT")
+	FTransform LeftHandTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALSXT")
+	FTransform SightTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALSXT")
+	FTransform TargetTransform;
+
+};
+
 UCLASS()
 class ALSXT_API UALSXTAnimationInstance : public UAlsAnimationInstance
 {
@@ -215,6 +246,9 @@ protected:
 	virtual bool IsTurnInPlaceAllowed() override;
 
 	void UpdateStatusState();
+
+	UFUNCTION(BlueprintPure, Category = "ALSXT|Animation Instance", Meta = (BlueprintThreadSafe, ReturnDisplayName = "Rig Input"))
+	FALSXTControlRigInput GetALSXTControlRigInput() const;
 };
 
 inline UALSXTAnimationInstanceSettings* UALSXTAnimationInstance::GetALSXTSettingsUnsafe() const

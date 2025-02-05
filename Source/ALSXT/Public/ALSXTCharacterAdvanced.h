@@ -322,6 +322,7 @@ public:
 	//Character Camera Effects Component Interface
 	UAlsCameraComponent* GetCameraComponent_Implementation() const override;
 	UALSXTCharacterCameraEffectsComponent* GetCameraEffectsComponent_Implementation() const override;
+	FALSXTGeneralCameraEffectsSettings GetCameraEffectsSettings_Implementation() const override;
 	void SetRadialBlurEffect_Implementation(float Amount) override;
 	void ResetRadialBlurEffect_Implementation() override;
 	void SetFocusEffect_Implementation(bool NewFocus) override;

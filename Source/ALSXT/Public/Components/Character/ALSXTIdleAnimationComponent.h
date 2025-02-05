@@ -79,8 +79,6 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void ServerProcessNewIdleState(const FALSXTIdleState& NewIdleState);
 
-
-
 	UPROPERTY(BlueprintReadOnly, Category = "Character", Meta = (AllowPrivateAccess))
 	UAnimInstance* AnimInstance{ nullptr };
 

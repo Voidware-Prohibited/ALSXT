@@ -548,6 +548,11 @@ UALSXTCharacterCameraEffectsComponent* AALSXTCharacterAdvanced::GetCameraEffects
 	return CameraEffects;
 }
 
+FALSXTGeneralCameraEffectsSettings AALSXTCharacterAdvanced::GetCameraEffectsSettings_Implementation() const
+{
+	return CameraEffects->GeneralCameraEffectsSettings;
+}
+
 FALSXTFirearmAimState AALSXTCharacterAdvanced::GetFirearmAimState_Implementation() const
 {
 	return FirearmAimState;

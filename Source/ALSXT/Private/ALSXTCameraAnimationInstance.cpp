@@ -55,6 +55,23 @@ void UALSXTCameraAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 	CombatStance = ALSXTCharacter->GetDesiredCombatStance();
 	WeaponFirearmStance = ALSXTCharacter->GetDesiredWeaponFirearmStance();
 	WeaponReadyPosition = ALSXTCharacter->GetDesiredWeaponReadyPosition();
+	CameraZoom = ALSXTCharacter->GetCameraZoom();
+
+	if (GetOwningActor()->Implements<UALSXTCharacterInterface>())
+	{
+		bool NewIsIdleCameraRotationActive{ IALSXTIdleAnimationComponentInterface::Execute_IsIdleCameraRotationActive(GetOwningActor()) };
+		if (NewIsIdleCameraRotationActive != bIsIdleCameraRotationActive)
+		{
+			bIsIdleCameraRotationActive = NewIsIdleCameraRotationActive;
+
+			float NewIdleCameraRotation{ IALSXTIdleAnimationComponentInterface::Execute_GetIdleCameraRotation(GetOwningActor()) };
+			if (NewIdleCameraRotation != IdleCameraRotation)
+			{
+				IdleCameraRotation = NewIdleCameraRotation;
+			}
+		}	
+		
+	}
 }
 
 void UALSXTCameraAnimationInstance::OnFirstPersonOverrideChangedEvent()

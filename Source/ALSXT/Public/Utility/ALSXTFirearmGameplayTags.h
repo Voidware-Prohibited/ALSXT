@@ -2,6 +2,13 @@
 
 #include "NativeGameplayTags.h"
 
+namespace ALSXTFirearmFireModeTags
+{
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(SemiAuto)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Burst)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Automatic)
+}
+
 namespace ALSXTFirearmTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Grenade)

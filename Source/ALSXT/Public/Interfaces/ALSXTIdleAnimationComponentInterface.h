@@ -24,6 +24,15 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
   void EnableIdleAnimation(bool Enable);
 
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
+  bool IsIdleCameraRotationActive() const;
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
+  float GetIdleCameraRotation() const;
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
+  AActor* GetGazeCameraTarget() const;
+
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Idle Animation Component Interface")
   void ResetTimer();
 

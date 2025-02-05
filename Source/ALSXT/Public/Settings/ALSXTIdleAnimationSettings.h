@@ -25,7 +25,7 @@ struct ALSXT_API FALSXTIdleState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIdle {false};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Alss.Idle Mode"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Idle Mode"))
 	FGameplayTag Mode{ FGameplayTag::EmptyTag };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -87,6 +87,12 @@ struct ALSXT_API FALSXTALSXTGeneralIdleAnimationSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinimumSpectacleScoreForGazing{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UCameraShakeBase> IdleCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UCameraShakeBase> GazeCameraShake;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bDebugMode{ false };

@@ -1,5 +1,12 @@
 #include "Utility/ALSXTFirearmGameplayTags.h"
 
+namespace ALSXTFirearmFireModeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(SemiAuto, TEXT("Als.Firearm Fire Mode.Semi-Auto"))
+	UE_DEFINE_GAMEPLAY_TAG(Burst, TEXT("Als.Firearm Fire Mode.Burst"))
+	UE_DEFINE_GAMEPLAY_TAG(Automatic, TEXT("Als.Firearm Fire Mode.Automatic"))
+}
+
 namespace ALSXTFirearmTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Grenade, TEXT("Als.OverlayMode.Grenade"))

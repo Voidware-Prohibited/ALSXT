@@ -1,4 +1,4 @@
-<h1 align="center">ALSXT - ALS-Refactored XT</h1>
+<h1 align="center">ALSXT</h1>
 
 <p align="center">
 <img src="ALSXT.png" alt="ALSXT">
@@ -21,6 +21,9 @@
     <img src="https://img.shields.io/github/license/Voidware-Prohibited/ALSXT.svg?style=flat-square&logo=github&logoColor=white"
          alt="MIT License">
     </a>
+</p>
+
+<p align="center">
     <a href="https://github.com/sponsors/colorindarkness">
     <img src="https://img.shields.io/github/sponsors/colorindarkness.svg?style=flat-square&logo=github&logoColor=white"
          alt="Become a Sponsor">
@@ -28,6 +31,12 @@
     <a href="https://www.patreon.com/colorindarkness">
     <img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dcolorindarkness%26type%3Dpatrons&style=flat"
          alt="Become a Patron">
+    </a>
+    <a href="https://ko-fi.com/colorindarkness">
+     <img alt="Support me on Ko-fi" src="https://img.shields.io/badge/support_me_on-Ko--fi-red?link=https%3A%2F%2Fko-fi.com%2Fcolorindarkness">
+    </a>
+    <a href="https://ko-fi.com/colorindarkness">
+     <img alt="Support me on Liberapay" src="https://img.shields.io/badge/support_me_on-liberapay-yellow?link=https%3A%2F%2Fliberapay.com%2Fcolorindarkness%2F">
     </a>
 </p>
 
@@ -37,7 +46,11 @@ _ALSXT is under heavy development, many features may not be finished or producti
 
 _[Contibutors](#Contributions) and PRs are welcome_.
 
+Source Assets of the Meshes, Textures, Sounds and Cascaduer files.
+
 # Introduction
+
+Two example Character classes are provided `ALSXTCharacter` and `ALSXTCharacterAdvanced`, each with their respective feature-sets. You can create a sub-class or blueprint of either class or simply use `ALSXTCharacterAdvanced` as an example for building your own custom class from the base `ALSXTCharacter` class.
 
 **Features**
 
@@ -55,7 +68,7 @@ ALSXT
 - Vaulting _In Progress_
 - Physical Animation _In Progress_
 - Sound Component _In Progress_
-- Idle Animation Component
+- Idle Animation Component _In Progress_
 - Gesture _In Progress_
 - Emotes _In Progress_
 - Basic Stats Component (Stamina and Health to demonstate the functionality of various components)
@@ -64,21 +77,26 @@ ALSXT Advanced
 
 - Combat
 - ADS
-- Procedural Recoil
-- Reloading
+- Procedural Recoil _In Progress_
+- Reloading _In Progress_
 - Camera FX Component _In Progress_
 - Acrobatic Actions (Flipping, Wallrunning etc) _In Progress_
 
 
 **Planned Features**
 - New Skeletal Mesh and Clothing set with Morph Targets/Shape Keys
-- Stationary Modes (Sitting etc)
+- Stationary Modes (Sitting, Vehilcles etc)
 - Prone Stance
+- Swimming Custom Movement Mode
 - Ladder Climbing Custom Movement Mode
 
 **Dependencies**
 
 - [Advanced Locomotion System Refactored](https://github.com/Sixze/ALS-Refactored/)
+
+**Integrations**
+
+- [Procedural Recoil Animation System](https://www.fab.com/listings/c664053f-900b-4f33-aa26-4bdb46959e4c)
 
 **Important Note**
 
@@ -91,7 +109,9 @@ ALSXT is not automatically synced with the main ALS-Refactored repository, but i
 - Install and setup MetaSound Plugin
 - Install the latest version of ALS-Refactored via https://github.com/Sixze/ALS-Refactored#quick-start
 - Clone/download ALSXT into your projects Plugin folder (You should have both ALS-Refactored and ALSXT side by side)
-- Build your Solution in Visual Studio again
+- Integrate Config\DefaultEngine.ini into your projects DefaultEngine.ini
+     - Note: Various `SurfaceTypes` and a new `CollisionChannel` named `Transferrable` are required for the Footprints and Impact Effects to work. SurfaceTypes can be renamed and/or re-assigned in the respective effects Settings.
+- Build your Solution in Visual Studio or Rider again
 - Once compilation is successful you can now begin using ALSXT in your project
 
 # Settings
@@ -109,40 +129,6 @@ Please submit an issue for any Compile error fixes. Most are usually the result 
 # License
 
 Original content and code in this repository is under the MIT license. Any git submodules are covered by their respective licenses. Content listed in the Attributions are covered by their respective licenses.
-
-# Attributions
-
-- [Palm Trees](https://sketchfab.com/3d-models/palm-trees-55690379305145488e20afb05fc687e6) by [Erroratten](https://sketchfab.com/erroratten) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to be seperate meshes
-
-- [LOOP surf on 100m sandbeach 01 170508_1135.wav](https://freesound.org/people/klankbeeld/sounds/392886/) by [klankbeeld](https://freesound.org/people/klankbeeld/) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to be shorter
-
-- [Female Grunts For Games](https://freesound.org/people/SkyRaeVoicing/sounds/368843/) by [Sky Rae Voicing](https://freesound.org/people/SkyRaeVoicing/) [License: CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) Modified to be seperate sounds
-
-- [Tactical Knife](https://sketchfab.com/3d-models/tactical-knife-db381f4766cf453aa9b80822b0b95361) by [slimecent](https://sketchfab.com/slimecent) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to fix and bake materials
-
-- [Tactical Axe 2](https://sketchfab.com/3d-models/tactical-axe2-e4fa55bab1d1433aaa8e8f563fd7ac05) by [TORI106](https://sketchfab.com/TORI106) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to optimize textures
-
-- [Bench 02](https://sketchfab.com/3d-models/bench-02-0fc91c47c6b04717bb4400c247de573e) by [Ricardo Sanchez](https://sketchfab.com/380660711785) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/)
-
-- [swipes and whooshes tshirt fast and short swings stereo ORTF 8040.wav](https://freesound.org/people/Soundholder/sounds/425856/) by [Soundholder](https://freesound.org/people/Soundholder/) [License: CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) Modified to be seperate sounds
-
-- [BACKPACK](https://sketchfab.com/3d-models/backpack-9ccadc2945c34826a0ce1c37de13675e) by [Idmental](https://sketchfab.com/idmental.id) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to optimize textures
-
-- Vertical Foregrip from [Low-Poly Mk18 Mod0](https://sketchfab.com/3d-models/backpack-9ccadc2945c34826a0ce1c37de13675e) by [notcplkerry](https://sketchfab.com/notcplkerry) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate and retexture model
-
-- [Textured Suppressor - Free Download](https://sketchfab.com/3d-models/textured-suppressor-free-download-d176b5b1b03f4a78983698c6f7675023) by [RMT](https://sketchfab.com/rmt) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to optimize textures
-
-- Angled Foregrip from [M4 - Stealth and Grenadier Configurations](https://sketchfab.com/3d-models/m4-stealth-and-grenadier-configurations-e530c3225f094a04ba33273c6ebb3d1c) by [LunarEclipse](https://sketchfab.com/e.hackett.03) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate and retexture model
-
-- Bushnell 1x22x33 from [low-poly Sight set](https://sketchfab.com/3d-models/low-poly-sight-set-2cdf0f52f1254ad3bc387bbd7e8d6223) by [D.U.](https://sketchfab.com/D.U.) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate and retexture model
-
-- [Pita bush](https://sketchfab.com/3d-models/pita-bush-f2313748d4a54c11af3eba587dd3a703) by [SCADL & Co](https://sketchfab.com/scadl) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/)
-
-- PaperTarget from [Shooting Target Set](https://sketchfab.com/3d-models/shooting-target-set-ba8282fc05e044a187f556ef14c3ee26) by [HippoStance](https://sketchfab.com/hippostance) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified to isolate model
-
-- [motorcycle HELMET](https://sketchfab.com/3d-models/motorcycle-helmet-1d489db9cdc24161a7537926a20bb17b) by [djengala](https://sketchfab.com/djengala) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified Materials for apperance
-
-- [Draft](https://sketchfab.com/3d-models/draft-12e6d0ea1da049afaf3fee3c517ed64d) by [Iv.An.](https://sketchfab.com/iv.an) [License: CC Attribution](https://creativecommons.org/licenses/by/4.0/) Modified Materials for apperance
 
 # Special Thanks
 

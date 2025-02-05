@@ -96,7 +96,7 @@ void FALSXTRootMotionSource_Vaulting::PrepareRootMotion(const float SimulationDe
 		{
 			// Calculate the animation offset. This would be the location the actual animation starts at relative to the target transform.
 
-			auto AnimationLocationOffset{TargetTransform.GetUnitAxis(EAxis::X) * VaultingState.VaultingParameters.TargetHandPlantRelativeLocation.X};
+			auto AnimationLocationOffset{PlantingTargetTransform.GetUnitAxis(EAxis::X) * VaultingState.VaultingParameters.TargetHandPlantRelativeLocation.X};
 			AnimationLocationOffset.Z = VaultingState.VaultingParameters.TargetHandPlantRelativeLocation.Z;
 			AnimationLocationOffset *= Character.GetMesh()->GetComponentScale().Z;
 
@@ -127,8 +127,8 @@ void FALSXTRootMotionSource_Vaulting::PrepareRootMotion(const float SimulationDe
 
 	// Apply final offsets.
 
-	TargetTransform.AddToTranslation(LocationOffset);
-	TargetTransform.ConcatenateRotation(RotationOffset.Quaternion());
+	PlantingTargetTransform.AddToTranslation(LocationOffset);
+	PlantingTargetTransform.ConcatenateRotation(RotationOffset.Quaternion());
 
 	// Find the delta transform between the character and the target transform and divide by the delta time to get the velocity.
 

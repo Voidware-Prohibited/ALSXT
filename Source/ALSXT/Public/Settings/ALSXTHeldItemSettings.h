@@ -266,3 +266,26 @@ struct ALSXT_API FALSXTHeldItemState
 		return (other.GripState == GripState) && (other.FingerPosition == FingerPosition) && (other.FingerAction == FingerAction) && (other.WeaponAction == WeaponAction) && (other.WeaponAttack == WeaponAttack);
 	}
 };
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FALSXTHeldItemViewTarget
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform Transform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float FOV;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float VignetteIntensity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Attachment;
+
+	bool operator==(const FALSXTHeldItemViewTarget& other) const
+	{
+		return (other.Transform.Equals(Transform, 9.99)) && (other.FOV == FOV) && (other.VignetteIntensity == VignetteIntensity) && (other.Attachment == Attachment);
+	}
+};

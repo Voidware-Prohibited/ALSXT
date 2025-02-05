@@ -97,6 +97,34 @@ AALSXTCharacter::AALSXTCharacter(const FObjectInitializer& ObjectInitializer) :
 	HeadDummyShadow->SetLeaderPoseComponent(GetMesh());
 	HeadDummyShadow->bReceivesDecals = false;
 
+	Teeth = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Teeth"));
+	Teeth->SetupAttachment(BodyParts);
+	Teeth->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	Teeth->bEnableUpdateRateOptimizations = false;
+	Teeth->AlwaysLoadOnClient = true;
+	Teeth->AlwaysLoadOnServer = true;
+	Teeth->bOwnerNoSee = false;
+	Teeth->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	Teeth->bCastDynamicShadow = true;
+	Teeth->bAffectDynamicIndirectLighting = true;
+	Teeth->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Teeth->SetLeaderPoseComponent(GetMesh());
+	Teeth->bReceivesDecals = false;
+
+	Tongue = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Tongue"));
+	Tongue->SetupAttachment(BodyParts);
+	Tongue->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	Tongue->bEnableUpdateRateOptimizations = false;
+	Tongue->AlwaysLoadOnClient = true;
+	Tongue->AlwaysLoadOnServer = true;
+	Tongue->bOwnerNoSee = false;
+	Tongue->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	Tongue->bCastDynamicShadow = true;
+	Tongue->bAffectDynamicIndirectLighting = true;
+	Tongue->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	Tongue->SetLeaderPoseComponent(GetMesh());
+	Tongue->bReceivesDecals = false;
+
 	Hair = CreateDefaultSubobject<UALSXTPaintableSkeletalMeshComponent>(TEXT("Hair"));
 	Hair->SetupAttachment(BodyParts);
 	Hair->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
@@ -1114,6 +1142,16 @@ void AALSXTCharacter::SetMovementModeLocked(bool bNewMovementModeLocked)
 {
 	bMovementEnabled = !bNewMovementModeLocked;
 	ForceNetUpdate();
+}
+
+const float AALSXTCharacter::GetCameraZoom() const
+{
+	return CameraZoom;
+}
+
+void AALSXTCharacter::SetCameraZoom(const float NewCameraZoom)
+{
+	CameraZoom = NewCameraZoom;
 }
 
 void AALSXTCharacter::Crouch(const bool bClientSimulation)
@@ -3703,6 +3741,11 @@ FRotator AALSXTCharacter::GetCharacterControlRotation_Implementation() const
 	return GetControlRotation();
 }
 
+FVector AALSXTCharacter::GetCharacterFirstPersonCameraLocation_Implementation() const
+{
+	return Camera->GetFirstPersonCameraLocation();
+}
+
 FALSXTBreathState AALSXTCharacter::GetCharacterBreathState_Implementation() const
 {
 	return GetBreathState();
@@ -3721,6 +3764,16 @@ FGameplayTag AALSXTCharacter::GetCharacterLocomotionMode_Implementation() const
 FGameplayTag AALSXTCharacter::GetCharacterGait_Implementation() const
 {
 	return GetDesiredGait();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterRotationMode_Implementation() const
+{
+	return GetDesiredRotationMode();
+}
+
+FGameplayTag AALSXTCharacter::GetCharacterViewMode_Implementation() const
+{
+	return GetViewMode();
 }
 
 FGameplayTag AALSXTCharacter::GetCharacterLean_Implementation() const
@@ -3771,6 +3824,16 @@ bool AALSXTCharacter::IsBlocking_Implementation() const
 bool AALSXTCharacter::IsCharacterPlayerControlled_Implementation() const
 {
 	return IsPlayerControlled();
+}
+
+bool AALSXTCharacter::GetCharacterFirstPersonFocus_Implementation() const
+{
+	return IsFirstPersonEyeFocusActive();
+}
+
+bool AALSXTCharacter::GetCharacterAimingDownSights_Implementation() const
+{
+	return IsAimingDownSights();
 }
 
 bool AALSXTCharacter::CanEmote_Implementation() const

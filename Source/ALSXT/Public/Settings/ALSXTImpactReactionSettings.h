@@ -309,10 +309,16 @@ struct ALSXT_API FALSXTGeneralImpactReactionSettings
 	bool EnableImpactReactions{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableImpactAnticipationReactions{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableAttackReactions{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableBumpReactions{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableCrowdNavigationReactions{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableFacialExpressions{ true };

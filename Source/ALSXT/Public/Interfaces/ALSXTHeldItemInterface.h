@@ -3,6 +3,8 @@
 #include "Settings/ALSXTHeldItemSettings.h"
 #include "ALSXTHeldItemInterface.generated.h"
 
+
+
 UINTERFACE(Blueprintable)
 class UALSXTHeldItemInterface : public UInterface {
 	GENERATED_BODY()
@@ -25,6 +27,9 @@ public:
   // Get which current Modes, Positions and Stances for the Held Item
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")
   FALSXTHeldItemState GetCharacterHeldItemState() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALSXTCharacter Interface|Held Item")
+  FALSXTHeldItemViewTarget GetCharacterHeldItemViewTarget() const;
 
   // Get the current Transform, Socket Names and Positions for the Held Item
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface|Held Item")

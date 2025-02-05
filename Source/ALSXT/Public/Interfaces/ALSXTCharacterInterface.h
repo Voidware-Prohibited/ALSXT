@@ -26,10 +26,19 @@ struct ALSXT_API FALSXTJigglePhysicsSettings
 	bool EnableBreastsJigglePhysics{ false };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float BreastsJigglePhysicsScale{ 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableButtJigglePhysics{ false };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ButtJigglePhysicsScale{ 1.0 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableBellyJigglePhysics{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float BellyJigglePhysicsScale{ 1.0 };
 };
 
 UINTERFACE(Blueprintable)
@@ -57,10 +66,25 @@ public:
   UInputComponent* GetCharacterInputComponent() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FVector GetCharacterFirstPersonCameraLocation() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  bool GetCharacterFirstPersonFocus() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  bool GetCharacterAimingDownSights() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterLocomotionMode() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterGait() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterRotationMode() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterViewMode() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterLean() const;

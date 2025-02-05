@@ -118,6 +118,12 @@ public:
 	TObjectPtr<USkeletalMeshComponent> HeadDummyShadow;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Teeth;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Tongue;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UALSXTPaintableSkeletalMeshComponent> Hair;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
@@ -247,6 +253,7 @@ public:
 	
 	//Character Interface
 	virtual FRotator GetCharacterControlRotation_Implementation() const override;
+	virtual FVector GetCharacterFirstPersonCameraLocation_Implementation() const override;
 	virtual UALSXTCameraAnimationInstance* GetCharacterCameraAnimationInstance_Implementation() const override;
 	virtual UAlsCameraComponent* GetCharacterCamera_Implementation() const override;
 	virtual FGameplayTag GetCharacterSex_Implementation() const override;
@@ -274,6 +281,10 @@ public:
 
 protected:
 
+	// Camera Zoom
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float CameraZoom {0.0f};
+	
 	//Overlay Object
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
@@ -1296,6 +1307,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Als Character")
 	bool CanSetToViewMode(const FGameplayTag& ViewModeTag) const;
 
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	const float GetCameraZoom() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	void SetCameraZoom(const float NewCamerZoom);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Held Item")
 	void GetUnarmedAttackDamageInfo(const FGameplayTag& UnarmedAttackType, const FGameplayTag& UnarmedAttackStrength, float& BaseDamage, FGameplayTag& ImpactForm, FGameplayTag& DamageType) const;
 
@@ -2045,6 +2062,8 @@ protected:
 	virtual UALSXTCharacterSettings* GetCharacterSettings_Implementation() const override;
 	virtual UInputComponent* GetCharacterInputComponent_Implementation() const override;
 	virtual bool IsCharacterPlayerControlled_Implementation() const override;
+	virtual bool GetCharacterFirstPersonFocus_Implementation() const override;
+	virtual bool GetCharacterAimingDownSights_Implementation() const override;
 	virtual bool CanEmote_Implementation() const override;
 	virtual bool CanGesture_Implementation() const override;
 
@@ -2088,6 +2107,10 @@ protected:
 	virtual void SetCharacterMovementModeLocked_Implementation(bool NewLocked) override;
 	virtual void SetCharacterStance_Implementation(const FGameplayTag& NewStance) override;
 	virtual FGameplayTag GetCharacterGait_Implementation() const override;
+
+	virtual FGameplayTag GetCharacterRotationMode_Implementation() const override;
+	virtual FGameplayTag GetCharacterViewMode_Implementation() const override;
+
 	virtual FGameplayTag GetCharacterLean_Implementation() const override;
 	virtual FGameplayTag GetCharacterLocomotionMode_Implementation() const override;
 	virtual FGameplayTag GetCharacterLocomotionAction_Implementation() const override;		

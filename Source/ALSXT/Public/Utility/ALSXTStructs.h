@@ -1720,6 +1720,9 @@ struct ALSXT_API FIdleAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Idle Animation Activity", TitleProperty = "{Activity}", AllowPrivateAccess))
 	FGameplayTagContainer Activity;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Idle Animation Activity", TitleProperty = "{Activity}", AllowPrivateAccess))
+	FGameplayTagContainer Weather;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	bool Loops{ false };
 

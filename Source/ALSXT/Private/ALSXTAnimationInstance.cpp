@@ -264,3 +264,12 @@ void UALSXTAnimationInstance::UpdateStatusState()
 		}
 	}
 }
+
+FALSXTControlRigInput UALSXTAnimationInstance::GetALSXTControlRigInput() const {
+
+	return {
+		.bObstacleNavigation = DefensiveModeState.ObstacleMode == ALSXTDefensiveModeTags::CrowdNavigation || DefensiveModeState.ObstacleMode == ALSXTDefensiveModeTags::ObstacleNavigation,
+		.bCombatStance = CombatStance != ALSXTCombatStanceTags::Neutral,
+		.bEnableLeftHandIK = DoesOverlayObjectUseLeftHandIK
+	};
+}

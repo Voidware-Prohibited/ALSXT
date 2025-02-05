@@ -7,6 +7,8 @@
 #include "Utility/ALSXTGameplayTags.h"
 #include "Settings/ALSXTCameraAnimationInstanceSettings.h"
 #include "ALSXTCharacter.h"
+#include "Interfaces/ALSXTCharacterInterface.h"
+#include "Interfaces/ALSXTIdleAnimationComponentInterface.h"
 #include "ALSXTCameraAnimationInstance.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFirstPersonOverrideChanged, float, FirstPersonOverride);
@@ -27,6 +29,18 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 		TObjectPtr<UAlsCameraComponent> ALSXTCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	bool bIsFocusActive {false};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	float CameraZoom {0.0f};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	bool bIsIdleCameraRotationActive {false};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	float IdleCameraRotation {0.0f};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 		FGameplayTag Overlay {

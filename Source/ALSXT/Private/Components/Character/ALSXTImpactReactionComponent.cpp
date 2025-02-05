@@ -387,6 +387,11 @@ FGameplayTag UALSXTImpactReactionComponent::ConvertPhysicalSurfaceToFormTag(EPhy
 // Grounded Bump and Crowd Navigation
 void UALSXTImpactReactionComponent::ObstacleTrace()
 {
+	if (!ImpactReactionSettings.EnableBumpReactions && !ImpactReactionSettings.EnableImpactReactions)
+	{
+		return;
+	}
+	
 	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) != AlsLocomotionModeTags::Grounded || IALSXTCharacterInterface::Execute_GetCharacterLocomotionAction(GetOwner()) != FGameplayTag::EmptyTag || (IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::Dead || IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::Unconscious))
 	{
 		return;
@@ -409,10 +414,6 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 		//				HitActor-EnterCombat
 
 
-
-	}
-	if (IALSXTCharacterInterface::Execute_GetCharacterCombatStance(GetOwner()) == ALSXTCombatStanceTags::Neutral )
-	{
 
 	}
 
@@ -763,13 +764,14 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 											{
 												DefensiveModeState.AnticipationTransform = { UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal), HitResult.ImpactPoint, { 1.0f, 1.0f, 1.0f } };
 
-
 												if (IALSXTCharacterInterface::Execute_GetCharacterGait(GetOwner()) == AlsGaitTags::Sprinting)
 												{
 													return;
 												}
 												else
 												{
+													// IALSXTCharacterInterface::Execute_GetCharacterDefensiveMode(GetOwner()) == ALSXTDefensiveModeTags::
+													
 													// update anim if necessary
 													// Check if still left/right top/middle/bottom
 
@@ -986,11 +988,23 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 									if (FormSurfaces.Num() < 1)
 									{
 										Form = ALSXTImpactFormTags::Blunt;
+										return;
 									}
 									// Get only Form from FormSurfaces
 									if (FormSurfaces.Num() == 1)
 									{
-										Form = FormSurfaces[0].Form;
+										
+										if (FormSurfaces[0].Form.IsValid())
+										{
+											Form = FormSurfaces[0].Form;
+											return;
+										}
+										else
+										{
+											Form = ALSXTImpactFormTags::Blunt;
+											return;
+										}
+										
 									}
 									// Get Form from FormSurfaces
 									if (FormSurfaces.Num() > 1)
@@ -999,9 +1013,23 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 										{
 											if (FormSurface.Surfaces.Contains(HitResult.PhysMaterial->SurfaceType))
 											{
+												// if (Form.) //  T0DO 12/23
+												// {
+												// 
+												// }
+
 												Form = FormSurface.Form;
-												break;
+												return;
 											}
+										}
+										if (Form.IsValid())
+										{
+											Form = FormSurfaces[0].Form;
+											return;
+										}
+										else
+										{
+
 										}
 									}								
 
@@ -1072,6 +1100,11 @@ void UALSXTImpactReactionComponent::ObstacleTrace()
 // Dynamically react to colliding objects when moving fast
 void UALSXTImpactReactionComponent::AnticipationTrace()
 {
+	if (!ImpactReactionSettings.bEnableImpactAnticipationReactions)
+	{
+		return;
+	}
+	
 	// Check Status
 	if (IALSXTCharacterInterface::Execute_GetCharacterLocomotionMode(GetOwner()) == AlsLocomotionModeTags::InAir && IALSXTCollisionInterface::Execute_ShouldPerformDefensiveReaction(GetOwner()) && GetOwner()->GetVelocity().Length() > FGenericPlatformMath::Min(ImpactReactionSettings.CharacterBumpDetectionMinimumVelocity, ImpactReactionSettings.ObstacleBumpDetectionMinimumVelocity) && (IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::Normal || IALSXTCharacterInterface::Execute_GetCharacterStatus(GetOwner()) == ALSXTStatusTags::KnockedDown))
 	{
