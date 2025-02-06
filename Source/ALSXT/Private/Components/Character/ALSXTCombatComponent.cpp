@@ -282,7 +282,7 @@ void UALSXTCombatComponent::SetCurrentTarget(const FTargetHitResultEntry& NewTar
 
 void UALSXTCombatComponent::ClearCurrentTarget()
 {
-	if (CurrentTarget.Valid = true && CurrentTarget.HitResult.GetActor())
+	if (CurrentTarget.Valid == true && CurrentTarget.HitResult.GetActor())
 	{
 		CurrentTarget.Valid = false;
 		CurrentTarget.DistanceFromPlayer = 340282346638528859811704183484516925440.0f;
