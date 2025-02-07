@@ -276,13 +276,13 @@ struct ALSXT_API FALSXTHeldItemViewTarget
 	FTransform Transform;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float FOV;
+	float FOV {90.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float VignetteIntensity;
+	float VignetteIntensity {0.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool Attachment;
+	bool Attachment {false};
 
 	bool operator==(const FALSXTHeldItemViewTarget& other) const
 	{

@@ -12,7 +12,7 @@ struct ALSXT_API FALSXTInputAction
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
-	UInputAction* InputAction;
+	UInputAction* InputAction {nullptr};
 
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
 	// FInputActionValue InputActionValue;
@@ -35,7 +35,7 @@ struct ALSXT_API FALSXTInputComboEntry
 	FGameplayTagContainer Overlays;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Criteria", Meta = (AllowPrivateAccess))
-	UAnimMontage* Montage;
+	UAnimMontage* Montage {nullptr};
 
 	bool operator==(const FALSXTInputComboEntry& other) const
 	{

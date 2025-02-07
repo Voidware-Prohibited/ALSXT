@@ -79,7 +79,12 @@ bool UALSXTPaintableSkeletalMeshComponent::IsMeshPaintingEnabled() const
 void UALSXTPaintableSkeletalMeshComponent::InitializeMaterials()
 {
 	FALSXTServerMeshPaintingSettings ServerGeneralMeshPaintingSettings{ IALSXTMeshPaintingInterface::Execute_GetServerGeneralMeshPaintingSettings(GetOwner()) };
-	PhysicalMaterialMapTexture = GetMaterial(0)->GetPhysicalMaterialMask()->MaskTexture;
+
+	// if (GetMaterial(0)->GetPhysicalMaterialMask()->MaskTexture)
+	// {
+	// 	PhysicalMaterialMapTexture = GetMaterial(0)->GetPhysicalMaterialMask()->MaskTexture;
+	// }
+	
 	PhysicalMaterialMask = GetMaterial(0)->GetPhysicalMaterialMask();
 
 	for (int i = 0; i < 8; i++)

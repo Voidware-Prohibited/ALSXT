@@ -4511,7 +4511,7 @@ FSound UALSXTImpactReactionComponent::GetImpactReactionSound(FDoubleHitResult Hi
 		// LastAttackReactionAnimation = SelectedAttackReactionAnimation;
 		return FoundImpactSound;
 	}
-	return FoundImpactSound;
+	// return FoundImpactSound;
 }
 
 // UNiagaraSystem* UALSXTImpactReactionComponent::GetBodyFallParticle(FDoubleHitResult Hit)
