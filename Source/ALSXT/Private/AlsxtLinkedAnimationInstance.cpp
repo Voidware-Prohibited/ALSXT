@@ -6,6 +6,8 @@
 #include "AlsxtAnimationInstance.h"
 #include "AlsxtCharacter.h"
 #include "Utility/AlsMacros.h"
+#include "Settings/AlsxtAnimationAssetsSettings.h"
+#include "ChooserFunctionLibrary.h" 
 
 UAlsxtLinkedAnimationInstance::UAlsxtLinkedAnimationInstance()
 {
@@ -46,4 +48,23 @@ void UAlsxtLinkedAnimationInstance::NativeBeginPlay()
 					ALS_GET_TYPE_STRING(UAlsxtAnimationInstance).GetData());
 
 	Super::NativeBeginPlay();
+}
+
+void UAlsxtLinkedAnimationInstance::NativeUpdateAnimation(float DeltaSeconds)
+{
+	Super::NativeUpdateAnimation(DeltaSeconds);
+	UpdateAnimationAssets();
+}
+
+UChooserTable* UAlsxtLinkedAnimationInstance::GetChooserTable_Implementation()
+{
+	return nullptr;
+}
+
+void UAlsxtLinkedAnimationInstance::UpdateAnimationAssets_Implementation()
+{
+	if (IsValid(GetChooserTable()))
+	{
+		AnimationAssets = EvaluateChooserTable()->Assets;
+	}
 }

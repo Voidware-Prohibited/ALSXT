@@ -9,41 +9,29 @@ struct ALSXT_API FAlsxtAnimationParametersState
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Overlay", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Sex, Als.Locomotion Variant", AllowPrivateAccess))
+	FGameplayTagContainer CharacteristicsTags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.OverlayMode, Als.OverlaySlot, Als.OverlayLeftHandMirrorPolicy", AllowPrivateAccess))
 	FGameplayTagContainer OverlayTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (AllowPrivateAccess))
-	FGameplayTagContainer PoseTags;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Stance, Als.Combat Stance, Als.Weapon Firearm Stance, Als.Weapon Carry Position, Als.Weapon Ready Position", AllowPrivateAccess))
 	FGameplayTagContainer StanceTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Combat Stance", AllowPrivateAccess))
-	FGameplayTag CombatStance {FGameplayTag::EmptyTag};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Defensive Mode, Als.Injury, Als.Combat Stance", AllowPrivateAccess))
+	FGameplayTagContainer PoseTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Weapon Firearm Stance", AllowPrivateAccess))
-	FGameplayTag WeaponFirearmStance {FGameplayTag::EmptyTag};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Grip Position, Als.Foregrip Position", AllowPrivateAccess))
+	FGameplayTagContainer GripTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Weapon Carry Position", AllowPrivateAccess))
-	FGameplayTag WeaponCarryPosition {FGameplayTag::EmptyTag};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Weapon Ready Position", AllowPrivateAccess))
-	FGameplayTag WeaponReadyPosition {FGameplayTag::EmptyTag};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Lean Direction", AllowPrivateAccess))
-	FGameplayTag GripPosition {FGameplayTag::EmptyTag};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Lean Direction", AllowPrivateAccess))
-	FGameplayTag ForegripPosition {FGameplayTag::EmptyTag};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FGameplayTag DefensiveMode {FGameplayTag::EmptyTag};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	FGameplayTag CrowdNavigationPose {FGameplayTag::EmptyTag};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Stationary Mode, Als.Vehicle Seat", AllowPrivateAccess))
+	FGameplayTagContainer StationaryModeTags;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 2))
 	float BreathingRate{ 0.5 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 2))
+	float BreathingAlpha{ 0.5 };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 2))
 	float DefensiveAmount{ 0.0 };
@@ -86,6 +74,6 @@ struct ALSXT_API FAlsxtAnimationParametersState
 
 	bool operator==(const FAlsxtAnimationParametersState& other) const
 	{
-		return (other.CombatStance == CombatStance) && (other.WeaponFirearmStance == WeaponFirearmStance) && (other.WeaponCarryPosition == WeaponCarryPosition) && (other.OverlayTags == OverlayTags);
+		return (other.CharacteristicsTags == CharacteristicsTags) && (other.OverlayTags == OverlayTags) && (other.StanceTags == StanceTags) && (other.PoseTags == PoseTags) && (other.GripTags == GripTags) && (other.StationaryModeTags == StationaryModeTags);
 	}
 };

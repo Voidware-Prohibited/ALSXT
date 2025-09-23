@@ -95,7 +95,7 @@ void UAlsxtAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		AimState = IAlsxtCharacterInterface::Execute_GetCharacterAimState(GetOwningActor());
 		FreelookState = IAlsxtCharacterInterface::Execute_GetCharacterFreelookState(GetOwningActor());
 		HeadLookAtState = IAlsxtCharacterInterface::Execute_GetCharacterHeadLookAtState(GetOwningActor());
-		StatusState = IAlsxtCharacterInterface::Execute_GetStatusState(GetOwningActor());
+		StatusState = IAlsxtCharacterInterface::Execute_GetCharacterStatusState(GetOwningActor());
 		DefensiveModeState = IAlsxtCharacterInterface::Execute_GetCharacterDefensiveModeState(GetOwningActor());
 		DefensiveModeAnimations = IAlsxtCharacterInterface::Execute_GetCharacterDefensiveModeAnimations(GetOwningActor());
 		StationaryModeState = IAlsxtCharacterInterface::Execute_GetCharacterStationaryModeState(GetOwningActor());
@@ -261,7 +261,7 @@ void UAlsxtAnimationInstance::UpdateStatusState()
 {
 	if (GetOwningActor()->Implements<UAlsxtCharacterInterface>())
 	{
-		FAlsxtStatusState NewStatusState{ IAlsxtCharacterInterface::Execute_GetStatusState(GetOwningActor()) };
+		FAlsxtStatusState NewStatusState{ IAlsxtCharacterInterface::Execute_GetCharacterStatusState(GetOwningActor()) };
 
 		if (NewStatusState != StatusState)
 		{

@@ -42,6 +42,16 @@ public:
 	FGameplayAttributeData MaximumBreathRate;
 	ATTRIBUTE_ACCESSORS_BASIC(UAlsxtBreathAttributeSet, MaximumBreathRate)
 
+	// Holds the current value for Breath.
+	UPROPERTY(BlueprintReadOnly, Category = "Breath Attribute Set", ReplicatedUsing = OnRep_CurrentBreathMagnitude)
+	FGameplayAttributeData CurrentBreathMagnitude;
+	ATTRIBUTE_ACCESSORS_BASIC(UAlsxtBreathAttributeSet, CurrentBreathMagnitude)
+
+	// Holds the value for Maximum Breath.
+	UPROPERTY(BlueprintReadOnly, Category = "Breath Attribute Set", ReplicatedUsing = OnRep_MaxBreathMagnitude)
+	FGameplayAttributeData MaxBreathMagnitude;
+	ATTRIBUTE_ACCESSORS_BASIC(UAlsxtBreathAttributeSet, MaxBreathMagnitude)
+
 	// Holds the current value for Breath Regeneration.
 	UPROPERTY(BlueprintReadOnly, Category = "Breath Attribute Set", ReplicatedUsing = OnRep_CurrentBreathRegeneration)
 	FGameplayAttributeData CurrentBreathRegeneration;
@@ -59,6 +69,12 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_MaximumBreathRate(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	virtual void OnRep_CurrentBreathMagnitude(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	virtual void OnRep_MaxBreathMagnitude(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
 	virtual void OnRep_CurrentBreathRegeneration(const FGameplayAttributeData& OldValue);

@@ -55,7 +55,7 @@ void UAlsxtIdleAnimationComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (IdleAnimationSettings.EnableIdleAnimations)
 	{
-		StatusState = IAlsxtCharacterInterface::Execute_GetStatusState(GetOwner());
+		StatusState = IAlsxtCharacterInterface::Execute_GetCharacterStatusState(GetOwner());
 		if (IsValid(GetIdleState().CurrentIdleMontage) && !IsPlayerInputIdle())
 		{
 			StopIdle();

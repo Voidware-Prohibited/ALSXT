@@ -3,6 +3,7 @@
 #include "AbilitySystem/GameplayAbilities/AlsxtGameplayAbilityJump.h"
 #include "AbilitySystem/AbilitySystemComponent/AlsxtAbilitySystemComponent.h"
 #include "AlsxtCharacter.h"
+#include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
 #include "GameFramework/Character.h"
 
 UAlsxtGameplayAbilityJump::UAlsxtGameplayAbilityJump()
@@ -70,8 +71,42 @@ bool UAlsxtGameplayAbilityJump::CanActivateAbility(const FGameplayAbilitySpecHan
 		return false;
 	}
 
+	UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get();
+	if (!ASC)
+	{
+		return false;
+	}
+
+	// Get the Stamina Attribute Set
+	const UAlsxtStaminaAttributeSet* StaminaSet = ASC->GetSet<UAlsxtStaminaAttributeSet>();
+	if (!StaminaSet)
+	{
+		return false;
+	}
+
+	// Calculate the jump cost from the Gameplay Effect
+	
 	const ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
-	return Character && Character->CanJump();
+	float CurrentStamina = StaminaSet->GetCurrentStamina();
+	if (CostGameplayEffectClass)
+	{
+		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+		FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
+		if (CostSpecHandle.IsValid())
+		{
+			for (const FGameplayModifierInfo& Modifier : CostSpecHandle.Data->Def->Modifiers)
+			{
+				if (Modifier.Attribute == UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute() && Modifier.ModifierOp == EGameplayModOp::Additive)
+				{
+					float JumpCost = 0.0f;
+					JumpCost -= CostSpecHandle.Data->GetModifierMagnitude(0);
+					return CurrentStamina >= FMath::Abs(JumpCost) && Character->CanJump(); // Use FMath::Abs as cost is likely negative
+				}
+			}
+		}
+		return Character->CanJump();
+	}
+	return Character->CanJump();
 }
 
 void UAlsxtGameplayAbilityJump::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo * ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)

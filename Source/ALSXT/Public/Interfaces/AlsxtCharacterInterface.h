@@ -304,7 +304,7 @@ public:
   UPARAM(meta = (Categories = "Als.Status")) FGameplayTag GetCharacterStatus() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
-  FAlsxtStatusState GetStatusState() const;
+  FAlsxtStatusState GetCharacterStatusState() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
   void GetStaminaThresholds(float& Optimal, float& Low) const;

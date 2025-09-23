@@ -1,3 +1,5 @@
+// MIT
+
 #include "AbilitySystem/Calculations/AlsxtGeecBreathingRate.h"
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
 #include "AbilitySystem/AttributeSets/AlsxtBreathAttributeSet.h"
@@ -40,6 +42,8 @@ UAlsxtGeecBreathingRate::UAlsxtGeecBreathingRate()
 	// `false` means we don't need a snapshot of the attribute at the start.
 	StaminaDef = FGameplayEffectAttributeCaptureDefinition(UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute(), EGameplayEffectAttributeCaptureSource::Target, false);
 	MaxStaminaDef = FGameplayEffectAttributeCaptureDefinition(UAlsxtStaminaAttributeSet::GetMaxStaminaAttribute(), EGameplayEffectAttributeCaptureSource::Target, false);
+	StaminaDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Source;
+	MaxStaminaDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Source;
 	// UAlsxtGeecBreathingRate::FBreathingRateCaptureDefinition UAlsxtGeecBreathingRate::BreathingRateCaptureDefinition;
 
 	// Add the capture definitions to the relevant attributes.
@@ -65,24 +69,23 @@ void UAlsxtGeecBreathingRate::Execute_Implementation(const FGameplayEffectCustom
 	}
 
 	// --- Capture attribute values ---
-	float Stamina = 0.0f;
+	float Stamina = 1.0f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(StaminaDef, EvaluationParameters, Stamina);
 
-	float MaxStamina = 0.0f;
+	float MaxStamina = 1.0f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(MaxStaminaDef, EvaluationParameters, MaxStamina);
 
 	// --- Perform the calculation logic ---
 	float BreathingRate = 0.0f;
-
-	// This is a simple example. A more complex formula could be used.
-	// For instance, the breathing rate could increase as stamina gets lower.
+	float BreathingMagnitude = 0.0f;
+	
 	if (MaxStamina > 0.0f)
 	{
 		float StaminaRatio = Stamina / MaxStamina;
 
 		// Inverse relationship: lower stamina means higher breathing rate.
-		// Use a clamped value to prevent extreme rates.
-		BreathingRate = FMath::Lerp(5.0f, 1.0f, FMath::Clamp(StaminaRatio, 0.0f, 1.0f)); 
+		BreathingRate = FMath::Lerp(2.0f, 0.2f, FMath::Clamp(StaminaRatio, 0.0f, 1.0f));
+		BreathingMagnitude = FMath::Lerp(2.0f, 0.2f, FMath::Clamp(StaminaRatio, 0.0f, 1.0f)); 
 		
 		// For example, if Stamina is 100% (Ratio 1.0), BreathingRate = 1.0 (calm).
 		// If Stamina is 0% (Ratio 0.0), BreathingRate = 5.0 (heavy breathing).
@@ -90,31 +93,37 @@ void UAlsxtGeecBreathingRate::Execute_Implementation(const FGameplayEffectCustom
 	else
 	{
 		// Default to a resting rate if max stamina is zero or invalid.
-		BreathingRate = 1.0f; 
+		BreathingRate = 0.2f;
+		BreathingMagnitude = 0.2f;
 	}
 
-	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->GetOwnerActor() : nullptr;
-	AAlsxtCharacter* MyCharacter = Cast<AAlsxtCharacter>(TargetActor);
+	
 
-	if (!MyCharacter)
+	float BreathingRateValue = 0.f;
+	float BreathingMagnitudeValue = 0.0f;
+	FGameplayEffectAttributeCaptureDefinition BreathRateGameplayEffectAttributeCaptureDefinition = FGameplayEffectAttributeCaptureDefinition();
+	BreathRateGameplayEffectAttributeCaptureDefinition.AttributeToCapture = UAlsxtBreathAttributeSet::GetCurrentBreathRateAttribute();
+	BreathRateGameplayEffectAttributeCaptureDefinition.AttributeSource = EGameplayEffectAttributeCaptureSource::Source;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(BreathRateGameplayEffectAttributeCaptureDefinition, FAggregatorEvaluateParameters(), BreathingRateValue);
+
+	FGameplayEffectAttributeCaptureDefinition BreathAlphaGameplayEffectAttributeCaptureDefinition = FGameplayEffectAttributeCaptureDefinition();
+	BreathAlphaGameplayEffectAttributeCaptureDefinition.AttributeToCapture = UAlsxtBreathAttributeSet::GetCurrentBreathRateAttribute();
+	BreathAlphaGameplayEffectAttributeCaptureDefinition.AttributeSource = EGameplayEffectAttributeCaptureSource::Source;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(BreathAlphaGameplayEffectAttributeCaptureDefinition, FAggregatorEvaluateParameters(), BreathingMagnitudeValue);
+	
+	// --- Apply the output modifiers ---
+	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UAlsxtBreathAttributeSet::GetCurrentBreathRateAttribute(), EGameplayModOp::Override, BreathingRateValue));
+	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UAlsxtBreathAttributeSet::GetCurrentBreathMagnitudeAttribute(), EGameplayModOp::Override, BreathingMagnitudeValue));
+
+	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->GetOwnerActor() : nullptr;
+	AAlsxtCharacter* AlsxtCharacter = Cast<AAlsxtCharacter>(TargetActor);
+
+	if (!AlsxtCharacter)
 	{
 		return;
 	}
 
-	float BreathingRateValue = 0.f;
-	FGameplayEffectAttributeCaptureDefinition GameplayEffectAttributeCaptureDefinition = FGameplayEffectAttributeCaptureDefinition();
-	GameplayEffectAttributeCaptureDefinition.AttributeToCapture = UAlsxtBreathAttributeSet::GetCurrentBreathRateAttribute();
-	GameplayEffectAttributeCaptureDefinition.AttributeSource = EGameplayEffectAttributeCaptureSource::Source;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GameplayEffectAttributeCaptureDefinition, FAggregatorEvaluateParameters(), BreathingRateValue);
-
 	// Update the struct in the Character
-	MyCharacter->AnimationParametersState.BreathingRate = BreathingRateValue;
-	
-	// --- Apply the output modifier ---
-	// Create a new modifier for the 'BreathingRate' attribute.
-	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(
-		UAlsxtBreathAttributeSet::GetCurrentBreathRateAttribute(),
-		EGameplayModOp::Override, // This will directly set the base value.
-		BreathingRate
-	));
+	AlsxtCharacter->AnimationParametersState.BreathingRate = BreathingRateValue;
+	AlsxtCharacter->AnimationParametersState.BreathingAlpha = BreathingMagnitudeValue;
 }

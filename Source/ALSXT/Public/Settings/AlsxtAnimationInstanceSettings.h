@@ -1,6 +1,5 @@
 #pragma once
 
-#include "GameplayTagContainer.h"
 #include "ALSXT/Public/Settings/AlsxtStationaryModeSettings.h"
 #include "ALS/Public/Settings/AlsFeetSettings.h"
 #include "ALS/Public/Settings/AlsGeneralAnimationSettings.h"
@@ -18,7 +17,10 @@ class ALSXT_API UAlsxtAnimationInstanceSettings : public UDataAsset
 {
 	GENERATED_BODY()
 
-public:	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UMirrorDataTable> MirrorTable;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FAlsxtStationaryModeAnimations StationaryMode;
 

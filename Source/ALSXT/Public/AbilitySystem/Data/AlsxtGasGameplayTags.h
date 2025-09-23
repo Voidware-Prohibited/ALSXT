@@ -39,11 +39,6 @@ namespace ALSXTGASGameplayTags
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StaminaCost_Instant_Vault);
 	}
 
-	namespace Data
-	{
-		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Data_Magnitude_Sprint);
-	}
-	
 	namespace BasicAttack
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_DamageType_DirectDamage);
@@ -66,6 +61,7 @@ namespace ALSXTGASGameplayTags
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Max_Health);
 
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Cooldown_StaminaRegen);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Min_Stamina);
 		
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Max_Blood);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Max_BodyTemp);

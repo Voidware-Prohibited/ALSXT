@@ -10,6 +10,8 @@ UAlsxtBreathAttributeSet::UAlsxtBreathAttributeSet()
 {
 	MaximumBreathRate = 1.0f;
 	CurrentBreathRate = 1.0f;
+	CurrentBreathMagnitude = 1.0f;
+	MaxBreathMagnitude = 1.0f;
 	CurrentBreathRegeneration = 0.0f;
 	MaxBreathRegeneration = 0.0f;
 }
@@ -27,6 +29,18 @@ void UAlsxtBreathAttributeSet::PostAttributeChange(const FGameplayAttribute& Att
 	if (Attribute == GetMaximumBreathRateAttribute())
 	{
 		AdjustAttributeForMaxChange(GetCurrentBreathRateAttribute(), OldValue, NewValue);
+		return;
+	}
+
+	if (Attribute == GetCurrentBreathMagnitudeAttribute())
+	{
+		CheckMaxReachedForAttribute(MaxBreathMagnitude, ALSXTGASGameplayTags::State::TAG_State_Max_Breath.GetTag(), NewValue);
+		return;
+	}
+
+	if (Attribute == GetMaxBreathMagnitudeAttribute())
+	{
+		AdjustAttributeForMaxChange(GetCurrentBreathMagnitudeAttribute(), OldValue, NewValue);
 		return;
 	}
 
@@ -54,6 +68,13 @@ void UAlsxtBreathAttributeSet::ClampAttributes(const FGameplayAttribute& Attribu
 		return;
 	}
 
+	if (Attribute == GetCurrentBreathMagnitudeAttribute())
+	{
+		// This should be removed in favor of another method, as we're modifying 2 times the current Breath. (One right before post, one right after (here).
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxBreathMagnitude());
+		return;
+	}
+
 	if (Attribute == GetCurrentBreathRegenerationAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxBreathRegeneration());
@@ -73,6 +94,8 @@ void UAlsxtBreathAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	// Replicated to all
 	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtBreathAttributeSet, CurrentBreathRate, Params);
 	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtBreathAttributeSet, MaximumBreathRate, Params);
+	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtBreathAttributeSet, CurrentBreathMagnitude, Params);
+	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtBreathAttributeSet, MaxBreathMagnitude, Params);
 
 	// Owner Only
 	Params.Condition = COND_OwnerOnly;
@@ -88,6 +111,16 @@ void UAlsxtBreathAttributeSet::OnRep_CurrentBreathRate(const FGameplayAttributeD
 void UAlsxtBreathAttributeSet::OnRep_MaximumBreathRate(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UAlsxtBreathAttributeSet, MaximumBreathRate, OldValue);
+}
+
+void UAlsxtBreathAttributeSet::OnRep_CurrentBreathMagnitude(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAlsxtBreathAttributeSet, CurrentBreathMagnitude, OldValue);
+}
+
+void UAlsxtBreathAttributeSet::OnRep_MaxBreathMagnitude(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAlsxtBreathAttributeSet, MaxBreathMagnitude, OldValue);
 }
 
 void UAlsxtBreathAttributeSet::OnRep_CurrentBreathRegeneration(const FGameplayAttributeData& OldValue)

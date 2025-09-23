@@ -112,6 +112,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|State|Parameters", Meta = (AllowPrivateAccess), Transient)
 	FAlsxtAnimationParametersState AnimationParametersState;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ALS|State|Parameters", Meta = (AllowPrivateAccess), Transient)
+	FAlsxtStatusState StatusState;
 
 	UPROPERTY(BlueprintAssignable)
 	FSetupPlayerInputComponentDelegate OnSetupPlayerInputComponentUpdated;

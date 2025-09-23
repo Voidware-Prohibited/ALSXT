@@ -3438,7 +3438,7 @@ void AAlsxtCharacter::OnWeaponObstructionChanged_Implementation(const FGameplayT
 void AAlsxtCharacter::UpdateBreathState()
 {
 	FAlsxtBreathState NewBreathState;
-	const float Stamina = GetStatusState().CurrentStamina;
+	const float Stamina = GetCharacterStatusState().CurrentStamina;
 	if (this->Implements<UAlsxtCharacterInterface>())
 	{
 		FGameplayTag BreathType = IAlsxtCharacterInterface::Execute_GetBreathType(this);
@@ -3455,9 +3455,9 @@ void AAlsxtCharacter::UpdateBreathState()
 
 bool AAlsxtCharacter::ShouldUpdateBreathState() const
 {
-	FAlsxtStatusState StatusState = IAlsxtCharacterInterface::Execute_GetStatusState(this);
+	FAlsxtStatusState NewStatusState = IAlsxtCharacterInterface::Execute_GetCharacterStatusState(this);
 	float CurrentStamina = IAlsxtCharacterInterface::Execute_GetStamina(this);
-	return StatusState.CurrentStamina != CurrentStamina;
+	return NewStatusState.CurrentStamina != CurrentStamina;
 }
 
 bool AAlsxtCharacter::ShouldTransitionBreathState()
@@ -3502,7 +3502,7 @@ FAlsxtTargetBreathState AAlsxtCharacter::CalculateTargetBreathState()
 	{
 		FVector2D ConversionRange{ 0, 1 };
 		FVector2D UtilizedStaminaRange{ 0, ALSXTSettings->StatusSettings.StaminaThresholdSettings.StaminaOptimalThreshold };
-		float CurrentStaminaConverted = FMath::GetMappedRangeValueClamped(UtilizedStaminaRange, ConversionRange, IAlsxtCharacterInterface::Execute_GetStatusState(this).CurrentStamina);
+		float CurrentStaminaConverted = FMath::GetMappedRangeValueClamped(UtilizedStaminaRange, ConversionRange, IAlsxtCharacterInterface::Execute_GetCharacterStatusState(this).CurrentStamina);
 		float PlayRateConverted = FMath::GetMappedRangeValueClamped(ConversionRange, IAlsxtCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(this).BreathAnimationPlayRateRange, CurrentStaminaConverted);
 		float BlendConverted = FMath::GetMappedRangeValueClamped(ConversionRange, IAlsxtCharacterSoundComponentInterface::Execute_GetBreathEffectsSettings(this).BreathAnimationBlendRange, CurrentStaminaConverted);
 		NewTargetBreathState.Alpha = BlendConverted;

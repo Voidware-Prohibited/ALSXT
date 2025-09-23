@@ -34,12 +34,7 @@ namespace ALSXTGASGameplayTags
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_Mantle, "StaminaCost.Instant.Mantle", "A Gameplay Tag applied to Mantle Stamina Cost")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_Vault, "StaminaCost.Instant.Vault", "A Gameplay Tag applied to Vaulting Stamina Cost")
 	}
-
-	namespace Data
-	{
-		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Data_Magnitude_Sprint, "Data.Magnitude.Sprint", "A Gameplay Tag applied to Sprinting Magnitude")
-	}
-
+	
 	namespace BasicAttack
 	{
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_DamageType_DirectDamage, "DamageType.DirectDamage", "Basic Damage Type. Used to calculated Resistance to Basic Damage.")
@@ -61,6 +56,7 @@ namespace ALSXTGASGameplayTags
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_State_Exhausted, "State.Exhausted", "Exhausted")
 
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_State_Cooldown_StaminaRegen, "State.Cooldown.StaminaRegen", "Stamina Regeneration Cooldown")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_State_Min_Stamina, "State.Min.Stamina", "Min Stamina reached")
 
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_State_Max_Health, "State.Max.Health", "Max Health reached")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_State_Max_Stamina, "State.Max.Stamina", "Max Stamina reached")

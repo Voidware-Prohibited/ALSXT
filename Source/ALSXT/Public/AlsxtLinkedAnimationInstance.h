@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "AlsxtCharacter.h"
 #include "AlsLinkedAnimationInstance.h"
+#include "Chooser.h"
 #include "AlsxtLinkedAnimationInstance.generated.h"
 
+class UAlsxtAnimationAssetsSettings;
 /**
  * 
  */
@@ -16,11 +18,17 @@ class ALSXT_API UAlsxtLinkedAnimationInstance : public UAlsLinkedAnimationInstan
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-		TObjectPtr<UAlsxtAnimationInstance> ALSXTParent;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	TObjectPtr<UAlsxtAnimationInstance> ALSXTParent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-		TObjectPtr<AAlsxtCharacter> ALSXTCharacter;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	TObjectPtr<AAlsxtCharacter> ALSXTCharacter;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Meta = (AllowPrivateAccess))
+	FAlsxtAnimationInstanceAssets AnimationAssets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Meta = (AllowPrivateAccess))
+	TObjectPtr<UChooserTable> ChooserTable;
 	
 public:
 	UAlsxtLinkedAnimationInstance();
@@ -28,6 +36,17 @@ public:
 	virtual void NativeInitializeAnimation() override;
 
 	virtual void NativeBeginPlay() override;
+	
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	UFUNCTION(BlueprintPure, BlueprintNativeEvent, BlueprintCallable, Category = "Animation|Chooser")
+	UChooserTable* GetChooserTable();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Animation|Chooser")
+	UAlsxtAnimationAssetsSettings* EvaluateChooserTable();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "State")
+	void UpdateAnimationAssets();
 
 protected:
 	// Be very careful when using this function to read your custom variables using the property access system. It is
