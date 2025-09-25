@@ -15,6 +15,11 @@ struct ALSXT_API FAlsxtCameraShakeSetting
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float BaseMagnitude{ 1.0f };
+
+	bool operator==(const FAlsxtCameraShakeSetting& other) const
+	{
+		return (other.CameraShake == CameraShake) && (other.BaseMagnitude == BaseMagnitude);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -29,6 +34,12 @@ struct ALSXT_API FAlsxtOverlayCameraShakeSettings
 	FAlsxtCameraShakeSetting WalkingCameraShake;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtCameraShakeSetting ADSCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtCameraShakeSetting CombatCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FAlsxtCameraShakeSetting RunningCameraShake;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -38,13 +49,35 @@ struct ALSXT_API FAlsxtOverlayCameraShakeSettings
 	FAlsxtCameraShakeSetting CrouchWalkingCameraShake;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtCameraShakeSetting CrouchADSCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtCameraShakeSetting CrouchCombatCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FAlsxtCameraShakeSetting CrouchRunningCameraShake;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FAlsxtCameraShakeSetting ProneWalkingCameraShake;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtCameraShakeSetting ProneCombatCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FAlsxtCameraShakeSetting ProneRunningCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtCameraShakeSetting ProneSprintingCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtCameraShakeSetting LadderWalkingCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtCameraShakeSetting LadderRunningCameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtCameraShakeSetting LadderSprintingCameraShake;
+
 };
 
 USTRUCT(BlueprintType)

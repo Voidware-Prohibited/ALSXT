@@ -62,6 +62,7 @@
 #include "ContextualAnimSceneActorComponent.h"
 #include "PhysicsControlComponent.h"
 #include "State/AlsxtAnimationParametersState.h"
+#include "Utility/AlsxtOverlayStructs.h"
 
 #include "AlsxtCharacter.generated.h"
 
@@ -98,6 +99,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System", Meta = (ShowOnlyInnerProperties))
 	TSoftObjectPtr<UAlsxtAbilitySystemInitializationDataAsset> AbilitySystemInitializationData;
 
+private:
+	virtual void ServerSetDesiredStance_Implementation(const FGameplayTag& NewDesiredStance) override;
+
 public:
 	virtual void OnRep_PlayerState() override;
 
@@ -109,7 +113,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Als Character", Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsxtCharacterSettings> ALSXTSettings;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|State|Parameters", Meta = (AllowPrivateAccess), Transient)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|State|Parameters", Replicated, Meta = (AllowPrivateAccess), Transient)
 	FAlsxtAnimationParametersState AnimationParametersState;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ALS|State|Parameters", Meta = (AllowPrivateAccess), Transient)

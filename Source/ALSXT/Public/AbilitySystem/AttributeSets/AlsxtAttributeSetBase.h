@@ -24,6 +24,7 @@ protected:
 	void AdjustAttributeForMaxChange(const FGameplayAttribute& AffectedAttribute, const float OldMaxValue, const float NewMaxValue) const;
 
 	void CheckMaxReachedForAttribute(const FGameplayAttributeData& MaxAttribute, const FGameplayTag& MaxTag, const float& NewValue) const;
+	void CheckMinReachedForAttribute(const FGameplayAttributeData& MinAttribute, const FGameplayTag& MinTag, const float& NewValue) const;
 	void CheckStatusTagForAttribute(const FGameplayTag& StatusTag, const float& NewValue, const float& OldValue) const;
 
 

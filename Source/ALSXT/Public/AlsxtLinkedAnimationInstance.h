@@ -8,7 +8,7 @@
 #include "Chooser.h"
 #include "AlsxtLinkedAnimationInstance.generated.h"
 
-class UAlsxtAnimationAssetsSettings;
+class UAlsxtLocomotionAnimationAssetsSettings;
 /**
  * 
  */
@@ -23,12 +23,6 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	TObjectPtr<AAlsxtCharacter> ALSXTCharacter;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Meta = (AllowPrivateAccess))
-	FAlsxtAnimationInstanceAssets AnimationAssets;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", Meta = (AllowPrivateAccess))
-	TObjectPtr<UChooserTable> ChooserTable;
 	
 public:
 	UAlsxtLinkedAnimationInstance();
@@ -36,17 +30,15 @@ public:
 	virtual void NativeInitializeAnimation() override;
 
 	virtual void NativeBeginPlay() override;
-	
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	UFUNCTION(BlueprintPure, BlueprintNativeEvent, BlueprintCallable, Category = "Animation|Chooser")
-	UChooserTable* GetChooserTable();
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Animation|Chooser")
-	UAlsxtAnimationAssetsSettings* EvaluateChooserTable();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "State")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "State|Chooser")
 	void UpdateAnimationAssets();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Chooser", Meta = (AllowPrivateAccess))
+	TObjectPtr<UChooserTable> ChooserTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Chooser", Meta = (AllowPrivateAccess))
+	bool bEvaluateChooserTableForAnimationAssets {false};
 
 protected:
 	// Be very careful when using this function to read your custom variables using the property access system. It is

@@ -40,6 +40,16 @@
 #include "AbilitySystem/AttributeSets/AlsxtBreathAttributeSet.h"
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
 
+void AAlsxtCharacter::ServerSetDesiredStance_Implementation(const FGameplayTag& NewDesiredStance)
+{
+	Super::ServerSetDesiredStance_Implementation(NewDesiredStance);
+	FGameplayTagContainer StanceTags {AlsStanceTags::Standing};
+	StanceTags.AddTag(AlsStanceTags::Crouching);
+	StanceTags.AddTag(AlsStanceTags::Prone);
+	AnimationParametersState.StanceTags.RemoveTags(StanceTags);
+	AnimationParametersState.StanceTags.AddTag(NewDesiredStance);
+}
+
 void AAlsxtCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();

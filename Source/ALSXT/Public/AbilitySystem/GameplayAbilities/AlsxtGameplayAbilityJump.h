@@ -16,6 +16,10 @@ class ALSXT_API UAlsxtGameplayAbilityJump : public UAlsxtGameplayAbilityBase
 
 public:
 	UAlsxtGameplayAbilityJump();
+
+	// Default value for the stamina cost
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jump|Cost")
+	float BaseJumpStaminaCost = 0.20f;
 	
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
@@ -24,6 +28,8 @@ public:
 	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
 	virtual void CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility) override;
+
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	
 protected:
 	// The Gameplay Effect for the stamina cost
@@ -33,9 +39,7 @@ protected:
 	// Tag to set the magnitude of the stamina cost effect
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jump|Cost")
 	FGameplayTag StaminaCostTag;
-	
-	// Default value for the stamina cost
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jump|Cost")
-	float BaseJumpStaminaCost = 10.0f;
-	
+
+	UPROPERTY()
+	FGameplayEffectSpecHandle StaminaDrainEffectSpecHandle;
 };

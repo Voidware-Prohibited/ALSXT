@@ -112,5 +112,27 @@ bool UAlsxtGameplayAbilitySprint::CanActivateAbility(const FGameplayAbilitySpecH
 		return false;
 	}
 	
-	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+	// Calculate the jump cost from the Gameplay Effect
+	
+	const ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
+	float CurrentStamina = StaminaAttributeSet->GetCurrentStamina();
+	if (CostGameplayEffectClass)
+	{
+		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+		FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
+		if (CostSpecHandle.IsValid())
+		{
+			for (const FGameplayModifierInfo& Modifier : CostSpecHandle.Data->Def->Modifiers)
+			{
+				if (Modifier.Attribute == UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute() && Modifier.ModifierOp == EGameplayModOp::Additive)
+				{
+					float JumpCost = 0.0f;
+					JumpCost -= CostSpecHandle.Data->GetModifierMagnitude(0);
+					return CurrentStamina >= FMath::Abs(JumpCost); // Use FMath::Abs as cost is likely negative
+				}
+			}
+		}
+		return false;
+	}
+	return false;
 }

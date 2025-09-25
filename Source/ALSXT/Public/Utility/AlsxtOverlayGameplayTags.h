@@ -2,7 +2,7 @@
 
 #include "NativeGameplayTags.h"
 
-namespace AlsxtOverlaySlotTags
+namespace AlsxtOverlayLeftHandMirrorPolicyTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Mirror)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Unique)
@@ -10,6 +10,7 @@ namespace AlsxtOverlaySlotTags
 
 namespace AlsxtOverlaySettingsTags
 {
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Mirror)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Aimable)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(UseGunBoneForOverlayObjects)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(LeftHandIK)
@@ -17,12 +18,12 @@ namespace AlsxtOverlaySettingsTags
 
 namespace AlsxtOverlaySlotTags
 {
-	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Left)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Right)
+	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Left)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TwoHanded)
 }
 
-namespace AlsxtOverlayStanceTags
+namespace AlsxtOverlaySlotStanceTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TwoHanded)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Active)

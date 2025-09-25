@@ -47,6 +47,33 @@ void UAlsxtAttributeSetBase::CheckMaxReachedForAttribute(const FGameplayAttribut
 	}
 }
 
+void UAlsxtAttributeSetBase::CheckMinReachedForAttribute(const FGameplayAttributeData& MinAttribute, const FGameplayTag& MinTag, const float& NewValue) const
+{
+	UAbilitySystemComponent* const ASC = GetOwningAbilitySystemComponent();
+	if (!ASC)
+	{
+		return;
+	}
+
+	const float Min = MinAttribute.GetCurrentValue();
+	const bool bHasTag = ASC->HasMatchingGameplayTag(MinTag);
+
+	int32 Count = -1;
+	if (Min < NewValue && bHasTag)
+	{
+		Count = 0;
+	} else if (Min >= NewValue && !bHasTag)
+	{
+		Count = 1;
+	}
+
+	if (Count >= 0)
+	{
+		ASC->SetLooseGameplayTagCount(MinTag, Count);
+		ASC->SetReplicatedLooseGameplayTagCount(MinTag, Count);
+	}
+}
+
 void UAlsxtAttributeSetBase::CheckStatusTagForAttribute(const FGameplayTag& StatusTag, const float& NewValue, const float& OldValue) const
 {
 	UAbilitySystemComponent* const ASC = GetOwningAbilitySystemComponent();

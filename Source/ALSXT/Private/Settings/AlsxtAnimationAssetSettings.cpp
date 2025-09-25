@@ -1,12 +1,12 @@
-#include "Settings/AlsxtAnimationAssetsSettings.h"
+#include "Settings/AlsxtLocomotionAnimationAssetsSettings.h"
 
-UAlsxtAnimationAssetsSettings::UAlsxtAnimationAssetsSettings()
+UAlsxtLocomotionAnimationAssetsSettings::UAlsxtLocomotionAnimationAssetsSettings()
 {
 	
 }
 
 #if WITH_EDITOR
-void UAlsxtAnimationAssetsSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void UAlsxtLocomotionAnimationAssetsSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }

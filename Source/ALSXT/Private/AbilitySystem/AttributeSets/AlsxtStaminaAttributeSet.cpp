@@ -23,6 +23,7 @@ void UAlsxtStaminaAttributeSet::PostAttributeChange(const FGameplayAttribute& At
 	if (Attribute == GetCurrentStaminaAttribute())
 	{
 		CheckMaxReachedForAttribute(MaxStamina, ALSXTGASGameplayTags::State::TAG_State_Max_Stamina.GetTag(), NewValue);
+		CheckMinReachedForAttribute(LowStaminaThreshold, ALSXTGASGameplayTags::State::TAG_State_Min_Stamina.GetTag(), NewValue);
 		return;
 	}
 
@@ -80,46 +81,6 @@ void UAlsxtStaminaAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 void UAlsxtStaminaAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
-	
-	// Get the Ability System Component from the target actor
-	UAbilitySystemComponent* TargetASC = GetOwningAbilitySystemComponentChecked();	
-	// UAbilitySystemComponent* TargetASC = Data.Target.AbilityActorInfo.Get()->AbilitySystemComponent.Get();
-	if (!TargetASC)
-	{
-		return;
-	}
-
-	// Check if the modified attribute was CurrentStamina
-	if (Data.EvaluatedData.Attribute == GetCurrentStaminaAttribute())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GetCurrentStaminaAttribute modified!"));
-		float NewStamina = GetCurrentStamina();
-        
-		// Add the tag if stamina is below the threshold
-		if (NewStamina <= LowStaminaThreshold)
-		{
-			if (!TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.Min.Stamina"))))
-			{
-				UE_LOG(LogTemp, Warning, TEXT("UAlsxtStaminaAttributeSet::PostGameplayEffectExecute: Apply Tag: State.Min.Stamina"));
-				// TargetASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.Min.Stamina")));
-				TargetASC->AddReplicatedLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.Min.Stamina")));
-			}
-		}
-		// Remove the tag if stamina is above the threshold
-		else
-		{
-			if (TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.Min.Stamina"))))
-			{
-				UE_LOG(LogTemp, Warning, TEXT("UAlsxtStaminaAttributeSet::PostGameplayEffectExecute: Remove Tag: State.Min.Stamina"));
-				// TargetASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.Min.Stamina")));
-				TargetASC->RemoveReplicatedLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.Min.Stamina")));
-			}
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GetCurrentStaminaAttribute not modified"));
-	}
 }
 
 void UAlsxtStaminaAttributeSet::OnRep_CurrentStamina(const FGameplayAttributeData& OldValue)

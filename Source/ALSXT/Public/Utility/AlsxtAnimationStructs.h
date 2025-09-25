@@ -54,6 +54,36 @@ struct ALSXT_API FAlsxtAnimationInstanceBlendSpaceAssets
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtSwimmingAnimationInstanceBlendSpaceAssets
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UBlendSpace> WalkRun_Forward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UBlendSpace> WalkRun_Left_Forward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UBlendSpace> WalkRun_Right_Forward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UBlendSpace> WalkRun_Backward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UBlendSpace> WalkRun_Left_Backward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UBlendSpace> WalkRun_Right_Backward;
+
+	bool operator==(const FAlsxtSwimmingAnimationInstanceBlendSpaceAssets& other) const
+	{
+		return (other.WalkRun_Forward == WalkRun_Forward) && (other.WalkRun_Left_Forward == WalkRun_Left_Forward);
+	}
+
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtAnimationInstanceRunStartAssets
 {
 	GENERATED_BODY()
@@ -144,7 +174,7 @@ struct ALSXT_API FAlsxtAnimationInstanceStopTransitionAssets
 };
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FAlsxtAnimationInstanceAssets
+struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 {
 	GENERATED_BODY()
 
@@ -172,15 +202,67 @@ struct ALSXT_API FAlsxtAnimationInstanceAssets
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Standing")
 	FAlsxtAnimationInstanceStopTransitionAssets StopTransitions;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Crouch and Prone")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Crouch, Prone and Ladder")
 	TObjectPtr<UAnimSequence> WalkPose;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Crouch and Prone")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Crouch, Prone and Ladder")
 	FAlsxtAnimationInstanceMovementAssets MovementAssets;
 
-	bool operator==(const FAlsxtAnimationInstanceAssets& other) const
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Crouch, Prone and Ladder")
+	FAlsxtSwimmingAnimationInstanceBlendSpaceAssets SwimmingBlendSpaceAssets;
+
+	bool operator==(const FAlsxtLocomotionAnimationInstanceAssets& other) const
 	{
 		return (other.IdlePose == IdlePose) && (other.Sprint == Sprint) && (other.RotateInPlaceAssets == RotateInPlaceAssets);
+	}
+
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtOverlayAnimationInstanceAssets
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> OverlayPoses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Run_Arms;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Sprint_Arms;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Sprint_Impulse_Arms;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Aim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Aim_Crouch;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Aim_Prone;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Aim_AroundCover;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Aim_Crouch_AroundCover;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Aim_Stationary;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Aim_Ladder;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Aim_Swimming;
+	
+
+	bool operator==(const FAlsxtOverlayAnimationInstanceAssets& other) const
+	{
+		return (other.OverlayPoses == OverlayPoses) && (other.Run_Arms == Run_Arms) && (other.Sprint_Arms == Sprint_Arms) && (other.Sprint_Impulse_Arms == Sprint_Impulse_Arms) && (other.Aim == Aim) && (other.Aim_Crouch == Aim_Crouch) && (other.Aim_Prone == Aim_Prone) && (other.Aim_AroundCover == Aim_AroundCover) && (other.Aim_Crouch_AroundCover == Aim_Crouch_AroundCover) && (other.Aim_Stationary == Aim_Stationary) && (other.Aim_Ladder == Aim_Ladder) && (other.Aim_Swimming == Aim_Swimming);
 	}
 
 };

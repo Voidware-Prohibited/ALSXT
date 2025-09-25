@@ -48,16 +48,19 @@ void UAlsxtGameplayAbilityJump::ActivateAbility(const FGameplayAbilitySpecHandle
 
 						// Create the effect spec and set the cost
 						UGameplayEffect* CostEffect = StaminaCostEffect->GetDefaultObject<UGameplayEffect>();
+						EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
 						// FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingGameplayEffectSpec(StaminaCostEffect, GetAbilityLevel());
-						FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingSpec(StaminaCostEffect, GetAbilityLevel(), EffectContext);
-						CostSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseJumpStaminaCost); // Use negative for costs
+						StaminaDrainEffectSpecHandle = ASC->MakeOutgoingSpec(StaminaCostEffect, GetAbilityLevel(), EffectContext);
+						StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseJumpStaminaCost); // Use negative for costs
 
 						// Apply the stamina cost effect
-						ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*CostSpecHandle.Data.Get());
+						ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaDrainEffectSpecHandle.Data.Get());
 					}
 					
 					// Perform the jump action
 					Character->Jump();
+
+					EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 				}
 			}
 		}
@@ -113,17 +116,10 @@ void UAlsxtGameplayAbilityJump::InputReleased(const FGameplayAbilitySpecHandle H
 {
 	if (ActorInfo != NULL && ActorInfo->AvatarActor != NULL)
 	{
-		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 	}
 }
 
-// Epic's comment
-/**
- *	Canceling an non instanced ability is tricky. Right now this works for Jump since there is nothing that can go wrong by calling
- *	StopJumping() if you aren't already jumping. If we had a montage playing non instanced ability, it would need to make sure the
- *	Montage that *it* played was still playing, and if so, to cancel it. If this is something we need to support, we may need some
- *	light weight data structure to represent 'non intanced abilities in action' with a way to cancel/end them.
- */
 void UAlsxtGameplayAbilityJump::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo * ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
 	if (ScopeLockCount > 0)
@@ -131,11 +127,30 @@ void UAlsxtGameplayAbilityJump::CancelAbility(const FGameplayAbilitySpecHandle H
 		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &UAlsxtGameplayAbilityJump::CancelAbility, Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility));
 		return;
 	}
+	
+	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 
 	ACharacter * Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
 	Character->StopJumping();
+}
+
+void UAlsxtGameplayAbilityJump::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
+	// Character->SetDesiredGait(AlsGaitTags::Running);
+
+	// Try to Activate Stamina Regen Ability
+	FGameplayTagContainer StaminaRegenGameplayTags;
+	StaminaRegenGameplayTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
+	if (ActorInfo->AbilitySystemComponent->TryActivateAbilitiesByTag(StaminaRegenGameplayTags, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UAlsxtGameplayAbilityJump::EndAbility: Gameplay.Ability.StaminaRegen activated!"));
+	}
+	
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 
