@@ -49,7 +49,7 @@ void UAlsxtAdvancedAnimationInstance::NativeUpdateAnimation(const float DeltaTim
 		return;
 	}
 	
-	RefreshALSXTPose();
+	RefreshAlsxtPose();
 
 
 	if (GetOwningActor()->Implements<UAlsxtCharacterInterface>())
@@ -83,7 +83,7 @@ FAnimInstanceProxy* UAlsxtAdvancedAnimationInstance::CreateAnimInstanceProxy()
 	return new FAlsxtAdvancedAnimationInstanceProxy{ this };
 }
 
-void UAlsxtAdvancedAnimationInstance::RefreshALSXTPose()
+void UAlsxtAdvancedAnimationInstance::RefreshAlsxtPose()
 {
-	Super::RefreshALSXTPose();
+	Super::RefreshAlsxtPose();
 }

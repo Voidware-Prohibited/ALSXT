@@ -12,10 +12,13 @@ struct ALSXT_API FAlsxtAnimationParametersState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Sex,Als.Locomotion Variant", AllowPrivateAccess))
 	FGameplayTagContainer CharacteristicsTags;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.LocomotionMode,Als.LocomotionModifier,Als.LocomotionModifierSettings", AllowPrivateAccess))
+	FGameplayTagContainer LocomotionTags;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.OverlayMode,Als.OverlayLeftHandMirrorPolicy,Als.OverlaySettings", AllowPrivateAccess))
 	FGameplayTagContainer OverlayTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Stance,Als.Combat Stance,Als.Weapon Firearm Stance,Als.Weapon Carry Position,Als.Weapon Ready Position", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Stance,Als.Combat Stance,Als.Ready Stance,Als.Weapon Firearm Stance,Als.Weapon Carry Position,Als.Weapon Ready Position", AllowPrivateAccess))
 	FGameplayTagContainer StanceTags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Defensive Mode,Als.Injury,Als.Combat Stance", AllowPrivateAccess))

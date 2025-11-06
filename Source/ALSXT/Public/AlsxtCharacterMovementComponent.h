@@ -5,9 +5,11 @@
 
 #include "CoreMinimal.h"
 #include "AlsCharacterMovementComponent.h"
+#include "Settings/AlsxtMovementSettings.h"
 #include "Utility/AlsxtGameplayTags.h"
 #include "AlsxtCharacterMovementComponent.generated.h"
 
+class UAlsxtMovementSettings;
 class AAlsxtCharacter;
 
 
@@ -22,8 +24,8 @@ enum ECustomMovementMode
 	CMOVE_MAX			UMETA(Hidden),
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnterSlideSlopeAngleDelegate, float, CurrentSlopeAngle);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExitSlideSlopeAngleDelegate, float, CurrentSlopeAngle);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterSlideSlopeAngleDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnExitSlideSlopeAngleDelegate);
 
 /**
  * 
@@ -43,6 +45,8 @@ public:
 	virtual float GetMaxAcceleration() const override;
 
 	void SetMovementSpeedMultiplier(float Multiplier);
+
+	float GetCharacterWeight() const;
 
 	float GetStandingWalkSpeedMultiplier() const;
 	float GetStandingAimingSpeedMultiplier() const;
@@ -126,7 +130,6 @@ public:
 	void SetSwimmingRunSpeedMultiplier(float Multiplier);
 	void SetSwimmingSprintSpeedMultiplier(float Multiplier);
 
-	UPROPERTY(BlueprintAssignable, Category="Movement")
 	FOnEnterSlideSlopeAngleDelegate OnEnterSlideSlopeAngle;
 
 	UPROPERTY(BlueprintAssignable, Category="Movement")
@@ -135,6 +138,12 @@ public:
 protected:
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient)
+	TObjectPtr<UAlsxtMovementSettings> AlsxtMovementSettings;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient)
+	FAlsxtMovementGaitSettings AlsxtGaitSettings;
 
 	/**
 	 * @todo Add the following into settings

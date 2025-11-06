@@ -54,6 +54,33 @@ struct ALSXT_API FAlsxtAnimationInstanceBlendSpaceAssets
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxt1DLocomotionBlendSpaceAssets
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UBlendSpace> Forward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UBlendSpace> Backward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimSequence> Pose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimSequence> ForwardToBackwardTransition;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimSequence> BackwardToForwardTransition;
+ 
+	bool operator==(const FAlsxt1DLocomotionBlendSpaceAssets& other) const
+	{
+		return (other.Forward == Forward) && (other.Backward == Backward) && (other.Pose == Pose) && (other.ForwardToBackwardTransition == ForwardToBackwardTransition) && (other.BackwardToForwardTransition == BackwardToForwardTransition);
+	}
+
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtSwimmingAnimationInstanceBlendSpaceAssets
 {
 	GENERATED_BODY()
@@ -185,13 +212,19 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 	TObjectPtr<UAnimSequence> Sprint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Standing")
-	TObjectPtr<UBlendSpace> Lean;
+	TObjectPtr<UBlendSpace> SprintLean;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FAlsxtAnimationInstanceRotateInPlaceAssets RotateInPlaceAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Standing")
 	FAlsxtAnimationInstanceBlendSpaceAssets BlendSpaceAssets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Standing")
+	FAlsxt1DLocomotionBlendSpaceAssets SidlingRightBlendSpaceAssets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Standing")
+	FAlsxt1DLocomotionBlendSpaceAssets SidlingLeftBlendSpaceAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Standing")
 	FAlsxtAnimationInstanceRunStartAssets RunStartAssets;
@@ -239,10 +272,25 @@ struct ALSXT_API FAlsxtOverlayAnimationInstanceAssets
 	TObjectPtr<UAnimSequence> Aim;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> SlopeSlide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimSequence> Aim_Crouch;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> SlopeSlide_Crouch;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimSequence> Aim_Prone;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Lean;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Lean_Crouch;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequence> Lean_Prone;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimSequence> Aim_AroundCover;

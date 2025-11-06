@@ -3,7 +3,10 @@
 
 #include "AlsxtBlueprintFunctionLibrary.h"
 #include "GameFramework/PlayerController.h"
+#include "GameplayTagsManager.h"
+#include "GameplayTagContainer.h"
 #include "Interfaces/AlsxtControllerRenderInterface.h"
+#include "Utility/AlsxtOverlayStructs.h"
 #include "Utility/AlsxtGameplayTags.h"
 
 FQuat UAlsxtBlueprintFunctionLibrary::ConvertEulerToQuaternion(FRotator CurrentRotation)
@@ -81,6 +84,67 @@ bool UAlsxtBlueprintFunctionLibrary::GetAdjustedRenderMatrix(const UMeshComponen
 		}
 	}
 	return false;
+}
+
+TArray<FGameplayTag> UAlsxtBlueprintFunctionLibrary::GetDirectChildTags(const FGameplayTag& Tag)
+{
+	if (!Tag.IsValid())
+	{
+		return TArray<FGameplayTag>();
+	}
+
+	UGameplayTagsManager& TagsManager = UGameplayTagsManager::Get();
+
+	FGameplayTagContainer AllDescendantTags;
+	// TagsManager.RequestGameplayTagChildrenInDictionary(Tag);
+	AllDescendantTags = UGameplayTagsManager::Get().RequestGameplayTagChildren(Tag);
+	TArray<FGameplayTag> FirstLevelChildTags;
+
+	// Iterate through all descendant tags and check if they are a direct child
+	for (const FGameplayTag& DescendantTag : AllDescendantTags)
+	{
+		// Check if the current tag's direct parent is the tag we're looking for
+		if (TagsManager.RequestGameplayTagDirectParent(DescendantTag) == Tag)
+		{
+			FirstLevelChildTags.Add(DescendantTag);
+		}
+	}
+
+	return FirstLevelChildTags;
+}
+
+bool UAlsxtBlueprintFunctionLibrary::DoesGameplayTagEndWithString(FGameplayTag Tag, FString String)
+{
+	if (!Tag.IsValid())
+	{
+		return false;
+	}
+    
+	// Get the full tag string representation
+	FString TagString = Tag.ToString();
+
+	// Check if the tag string ends with the specified suffix
+	return TagString.EndsWith(String, ESearchCase::IgnoreCase);
+}
+
+bool UAlsxtBlueprintFunctionLibrary::DoesGameplayTagContainerHaveTagWithSuffix(const FGameplayTagContainer& InTagContainer, const FString& Suffix)
+{
+	for (const FGameplayTag& Tag : InTagContainer)
+	{
+		if (Tag.ToString().EndsWith(Suffix))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+TArray<FGameplayTag> UAlsxtBlueprintFunctionLibrary::GetOverlayAnimationInfoKeys(const TMap<FGameplayTag, FAlsxtOverlayAnimationInfo>& InMap)
+{
+	TArray<FGameplayTag> Keys;
+	InMap.GetKeys(Keys);
+	return Keys;
 }
 
 void UAlsxtBlueprintFunctionLibrary::GetSideFromHit(FDoubleHitResult Hit, FGameplayTag& Side)

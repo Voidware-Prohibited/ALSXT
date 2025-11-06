@@ -109,6 +109,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient)
 	FAlsxtPoseState ALSXTPoseState;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient)
+	FAlsStandingState AlsxtCrouchingState;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FAlsxtStatusState StatusState;
 
@@ -215,7 +218,7 @@ protected:
 	FAlsxtRecoilState RecoilState;
 
 protected:
-	void RefreshALSXTPose();
+	virtual void RefreshAlsxtPose();
 
 public:
 
@@ -233,6 +236,17 @@ public:
 
 protected:
 	virtual FAnimInstanceProxy* CreateAnimInstanceProxy() override;
+
+	void AlsxtPlayQueuedTransitionAnimation();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Linked Animation Instance", Meta = (BlueprintThreadSafe))
+	void AlsxtRefreshCrouchingMovement();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Linked Animation Instance", Meta = (BlueprintThreadSafe))
+	void AlsxtRefreshStandingMovement();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Linked Animation Instance", Meta = (BlueprintThreadSafe))
+	void AlsxtRefreshDynamicTransitions();
 
 	// Core
 
@@ -261,6 +275,9 @@ protected:
 
 	UFUNCTION(BlueprintPure, Category = "ALSXT|Animation Instance", Meta = (BlueprintThreadSafe, ReturnDisplayName = "Rig Input"))
 	FALSXTControlRigInput GetALSXTControlRigInput() const;
+
+private:
+	FVector2f GetAlsxtRelativeAccelerationAmount() const;
 };
 
 inline UAlsxtAnimationInstanceSettings* UAlsxtAnimationInstance::GetALSXTSettingsUnsafe() const

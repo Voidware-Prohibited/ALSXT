@@ -8,6 +8,8 @@
 #include "Chooser.h"
 #include "AlsxtLinkedAnimationInstance.generated.h"
 
+struct FAnimNodeReference;
+struct FAnimUpdateContext;
 class UAlsxtLocomotionAnimationAssetsSettings;
 /**
  * 
@@ -18,6 +20,8 @@ class ALSXT_API UAlsxtLinkedAnimationInstance : public UAlsLinkedAnimationInstan
 	GENERATED_BODY()
 
 protected:
+	FAnimInstanceProxy* CreateAnimInstanceProxy() override;
+	
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsxtAnimationInstance> ALSXTParent;
 
@@ -33,6 +37,15 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "State|Chooser")
 	void UpdateAnimationAssets();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS", meta = (BlueprintThreadSafe))
+	void AlsxtRefreshStandingMovement();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS", meta = (BlueprintThreadSafe))
+	void AlsxtRefreshCrouchingMovement();
+
+	UFUNCTION(BlueprintCallable, Category = "ALS", meta = (BlueprintThreadSafe))
+	void AlsxtRefreshDynamicTransitions();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Chooser", Meta = (AllowPrivateAccess))
 	TObjectPtr<UChooserTable> ChooserTable;

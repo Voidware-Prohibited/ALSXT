@@ -53,6 +53,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
 	UCameraShakeBase* CurrentCameraShake;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Settings", Meta = (AllowPrivateAccess))
+	FAlsxtCameraShakeSetting CurrentCameraShakeSettings;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Settings")
 	void OnCameraShakeChanged();
 

@@ -89,6 +89,18 @@ namespace ALSXTGASGameplayTags
 	
 	namespace Statuses
 	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Dead, "Status.Dead", "Is Dead. Can be used to disable effects.")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_KnockedDown, "State.KnockedDown", "KnockedDown")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Unconscious, "State.Unconscious", "Unconscious")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Exhausted, "Status.Exhausted", "Is Exhausted. Can be used to trigger more effects.")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Freezing, "Status.Freezing", "Is Freezing. Can be used to trigger more effects.")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Overheated, "Status.Overheated", "Is Overheated. Can be used to trigger more effects.")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Poisoned, "Status.Poisoned", "Is Overheated. Can be used to trigger more effects.")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Infected, "Status.Infected", "Is Overheated. Can be used to trigger more effects.")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Dizzy, "Status.Dizzy", "Is Dizzy. Can be used to trigger more effects.")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Drunk, "Status.Drunk", "Is Drunk. Can be used to trigger more effects.")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_High, "Status.High", "Is High. Can be used to trigger more effects.")
+		
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Debuff_Bleeding, "Debuff.Bleeding", "Is Bleeding. Can be used to trigger more effects.")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_DamageType_Bleeding, "DamageType.Bleeding", "Bleeding Damage Type. Used to calculated Resistance to Bleeding Damage.")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Immunity_Bleeding, "Immunity.Bleeding", "Immune to Bleeding")

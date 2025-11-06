@@ -1,8 +1,11 @@
 // MIT
 
 #include "AlsxtCharacterMovementComponent.h"
+
+#include "AlsxtCharacter.h"
 #include "Utility/AlsxtGameplayTags.h"
 #include "Interfaces/AlsxtCharacterInterface.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UAlsxtCharacterMovementComponent::BeginPlay()
 {
@@ -288,6 +291,11 @@ void UAlsxtCharacterMovementComponent::SetMovementSpeedMultiplier(float Multipli
 	MovementSpeedMultiplier = Multiplier;
 }
 
+float UAlsxtCharacterMovementComponent::GetCharacterWeight() const
+{
+	return 90.62f;
+}
+
 void UAlsxtCharacterMovementComponent::SetStandingWalkSpeedMultiplier(float Multiplier)
 {
 	StandingWalkSpeedMultiplier = Multiplier;
@@ -416,24 +424,75 @@ void UAlsxtCharacterMovementComponent::SetSwimmingSprintSpeedMultiplier(float Mu
 void UAlsxtCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
-	
-	if (MovementMode == MOVE_Walking)
+
+	if (AlsxtMovementSettings.Get())
 	{
-		CheckSlopeAngle();
+		if (CurrentFloor.IsWalkableFloor() && MovementMode == MOVE_Walking && AlsxtMovementSettings.Get()->bEnableSlopeSliding)
+		{
+			CheckSlopeAngle();
+		}
 	}
+	
 }
 
 void UAlsxtCharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (MovementMode == MOVE_Walking)
+	
+	if (AlsxtMovementSettings.Get())
 	{
-		CheckSlopeAngle();
+		if (CurrentFloor.IsWalkableFloor() && MovementMode == MOVE_Walking && AlsxtMovementSettings.Get()->bEnableSlopeSliding)
+		{
+			CheckSlopeAngle();
+		}
 	}
 }
 
 void UAlsxtCharacterMovementComponent::CheckSlopeAngle()
 {
+	if (!CurrentFloor.IsWalkableFloor())
+	{
+		// Not on a walkable floor (e.g., in the air), so return.
+		return;
+	}
+
+	// Get the normal of the surface the character is standing on
+	FVector FloorNormal = CurrentFloor.HitResult.Normal;
+
+	// The Up vector for the world is FVector::UpVector or FVector(0, 0, 1)
+	FVector UpVector = FVector::UpVector;
+
+	// Calculate the dot product between the surface normal and the world's Up vector
+	float DotProduct = FVector::DotProduct(FloorNormal, UpVector);
+
+	// Calculate the angle in radians using acos, then convert to degrees
+	float AngleInRadians = acosf(DotProduct);
+	float AngleInDegrees = FMath::RadiansToDegrees(AngleInRadians);
+
 	
+
+	if (AlsxtMovementSettings.Get()->RotationModes.Find(GetRotationMode())->Stances.Find(GetStance())->bEnableSlopeSliding && (AngleInDegrees > AlsxtMovementSettings.Get()->RotationModes.Find(GetRotationMode())->Stances.Find(GetStance())->SlopeSlideAngle))
+	{
+		// Calculate sliding direction based on floor normal
+		FVector SlideDirection = FVector::CrossProduct(FloorNormal, FVector::CrossProduct(FVector::UpVector, FloorNormal));
+		// FVector SlideDirection = FVector(CurrentFloor.HitResult.ImpactNormal.X, CurrentFloor.HitResult.ImpactNormal.Y, 0.0f).GetSafeNormal();
+		SlideDirection.Normalize();
+		
+		float SurfaceFriction {CurrentFloor.HitResult.PhysMaterial.Get()->Friction};
+		float CharacterWeight {GetCharacterWeight()};
+		float SlideForceAmount{0.0f};
+		float SlideSpeed = FVector::DotProduct(FloorNormal, SlideDirection); // Calculate from Surface Friction, Character Weight
+		float SlideForwardVectorBias{0.5f};
+
+		// Optionally, use character's forward vector for direction bias
+		FVector CharacterForward = GetOwner()->GetActorForwardVector();
+		SlideDirection = FMath::Lerp(SlideDirection, CharacterForward, SlideForwardVectorBias); // SlideForwardVectorBias is a float from 0 to 1
+
+		// Apply a force or set a desired velocity for sliding
+		AddForce(SlideDirection * SlideSpeed);
+		AddInputVector(SlideDirection * SlideForceAmount, true); // Adjust SlideForceAmount as needed
+		// Cast<AAlsxtCharacter>(GetCharacterOwner())->SetLocomotionMode(AlsLocomotionModeTags::SlopeSliding);
+		// OnEnterSlideSlopeAngle.Broadcast();
+		// SetMovementMode(MOVE_Falling); // Optional: transition to falling to bypass walking restrictions
+	}
 }

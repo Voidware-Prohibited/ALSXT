@@ -66,6 +66,7 @@
 
 #include "AlsxtCharacter.generated.h"
 
+class UAlsxtMovementSettings;
 class UAlsxtCameraAnimationInstance;
 class UAlsxtMantlingSettings;
 class UAlsxtAnimationInstance;
@@ -99,6 +100,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System", Meta = (ShowOnlyInnerProperties))
 	TSoftObjectPtr<UAlsxtAbilitySystemInitializationDataAsset> AbilitySystemInitializationData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character")
+	TObjectPtr<UAlsxtMovementSettings> AlsxtMovementSettings;
+
 private:
 	virtual void ServerSetDesiredStance_Implementation(const FGameplayTag& NewDesiredStance) override;
 
@@ -107,7 +111,7 @@ public:
 
 	AAlsxtCharacter(const FObjectInitializer& ObjectInitializer);
 
-	// Implement the IAbilitySystemInterface. (This is used to find the Ability System Component.)
+	// Implement the IAbilitySystemInterface.
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Als Character", Meta = (AllowPrivateAccess))
@@ -127,6 +131,12 @@ public:
 
 	FScriptDelegate OnRagdollingStartedDelegate;
 	FScriptDelegate OnRagdollingEndedDelegate;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	void OnEnterSlideSlopeAngle();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	void OnExitSlideSlopeAngle();
 
 	// Components
 
@@ -288,6 +298,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	void DisableLookAt(const bool Disable);
 
+protected:
+	virtual void NotifyLocomotionModeChanged(const FGameplayTag& PreviousLocomotionMode) override;
+
+public:
 	virtual bool IsMantlingAllowedToStart_Implementation() const override;
 	
 	//Character Interface

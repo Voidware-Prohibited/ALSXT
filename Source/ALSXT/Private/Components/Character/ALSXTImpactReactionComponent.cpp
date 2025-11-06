@@ -7189,7 +7189,7 @@ void UAlsxtImpactReactionComponent::RefreshImpactReactionPhysics(const float Del
 	}
 	else
 	{
-		TargetRotation.Yaw = UAlsRotation::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
+		TargetRotation.Yaw = UAlsRotation::DamperExactAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
 			ImpactReactionState.ImpactReactionParameters.TargetYawAngle, DeltaTime,
 			ImpactReactionSettings.RotationInterpolationSpeed);
 

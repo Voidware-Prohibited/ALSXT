@@ -8,8 +8,9 @@
 #include "ALS/Public/Settings/AlsRotateInPlaceSettings.h"
 #include "ALS/Public/Settings/AlsTransitionsSettings.h"
 #include "ALS/Public/Settings/AlsTurnInPlaceSettings.h"
-#include "ALS/Public/Settings/AlsViewAnimationSettings.h"
+#include "ALS/Public/Settings/AlsHeadSettings.h"
 #include "Engine/DataAsset.h"
+#include "Settings/AlsStandingSettings.h"
 #include "AlsxtAnimationInstanceSettings.generated.h"
 
 UCLASS(Blueprintable, BlueprintType)
@@ -20,6 +21,9 @@ class ALSXT_API UAlsxtAnimationInstanceSettings : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TObjectPtr<UMirrorDataTable> MirrorTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	FAlsStandingSettings Crouching;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FAlsxtStationaryModeAnimations StationaryMode;
@@ -28,7 +32,7 @@ public:
 	FAlsGeneralAnimationSettings General;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	FAlsViewAnimationSettings View;
+	FAlsHeadSettings Head;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FAlsGroundedSettings Grounded;

@@ -5,54 +5,75 @@
 #include "Camera/CameraShakeBase.h"
 #include "Curves/CurveVector.h"
 #include "Settings/AlsxtFPEyeFocusSettings.h"
+#include "GameplayTagContainer.h"
 #include "AlsxtCameraEffectsSettings.generated.h"
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtCameraShakeSetting
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UCameraShakeBase> CameraShake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float BaseMagnitude{ 1.0f };
+
+	bool operator==(const FAlsxtCameraShakeSetting& other) const
+	{
+		return (other.CameraShake == CameraShake) && (other.BaseMagnitude == BaseMagnitude);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtStanceMovementCameraViewShakeSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Als.Gait"))
+	TMap<UPARAM(meta = (Categories = "Als.Gait")) FGameplayTag, FAlsxtCameraShakeSetting> Gaits;
+
+	bool operator==(const FAlsxtStanceMovementCameraViewShakeSettings& other) const
+	{
+		return (other.Gaits.OrderIndependentCompareEqual(Gaits));
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtMovementCameraViewShakeSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Als.Stance"))
+	TMap<UPARAM(meta = (Categories = "Als.Stance")) FGameplayTag, FAlsxtStanceMovementCameraViewShakeSettings> Grounded;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Als.Gait"))
+	TMap<UPARAM(meta = (Categories = "Als.Gait")) FGameplayTag, FAlsxtCameraShakeSetting> Ladder;
+	
+	bool operator==(const FAlsxtMovementCameraViewShakeSettings& other) const
+	{
+		return (other.Grounded.OrderIndependentCompareEqual(Grounded)) && (other.Ladder.OrderIndependentCompareEqual(Ladder));
+	}
+};
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtMovementCameraShakeSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf<UCameraShakeBase> ThirdPersonDefaultCameraShake{ nullptr };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bUseCameraShakeForOverlayModes{ false };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf<UCameraShakeBase> ThirdPersonWalkCameraShake{ nullptr };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtMovementCameraViewShakeSettings ThirdPerson;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf <UCameraShakeBase> ThirdPersonRunCameraShake{ nullptr };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtMovementCameraViewShakeSettings FirstPerson;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf <UCameraShakeBase> ThirdPersonSprintCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf<UCameraShakeBase> ThirdPersonCrouchCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf <UCameraShakeBase> ThirdPersonCrouchWalkCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|Third Person")
-	TSubclassOf <UCameraShakeBase> ThirdPersonCrouchRunCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonDefaultCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonWalkCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonRunCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonSprintCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonCrouchCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonCrouchWalkCameraShake{ nullptr };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Shake|First Person")
-	TSubclassOf <UCameraShakeBase> FirstPersonCrouchRunCameraShake{ nullptr };
+	bool operator==(const FAlsxtMovementCameraShakeSettings& other) const
+	{
+		return (other.bUseCameraShakeForOverlayModes == bUseCameraShakeForOverlayModes) && (other.ThirdPerson == ThirdPerson) && (other.FirstPerson == FirstPerson);
+	}
 };
 
 UCLASS()

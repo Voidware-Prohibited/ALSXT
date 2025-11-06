@@ -37,6 +37,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "State/AlsxtFootstepState.h"
 #include "AlsxtCameraAnimationInstance.h"
+#include "AlsxtCharacterNpc.h"
 #include "AbilitySystem/AttributeSets/AlsxtBreathAttributeSet.h"
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
 
@@ -461,6 +462,8 @@ AAlsxtCharacter::AAlsxtCharacter(const FObjectInitializer& ObjectInitializer) :
 
 	OnRagdollingStartedDelegate.BindUFunction(ImpactReaction, "OnRagdollingStarted");
 	OnRagdollingEndedDelegate.BindUFunction(ImpactReaction, "OnRagdollingEnded");
+	ALSXTCharacterMovement->OnEnterSlideSlopeAngle.AddUniqueDynamic(this, &AAlsxtCharacter::OnEnterSlideSlopeAngle);
+	ALSXTCharacterMovement->OnExitSlideSlopeAngle.AddUniqueDynamic(this, &AAlsxtCharacter::OnExitSlideSlopeAngle);
 }
 
 void AAlsxtCharacter::Tick(const float DeltaTime)
@@ -600,6 +603,19 @@ UAbilitySystemComponent* AAlsxtCharacter::GetAbilitySystemComponent() const
 	return nullptr;
 }
 
+void AAlsxtCharacter::OnEnterSlideSlopeAngle_Implementation()
+{
+	SetLocomotionMode(AlsLocomotionModeTags::SlopeSliding);
+}
+
+void AAlsxtCharacter::OnExitSlideSlopeAngle_Implementation()
+{
+	/*
+	 * @todo Detect new Locomotion Mode when exiting Slope Sliding
+	 **/
+	SetLocomotionMode(AlsLocomotionModeTags::Grounded);
+}
+
 void AAlsxtCharacter::CalcCamera(const float DeltaTime, FMinimalViewInfo& ViewInfo)
 {
 	if (Camera->IsActive())
@@ -663,38 +679,28 @@ void AAlsxtCharacter::OnStanceChanged_Implementation(const FGameplayTag& Previou
 FAlsxtCameraShakeSetting AAlsxtCharacter::SelectMovementCameraShakeAsset()
 {
 	FAlsxtCameraShakeSetting FoundCameraShakeSetting;
-	auto CameraShakeSettings = ALSXTSettings->OverlaySettings.CameraShake.Find(GetOverlayMode());
-	if (CameraShakeSettings)
+	if (const TObjectPtr<UAlsxtCameraShakeSettings>* CameraShakeSettings = ALSXTSettings->OverlaySettings.CameraShake.Find(GetOverlayMode()))
 	{
-		if (GetStance() == AlsStanceTags::Standing)
+		if (GetViewMode() == AlsViewModeTags::FirstPerson)
 		{
-			if (GetDesiredGait() == AlsGaitTags::Running)
+			if (FAlsxtStanceMovementCameraViewShakeSettings* CameraViewShakeSettings = CameraShakeSettings->Get()->CameraShakeSettings.FirstPerson.Grounded.Find(GetDesiredStance()))
 			{
-				FoundCameraShakeSetting = CameraShakeSettings->RunningCameraShake;
-				return CameraShakeSettings->RunningCameraShake;
-			}
-			else if (GetDesiredGait() == AlsGaitTags::Sprinting)
-			{
-				FoundCameraShakeSetting = CameraShakeSettings->SprintingCameraShake;
-				return FoundCameraShakeSetting;
-			}
-			else
-			{
-				FoundCameraShakeSetting = CameraShakeSettings->WalkingCameraShake;
-				return FoundCameraShakeSetting;
+				if (CameraViewShakeSettings->Gaits.Find(GetDesiredGait()))
+				{
+					FoundCameraShakeSetting = *CameraViewShakeSettings->Gaits.Find(GetDesiredGait());
+					return FoundCameraShakeSetting;
+				}
 			}
 		}
-		else
+		if (GetViewMode() == AlsViewModeTags::ThirdPerson)
 		{
-			if (GetDesiredGait() == AlsGaitTags::Running)
+			if (FAlsxtStanceMovementCameraViewShakeSettings* CameraViewShakeSettings = CameraShakeSettings->Get()->CameraShakeSettings.ThirdPerson.Grounded.Find(GetDesiredStance()))
 			{
-				FoundCameraShakeSetting = CameraShakeSettings->CrouchRunningCameraShake;
-				return FoundCameraShakeSetting;
-			}
-			else
-			{
-				FoundCameraShakeSetting = CameraShakeSettings->CrouchWalkingCameraShake;
-				return FoundCameraShakeSetting;
+				if (CameraViewShakeSettings->Gaits.Find(GetDesiredGait()))
+				{
+					FoundCameraShakeSetting = *CameraViewShakeSettings->Gaits.Find(GetDesiredGait());
+					return FoundCameraShakeSetting;
+				}
 			}
 		}
 	}
@@ -734,6 +740,13 @@ void AAlsxtCharacter::DisableInputMovement(const bool Disable)
 void AAlsxtCharacter::DisableLookAt(const bool Disable)
 {
 
+}
+
+void AAlsxtCharacter::NotifyLocomotionModeChanged(const FGameplayTag& PreviousLocomotionMode)
+{
+	Super::NotifyLocomotionModeChanged(PreviousLocomotionMode);
+	AnimationParametersState.LocomotionTags.RemoveTag(PreviousLocomotionMode);
+	AnimationParametersState.LocomotionTags.AddTag(LocomotionMode);
 }
 
 void AAlsxtCharacter::InputLookMouse(const FInputActionValue& ActionValue)

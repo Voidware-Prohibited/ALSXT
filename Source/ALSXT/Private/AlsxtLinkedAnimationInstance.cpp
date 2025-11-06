@@ -4,6 +4,7 @@
 #include "AlsxtLinkedAnimationInstance.h"
 
 #include "AlsxtAnimationInstance.h"
+#include "AlsxtAnimationInstanceProxy.h"
 #include "AlsxtCharacter.h"
 #include "Utility/AlsMacros.h"
 #include "Settings/AlsxtLocomotionAnimationAssetsSettings.h"
@@ -48,6 +49,35 @@ void UAlsxtLinkedAnimationInstance::NativeBeginPlay()
 					ALS_GET_TYPE_STRING(UAlsxtAnimationInstance).GetData());
 
 	Super::NativeBeginPlay();
+}
+
+FAnimInstanceProxy* UAlsxtLinkedAnimationInstance::CreateAnimInstanceProxy()
+{
+	return new FAlsxtAnimationInstanceProxy{this};
+}
+
+void UAlsxtLinkedAnimationInstance::AlsxtRefreshStandingMovement()
+{
+	if (IsValid(ALSXTParent))
+	{
+		ALSXTParent->AlsxtRefreshStandingMovement();
+	}
+}
+
+void UAlsxtLinkedAnimationInstance::AlsxtRefreshCrouchingMovement()
+{
+	if (IsValid(ALSXTParent))
+	{
+		ALSXTParent->AlsxtRefreshCrouchingMovement();
+	}
+}
+
+void UAlsxtLinkedAnimationInstance::AlsxtRefreshDynamicTransitions()
+{
+	if (IsValid(ALSXTParent))
+	{
+		ALSXTParent->AlsxtRefreshDynamicTransitions();
+	}
 }
 
 void UAlsxtLinkedAnimationInstance::UpdateAnimationAssets_Implementation()

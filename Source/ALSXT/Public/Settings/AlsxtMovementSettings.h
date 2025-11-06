@@ -15,108 +15,58 @@ struct ALSXT_API FAlsxtMovementGaitSettings
 	GENERATED_BODY()
 
 public:
+	// When enabled, MaxWalkableSlopeAngle will be set to FallAngle, and Character will slide when traversing between SlideSlopeAngle and 60 degrees.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Slope Sliding")
+	bool bEnableSlopeSliding{true};
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Slope Sliding", Meta = (EditCondition="bEnableSlopeSliding", ClampMin = 35.0f, ClampMax = 60.0, ForceUnits = "Degrees"))
+	float SlopeSlideAngle{40.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Slope Sliding", Meta = (EditCondition="bEnableSlopeSliding", ClampMin = 44.0f, ClampMax = 89.0, ForceUnits = "Degrees"))
+	float FallAngle{60.0f};
+
+	// The amount of influence surface Wetness has on sliding
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Slope Sliding", Meta = (EditCondition="bEnableSlopeSliding", ClampMin = 1.0f, ClampMax = 10.0))
+	float WetnessSlideSlopeAngleModifier{3.0f};
+
+	// The amount of influence that the Character weight has on sliding. If surface is Mud-like it will resist sliding, but if the surface is smooth it will increase sliding.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Slope Sliding", Meta = (EditCondition="bEnableSlopeSliding", ClampMin = 1.0f, ClampMax = 10.0))
+	float SlopeSlidingWeightResistanceFactor{1.0f};
+	
 	// Currently, the direction-dependent movement speed can cause some jitter in multiplayer, so enable it at your own risk.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ALS")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Features|Movement")
 	uint8 bAllowDirectionDependentMovementSpeed : 1 {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float StandingWalkForwardSpeed{175.0f};
+	float WalkForwardSpeed{175.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
 		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float StandingWalkBackwardSpeed{175.0f};
+	float WalkBackwardSpeed{175.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float StandingAimingForwardSpeed{175.0f};
+	float AimingForwardSpeed{175.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
 		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float StandingAimingBackwardSpeed{175.0f};
+	float AimingBackwardSpeed{175.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float StandingCombatForwardSpeed{175.0f};
+	float CombatForwardSpeed{175.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
 		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float StandingCombatBackwardSpeed{175.0f};
+	float CombatBackwardSpeed{175.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float StandingRunForwardSpeed{375.0f};
+	float RunForwardSpeed{375.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
 		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float StandingRunBackwardSpeed{375.0f};
+	float RunBackwardSpeed{375.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float StandingSprintSpeed{650.0f};
-
-	//
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float CrouchedWalkForwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
-		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float CrouchedWalkBackwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float CrouchedAimingForwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
-		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float CrouchedAimingBackwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float CrouchedCombatForwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
-		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float CrouchedCombatBackwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float CrouchedRunForwardSpeed{375.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
-		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float CrouchedRunBackwardSpeed{375.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float CrouchedSprintSpeed{650.0f};
-
-	//
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float ProneWalkForwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
-		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float ProneWalkBackwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float ProneAimingForwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
-		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float ProneAimingBackwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float ProneCombatForwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
-		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float ProneCombatBackwardSpeed{175.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float ProneRunForwardSpeed{375.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS",
-		Meta = (ClampMin = 0, EditCondition = "bAllowDirectionDependentMovementSpeed", ForceUnits = "cm/s"))
-	float ProneRunBackwardSpeed{375.0f};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
-	float ProneSprintSpeed{650.0f};
-
-	//
+	float SprintSpeed{650.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ClampMin = 0, ForceUnits = "cm/s"))
 	float ClimbingWalkForwardSpeed{175.0f};
@@ -193,23 +143,11 @@ public:
 	TObjectPtr<UCurveFloat> RotationInterpolationSpeedCurve;
 
 public:
-	float GetMaxStandingWalkSpeed() const;
-	float GetMaxStandingAimingSpeed() const;
-	float GetMaxStandingCombatSpeed() const;
-	float GetMaxStandingRunSpeed() const;
-	float GetMaxStandingSprintSpeed() const;
-
-	float GetMaxCrouchedWalkSpeed() const;
-	float GetMaxCrouchedAimingSpeed() const;
-	float GetMaxCrouchedCombatSpeed() const;
-	float GetMaxCrouchedRunSpeed() const;
-	float GetMaxCrouchedSprintSpeed() const;
-
-	float GetMaxProneWalkSpeed() const;
-	float GetMaxProneAimingSpeed() const;
-	float GetMaxProneCombatSpeed() const;
-	float GetMaxProneRunSpeed() const;
-	float GetMaxProneSprintSpeed() const;
+	float GetMaxWalkSpeed() const;
+	float GetMaxAimingSpeed() const;
+	float GetMaxCombatSpeed() const;
+	float GetMaxRunSpeed() const;
+	float GetMaxSprintSpeed() const;
 
 	float GetMaxClimbingWalkSpeed() const;
 	float GetMaxClimbingAimingSpeed() const;
@@ -250,6 +188,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0, ClampMax = 180, ForceUnits = "deg"))
 	FVector2f VelocityAngleToSpeedInterpolationRange{100.0f, 125.0f};
 
+	// When enabled, MaxWalkableSlopeAngle will be set to FallAngle, and Character will slide when traversing between SlideSlopeAngle and 60 degrees.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Slope Sliding")
+	bool bEnableSlopeSliding{true};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Slope Sliding")
+	bool UseSurfaceFrictionForSlopeSliding{true};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Features|Slope Sliding")
+	bool UseCharacterWeightForSlopeSliding{true};
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
 	TMap<FGameplayTag, FAlsxtMovementStanceSettings> RotationModes
 	{
@@ -264,116 +212,40 @@ public:
 #endif
 };
 
-inline float FAlsxtMovementGaitSettings::GetMaxStandingWalkSpeed() const
+inline float FAlsxtMovementGaitSettings::GetMaxWalkSpeed() const
 {
 	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(StandingWalkForwardSpeed, StandingWalkBackwardSpeed)
-			   : StandingWalkForwardSpeed;
+			   ? FMath::Max(WalkForwardSpeed, WalkBackwardSpeed)
+			   : WalkForwardSpeed;
 }
 
-inline float FAlsxtMovementGaitSettings::GetMaxStandingAimingSpeed() const
+inline float FAlsxtMovementGaitSettings::GetMaxAimingSpeed() const
 {
 	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(StandingAimingForwardSpeed, StandingAimingBackwardSpeed)
-			   : StandingAimingForwardSpeed;
+			   ? FMath::Max(AimingForwardSpeed, AimingBackwardSpeed)
+			   : AimingForwardSpeed;
 }
 
-inline float FAlsxtMovementGaitSettings::GetMaxStandingCombatSpeed() const
+inline float FAlsxtMovementGaitSettings::GetMaxCombatSpeed() const
 {
 	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(StandingCombatForwardSpeed, StandingCombatBackwardSpeed)
-			   : StandingCombatForwardSpeed;
+			   ? FMath::Max(CombatForwardSpeed, CombatBackwardSpeed)
+			   : CombatForwardSpeed;
 }
 
-inline float FAlsxtMovementGaitSettings::GetMaxStandingRunSpeed() const
+inline float FAlsxtMovementGaitSettings::GetMaxRunSpeed() const
 {
 	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(StandingWalkForwardSpeed, StandingWalkBackwardSpeed)
-			   : StandingWalkForwardSpeed;
+			   ? FMath::Max(WalkForwardSpeed, WalkBackwardSpeed)
+			   : WalkForwardSpeed;
 }
 
-inline float FAlsxtMovementGaitSettings::GetMaxStandingSprintSpeed() const
+inline float FAlsxtMovementGaitSettings::GetMaxSprintSpeed() const
 {
 	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(StandingWalkForwardSpeed, StandingWalkBackwardSpeed)
-			   : StandingWalkForwardSpeed;
+			   ? FMath::Max(WalkForwardSpeed, WalkBackwardSpeed)
+			   : WalkForwardSpeed;
 }
-
-//
-
-inline float FAlsxtMovementGaitSettings::GetMaxCrouchedWalkSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(CrouchedWalkForwardSpeed, CrouchedWalkBackwardSpeed)
-			   : CrouchedWalkForwardSpeed;
-}
-
-inline float FAlsxtMovementGaitSettings::GetMaxCrouchedAimingSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(CrouchedAimingForwardSpeed, CrouchedAimingBackwardSpeed)
-			   : CrouchedAimingForwardSpeed;
-}
-
-inline float FAlsxtMovementGaitSettings::GetMaxCrouchedCombatSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(CrouchedCombatForwardSpeed, CrouchedCombatBackwardSpeed)
-			   : CrouchedCombatForwardSpeed;
-}
-
-inline float FAlsxtMovementGaitSettings::GetMaxCrouchedRunSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(CrouchedWalkForwardSpeed, CrouchedWalkBackwardSpeed)
-			   : CrouchedWalkForwardSpeed;
-}
-
-inline float FAlsxtMovementGaitSettings::GetMaxCrouchedSprintSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(CrouchedWalkForwardSpeed, CrouchedWalkBackwardSpeed)
-			   : CrouchedWalkForwardSpeed;
-}
-
-//
-
-inline float FAlsxtMovementGaitSettings::GetMaxProneWalkSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(ProneWalkForwardSpeed, ProneWalkBackwardSpeed)
-			   : ProneWalkForwardSpeed;
-}
-
-inline float FAlsxtMovementGaitSettings::GetMaxProneAimingSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(ProneAimingForwardSpeed, ProneAimingBackwardSpeed)
-			   : ProneAimingForwardSpeed;
-}
-
-inline float FAlsxtMovementGaitSettings::GetMaxProneCombatSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(ProneCombatForwardSpeed, ProneCombatBackwardSpeed)
-			   : ProneCombatForwardSpeed;
-}
-
-inline float FAlsxtMovementGaitSettings::GetMaxProneRunSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(ProneWalkForwardSpeed, ProneWalkBackwardSpeed)
-			   : ProneWalkForwardSpeed;
-}
-
-inline float FAlsxtMovementGaitSettings::GetMaxProneSprintSpeed() const
-{
-	return bAllowDirectionDependentMovementSpeed
-			   ? FMath::Max(ProneWalkForwardSpeed, ProneWalkBackwardSpeed)
-			   : ProneWalkForwardSpeed;
-}
-
-//
 
 inline float FAlsxtMovementGaitSettings::GetMaxClimbingWalkSpeed() const
 {

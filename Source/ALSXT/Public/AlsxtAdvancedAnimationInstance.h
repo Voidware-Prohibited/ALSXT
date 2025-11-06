@@ -31,7 +31,7 @@ protected:
 	FAlsxtFirearmAimState FirearmAimState;
 
 private:
-	void RefreshALSXTPose();
+	void RefreshAlsxtPose();
 
 public:
 

@@ -157,7 +157,7 @@ void AAlsxtCharacter::RefreshSlidingPhysics(const float DeltaTime)
 	}
 	else
 	{
-		TargetRotation.Yaw = UAlsRotation::ExponentialDecayAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
+		TargetRotation.Yaw = UAlsRotation::DamperExactAngle(UE_REAL_TO_FLOAT(FRotator::NormalizeAxis(TargetRotation.Yaw)),
 			SlidingState.TargetYawAngle, DeltaTime,
 			ALSXTSettings->Sliding.RotationInterpolationSpeed);
 

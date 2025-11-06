@@ -76,8 +76,8 @@ void UAlsxtGeecBreathingRate::Execute_Implementation(const FGameplayEffectCustom
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(MaxStaminaDef, EvaluationParameters, MaxStamina);
 
 	// --- Perform the calculation logic ---
-	float BreathingRate = 0.0f;
-	float BreathingMagnitude = 0.0f;
+	float BreathingRate = 0.5f;
+	float BreathingMagnitude = 0.5f;
 	
 	if (MaxStamina > 0.0f)
 	{
@@ -99,8 +99,8 @@ void UAlsxtGeecBreathingRate::Execute_Implementation(const FGameplayEffectCustom
 
 	
 
-	float BreathingRateValue = 0.f;
-	float BreathingMagnitudeValue = 0.0f;
+	float BreathingRateValue = 0.5f;
+	float BreathingMagnitudeValue = 0.5f;
 	FGameplayEffectAttributeCaptureDefinition BreathRateGameplayEffectAttributeCaptureDefinition = FGameplayEffectAttributeCaptureDefinition();
 	BreathRateGameplayEffectAttributeCaptureDefinition.AttributeToCapture = UAlsxtBreathAttributeSet::GetCurrentBreathRateAttribute();
 	BreathRateGameplayEffectAttributeCaptureDefinition.AttributeSource = EGameplayEffectAttributeCaptureSource::Source;

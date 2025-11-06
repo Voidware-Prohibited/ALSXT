@@ -14,6 +14,14 @@
 #include "AbilitySystem/AbilitySystemComponent/AlsxtAbilitySystemComponent.h"
 #include "AbilitySystem/AttributeSets/AlsxtBreathAttributeSet.h"
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
+#include "Settings/AlsAnimationInstanceSettings.h"
+#include "Utility/AlsConstants.h"
+#include "Utility/AlsUtility.h"
+#include "Utility/AlsVector.h"
+#include "Utility/AlsPrivateMemberAccessor.h"
+
+ALS_DEFINE_PRIVATE_MEMBER_ACCESSOR(AlsGetAnimationCurvesAccessor, &FAnimInstanceProxy::GetAnimationCurves,
+								   const TMap<FName, float>& (FAnimInstanceProxy::*)(EAnimCurveType) const)
 
 UAlsxtAnimationInstance::UAlsxtAnimationInstance()
 {
@@ -67,7 +75,7 @@ void UAlsxtAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		return;
 	}
 
-	RefreshALSXTPose();
+	RefreshAlsxtPose();
 	
 	if (GetOwningActor()->Implements<UAlsxtCharacterInterface>())
 	{
@@ -176,6 +184,293 @@ FAnimInstanceProxy* UAlsxtAnimationInstance::CreateAnimInstanceProxy()
 	return new FAlsxtAnimationInstanceProxy{ this };
 }
 
+void UAlsxtAnimationInstance::AlsxtPlayQueuedTransitionAnimation()
+{
+	check(IsInGameThread())
+
+	if (TransitionsState.bStopTransitionsQueued || !IsValid(TransitionsState.QueuedTransitionSequence))
+	{
+		return;
+	}
+
+	PlaySlotAnimationAsDynamicMontage(TransitionsState.QueuedTransitionSequence, UAlsConstants::TransitionSlotName(),
+									  TransitionsState.QueuedTransitionBlendInDuration, TransitionsState.QueuedTransitionBlendOutDuration,
+									  TransitionsState.QueuedTransitionPlayRate, 1, 0.0f, TransitionsState.QueuedTransitionStartTime);
+
+	TransitionsState.QueuedTransitionSequence = nullptr;
+	TransitionsState.QueuedTransitionBlendInDuration = 0.0f;
+	TransitionsState.QueuedTransitionBlendOutDuration = 0.0f;
+	TransitionsState.QueuedTransitionPlayRate = 1.0f;
+	TransitionsState.QueuedTransitionStartTime = 0.0f;
+}
+
+void UAlsxtAnimationInstance::AlsxtRefreshCrouchingMovement()
+{
+#if WITH_EDITOR
+	if (!IsValid(GetWorld()) || !GetWorld()->IsGameWorld())
+	{
+		return;
+	}
+#endif
+
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UAlsxtAnimationInstance::RefreshCrouchingMovement"),
+								STAT_UAlsxtAnimationInstance_RefreshCrouchingMovement, STATGROUP_Als)
+	TRACE_CPUPROFILER_EVENT_SCOPE_STR(__FUNCTION__)
+
+	if (!IsValid(ALSXTSettings))
+	{
+		return;
+	}
+
+	// const auto Speed{LocomotionState.Speed / LocomotionState.Scale};
+ 
+	// CrouchingState.StrideBlendAmount = Settings->Crouching.StrideBlendAmountCurve->GetFloatValue(Speed);
+ 
+	// CrouchingState.PlayRate = FMath::Clamp(
+	// 	Speed / (Settings->Crouching.AnimatedCrouchSpeed * CrouchingState.StrideBlendAmount),
+	// 	UE_KINDA_SMALL_NUMBER, 2.0f);
+
+	////
+
+	const auto Speed{LocomotionState.Speed / LocomotionState.Scale};
+
+	// Calculate the stride blend amount. This value is used within the blend spaces to scale the stride (distance feet travel)
+	// so that the character can walk or run at different movement speeds. It also allows the walk or run gait animations to
+	// blend independently while still matching the animation speed to the movement speed, preventing the character from needing
+	// to play a half walk + half run blend. The curves are used to map the stride amount to the speed for maximum control.
+
+	AlsxtCrouchingState.StrideBlendAmount = FMath::Lerp(ALSXTSettings->Crouching.StrideBlendAmountWalkCurve->GetFloatValue(Speed),
+	                                              ALSXTSettings->Crouching.StrideBlendAmountRunCurve->GetFloatValue(Speed),
+	                                              PoseState.UnweightedGaitRunningAmount);
+
+	// Calculate the walk run blend amount. This value is used within the blend spaces to blend between walking and running.
+
+	AlsxtCrouchingState.WalkRunBlendAmount = Gait == AlsGaitTags::Walking ? 0.0f : 1.0f;
+
+	// Calculate the standing play rate by dividing the character's speed by the animated speed for each gait.
+	// The interpolation is determined by the gait amount curve that exists on every locomotion cycle so that
+	// the play rate is always in sync with the currently blended animation. The value is also divided by the
+	// stride blend and the capsule scale so that the play rate increases as the stride or scale gets smaller.
+
+	// TODO Automatically calculate the play rate, such as is done in the UAnimDistanceMatchingLibrary::SetPlayrateToMatchSpeed() function.
+
+	const auto WalkRunSpeedAmount{
+		FMath::Lerp(Speed / ALSXTSettings->Crouching.AnimatedWalkSpeed,
+		            Speed / ALSXTSettings->Crouching.AnimatedRunSpeed,
+		            PoseState.UnweightedGaitRunningAmount)
+	};
+
+	const auto WalkRunSprintSpeedAmount{
+		FMath::Lerp(WalkRunSpeedAmount,
+		            Speed / ALSXTSettings->Crouching.AnimatedSprintSpeed,
+		            PoseState.UnweightedGaitSprintingAmount)
+	};
+
+	// Do not let the play rate be exactly zero, otherwise animation notifies
+	// may start to be triggered every frame until the play rate is changed.
+	// TODO Check the need for this hack in future engine versions.
+
+	AlsxtCrouchingState.PlayRate = FMath::Clamp(WalkRunSprintSpeedAmount / AlsxtCrouchingState.StrideBlendAmount, UE_KINDA_SMALL_NUMBER, 3.0f);
+
+	AlsxtCrouchingState.SprintBlockAmount = GetCurveValueClamped01(UAlsConstants::SprintBlockCurveName());
+
+	if (Gait != AlsGaitTags::Sprinting)
+	{
+		AlsxtCrouchingState.SprintTime = 0.0f;
+		AlsxtCrouchingState.SprintAccelerationAmount = 0.0f;
+		return;
+	}
+
+	// Use the relative acceleration as the sprint relative acceleration if less than 0.5 seconds has
+	// elapsed since the start of the sprint, otherwise set the sprint relative acceleration to zero.
+	// This is necessary to apply the acceleration animation only at the beginning of the sprint.
+
+	static constexpr auto SprintTimeThreshold{0.5f};
+
+	AlsxtCrouchingState.SprintTime = bPendingUpdate
+		                           ? SprintTimeThreshold
+		                           : AlsxtCrouchingState.SprintTime + GetDeltaSeconds();
+
+	AlsxtCrouchingState.SprintAccelerationAmount = AlsxtCrouchingState.SprintTime >= SprintTimeThreshold
+		                                         ? 0.0f
+		                                         : GetAlsxtRelativeAccelerationAmount().X;
+}
+
+void UAlsxtAnimationInstance::AlsxtRefreshStandingMovement()
+{
+	#if WITH_EDITOR
+	if (!IsValid(GetWorld()) || !GetWorld()->IsGameWorld())
+	{
+		return;
+	}
+#endif
+
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UAlsxtAnimationInstance::AlsxtRefreshStandingMovement"),
+	                            STAT_UAlsxtAnimationInstance_AlsxtRefreshStandingMovement, STATGROUP_Als)
+	TRACE_CPUPROFILER_EVENT_SCOPE_STR(__FUNCTION__)
+
+	if (!IsValid(Settings))
+	{
+		return;
+	}
+
+	const auto Speed{LocomotionState.Speed / LocomotionState.Scale};
+
+	// Calculate the stride blend amount. This value is used within the blend spaces to scale the stride (distance feet travel)
+	// so that the character can walk or run at different movement speeds. It also allows the walk or run gait animations to
+	// blend independently while still matching the animation speed to the movement speed, preventing the character from needing
+	// to play a half walk + half run blend. The curves are used to map the stride amount to the speed for maximum control.
+
+	StandingState.StrideBlendAmount = FMath::Lerp(Settings->Standing.StrideBlendAmountWalkCurve->GetFloatValue(Speed),
+	                                              Settings->Standing.StrideBlendAmountRunCurve->GetFloatValue(Speed),
+	                                              PoseState.UnweightedGaitRunningAmount);
+
+	// Calculate the walk run blend amount. This value is used within the blend spaces to blend between walking and running.
+
+	StandingState.WalkRunBlendAmount = Gait == AlsGaitTags::Walking ? 0.0f : 1.0f;
+
+	// Calculate the standing play rate by dividing the character's speed by the animated speed for each gait.
+	// The interpolation is determined by the gait amount curve that exists on every locomotion cycle so that
+	// the play rate is always in sync with the currently blended animation. The value is also divided by the
+	// stride blend and the capsule scale so that the play rate increases as the stride or scale gets smaller.
+
+	// TODO Automatically calculate the play rate, such as is done in the UAnimDistanceMatchingLibrary::SetPlayrateToMatchSpeed() function.
+
+	const auto WalkRunSpeedAmount{
+		FMath::Lerp(Speed / Settings->Standing.AnimatedWalkSpeed,
+		            Speed / Settings->Standing.AnimatedRunSpeed,
+		            PoseState.UnweightedGaitRunningAmount)
+	};
+
+	const auto WalkRunSprintSpeedAmount{
+		FMath::Lerp(WalkRunSpeedAmount,
+		            Speed / Settings->Standing.AnimatedSprintSpeed,
+		            PoseState.UnweightedGaitSprintingAmount)
+	};
+
+	// Do not let the play rate be exactly zero, otherwise animation notifies
+	// may start to be triggered every frame until the play rate is changed.
+	// TODO Check the need for this hack in future engine versions.
+
+	StandingState.PlayRate = FMath::Clamp(WalkRunSprintSpeedAmount / StandingState.StrideBlendAmount, UE_KINDA_SMALL_NUMBER, 3.0f);
+
+	StandingState.SprintBlockAmount = GetCurveValueClamped01(UAlsConstants::SprintBlockCurveName());
+
+	if (Gait != AlsGaitTags::Sprinting)
+	{
+		StandingState.SprintTime = 0.0f;
+		StandingState.SprintAccelerationAmount = 0.0f;
+		return;
+	}
+
+	// Use the relative acceleration as the sprint relative acceleration if less than 0.5 seconds has
+	// elapsed since the start of the sprint, otherwise set the sprint relative acceleration to zero.
+	// This is necessary to apply the acceleration animation only at the beginning of the sprint.
+
+	static constexpr auto SprintTimeThreshold{0.5f};
+
+	StandingState.SprintTime = bPendingUpdate
+		                           ? SprintTimeThreshold
+		                           : StandingState.SprintTime + GetDeltaSeconds();
+
+	StandingState.SprintAccelerationAmount = StandingState.SprintTime >= SprintTimeThreshold
+		                                         ? 0.0f
+		                                         : GetAlsxtRelativeAccelerationAmount().X;
+}
+
+void UAlsxtAnimationInstance::AlsxtRefreshDynamicTransitions()
+{
+	#if WITH_EDITOR
+	if (!IsValid(GetWorld()) || !GetWorld()->IsGameWorld())
+	{
+		return;
+	}
+#endif
+
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UAlsAnimationInstance::RefreshDynamicTransitions"),
+	                            STAT_UAlsAnimationInstance_RefreshDynamicTransitions, STATGROUP_Als)
+	TRACE_CPUPROFILER_EVENT_SCOPE_STR(__FUNCTION__)
+
+	if (DynamicTransitionsState.bUpdatedThisFrame || !IsValid(Settings))
+	{
+		return;
+	}
+
+	DynamicTransitionsState.bUpdatedThisFrame = true;
+
+	if (DynamicTransitionsState.FrameDelay > 0)
+	{
+		DynamicTransitionsState.FrameDelay -= 1;
+		return;
+	}
+
+	if (!TransitionsState.bTransitionsAllowed)
+	{
+		return;
+	}
+
+	// Check each foot to see if the location difference between the foot look and its desired / target location
+	// exceeds a threshold. If it does, play an additive transition animation on that foot. The currently set
+	// transition plays the second half of a 2 foot transition animation, so that only a single foot moves.
+
+	const auto FootLockDistanceThresholdSquared{
+		FMath::Square(Settings->DynamicTransitions.FootLockDistanceThreshold * LocomotionState.Scale)
+	};
+
+	const auto FootLockLeftDistanceSquared{FVector::DistSquared(FeetState.Left.TargetLocation, FeetState.Left.LockLocation)};
+	const auto FootLockRightDistanceSquared{FVector::DistSquared(FeetState.Right.TargetLocation, FeetState.Right.LockLocation)};
+
+	const auto bTransitionLeftAllowed{
+		FAnimWeight::IsRelevant(FeetState.Left.LockAmount) && FootLockLeftDistanceSquared > FootLockDistanceThresholdSquared
+	};
+
+	const auto bTransitionRightAllowed{
+		FAnimWeight::IsRelevant(FeetState.Right.LockAmount) && FootLockRightDistanceSquared > FootLockDistanceThresholdSquared
+	};
+
+	if (!bTransitionLeftAllowed && !bTransitionRightAllowed)
+	{
+		return;
+	}
+
+	TObjectPtr<UAnimSequenceBase> DynamicTransitionSequence;
+
+	// If both transitions are allowed, choose the one with a greater lock distance.
+
+	if (!bTransitionLeftAllowed || (bTransitionRightAllowed && FootLockLeftDistanceSquared < FootLockRightDistanceSquared))
+	{
+		DynamicTransitionSequence = Stance == AlsStanceTags::Crouching
+			                            ? Settings->DynamicTransitions.CrouchingRightSequence
+			                            : Settings->DynamicTransitions.StandingRightSequence;
+	}
+	else if (!bTransitionRightAllowed || FootLockLeftDistanceSquared >= FootLockRightDistanceSquared)
+	{
+		DynamicTransitionSequence = Stance == AlsStanceTags::Crouching
+			                            ? Settings->DynamicTransitions.CrouchingLeftSequence
+			                            : Settings->DynamicTransitions.StandingLeftSequence;
+	}
+
+	if (IsValid(DynamicTransitionSequence))
+	{
+		// Block next dynamic transitions for about 2 frames to give the animation blueprint some time to properly react to the animation.
+
+		DynamicTransitionsState.FrameDelay = 2;
+
+		// Animation montages can't be played in the worker thread, so queue them up to play later in the game thread.
+
+		TransitionsState.QueuedTransitionSequence = DynamicTransitionSequence;
+		TransitionsState.QueuedTransitionBlendInDuration = Settings->DynamicTransitions.BlendDuration;
+		TransitionsState.QueuedTransitionBlendOutDuration = Settings->DynamicTransitions.BlendDuration;
+		TransitionsState.QueuedTransitionPlayRate = Settings->DynamicTransitions.PlayRate;
+		TransitionsState.QueuedTransitionStartTime = 0.0f;
+
+		if (IsInGameThread())
+		{
+			AlsxtPlayQueuedTransitionAnimation();
+		}
+	}
+}
+
 bool UAlsxtAnimationInstance::IsSpineRotationAllowed()
 {
 	if (GetOwningActor()->Implements<UAlsxtCharacterInterface>())
@@ -213,7 +508,7 @@ bool UAlsxtAnimationInstance::IsTurnInPlaceAllowed()
 	}
 }
 
-void UAlsxtAnimationInstance::RefreshALSXTPose()
+void UAlsxtAnimationInstance::RefreshAlsxtPose()
 {
 	const auto& Curves{ GetProxyOnAnyThread<FAlsxtAnimationInstanceProxy>().GetAnimationCurves(EAnimCurveType::AttributeCurve) };
 
@@ -318,4 +613,26 @@ FALSXTControlRigInput UAlsxtAnimationInstance::GetALSXTControlRigInput() const {
 		.bCombatStance = CombatStance != ALSXTCombatStanceTags::Neutral,
 		.bEnableLeftHandIK = DoesOverlayObjectUseLeftHandIK
 	};
+}
+
+FVector2f UAlsxtAnimationInstance::GetAlsxtRelativeAccelerationAmount() const
+{
+	// This value represents the current amount of acceleration / deceleration relative to the
+	// character rotation. It is normalized to a range of -1 to 1 so that -1 equals the max
+	// braking deceleration and 1 equals the max acceleration of the character movement component.
+
+	const auto MaxAcceleration{
+		(LocomotionState.Acceleration | LocomotionState.Velocity) >= 0.0f
+			? LocomotionState.MaxAcceleration
+			: LocomotionState.MaxBrakingDeceleration
+	};
+
+	if (MaxAcceleration <= UE_KINDA_SMALL_NUMBER)
+	{
+		return FVector2f::ZeroVector;
+	}
+
+	const FVector3f RelativeAcceleration{LocomotionState.RotationQuaternion.UnrotateVector(LocomotionState.Acceleration)};
+
+	return FVector2f{UAlsVector::ClampMagnitude01(RelativeAcceleration / MaxAcceleration)};
 }
