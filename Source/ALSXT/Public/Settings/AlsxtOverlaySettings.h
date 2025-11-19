@@ -5,6 +5,7 @@
 #include "Animation/AnimInstance.h"
 #include "Utility/AlsxtOverlayStructs.h"
 #include "Settings/AlsxtCameraEffectsSettings.h"
+#include "Chooser.h"
 #include "AlsxtOverlaySettings.generated.h"
 
 struct FAlsxtMovementCameraShakeSettings;
@@ -24,6 +25,12 @@ USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtOverlaySettings
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Overlay Modes")
+	TSoftObjectPtr<UChooserTable> OverlayChooserTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Overlay Modes")
+	TSoftObjectPtr<UChooserTable> LocomotionActionChooserTable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
 	TMap<FGameplayTag, TSubclassOf<UAnimInstance>> OverlayAnimationInstanceClasses;

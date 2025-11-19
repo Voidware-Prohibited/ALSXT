@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AlsxtLocomotionSettings.h"
 #include "Settings/AlsCharacterSettings.h"
 #include "Settings/AlsxtLocomotionActionSettings.h"
 #include "Settings/AlsxtOverlaySettings.h"
@@ -28,10 +29,13 @@ class ALSXT_API UAlsxtCharacterSettings : public UAlsCharacterSettings
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
-	FAlsxtLocomotionActionSettings LocomotionActionSettings;
+	FAlsxtLocomotionSettings LocomotionSettings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
 	FAlsxtOverlaySettings OverlaySettings;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
+	FAlsxtLocomotionActionSettings LocomotionActionSettings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
 	FAlsxtDefensiveModeSettings DefensiveMode;

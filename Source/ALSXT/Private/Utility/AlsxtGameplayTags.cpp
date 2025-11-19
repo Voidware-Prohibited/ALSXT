@@ -175,10 +175,10 @@ namespace AlsLocomotionModifierTags
 	UE_DEFINE_GAMEPLAY_TAG(SidlingLeft, TEXT("Als.LocomotionModifier.Sidling.Left"))
 }
 
-namespace AlsLocomotionModifierSettingsTags
+namespace AlsLocomotionSettingsTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(Mirror, TEXT("Als.LocomotionModifierSettings.SidlingLeftSideMirrorPolicy.Mirror"))
-	UE_DEFINE_GAMEPLAY_TAG(Unique, TEXT("Als.LocomotionModifierSettings.SidlingLeftSideMirrorPolicy.Unique"))
+	UE_DEFINE_GAMEPLAY_TAG(Mirror, TEXT("Als.LocomotionSettings.MirrorPolicy.Mirror"))
+	UE_DEFINE_GAMEPLAY_TAG(Unique, TEXT("Als.LocomotionSettings.MirrorPolicy.Unique"))
 }
 
 namespace ALSXTLeanDirectionTags
@@ -529,20 +529,20 @@ namespace ALSXTInjuryTags
 	UE_DEFINE_GAMEPLAY_TAG(RightLeg, TEXT("Als.Injury.Right Leg"))
 }
 
-namespace ALSXTCombatStanceTags
-{
-	UE_DEFINE_GAMEPLAY_TAG(Orthdox, TEXT("Als.Combat Stance.Orthodox"))
-	UE_DEFINE_GAMEPLAY_TAG(Southpaw, TEXT("Als.Combat Stance.Southpaw"))
-	UE_DEFINE_GAMEPLAY_TAG(Neutral, TEXT("Als.Combat Stance.Neutral"))
-	UE_DEFINE_GAMEPLAY_TAG(Ready, TEXT("Als.Combat Stance.Ready"))
-	UE_DEFINE_GAMEPLAY_TAG(Aiming, TEXT("Als.Combat Stance.Aiming"))
-}
-
 namespace AlsxtReadyStanceTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Neutral, TEXT("Als.Ready Stance.Neutral"))
 	UE_DEFINE_GAMEPLAY_TAG(Ready, TEXT("Als.Ready Stance.Ready"))
 	UE_DEFINE_GAMEPLAY_TAG(Aiming, TEXT("Als.Ready Stance.Aiming"))
+}
+
+namespace ALSXTCombatStanceTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Orthodox, TEXT("Als.Combat Stance.Orthodox"))
+	UE_DEFINE_GAMEPLAY_TAG(Southpaw, TEXT("Als.Combat Stance.Southpaw"))
+	UE_DEFINE_GAMEPLAY_TAG(Neutral, TEXT("Als.Combat Stance.Neutral"))
+	UE_DEFINE_GAMEPLAY_TAG(Ready, TEXT("Als.Combat Stance.Ready"))
+	UE_DEFINE_GAMEPLAY_TAG(Aiming, TEXT("Als.Combat Stance.Aiming"))
 }
 
 namespace ALSXTIdleModeTags
@@ -707,6 +707,14 @@ namespace ALSXTHandTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Left, TEXT("Als.Hand.Left"))
 	UE_DEFINE_GAMEPLAY_TAG(Right, TEXT("Als.Hand.Right"))
+	UE_DEFINE_GAMEPLAY_TAG(BothHands, TEXT("Als.Hand.BothHands"))
+}
+
+namespace ALSXTOverlayStanceTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Active, FName{TEXTVIEW("Als.Overlay Stance.Active")})
+	UE_DEFINE_GAMEPLAY_TAG(Neutral, FName{TEXTVIEW("Als.Overlay Stance.Neutral")})
+	UE_DEFINE_GAMEPLAY_TAG(Passive, FName{TEXTVIEW("Als.Overlay Stance.Passive")})
 }
 
 namespace ALSXTWeaponObstructionTags

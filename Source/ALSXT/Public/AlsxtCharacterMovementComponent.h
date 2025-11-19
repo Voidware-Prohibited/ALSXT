@@ -134,6 +134,47 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Movement")
 	FOnExitSlideSlopeAngleDelegate OnExitSlideSlopeAngle;
+
+	/** If true, try to crouch (or keep crouching) on next update. If false, try to stop crouching on next update. */
+	UPROPERTY(Category="Character Movement (General Settings)", VisibleInstanceOnly, BlueprintReadOnly)
+	uint8 bWantsToProne:1;
+
+	/**
+	 * If true, crouching should keep the base of the capsule in place by lowering the center of the shrunken capsule. If false, the base of the capsule moves up and the center stays in place.
+	 * The same behavior applies when the character uncrouches: if true, the base is kept in the same location and the center moves up. If false, the capsule grows and only moves up if the base impacts something.
+	 * By default this variable is set when the movement mode changes: set to true when walking and false otherwise. Feel free to override the behavior when the movement mode changes.
+	 */
+	UPROPERTY(Category="Character Movement (General Settings)", VisibleInstanceOnly, BlueprintReadWrite, AdvancedDisplay)
+	uint8 bProneMaintainsBaseLocation:1;
+
+	/** Collision half-height when crouching (component scale is applied separately) */
+	UE_DEPRECATED_FORGAME(5.0, "Public access to this property is deprecated, and it will become private in a future release. Please use SetProneHalfHeight and GetProneHalfHeight instead.")
+	UPROPERTY(Category="Character Movement (General Settings)", EditAnywhere, BlueprintReadWrite, BlueprintSetter=SetProneHalfHeight, BlueprintGetter=GetProneHalfHeight, meta=(ClampMin="0", UIMin="0", ForceUnits=cm))
+	float ProneHalfHeight;
+
+	/**
+	 * Checks if new capsule size fits (no encroachment), and call CharacterOwner->OnStartProne() if successful.
+	 * In general you should set bWantsToProne instead to have the prone persist during movement, or just use the crouch functions on the owning Character.
+	 * @param	bClientSimulation	true when called when bIsProne is replicated to non owned clients, to update collision cylinder and offset.
+	 */
+	virtual void Prone(bool bClientSimulation = false);
+	
+	/**
+	 * Checks if default capsule size fits (no encroachment), and trigger OnEndCrouch() on the owner if successful.
+	 * @param	bClientSimulation	true when called when bIsCrouched is replicated to non owned clients, to update collision cylinder and offset.
+	 */
+	virtual void UnProne(bool bClientSimulation = false);
+
+	/** Returns true if the character is allowed to crouch in the current state. By default it is allowed when walking or falling, if CanEverCrouch() is true. */
+	virtual bool CanProneInCurrentState() const;
+
+	/** Sets collision half-height when crouching and updates dependent computations */
+	UFUNCTION(BlueprintSetter)
+	void SetProneHalfHeight(const float NewValue);
+
+	/** Returns the collision half-height when crouching (component scale is applied separately) */
+	UFUNCTION(BlueprintGetter)
+	float GetProneHalfHeight() const;
 	
 protected:
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;

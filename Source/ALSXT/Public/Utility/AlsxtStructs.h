@@ -5,8 +5,10 @@
 #include "Engine/EngineTypes.h"
 #include "Sound/SoundBase.h"
 #include "NiagaraSystem.h"
+#include "Settings/AlsxtContentRatingSettings.h"
 #include "AlsxtStructs.generated.h"
 
+enum class EIarcRating : uint8;
 class UAnimMontage;
 class UCurveFloat;
 class UCurveVector;
@@ -95,6 +97,9 @@ struct ALSXT_API FSound
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayThumbnail = "true", AllowPrivateAccess))
 	USoundBase* Sound{ nullptr };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	TObjectPtr<USoundBase> SoundAsset;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	FVector2D PitchRange {1.0f, 1.0f};
 
@@ -103,6 +108,9 @@ struct ALSXT_API FSound
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	bool Mature{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	EIarcRating IarcRating{ EIarcRating::EIarcRating_3 };
 
 	bool operator==(const FSound& other) const
 	{

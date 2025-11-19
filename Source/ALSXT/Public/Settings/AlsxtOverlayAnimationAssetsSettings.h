@@ -10,7 +10,7 @@ class ALSXT_API UAlsxtOverlayAnimationAssetsSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ShowOnlyInnerProperties))
 	FAlsxtOverlayAnimationInstanceAssets Assets;
 
 public:

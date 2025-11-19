@@ -32,6 +32,12 @@ public:
 
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
+	TObjectPtr<UInputAction> ProneAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
+	TObjectPtr<UInputAction> SwitchReadyStanceAction;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
 	void Input_OnPrimaryInteraction();
 
@@ -57,6 +63,8 @@ protected:
     virtual void Input_OnWalk();
     
     virtual void Input_OnCrouch();
+
+	virtual void Input_OnProne();
     
     virtual void Input_OnJump(const FInputActionValue& ActionValue);
     
@@ -81,8 +89,12 @@ protected:
     virtual void Input_OnFreelook(const FInputActionValue& ActionValue);
    
     virtual void Input_OnToggleGait();
+
+	virtual void Input_OnToggleReadyStance();
    
     virtual void Input_OnToggleCombatReady();
+
+	virtual void Input_OnSwitchCombatStance();
 
 	virtual void Input_OnBlock(const FInputActionValue& ActionValue);
    

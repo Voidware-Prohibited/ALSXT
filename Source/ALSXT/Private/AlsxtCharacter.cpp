@@ -40,6 +40,7 @@
 #include "AlsxtCharacterNpc.h"
 #include "AbilitySystem/AttributeSets/AlsxtBreathAttributeSet.h"
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
+#include "Utility/AlsxtOverlayGameplayTags.h"
 
 void AAlsxtCharacter::ServerSetDesiredStance_Implementation(const FGameplayTag& NewDesiredStance)
 {
@@ -466,6 +467,150 @@ AAlsxtCharacter::AAlsxtCharacter(const FObjectInitializer& ObjectInitializer) :
 	ALSXTCharacterMovement->OnExitSlideSlopeAngle.AddUniqueDynamic(this, &AAlsxtCharacter::OnExitSlideSlopeAngle);
 }
 
+void AAlsxtCharacter::OnRep_IsProne()
+{
+	if (ALSXTCharacterMovement)
+	{
+		if (IsCrouched())
+		{
+			ALSXTCharacterMovement->bWantsToProne = true;
+			ALSXTCharacterMovement->Crouch(true);
+		}
+		else
+		{
+			ALSXTCharacterMovement->bWantsToProne = false;
+			ALSXTCharacterMovement->UnCrouch(true);
+		}
+		ALSXTCharacterMovement->bNetworkUpdateReceived = true;
+	}
+}
+
+bool AAlsxtCharacter::IsProne() const
+{
+	return bIsProne;
+}
+
+void AAlsxtCharacter::SetIsProne(const bool bInIsProne)
+{
+	bIsProne = bInIsProne;
+}
+
+bool AAlsxtCharacter::GetOverlaySlot(const FGameplayTag& Slot, FGameplayTag& Overlay, FGameplayTag& Posture)
+{
+	// if (hasTags)
+	Overlay = AlsOverlayModeTags::Axe;
+	Posture = AlsOverlayModeTags::Axe;
+	return true;
+}
+
+bool AAlsxtCharacter::TrySetOverlaySlot(const FGameplayTag& TargetSlot, const FGameplayTag& NewOverlayMode, const FGameplayTag& NewCombatStance, const bool bForce)
+{
+	bool ReturnValue = false;
+	if (bForce)
+	{
+		if (TargetSlot == ALSXTHandTags::BothHands)
+		{
+			if (auto OverlayInfo = ALSXTSettings->OverlaySettings.Overlays->Overlays.Find(GetOverlayMode()))
+			{
+				if (OverlayInfo->AvailableSlots.HasTag(ALSXTHandTags::BothHands))
+				{
+					const FGameplayTagContainer EmptyContainer;
+					AnimationParametersState.OverlaySlots.OverlaySlotLeftHand = EmptyContainer;
+					AnimationParametersState.OverlaySlots.OverlaySlotRightHand = EmptyContainer;
+					AnimationParametersState.OverlaySlots.OverlaySlotBothHands.AddTagFast(NewOverlayMode);
+					AnimationParametersState.OverlaySlots.OverlaySlotBothHands.AppendTags(OverlayInfo->Settings);
+					return true;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (TargetSlot == ALSXTHandTags::Left)
+			{
+				if (auto OverlayInfo = ALSXTSettings->OverlaySettings.Overlays->Overlays.Find(GetOverlayMode()))
+				{
+					// Find existing entry for slot
+					AnimationParametersState.OverlaySlots.OverlaySlotRightHand.HasTag(AlsxtOverlaySlotStanceTags::Active);
+					if (ALSXTSettings->OverlaySettings.Overlays->Overlays.Find(GetOverlayMode())->AvailableStances.HasTag(Stance))
+					{
+						return true;
+					}
+					
+					//OverlayInfo.
+					AnimationParametersState.OverlaySlots.OverlaySlotLeftHand.AddTag(NewOverlayMode);
+					AnimationParametersState.OverlaySlots.OverlaySlotLeftHand.AddTag(Stance);
+					AnimationParametersState.OverlaySlots.OverlaySlotLeftHand.AppendTags(OverlayInfo->Settings);
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else if (TargetSlot == ALSXTHandTags::Right)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	else
+	{
+		if (TargetSlot == ALSXTHandTags::BothHands)
+		{
+			if (auto OverlayInfo = ALSXTSettings->OverlaySettings.Overlays->Overlays.Find(GetOverlayMode()))
+			{
+				if (OverlayInfo->AvailableSlots.HasTag(TargetSlot))
+				{
+					const FGameplayTagContainer EmptyContainer;
+					AnimationParametersState.OverlaySlots.OverlaySlotLeftHand = EmptyContainer;
+					AnimationParametersState.OverlaySlots.OverlaySlotRightHand = EmptyContainer;
+					AnimationParametersState.OverlaySlots.OverlaySlotBothHands.AddTagFast(NewOverlayMode);
+					AnimationParametersState.OverlaySlots.OverlaySlotBothHands.AppendTags(OverlayInfo->Settings);
+					return true;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (TargetSlot == ALSXTHandTags::Left)
+			{
+				if (ALSXTSettings->OverlaySettings.Overlays->Overlays.Find(GetOverlayMode())->AvailableStances.HasTag(Stance))
+				{
+					return true;
+				}
+			}
+			else if (TargetSlot == ALSXTHandTags::Right)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	return ReturnValue;
+}
+
+void AAlsxtCharacter::OnReplicated_OverlayModes(const FGameplayTagContainer& PreviousOverlayModes)
+{
+	OnOverlayModesChanged(PreviousOverlayModes);
+}
+
+void AAlsxtCharacter::OnOverlayModesChanged_Implementation(const FGameplayTagContainer& PreviousOverlayModes){}
+
 void AAlsxtCharacter::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -491,12 +636,12 @@ void AAlsxtCharacter::Tick(const float DeltaTime)
 		// NewAimState.CurrentHeadTargetTransform.Location = IALSXTCharacterInterface::Execute_GetCharacterFirearmSightLocation(this);
 	}
 
-	BreathState.TargetState = CalculateTargetBreathState();
+	// BreathState.TargetState = CalculateTargetBreathState();
 
-	if (ShouldTransitionBreathState())
-	{
-		TransitionBreathState();
-	}
+	// if (ShouldTransitionBreathState())
+	// {
+	// 	TransitionBreathState();
+	// }
 }
 
 void AAlsxtCharacter::NotifyControllerChanged()
@@ -534,6 +679,7 @@ void AAlsxtCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	FDoRepLifetimeParams Parameters;
 	Parameters.bIsPushBased = true;
 	Parameters.Condition = COND_SkipOwner;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, bIsProne, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FootprintsState, Parameters)
 	// DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PhysicalAnimationState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredLean, Parameters)
@@ -542,6 +688,7 @@ void AAlsxtCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredSex, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredLocomotionVariant, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredInjury, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredReadyStance, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredCombatStance, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponFirearmStance, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, DesiredWeaponReadyPosition, Parameters)
@@ -728,6 +875,21 @@ bool AAlsxtCharacter::IsMantlingAllowedToStart_Implementation() const
 	}
 
 	// return Super::IsMantlingAllowedToStart();
+}
+
+bool AAlsxtCharacter::CanProne() const
+{
+	return false;
+}
+
+void AAlsxtCharacter::OnStartProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	
+}
+
+void AAlsxtCharacter::OnEndProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	
 }
 
 void AAlsxtCharacter::DisableInputMovement(const bool Disable)
@@ -2197,6 +2359,42 @@ void AAlsxtCharacter::OnInjuryChanged_Implementation(const FGameplayTag& Previou
 
 // CombatStance
 
+void AAlsxtCharacter::SetDesiredReadyStance(const FGameplayTag& NewReadyStanceTag)
+{
+	if (DesiredReadyStance != NewReadyStanceTag)
+	{
+		DesiredReadyStance = NewReadyStanceTag;
+		const auto PreviousReadyStance{ ReadyStance };
+
+		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, DesiredReadyStance, this)
+
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				ServerSetDesiredReadyStance(NewReadyStanceTag);
+				if (NewReadyStanceTag != ALSXTCombatStanceTags::Neutral)
+				{
+					if (IAlsxtHeldItemInterface::Execute_IsHoldingAimableItem(this))
+					{
+						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
+					}
+					else
+					{
+						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+					}
+					SetDesiredRotationMode(AlsRotationModeTags::Aiming);
+				}
+				else
+				{
+					SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
+				}
+			}
+			else if (GetLocalRole() == ROLE_Authority)
+			{
+				OnReadyStanceChanged(PreviousReadyStance);
+			}
+	}
+}
+
 void AAlsxtCharacter::SetDesiredCombatStance(const FGameplayTag& NewCombatStanceTag)
 {
 	if (DesiredCombatStance != NewCombatStanceTag)
@@ -2233,9 +2431,27 @@ void AAlsxtCharacter::SetDesiredCombatStance(const FGameplayTag& NewCombatStance
 	}
 }
 
+void AAlsxtCharacter::ServerSetDesiredReadyStance_Implementation(const FGameplayTag& NewReadyStanceTag)
+{
+	SetDesiredReadyStance(NewReadyStanceTag);
+}
+
 void AAlsxtCharacter::ServerSetDesiredCombatStance_Implementation(const FGameplayTag& NewCombatStanceTag)
 {
 	SetDesiredCombatStance(NewCombatStanceTag);
+}
+
+void AAlsxtCharacter::SetReadyStance(const FGameplayTag& NewReadyStanceTag)
+{
+
+	if (CombatStance != NewReadyStanceTag)
+	{
+		const auto PreviousReadyStance{ ReadyStance };
+
+		CombatStance = NewReadyStanceTag;
+
+		OnReadyStanceChanged(PreviousReadyStance);
+	}
 }
 
 void AAlsxtCharacter::SetCombatStance(const FGameplayTag& NewCombatStanceTag)
@@ -2250,6 +2466,8 @@ void AAlsxtCharacter::SetCombatStance(const FGameplayTag& NewCombatStanceTag)
 		OnCombatStanceChanged(PreviousCombatStance);
 	}
 }
+
+void AAlsxtCharacter::OnReadyStanceChanged_Implementation(const FGameplayTag& PreviousCombatReadyTag) {}
 
 void AAlsxtCharacter::OnCombatStanceChanged_Implementation(const FGameplayTag& PreviousCombatStanceTag) {}
 

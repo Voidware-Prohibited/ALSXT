@@ -47,6 +47,7 @@ void AAlsxtCharacterPlayer::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSprint);
 		EnhancedInput->BindAction(WalkAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnWalk);
 		EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnCrouch);
+		EnhancedInput->BindAction(ProneAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnProne);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnJump);
 		EnhancedInput->BindAction(MantleAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnMantle);
 		EnhancedInput->BindAction(AimAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnAim);
@@ -64,6 +65,7 @@ void AAlsxtCharacterPlayer::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnFreelook);
 		EnhancedInput->BindAction(ToggleFreelookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnFreelook);
 		EnhancedInput->BindAction(ToggleGaitAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnToggleGait);
+		EnhancedInput->BindAction(SwitchReadyStanceAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSwitchCombatStance);
 		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnToggleCombatReady);
 		EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnPrimaryInteraction);
 		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSecondaryInteraction);
@@ -244,6 +246,18 @@ void AAlsxtCharacterPlayer::Input_OnCrouch()
 		{
 			SetDesiredStatus(ALSXTStatusTags::Normal);
 		}
+	}
+}
+
+void AAlsxtCharacterPlayer::Input_OnProne()
+{
+	if (GetDesiredStance() == AlsStanceTags::Prone)
+	{
+		SetDesiredStance(AlsStanceTags::Crouching);
+	}
+	else if (CanProne())
+	{
+		SetDesiredStance(AlsStanceTags::Prone);
 	}
 }
 
@@ -453,6 +467,40 @@ void AAlsxtCharacterPlayer::Input_OnToggleGait()
 	}
 }
 
+void AAlsxtCharacterPlayer::Input_OnToggleReadyStance()
+{
+	if (CanToggleCombatReady())
+	{
+		if ((GetDesiredCombatStance() == FGameplayTag::EmptyTag) || (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral))
+		{
+			if (CanBecomeCombatReady())
+			{
+				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
+				if (IAlsxtHeldItemInterface::Execute_IsHoldingAimableItem(this))
+				{
+					if (GetRotationMode() != AlsRotationModeTags::Aiming)
+					{
+						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
+					}
+					else
+					{
+						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+					}
+				}
+				else
+				{
+					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+				}
+			}
+		}
+		else
+		{
+			SetDesiredCombatStance(ALSXTCombatStanceTags::Neutral);
+			SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::PatrolReady);
+		}
+	}
+}
+
 void AAlsxtCharacterPlayer::Input_OnToggleCombatReady()
 {
 	if (CanToggleCombatReady())
@@ -483,6 +531,21 @@ void AAlsxtCharacterPlayer::Input_OnToggleCombatReady()
 		{
 			SetDesiredCombatStance(ALSXTCombatStanceTags::Neutral);
 			SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::PatrolReady);
+		}
+	}
+}
+
+void AAlsxtCharacterPlayer::Input_OnSwitchCombatStance()
+{
+	if (CanSwitchCombatStance())
+	{
+		if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Orthodox)
+		{
+			SetDesiredCombatStance(ALSXTCombatStanceTags::Southpaw);
+		}
+		else
+		{
+			SetDesiredCombatStance(ALSXTCombatStanceTags::Orthodox);
 		}
 	}
 }

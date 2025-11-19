@@ -53,20 +53,54 @@ public:
 	TArray<FVaultAnimation> VaultAnimations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	TObjectPtr<UAnimMontage> Montage;
+
+	// If checked, mantling will automatically calculate the start time based on how much vertical
+	// distance the character needs to move to reach the object they are about to mantle.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0))
+	uint8 bAutoCalculateStartTime : 1 {false};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0, EditCondition = "!bAutoCalculateStartTime"))
+	FVector2f StartTimeReferenceHeight{50.0f, 100.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0, EditCondition = "!bAutoCalculateStartTime"))
+	FVector2f StartTime{0.5f, 0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ClampMin = 0, ForceUnits = "t"))
+	FFloatInterval MotionWarpingTimeRange{0.0f, 0.3f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	EAlphaBlendOption MotionWarpingLocationBlendOption{EAlphaBlendOption::Linear};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings",
+		Meta = (EditCondition = "MotionWarpingLocationBlendOption == EAlphaBlendOption::Custom", EditConditionHides))
+	TObjectPtr<UCurveFloat> MotionWarpingLocationCustomBlendCurve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
+	EAlphaBlendOption MotionWarpingRotationBlendOption{EAlphaBlendOption::HermiteCubic};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings",
+		Meta = (EditCondition = "MotionWarpingRotationBlendOption == EAlphaBlendOption::Custom", EditConditionHides))
+	TObjectPtr<UCurveFloat> MotionWarpingRotationCustomBlendCurve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float VerticalOffset {0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FVector2D FirstPersonYawRange {-180.0f, 180.0f};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FVector2D FirstPersonPitchRange {-180.0f, 180.0f};
 
 public:
-	float GetStartTimeForHeight(FVector2D ReferenceHeight, FVector2D StartTime, float MantlingHeight) const;
+	float GetStartTimeForHeight(FVector2D ReferenceHeight, FVector2D InStartTime, float MantlingHeight) const;
 
 	float GetPlayRateForHeight(FVector2D ReferenceHeight, FVector2D PlayRate, float MantlingHeight) const;
 };
 
-inline float UAlsxtVaultingSettings::GetStartTimeForHeight(const FVector2D ReferenceHeight, const FVector2D StartTime, const float MantlingHeight) const
+inline float UAlsxtVaultingSettings::GetStartTimeForHeight(const FVector2D ReferenceHeight, const FVector2D InStartTime, const float MantlingHeight) const
 {
-	return FMath::GetMappedRangeValueClamped(ReferenceHeight, StartTime, MantlingHeight);
+	return FMath::GetMappedRangeValueClamped(ReferenceHeight, InStartTime, MantlingHeight);
 }
 
 inline float UAlsxtVaultingSettings::GetPlayRateForHeight(const FVector2D ReferenceHeight, const FVector2D PlayRate, const float MantlingHeight) const

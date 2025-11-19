@@ -2,7 +2,15 @@
 
 #include "GameplayTagContainer.h"
 #include "Utility/AlsxtGameplayTags.h"
+#include "Utility/AlsxtOverlayStructs.h"
 #include "AlsxtAnimationParametersState.generated.h"
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtOverlayModesState
+{
+	GENERATED_BODY()
+	
+};
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtAnimationParametersState
@@ -17,6 +25,9 @@ struct ALSXT_API FAlsxtAnimationParametersState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.OverlayMode,Als.OverlayLeftHandMirrorPolicy,Als.OverlaySettings", AllowPrivateAccess))
 	FGameplayTagContainer OverlayTags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (AllowPrivateAccess))
+	FAlsxtOverlaySlots OverlaySlots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Stance,Als.Combat Stance,Als.Ready Stance,Als.Weapon Firearm Stance,Als.Weapon Carry Position,Als.Weapon Ready Position", AllowPrivateAccess))
 	FGameplayTagContainer StanceTags;

@@ -45,11 +45,17 @@ struct ALSXT_API FAlsxtOverlayAnimationInfo
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TSubclassOf<UAnimInstance> BothHandsAnimationInstance;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlaySlot", AllowPrivateAccess))
+	FGameplayTagContainer AvailableSlots;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait", AllowPrivateAccess))
 	FGameplayTagContainer AvailableGaits;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", AllowPrivateAccess))
 	FGameplayTagContainer AvailableStances;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Ready Stance", AllowPrivateAccess))
+	FGameplayTagContainer AvailableReadyStances;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlaySettings", AllowPrivateAccess))
 	FGameplayTagContainer Settings;

@@ -80,8 +80,6 @@ struct FInputActionValue;
 class UAbilitySystemComponent;
 class UAlsxtAbilitySystemComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
-
 /**
 * @file ALSXTCharacter.h
 * @brief Template class that contains all shared Logic and Data for Player and NPC Child Classes.
@@ -90,47 +88,147 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
 * @todo change to UCLASS(Abstract, NotBlueprintable) after restructuring classes
 */
 
+/**
+ * @defgroup player_input_delegates Player Input Delegates
+ */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSetupPlayerInputComponentDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMovementInputDelegate);
+
+/**
+ * @defgroup locomotion_delegates Locomotion Delegates
+ */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartProneDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndProneDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartSlideDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndSlideDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartSlopeSlideDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndSlopeSlideDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartSidleDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndSidleDelegate);
+
+/**
+ * @defgroup ragdoll_delegates Ragdoll Delegates
+ */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRagdollingStartedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRagdollingEndedDelegate);
+
+/**
+ * @defgroup character_idle_delegates Character Idle Delegates
+ */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterIdleTimerBeginDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterIdleTimerCancelledDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterIdleTimerEndDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterIdleBeginDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterIdleEndDelegate);
+
+
 UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
 class ALSXT_API AAlsxtCharacter : public AAlsCharacter, public IAbilitySystemInterface, public IAlsxtCharacterCustomizationComponentInterface, public IAlsxtStationaryModeComponentInterface, public IAlsxtCollisionInterface, public IAlsxtHeadLookAtInterface, public IAlsxtTargetLockInterface, public IAlsxtCharacterSoundComponentInterface, public IAlsxtMeshPaintingInterface, public IAlsxtCharacterInterface, public IAlsxtHeldItemInterface, public IAlsxtIdleAnimationComponentInterface
 {
 	GENERATED_BODY()
 
+// Main	
+public:
+	AAlsxtCharacter(const FObjectInitializer& ObjectInitializer);
+
+	UPROPERTY(BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
+	AAlsCharacter* AlsCharacter{Cast<AAlsCharacter>(GetParentActor())};
+
+	/** Set by character movement to specify that this Character is currently prone. */
+	UPROPERTY(BlueprintReadOnly, replicatedUsing=OnRep_IsProne, Category=Character)
+	uint8 bIsProne:1;
+
+	/** Handle Prone replicated from server */
+	UFUNCTION()
+	virtual void OnRep_IsProne();
+
+	/** Set by character movement to specify that this Character is currently crouched. This function returns bIsCrouched.*/
+	bool IsProne() const;
+	
+	/** Specifies whether this Character is currently crouched or not. This function sets bIsCrouched and marks property as dirty.*/
+	void SetIsProne(const bool bInIsProne);
+
+	UFUNCTION(BlueprintCallable, Category = "State|Als Character")
+	bool GetOverlaySlot(const FGameplayTag& Slot, FGameplayTag& Overlay, FGameplayTag& Posture);
+
+	/** Tries to set an Overlay slot with a specified Posture by checking First, if Overlay supports the Slot, and Second, checks if the existing Overlay slot (if any) supports the Posture, otherwise sets a supported Posture. bForce will Set the Overlay slot regardless of restrictions */
+	UFUNCTION(BlueprintCallable, Category = "State|Als Character")
+	bool TrySetOverlaySlot(const FGameplayTag& TargetSlot, const FGameplayTag& NewOverlayMode, const FGameplayTag& NewCombatStance, const bool bForce);
+
+// Settings
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character")
+	TObjectPtr<UAlsxtMovementSettings> AlsxtMovementSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", ReplicatedUsing = "OnReplicated_OverlayModes")
+	FGameplayTagContainer OverlayModes{AlsOverlayModeTags::Default};
+
+private:
+	UFUNCTION()
+	void OnReplicated_OverlayModes(const FGameplayTagContainer& PreviousOverlayModes);
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
+	void OnOverlayModesChanged(const FGameplayTagContainer& PreviousOverlayModes);
+	
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Als Character", Meta = (AllowPrivateAccess))
+	TObjectPtr<UAlsxtCharacterSettings> ALSXTSettings;
+
+// Ability System
 protected:
 	// Data used to initialize the Ability System Component. (Can be found in "AbilitySystemData.h")
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System", Meta = (ShowOnlyInnerProperties))
 	TSoftObjectPtr<UAlsxtAbilitySystemInitializationDataAsset> AbilitySystemInitializationData;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character")
-	TObjectPtr<UAlsxtMovementSettings> AlsxtMovementSettings;
+public:
+	// Implement the IAbilitySystemInterface.
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 private:
 	virtual void ServerSetDesiredStance_Implementation(const FGameplayTag& NewDesiredStance) override;
 
+// State
 public:
 	virtual void OnRep_PlayerState() override;
-
-	AAlsxtCharacter(const FObjectInitializer& ObjectInitializer);
-
-	// Implement the IAbilitySystemInterface.
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings|Als Character", Meta = (AllowPrivateAccess))
-	TObjectPtr<UAlsxtCharacterSettings> ALSXTSettings;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|State|Parameters", Replicated, Meta = (AllowPrivateAccess), Transient)
 	FAlsxtAnimationParametersState AnimationParametersState;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ALS|State|Parameters", Meta = (AllowPrivateAccess), Transient)
 	FAlsxtStatusState StatusState;
 
+public:
+	/**
+	* @ingroup player_input_delegates
+	*/
 	UPROPERTY(BlueprintAssignable)
 	FSetupPlayerInputComponentDelegate OnSetupPlayerInputComponentUpdated;
+	
+	FOnMovementInputDelegate OnMovementInputDelegate;
 
-	UPROPERTY(BlueprintReadOnly, Category = "State|Als Character", Meta = (AllowPrivateAccess))
-	AAlsCharacter* AlsCharacter{Cast<AAlsCharacter>(GetParentActor())};
+	/**
+	* @ingroup locomotion_delegates
+	*/
+	FOnStartProneDelegate OnStartProneDelegate;
+	FOnEndProneDelegate OnEndProneDelegate;
+	FOnStartSlideDelegate OnStartSlideDelegate;
+	FOnEndSlideDelegate OnEndSlideDelegate;
 
+	/**
+	* @ingroup ragdoll_delegates
+	*/
 	FScriptDelegate OnRagdollingStartedDelegate;
 	FScriptDelegate OnRagdollingEndedDelegate;
+
+	/**
+	* @ingroup character_idle_delegates
+	*/
+	FOnCharacterIdleTimerBeginDelegate OnCharacterIdleTimerBeginDelegate;
+	FOnCharacterIdleTimerCancelledDelegate OnCharacterIdleTimerCancelledDelegate;
+	FOnCharacterIdleTimerEndDelegate OnCharacterIdleTimerEndDelegate;
+	FOnCharacterIdleBeginDelegate OnCharacterIdleBeginDelegate;
+	FOnCharacterIdleEndDelegate OnCharacterIdleEndDelegate;	
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	void OnEnterSlideSlopeAngle();
@@ -138,8 +236,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Als Character")
 	void OnExitSlideSlopeAngle();
 
-	// Components
+	/**
+	* @section Component members
+	*/
 
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
+	TObjectPtr<UAlsxtPaintableSkeletalMeshComponent> ALSXTMesh;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
+	TObjectPtr<UAlsxtCharacterMovementComponent> ALSXTCharacterMovement;
+	
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UContextualAnimSceneActorComponent> ContextualAnimationComponent;
 	
@@ -158,8 +266,6 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UCineCameraComponent> KillerCamera;
-
-	// Meshes
 
 	// Overlay
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
@@ -261,14 +367,8 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UPhysicalAnimationComponent* PhysicalAnimation;
-
-protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
-	TObjectPtr<UAlsxtPaintableSkeletalMeshComponent> ALSXTMesh;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Als Character")
-	TObjectPtr<UAlsxtCharacterMovementComponent> ALSXTCharacterMovement;
 	
+protected:
 	virtual void OnStanceChanged_Implementation(const FGameplayTag& PreviousStance) override;
 
 	// Breath State
@@ -303,6 +403,17 @@ protected:
 
 public:
 	virtual bool IsMantlingAllowedToStart_Implementation() const override;
+
+	// Stance
+
+	UFUNCTION(BlueprintCallable, Category=Character)
+	virtual bool CanProne() const;
+
+	UFUNCTION(BlueprintCallable, Category=Character)
+	virtual void OnStartProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust);
+
+	UFUNCTION(BlueprintCallable, Category=Character)
+	virtual void OnEndProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust);
 	
 	//Character Interface
 	virtual FRotator GetCharacterControlRotation_Implementation() const override;
@@ -790,6 +901,12 @@ protected:
 	FGameplayTag Injury{ALSXTInjuryTags::None};
 
 	// CombatStance
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
+	FGameplayTag DesiredReadyStance{AlsxtReadyStanceTags::Neutral};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag ReadyStance{AlsxtReadyStanceTags::Neutral};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
 	FGameplayTag DesiredCombatStance{ALSXTCombatStanceTags::Neutral};
@@ -1593,30 +1710,50 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
+	const FGameplayTag& GetDesiredReadyStance() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character")
 	const FGameplayTag& GetDesiredCombatStance() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewCombatReadyTag"))
+	void SetDesiredReadyStance(const FGameplayTag& NewCombatReadyTag);
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Als Character", Meta = (AutoCreateRefTerm = "NewCombatStanceTag"))
 	void SetDesiredCombatStance(const FGameplayTag& NewCombatStanceTag);
 
 private:
 	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void ServerSetDesiredReadyStance(const FGameplayTag& NewReadyStanceTag);
+	
+	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void ServerSetDesiredCombatStance(const FGameplayTag& NewCombatStanceTag);
 
 	// CombatStance
 
 public:
+	const FGameplayTag& GetReadyStance() const;
 	const FGameplayTag& GetCombatStance() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanToggleCombatReady() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanSwitchReadyStance() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
+	bool CanSwitchCombatStance() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanBecomeCombatReady() const;
 
 private:
 	void SetCombatStance(const FGameplayTag& NewCombatStanceTag);
+	void SetReadyStance(const FGameplayTag& NewCombatReadyTag);
 
 protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
+	void OnReadyStanceChanged(const FGameplayTag& PreviousCombatReadyTag);
+	
 	UFUNCTION(BlueprintNativeEvent, Category = "ALS|Als Character")
 	void OnCombatStanceChanged(const FGameplayTag& PreviousCombatStanceTag);
 
@@ -2211,6 +2348,11 @@ inline const FGameplayTag& AAlsxtCharacter::GetDesiredInjury() const
 inline const FGameplayTag& AAlsxtCharacter::GetInjury() const
 {
 	return Injury;
+}
+
+inline const FGameplayTag& AAlsxtCharacter::GetDesiredReadyStance() const
+{
+	return DesiredReadyStance;
 }
 
 inline const FGameplayTag& AAlsxtCharacter::GetDesiredCombatStance() const
