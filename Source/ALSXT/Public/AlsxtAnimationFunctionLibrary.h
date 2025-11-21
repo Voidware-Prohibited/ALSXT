@@ -18,8 +18,8 @@ class ALSXT_API UAlsxtAnimationFunctionLibrary : public UBlueprintFunctionLibrar
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "State Machine", meta=(BlueprintThreadSafe, AdvancedDisplay = "4"))
-	static void AlsxtRefreshStandingMovement(const FAnimUpdateContext& UpdateContext, const FAnimationStateMachineReference& Node);
+	UFUNCTION(BlueprintCallable, Category = "State Machine", meta=(BlueprintThreadSafe, DefaultToSelf = "Node", AdvancedDisplay = "4"))
+	static void AlsxtRefreshStandingMovement(const UObject* WorldContextObject, UPARAM(Ref) const FAnimUpdateContext& UpdateContext, UPARAM(Ref) const FAnimationStateMachineReference& Node);
 
 	UFUNCTION(BlueprintCallable, Category = "State Machine", meta=(BlueprintThreadSafe, AdvancedDisplay = "4"))
 	static void AlsxtRefreshCrouchingMovement(const FAnimUpdateContext& UpdateContext, const FAnimationStateMachineReference& Node);

@@ -8,7 +8,6 @@
 #include "Settings/AlsxtContentRatingSettings.h"
 #include "AlsxtStructs.generated.h"
 
-enum class EIarcRating : uint8;
 class UAnimMontage;
 class UCurveFloat;
 class UCurveVector;
@@ -110,7 +109,7 @@ struct ALSXT_API FSound
 	bool Mature{ false };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	EIarcRating IarcRating{ EIarcRating::EIarcRating_3 };
+	EIarcRating IarcRating{ EIarcRating::IarcRating_3 };
 
 	bool operator==(const FSound& other) const
 	{
