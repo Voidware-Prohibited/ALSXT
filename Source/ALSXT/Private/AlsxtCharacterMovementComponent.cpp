@@ -471,7 +471,7 @@ void UAlsxtCharacterMovementComponent::CheckSlopeAngle()
 
 	
 
-	if (AlsxtMovementSettings.Get()->RotationModes.Find(GetRotationMode())->Stances.Find(GetStance())->bEnableSlopeSliding && (AngleInDegrees > AlsxtMovementSettings.Get()->RotationModes.Find(GetRotationMode())->Stances.Find(GetStance())->SlopeSlideAngle))
+	if (AlsxtMovementSettings->bEnableSlopeSliding && (AngleInDegrees > AlsxtMovementSettings->BaseSlopeSlideAngle))
 	{
 		// Calculate sliding direction based on floor normal
 		FVector SlideDirection = FVector::CrossProduct(FloorNormal, FVector::CrossProduct(FVector::UpVector, FloorNormal));
@@ -535,7 +535,7 @@ void UAlsxtCharacterMovementComponent::Prone(bool bClientSimulation)
 	}
 
 	// See if collision is already at desired size.
-	if (CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() == ProneHalfHeight)
+	if (CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() == GetProneHalfHeight())
 	{
 		if (!bClientSimulation)
 		{
@@ -558,7 +558,7 @@ void UAlsxtCharacterMovementComponent::Prone(bool bClientSimulation)
 	const float OldUnscaledHalfHeight = CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 	const float OldUnscaledRadius = CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
 	// Height is not allowed to be smaller than radius.
-	const float ClampedProneHalfHeight = FMath::Max3(0.f, OldUnscaledRadius, ProneHalfHeight);
+	const float ClampedProneHalfHeight = FMath::Max3(0.f, OldUnscaledRadius, GetProneHalfHeight());
 	CharacterOwner->GetCapsuleComponent()->SetCapsuleSize(OldUnscaledRadius, ClampedProneHalfHeight);
 	float HalfHeightAdjust = (OldUnscaledHalfHeight - ClampedProneHalfHeight);
 	float ScaledHalfHeightAdjust = HalfHeightAdjust * ComponentScale;

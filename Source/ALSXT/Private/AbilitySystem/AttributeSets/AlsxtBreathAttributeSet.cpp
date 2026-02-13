@@ -3,17 +3,17 @@
 
 #include "AbilitySystem/AttributeSets/AlsxtBreathAttributeSet.h"
 #include "GameplayEffectExtension.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UAlsxtBreathAttributeSet::UAlsxtBreathAttributeSet()
 {
-	MaximumBreathRate = 1.0f;
+	MaximumBreathRate = 2.0f;
 	CurrentBreathRate = 1.0f;
 	CurrentBreathMagnitude = 1.0f;
-	MaxBreathMagnitude = 1.0f;
-	CurrentBreathRegeneration = 0.0f;
-	MaxBreathRegeneration = 0.0f;
+	MaxBreathMagnitude = 2.0f;
+	CurrentBreathRegeneration = 1.0f;
+	MaxBreathRegeneration = 2.0f;
 }
 
 void UAlsxtBreathAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue,	float NewValue)
@@ -22,7 +22,7 @@ void UAlsxtBreathAttributeSet::PostAttributeChange(const FGameplayAttribute& Att
 	
 	if (Attribute == GetCurrentBreathRateAttribute())
 	{
-		CheckMaxReachedForAttribute(MaximumBreathRate, ALSXTGASGameplayTags::State::TAG_State_Max_Breath.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaximumBreathRate, AlsxtGASGameplayTags::State::TAG_State_Max_Breath.GetTag(), NewValue);
 		return;
 	}
 
@@ -34,7 +34,7 @@ void UAlsxtBreathAttributeSet::PostAttributeChange(const FGameplayAttribute& Att
 
 	if (Attribute == GetCurrentBreathMagnitudeAttribute())
 	{
-		CheckMaxReachedForAttribute(MaxBreathMagnitude, ALSXTGASGameplayTags::State::TAG_State_Max_Breath.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaxBreathMagnitude, AlsxtGASGameplayTags::State::TAG_State_Max_Breath.GetTag(), NewValue);
 		return;
 	}
 
@@ -46,7 +46,7 @@ void UAlsxtBreathAttributeSet::PostAttributeChange(const FGameplayAttribute& Att
 
 	if (Attribute == GetCurrentBreathRateAttribute())
 	{
-		CheckMaxReachedForAttribute(MaxBreathRegeneration, ALSXTGASGameplayTags::State::TAG_State_Max_BreathRegen.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaxBreathRegeneration, AlsxtGASGameplayTags::State::TAG_State_Max_BreathRegen.GetTag(), NewValue);
 		return;
 	}
 

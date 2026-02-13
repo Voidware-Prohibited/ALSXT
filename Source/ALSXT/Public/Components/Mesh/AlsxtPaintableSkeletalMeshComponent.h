@@ -63,8 +63,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeSkeletalMeshElementalConditionSignature OnChangeElementalCondition;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Meta = (AllowPrivateAccess))
-	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
+	TSoftObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Meta = (AllowPrivateAccess))
 	UTextureRenderTarget2D* RenderTargetAsset;

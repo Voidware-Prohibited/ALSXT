@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/AttributeSets/AlsxtHoldBreathAttributeSet.h"
 #include "GameplayEffectExtension.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UAlsxtHoldBreathAttributeSet::UAlsxtHoldBreathAttributeSet()
@@ -101,13 +101,13 @@ void UAlsxtHoldBreathAttributeSet::PostAttributeChange(const FGameplayAttribute&
 	
 	if (Attribute == GetCurrentHoldBreathDurationAttribute())
 	{
-		CheckMaxReachedForAttribute(MaxHoldBreathDuration, ALSXTGASGameplayTags::State::TAG_State_Max_HoldingBreath.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaxHoldBreathDuration, AlsxtGASGameplayTags::State::TAG_State_Max_HoldingBreath.GetTag(), NewValue);
 		return;
 	}
 
 	if (Attribute == GetCurrentHoldBreathDurationRegenAttribute())
 	{
-		CheckMaxReachedForAttribute(MaxHoldBreathDurationRegen, ALSXTGASGameplayTags::State::TAG_State_Max_HoldingBreathRegen.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaxHoldBreathDurationRegen, AlsxtGASGameplayTags::State::TAG_State_Max_HoldingBreathRegen.GetTag(), NewValue);
 		return;
 	}
 

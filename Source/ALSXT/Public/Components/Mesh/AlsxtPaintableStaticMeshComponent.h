@@ -54,8 +54,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeStaticMeshElementalConditionSignature OnChangeItemMeshElementalCondition;
 
-	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
-	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
+	TSoftObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
 
 	UPROPERTY(BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	FAlsxtGlobalGeneralMeshPaintingSettings GlobalGeneralMeshPaintingSettings;

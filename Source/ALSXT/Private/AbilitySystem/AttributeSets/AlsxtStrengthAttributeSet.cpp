@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/AttributeSets/AlsxtStrengthAttributeSet.h"
 #include "GameplayEffectExtension.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UAlsxtStrengthAttributeSet::UAlsxtStrengthAttributeSet()
@@ -124,13 +124,13 @@ void UAlsxtStrengthAttributeSet::PostAttributeChange(const FGameplayAttribute& A
 	
 	if (Attribute == GetCurrentStrengthAttribute())
 	{
-		CheckMaxReachedForAttribute(MaximumStrength, ALSXTGASGameplayTags::State::TAG_State_Max_Strength.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaximumStrength, AlsxtGASGameplayTags::State::TAG_State_Max_Strength.GetTag(), NewValue);
 		return;
 	}
 	
 	if (Attribute == GetBleedingAttribute())
 	{
-		CheckStatusTagForAttribute(ALSXTGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
+		CheckStatusTagForAttribute(AlsxtGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
 		return;
 	}
 

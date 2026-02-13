@@ -15,7 +15,7 @@
 #include "Settings/AlsxtStationaryModeSettings.h"
 #include "AlsxtCharacter.h"
 #include "Utility/AlsxtGameplayTags.h"
-#include "Utility/AlsxtFirearmGameplayTags.h"
+#include "Utility/AlsxtAimableOverlayObjectGameplayTags.h"
 #include "Interfaces/AlsxtCharacterInterface.h"
 #include "Settings/AlsxtAnimationInstanceSettings.h"
 #include "Settings/AlsxtCharacterBreathEffectsSettings.h"
@@ -95,7 +95,7 @@ protected:
 	FGameplayTag LocomotionVariant{ALSXTLocomotionVariantTags::Default};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag Injury{ALSXTInjuryTags::None};
+	FGameplayTag Injury{AlsxtStatusEffectLocomotionVariantTags::None};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag CombatStance{ALSXTCombatStanceTags::Neutral};

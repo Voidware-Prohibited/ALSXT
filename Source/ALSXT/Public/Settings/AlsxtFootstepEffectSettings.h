@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AlsxtVertexSettings.h"
+#include "Chooser.h"
 #include "GameplayTagContainer.h"
 #include "Animation/AnimMontage.h"
 #include "AlsxtFootstepEffectSettings.generated.h"
@@ -15,14 +16,35 @@ struct ALSXT_API FAlsxtGeneralFootstepEffectSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableFootstepEffects { true };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bEnableEquipmentSounds{ true };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnableFootstepEffects"))
+	bool bEnableFootstepSounds { true };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bEnableOverlayObjectSounds{ true };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnableFootstepEffects"))
+	bool bEnableFootstepParticles { true };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnableFootstepEffects"))
+	bool bEnableFootstepDecals { true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="bEnableFootstepEffects"))
+	bool EnableCharacterMovementSound{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="bEnableFootstepEffects"))
+	bool EnableCharacterMovementAccentSound{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnableFootstepEffects"))
+	bool bEnableOverlayObjectMovementSounds{ true };
+
+	// EXPERIMENTAL: Perform a Trace for Vertex Paint color (ie Vertex-painted puddles) NOTE: More Resource-intensive
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnableFootstepEffects"))
 	bool bEnableVertexPaintTrace { true };
+
+	// Allow AI with Listening components to hear the footprint sounds
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="bEnableFootstepEffects"))
+	bool EnableMakeNoiseForAI{ true };
+	
+	// Allow AI with Viewing components to find footprint decals
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="bEnableFootstepEffects"))
+	bool EnableVisualAlertForAI{ true };
 
 };
 
@@ -100,6 +122,26 @@ struct ALSXT_API FALSXTFootwearTypeSoundLevels
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtFootwearTypeTextureSet
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Chooser Sound Result", Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UTexture2D> Surface;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Chooser Sound Result", Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UTexture2D> Shallow;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Chooser Sound Result", Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UTexture2D> Deep;
+
+	bool operator==(const FAlsxtFootwearTypeTextureSet& other) const
+	{
+		return (other.Surface == Surface) && (other.Shallow == Shallow) && (other.Deep == Deep);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FALSXTFootwearTypeEffectsSettings
 {
 	GENERATED_BODY()
@@ -152,6 +194,9 @@ USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtFootstepEffectSettings
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle System")
+	FGameplayTag SurfaceType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TArray<FALSXTFootwearTypeEffectsSettings> FootwearTypeEffectsSettings;
@@ -277,15 +322,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TEnumAsByte<ETraceTypeQuery> SurfaceTraceChannel;
 
+	// Allow AI with Listening components to hear the footprint sounds
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool EnableMakeNoise{ true };
 
+	// EXPERIMENTAL: Perform a Trace for Vertex Paint color (ie Vertex-painted puddles) NOTE: Requires being enabled in General Footstep Effects
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool EnableVertexPaintTrace{ false };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TWeakObjectPtr<UAlsxtVertexColorPhysicalMaterialMap> VertexColorPhysicalMaterialMap;
-	
+	// Map that defines wh
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="EnableVertexPaintTrace"))
+	TSoftObjectPtr<UAlsxtVertexColorPhysicalMaterialMap> VertexColorPhysicalMaterialMap;
+
+	// Enable movement sound based on the Characters clothing/equipment Physical Material
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool EnableCharacterMovementSound{ true };
 
@@ -294,6 +343,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool EnableWeaponMovementSound{ true };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool EnableOverlayObjectMovementSound{ true };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ClampMin = 0, ForceUnits = "cm"))
 	float SurfaceTraceDistance{50.0f};
@@ -309,6 +361,27 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "Foot Right Z Axis")
 	FVector FootRightZAxis{-1.0f, 0.0f, 0.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ForceInlineRow))
+	TSoftObjectPtr<UChooserTable> FootstepSoundChooserTable {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ForceInlineRow, EditCondition="EnableCharacterMovementSound"))
+	TSoftObjectPtr<UChooserTable> CharacterMovementSoundChooserTable {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ForceInlineRow, EditCondition="EnableCharacterMovementAccentSound"))
+	TSoftObjectPtr<UChooserTable> CharacterMovementAccentSoundChooserTable {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ForceInlineRow, EditCondition="EnableOverlayObjectMovementSound"))
+	TSoftObjectPtr<UChooserTable> CharacterOverlayObjectMovementSoundChooserTable {nullptr};
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ForceInlineRow))
+	TSoftObjectPtr<UChooserTable> ParticleChooserTable {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ForceInlineRow))
+	TSoftObjectPtr<UChooserTable> DecalTextureSetChooserTable {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ForceInlineRow))
+	TSoftObjectPtr<UALSXTFootstepEffectsSettings> EffectsNew {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (ForceInlineRow))
 	TMap<TEnumAsByte<EPhysicalSurface>, FAlsxtFootstepEffectSettings> Effects;

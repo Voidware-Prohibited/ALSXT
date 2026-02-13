@@ -10,6 +10,12 @@ struct ALSXT_API FAlsxtVertexColorToPhysicalMaterialMap
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TMap<EVertexColorChannel, UPhysicalMaterial*> VertexColorPhysicalMaterialMap;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ForceInlineRow, AllowPrivateAccess))
+	TMap<EVertexColorChannel, UPhysicalMaterial*> VertexColorPhysicalMaterialMap{
+		{EVertexColorChannel::Red, {}},
+		{EVertexColorChannel::Green, {}},
+		{EVertexColorChannel::Blue, {}},
+		{EVertexColorChannel::White, {}},
+		{EVertexColorChannel::Alpha, {}}
+	};
 };

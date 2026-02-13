@@ -1,25 +1,18 @@
 #pragma once
 
+#include "AlsxtMovementSettings.h"
 #include "GameplayTagContainer.h"
 #include "Camera/CameraShakeBase.h"
 #include "Animation/AnimInstance.h"
 #include "Utility/AlsxtOverlayStructs.h"
 #include "Settings/AlsxtCameraEffectsSettings.h"
+#include "Settings/AlsxtViewSettings.h"
 #include "Chooser.h"
+#include "Utility/AlsGameplayTags.h"
+#include "Settings/AlsxtAnimationSequenceSettings.h"
 #include "AlsxtOverlaySettings.generated.h"
 
 struct FAlsxtMovementCameraShakeSettings;
-
-UCLASS()
-class ALSXT_API UAlsxtOverlaySettingsDataAsset: public UDataAsset
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
-	TMap<FGameplayTag, FAlsxtOverlayAnimationInfo> Overlays;
-};
-
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtOverlaySettings
@@ -29,8 +22,29 @@ struct ALSXT_API FAlsxtOverlaySettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Overlay Modes")
 	TSoftObjectPtr<UChooserTable> OverlayChooserTable;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	TSoftObjectPtr<UAlsxtPoseMapSettingsAsset> OverlayPoseMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Overlay Modes")
+	TSoftObjectPtr<UChooserTable> OverlayActionChooserTable;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Overlay Modes")
 	TSoftObjectPtr<UChooserTable> LocomotionActionChooserTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat Stance")
+	bool bEnableOverlaySwitching {true};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat Stance", Meta = (Categories = "Als.Locmotion Variant"))
+	FGameplayTag DefaultOverlayMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bOverrideLocomotionVariant {false};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Locmotion Variant", EditCondition = "bOverrideLocomotionVariant"))
+	FGameplayTag LocomotionVariant;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
+	FAlsxtMovementRotationModeSettings MovementSettings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
 	TMap<FGameplayTag, TSubclassOf<UAnimInstance>> OverlayAnimationInstanceClasses;
@@ -51,4 +65,16 @@ struct ALSXT_API FAlsxtOverlaySettings
 	TMap<FGameplayTag, TObjectPtr<UAlsxtCameraShakeSettings>> CameraShake;
 };
 
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UAlsxtOverlaySettingsDataAsset: public UDataAsset
+{
+	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
+	TMap<FGameplayTag, FAlsxtOverlayAnimationInfo> Overlays;
+
+	// General Settings for Gameplay Camera System
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtGeneralViewSettingsDataAsset> ViewCameraSettings;
+};

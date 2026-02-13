@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Uriel Ballinas, VOIDWARE Prohibited. All rights reserved.
+// Copyright (C) 2026 Uriel Ballinas, VOIDWARE Prohibited. All rights reserved.
 // This software is licensed under the MIT License (LICENSE.md).
 
 #pragma once
@@ -22,7 +22,7 @@
 #include "Settings/AlsxtOverlaySettings.h"
 #include "State/AlsLocomotionState.h"
 #include "Utility/AlsxtGameplayTags.h"
-#include "Utility/AlsxtFirearmGameplayTags.h"
+#include "Utility/AlsxtAimableOverlayObjectGameplayTags.h"
 #include "Engine/EngineTypes.h"
 #include "Utility/AlsxtStructs.h"
 #include "State/AlsxtPoseState.h"
@@ -35,6 +35,8 @@
 #include "State/AlsxtSlidingState.h"
 #include "State/AlsxtVaultingState.h"
 #include "State/AlsxtBreathState.h"
+
+#include "Interfaces/AlsxtCharacterGameplayCameraComponentInterface.h"
 
 #include "Components/BoxComponent.h"
 #include "Settings/AlsxtCombatSettings.h"
@@ -123,7 +125,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterIdleEndDelegate);
 
 
 UCLASS(AutoExpandCategories = ("Settings|Als Character Example", "State|Als Character Example"))
-class ALSXT_API AAlsxtCharacter : public AAlsCharacter, public IAbilitySystemInterface, public IAlsxtCharacterCustomizationComponentInterface, public IAlsxtStationaryModeComponentInterface, public IAlsxtCollisionInterface, public IAlsxtHeadLookAtInterface, public IAlsxtTargetLockInterface, public IAlsxtCharacterSoundComponentInterface, public IAlsxtMeshPaintingInterface, public IAlsxtCharacterInterface, public IAlsxtHeldItemInterface, public IAlsxtIdleAnimationComponentInterface
+class ALSXT_API AAlsxtCharacter : public AAlsCharacter, public IAbilitySystemInterface, public IAlsxtCharacterGameplayCameraComponentInterface, public IAlsxtCharacterCustomizationComponentInterface, public IAlsxtStationaryModeComponentInterface, public IAlsxtCollisionInterface, public IAlsxtHeadLookAtInterface, public IAlsxtTargetLockInterface, public IAlsxtCharacterSoundComponentInterface, public IAlsxtMeshPaintingInterface, public IAlsxtCharacterInterface, public IAlsxtHeldItemInterface, public IAlsxtIdleAnimationComponentInterface
 {
 	GENERATED_BODY()
 
@@ -160,6 +162,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character")
 	TObjectPtr<UAlsxtMovementSettings> AlsxtMovementSettings;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character")
+	TSoftObjectPtr<UAlsxtLocomotionSettingsDataAsset> AlsxtLocomotionSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character")
+	TSoftObjectPtr<UAlsxtOverlaySettingsDataAsset> AlsxtOverlaySettings;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", ReplicatedUsing = "OnReplicated_OverlayModes")
 	FGameplayTagContainer OverlayModes{AlsOverlayModeTags::Default};
 
@@ -192,9 +200,20 @@ private:
 public:
 	virtual void OnRep_PlayerState() override;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|State|Parameters", Replicated, Meta = (AllowPrivateAccess), Transient)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|State|Parameters", ReplicatedUsing=OnRep_AnimationParametersState, BlueprintGetter=GetAnimationParametersState, Meta =(AllowPrivateAccess))
 	FAlsxtAnimationParametersState AnimationParametersState;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ALS|State|Parameters", Meta=(AllowPrivateAccess))
+	FAlsxtAnimationParametersState GetAnimationParametersState() const;
+
+	UFUNCTION(BlueprintCallable, Reliable, NetMulticast, Category = "ALS|State|Parameters", Meta=(AllowPrivateAccess))
+	void SetAnimationParametersState(FAlsxtAnimationParametersState NewAnimationParametersState);
+
+protected:
+	UFUNCTION()
+	void OnRep_AnimationParametersState();
+
+public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ALS|State|Parameters", Meta = (AllowPrivateAccess), Transient)
 	FAlsxtStatusState StatusState;
 
@@ -261,18 +280,18 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsCameraComponent> Camera;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
-	TObjectPtr<USpringArmComponent> KillerCameraSpringArm;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
-	TObjectPtr<UCineCameraComponent> KillerCamera;
-
 	// Overlay
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsxtPaintableSkeletalMeshComponent> OverlaySkeletalMesh;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	TObjectPtr<UAlsxtPaintableStaticMeshComponent> OverlayStaticMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UAlsxtPaintableSkeletalMeshComponent> OverlaySkeletalMeshSecondary;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TObjectPtr<UAlsxtPaintableStaticMeshComponent> OverlayStaticMeshSecondary;
 	
 	// Body
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
@@ -365,6 +384,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	class UAlsxtCharacterSoundComponent* CharacterSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	class UAlsxtProceduralRecoilAnimComponent* ProceduralRecoil;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UPhysicalAnimationComponent* PhysicalAnimation;
 	
@@ -414,7 +436,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category=Character)
 	virtual void OnEndProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust);
-	
+
+	virtual TSoftObjectPtr<UGameplayCameraComponent> GetCharacterGameplayCameraComponent_Implementation() const override;
+	virtual bool GetCharacterIsCameraRightShoulder_Implementation() const override;
+
 	//Character Interface
 	virtual FRotator GetCharacterControlRotation_Implementation() const override;
 	virtual FVector GetCharacterFirstPersonCameraLocation_Implementation() const override;
@@ -429,6 +454,9 @@ public:
 	virtual FGameplayTag GetCharacterWeaponReadyPosition_Implementation() const override;
 	virtual FGameplayTag GetCharacterWeaponFirearmStance_Implementation() const override;
 	virtual void SetCharacterRagdoll_Implementation(const bool NewRagdoll) override;
+
+	virtual FGameplayTag GetCharacterReadiness_Implementation() const override;
+	virtual void SetCharacterReadiness_Implementation(const FGameplayTag& NewReadiness) override;
 
 	// Mesh Painting Interface
 	virtual FAlsxtGlobalGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings_Implementation() const override;
@@ -895,10 +923,10 @@ protected:
 	// Injury
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredInjury{ALSXTInjuryTags::None};
+	FGameplayTag DesiredInjury{AlsxtStatusEffectLocomotionVariantTags::None};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag Injury{ALSXTInjuryTags::None};
+	FGameplayTag Injury{AlsxtStatusEffectLocomotionVariantTags::None};
 
 	// CombatStance
 
@@ -1335,10 +1363,6 @@ private:
 	void InputToggleGait();
 
 	void InputToggleCombatReady();
-
-	void InputLeanLeft(const FInputActionValue& ActionValue);
-
-	void InputLeanRight(const FInputActionValue& ActionValue);
 
 	void InputSwitchWeaponFirearmStance();
 

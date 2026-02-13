@@ -147,11 +147,12 @@ public:
 	UPROPERTY(Category="Character Movement (General Settings)", VisibleInstanceOnly, BlueprintReadWrite, AdvancedDisplay)
 	uint8 bProneMaintainsBaseLocation:1;
 
+private:
 	/** Collision half-height when crouching (component scale is applied separately) */
-	UE_DEPRECATED_FORGAME(5.0, "Public access to this property is deprecated, and it will become private in a future release. Please use SetProneHalfHeight and GetProneHalfHeight instead.")
-	UPROPERTY(Category="Character Movement (General Settings)", EditAnywhere, BlueprintReadWrite, BlueprintSetter=SetProneHalfHeight, BlueprintGetter=GetProneHalfHeight, meta=(ClampMin="0", UIMin="0", ForceUnits=cm))
+	UPROPERTY(Category="Character Movement (General Settings)", EditAnywhere, BlueprintSetter=SetProneHalfHeight, BlueprintGetter=GetProneHalfHeight, meta=(ClampMin="0", UIMin="0", ForceUnits=cm))
 	float ProneHalfHeight;
 
+public:
 	/**
 	 * Checks if new capsule size fits (no encroachment), and call CharacterOwner->OnStartProne() if successful.
 	 * In general you should set bWantsToProne instead to have the prone persist during movement, or just use the crouch functions on the owning Character.

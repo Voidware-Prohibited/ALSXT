@@ -13,6 +13,30 @@ struct ALSXT_API FAlsxtOverlayModesState
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtStatusEffectLocomotionVariantStateEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Status Effect Locomotion Variant", AllowPrivateAccess))
+	FGameplayTag StatusEffectLocomotionVariant;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
+	float Alpha{ 0.5 };
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtStatusEffectLocomotionVariantStateRankedEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (AllowPrivateAccess))
+	FAlsxtStatusEffectLocomotionVariantStateEntry Entry;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 1))
+	float Weight{ 1.0 };
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtAnimationParametersState
 {
 	GENERATED_BODY()
@@ -20,8 +44,23 @@ struct ALSXT_API FAlsxtAnimationParametersState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Sex,Als.Locomotion Variant", AllowPrivateAccess))
 	FGameplayTagContainer CharacteristicsTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.LocomotionMode,Als.LocomotionModifier,Als.LocomotionModifierSettings", AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Freelooking", AllowPrivateAccess))
+	FGameplayTagContainer ViewTags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.LocomotionMode,Als.Status Effect Locomotion Variant,Als.LocomotionModifier,Als.LocomotionModifierSettings", AllowPrivateAccess))
 	FGameplayTagContainer LocomotionTags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.OverlayMode,Als.Overlay Stance", AllowPrivateAccess))
+	FGameplayTagContainer OverlayBothHands;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.OverlayMode,Als.Overlay Stance,Als.Status Effect Locomotion Variant,Als.OverlayLeftHandMirrorPolicy,Als.OverlaySettings", AllowPrivateAccess))
+	FGameplayTagContainer OverlayLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.OverlayMode,Als.Overlay Stance,Als.Status Effect Locomotion Variant,Als.OverlayLeftHandMirrorPolicy,Als.OverlaySettings", AllowPrivateAccess))
+	FGameplayTagContainer OverlayRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.OverlayMode,Als.Overlay Stance", AllowPrivateAccess))
+	FGameplayTag AdditiveIdle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.OverlayMode,Als.OverlayLeftHandMirrorPolicy,Als.OverlaySettings", AllowPrivateAccess))
 	FGameplayTagContainer OverlayTags;
@@ -40,6 +79,9 @@ struct ALSXT_API FAlsxtAnimationParametersState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Stationary Mode,Als.Vehicle Seat", AllowPrivateAccess))
 	FGameplayTagContainer StationaryModeTags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (Categories = "Als.Stationary Mode,Als.Vehicle Seat", AllowPrivateAccess))
+	FGameplayTagContainer StatusEffectLocomotionVariantSeverity;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = 0, ClampMax = 2))
 	float BreathingRate{ 0.5 };

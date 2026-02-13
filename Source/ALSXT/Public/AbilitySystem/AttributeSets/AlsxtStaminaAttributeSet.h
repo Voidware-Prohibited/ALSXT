@@ -42,6 +42,11 @@ public:
 	FGameplayAttributeData MaxStamina;
 	ATTRIBUTE_ACCESSORS_BASIC(UAlsxtStaminaAttributeSet, MaxStamina)
 
+	// Holds the value for Max Stamina.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stamina Attribute Set", ReplicatedUsing = OnRep_LowStaminaThreshold)
+	FGameplayAttributeData LowStaminaThreshold;
+	ATTRIBUTE_ACCESSORS_BASIC(UAlsxtStaminaAttributeSet, LowStaminaThreshold)
+
 	// Holds the current value for Stamina Regen.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stamina Attribute Set", ReplicatedUsing = OnRep_CurrentStaminaRegenMagnitude)
 	FGameplayAttributeData CurrentStaminaRegenMagnitude;
@@ -69,6 +74,9 @@ protected:
 	virtual void OnRep_MaxStamina(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
+	virtual void OnRep_LowStaminaThreshold(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
 	virtual void OnRep_CurrentStaminaRegenMagnitude(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
@@ -79,7 +87,4 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_MaxStaminaRegenDelay(const FGameplayAttributeData& OldValue);
-
-	UPROPERTY(EditDefaultsOnly, Category = "Stamina")
-	float LowStaminaThreshold = 0.20f;
 };

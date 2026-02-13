@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/AttributeSets/AlsxtBodyTempAttributeSet.h"
 #include "GameplayEffectExtension.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UAlsxtBodyTempAttributeSet::UAlsxtBodyTempAttributeSet()
@@ -124,13 +124,13 @@ void UAlsxtBodyTempAttributeSet::PostAttributeChange(const FGameplayAttribute& A
 	
 	if (Attribute == GetCurrentBodyTempAttribute())
 	{
-		CheckMaxReachedForAttribute(MaximumBodyTemp, ALSXTGASGameplayTags::State::TAG_State_Max_BodyTemp.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaximumBodyTemp, AlsxtGASGameplayTags::State::TAG_State_Max_BodyTemp.GetTag(), NewValue);
 		return;
 	}
 	
 	if (Attribute == GetBleedingAttribute())
 	{
-		CheckStatusTagForAttribute(ALSXTGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
+		CheckStatusTagForAttribute(AlsxtGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
 		return;
 	}
 

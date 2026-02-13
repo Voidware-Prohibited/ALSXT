@@ -4,7 +4,7 @@
 
 #include "AlsxtCharacter.h"
 #include "AbilitySystem/AttributeSets/AlsxtLevelAttributeSet.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "AbilitySystem/FunctionLibrary/AlsxtAbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/Character/GASDemoCharacterBase.h"
 
@@ -94,7 +94,7 @@ void UAlsxtAbilitySystemComponent::ChangeLevel_Implementation(const float Desire
 
 	// Do not change the level of any GE with the NoLevel tag.
 	FGameplayEffectQuery Query{};
-	Query.EffectTagQuery.MakeQuery_MatchNoTags(ALSXTGASGameplayTags::TAG_Effect_NoLevel.GetTag().GetSingleTagContainer());
+	Query.EffectTagQuery.MakeQuery_MatchNoTags(AlsxtGASGameplayTags::TAG_Effect_NoLevel.GetTag().GetSingleTagContainer());
 	
 	// Note: Floats could be used, but need to create a new method.
 	// Note 2: This method performance could be improved (Loop of Loops)

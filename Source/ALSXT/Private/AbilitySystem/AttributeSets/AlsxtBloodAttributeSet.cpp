@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/AttributeSets/AlsxtBloodAttributeSet.h"
 #include "GameplayEffectExtension.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UAlsxtBloodAttributeSet::UAlsxtBloodAttributeSet()
@@ -124,13 +124,13 @@ void UAlsxtBloodAttributeSet::PostAttributeChange(const FGameplayAttribute& Attr
 	
 	if (Attribute == GetCurrentBloodAttribute())
 	{
-		CheckMaxReachedForAttribute(MaximumBlood, ALSXTGASGameplayTags::State::TAG_State_Max_Blood.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaximumBlood, AlsxtGASGameplayTags::State::TAG_State_Max_Blood.GetTag(), NewValue);
 		return;
 	}
 	
 	if (Attribute == GetBleedingAttribute())
 	{
-		CheckStatusTagForAttribute(ALSXTGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
+		CheckStatusTagForAttribute(AlsxtGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
 		return;
 	}
 

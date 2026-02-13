@@ -38,30 +38,47 @@ void UAlsxtGameplayAbilityJump::ActivateAbility(const FGameplayAbilitySpecHandle
 		{
 			if (AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get()))
 			{
-				if (Character->CanJump() && StaminaCostEffect)
+				// if (Character->CanJump() && StaminaCostEffect)
+				// {
+				// 	if (StaminaCostEffect)
+				// 	{
+				// 		// Create a new effect context
+				// 		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+				// 		EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
+// 
+				// 		// Create the effect spec and set the cost
+				// 		UGameplayEffect* CostEffect = StaminaCostEffect->GetDefaultObject<UGameplayEffect>();
+				// 		EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
+				// 		// FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingGameplayEffectSpec(StaminaCostEffect, GetAbilityLevel());
+				// 		StaminaDrainEffectSpecHandle = ASC->MakeOutgoingSpec(StaminaCostEffect, GetAbilityLevel(), EffectContext);
+				// 		StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseJumpStaminaCost); // Use negative for costs
+// 
+				// 		// Apply the stamina cost effect
+				// 		ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaDrainEffectSpecHandle.Data.Get());
+				// 	}
+				// 	
+				// 	// Perform the jump action
+				// 	Character->Jump();
+// 
+				// 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+				// }
+				// New
+				if (CostGameplayEffectClass)
 				{
-					if (StaminaCostEffect)
+					FGameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemComponent->MakeEffectContext();
+					EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
+					StaminaDrainEffectSpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
+					// StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseStaminaCostPerSecond);
+        
+					if (StaminaDrainEffectSpecHandle.IsValid())
 					{
-						// Create a new effect context
-						FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
-						EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
-
-						// Create the effect spec and set the cost
-						UGameplayEffect* CostEffect = StaminaCostEffect->GetDefaultObject<UGameplayEffect>();
-						EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
-						// FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingGameplayEffectSpec(StaminaCostEffect, GetAbilityLevel());
-						StaminaDrainEffectSpecHandle = ASC->MakeOutgoingSpec(StaminaCostEffect, GetAbilityLevel(), EffectContext);
-						StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseJumpStaminaCost); // Use negative for costs
-
-						// Apply the stamina cost effect
 						ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaDrainEffectSpecHandle.Data.Get());
 					}
-					
-					// Perform the jump action
-					Character->Jump();
-
-					EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 				}
+				// Perform the jump action
+				Character->Jump();
+
+				EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 			}
 		}
 	}

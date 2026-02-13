@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AlsxtLocomotionSettings.h"
+#include "AlsxtStatusEffectSettings.h"
+#include "AlsxtViewSettings.h"
 #include "Settings/AlsCharacterSettings.h"
 #include "Settings/AlsxtLocomotionActionSettings.h"
 #include "Settings/AlsxtOverlaySettings.h"
@@ -23,19 +25,39 @@
 #include "AlsxtCharacterSettings.generated.h"
 
 UCLASS()
-class ALSXT_API UAlsxtCharacterSettings : public UAlsCharacterSettings
+class ALSXT_API UAlsxtCharacterSettings : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
+	// Movement Speed for Gaits and Stances
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtMovementSettings> MovementSettings {nullptr};
+	
+	// Settings for Base Locomotion, Locomotion Modifiers, Locomotion Status Effects
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtLocomotionSettingsDataAsset> LocomotionSettingsNew {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtOverlaySettingsDataAsset> OverlaySettingsNew {nullptr};
+	
+	// General Settings for Rolling, Sliding, Mantling and Vaulting
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtLocomotionActionSettingsDataAsset> LocomotionActionSettings {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtStatusEffectSettingsDataAsset> StatusEffectSettings {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtGeneralViewSettingsDataAsset> ViewSettings {nullptr};
+
+	// Old Code Below
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
 	FAlsxtLocomotionSettings LocomotionSettings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
 	FAlsxtOverlaySettings OverlaySettings;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
-	FAlsxtLocomotionActionSettings LocomotionActionSettings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
 	FAlsxtDefensiveModeSettings DefensiveMode;

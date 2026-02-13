@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AlsxtOverlayStructs.h"
 #include "NativeGameplayTags.h"
 #include "Animation/AnimMontage.h"
 #include "Engine/EngineTypes.h"
@@ -45,10 +46,10 @@ struct ALSXT_API FAlsxtTransitionAssets
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	TObjectPtr<UAnimSequenceBase> LeftSequence;
+	TObjectPtr<UAnimSequenceBase> LeftSequence {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
-	TObjectPtr<UAnimSequenceBase> RightSequence;
+	TObjectPtr<UAnimSequenceBase> RightSequence {nullptr};
 };
 
 USTRUCT(BlueprintType)
@@ -57,16 +58,16 @@ struct ALSXT_API FAlsxtTurnInPlaceStanceAssets
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Instanced, DisplayName = "Turn 90 Left")
-	TObjectPtr<UAlsTurnInPlaceSettings> Turn90Left;
+	TObjectPtr<UAlsTurnInPlaceSettings> Turn90Left {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Instanced, DisplayName = "Turn 90 Right")
-	TObjectPtr<UAlsTurnInPlaceSettings> Turn90Right;
+	TObjectPtr<UAlsTurnInPlaceSettings> Turn90Right {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Instanced, DisplayName = "Turn 180 Left")
-	TObjectPtr<UAlsTurnInPlaceSettings> Turn180Left;
+	TObjectPtr<UAlsTurnInPlaceSettings> Turn180Left {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Instanced, DisplayName = "Turn 180 Right")
-	TObjectPtr<UAlsTurnInPlaceSettings> Turn180Right;
+	TObjectPtr<UAlsTurnInPlaceSettings> Turn180Right {nullptr};
 };
 
 USTRUCT(BlueprintType)
@@ -75,7 +76,7 @@ struct ALSXT_API FAlsxtPoseSingleFrame
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
-	TObjectPtr<UAnimSequenceBase> Pose;
+	TObjectPtr<UAnimSequenceBase> Pose {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
 	float ExplicitTime {0.0f};
@@ -93,22 +94,22 @@ struct ALSXT_API FAlsxtAnimationInstanceBlendSpaceAssets
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Forward;
+	TObjectPtr<UBlendSpace> WalkRun_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Left_Forward;
+	TObjectPtr<UBlendSpace> WalkRun_Left_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Right_Forward;
+	TObjectPtr<UBlendSpace> WalkRun_Right_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Backward;
+	TObjectPtr<UBlendSpace> WalkRun_Backward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Left_Backward;
+	TObjectPtr<UBlendSpace> WalkRun_Left_Backward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Right_Backward;
+	TObjectPtr<UBlendSpace> WalkRun_Right_Backward {nullptr};
 
 	bool operator==(const FAlsxtAnimationInstanceBlendSpaceAssets& other) const
 	{
@@ -123,19 +124,19 @@ struct ALSXT_API FAlsxt1DLocomotionBlendSpaceAssets
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> Forward;
+	TObjectPtr<UBlendSpace> Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> Backward;
+	TObjectPtr<UBlendSpace> Backward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Pose;
+	TObjectPtr<UAnimSequence> Pose {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> ForwardToBackwardTransition;
+	TObjectPtr<UAnimSequence> ForwardToBackwardTransition {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> BackwardToForwardTransition;
+	TObjectPtr<UAnimSequence> BackwardToForwardTransition {nullptr};
  
 	bool operator==(const FAlsxt1DLocomotionBlendSpaceAssets& other) const
 	{
@@ -159,7 +160,7 @@ struct ALSXT_API FAlsxtSidlingAssets
 	bool MirrorLeftForRight {true};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> LeftToRightTransition;
+	TObjectPtr<UAnimSequence> LeftToRightTransition {nullptr};
  
 	bool operator==(const FAlsxtSidlingAssets& other) const
 	{
@@ -174,34 +175,34 @@ struct ALSXT_API FAlsxtCustomMovementAnimationInstanceBlendSpaceAssets
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Movement")
-	TObjectPtr<UAnimSequence> IdlePose;
+	TObjectPtr<UAnimSequence> IdlePose {nullptr};
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Sprint;
+	TObjectPtr<UAnimSequence> Sprint {nullptr};
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Forward;
+	TObjectPtr<UBlendSpace> WalkRun_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Left_Forward;
+	TObjectPtr<UBlendSpace> WalkRun_Left_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Right_Forward;
+	TObjectPtr<UBlendSpace> WalkRun_Right_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Backward;
+	TObjectPtr<UBlendSpace> WalkRun_Backward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Left_Backward;
+	TObjectPtr<UBlendSpace> WalkRun_Left_Backward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Right_Backward;
+	TObjectPtr<UBlendSpace> WalkRun_Right_Backward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Up;
+	TObjectPtr<UBlendSpace> WalkRun_Up {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UBlendSpace> WalkRun_Down;
+	TObjectPtr<UBlendSpace> WalkRun_Down {nullptr};
 
 	bool operator==(const FAlsxtCustomMovementAnimationInstanceBlendSpaceAssets& other) const
 	{
@@ -216,16 +217,16 @@ struct ALSXT_API FAlsxtAnimationInstanceAccelerationAssets
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Acceleration_Forward;
+	TObjectPtr<UAnimSequence> Acceleration_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Acceleration_Backward;
+	TObjectPtr<UAnimSequence> Acceleration_Backward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Acceleration_Left;
+	TObjectPtr<UAnimSequence> Acceleration_Left {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Acceleration_Right;
+	TObjectPtr<UAnimSequence> Acceleration_Right {nullptr};
 
 	bool operator==(const FAlsxtAnimationInstanceAccelerationAssets& other) const
 	{
@@ -240,22 +241,22 @@ struct ALSXT_API FAlsxtAnimationInstanceMovementAssets
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Walk_Forward;
+	TObjectPtr<UAnimSequence> Walk_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Walk_Backward;
+	TObjectPtr<UAnimSequence> Walk_Backward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Walk_Left_Forward;
+	TObjectPtr<UAnimSequence> Walk_Left_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Walk_Left_Backward;
+	TObjectPtr<UAnimSequence> Walk_Left_Backward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Walk_Right_Forward;
+	TObjectPtr<UAnimSequence> Walk_Right_Forward {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Walk_Right_Backward;
+	TObjectPtr<UAnimSequence> Walk_Right_Backward {nullptr};
 
 	bool operator==(const FAlsxtAnimationInstanceMovementAssets& other) const
 	{
@@ -270,10 +271,10 @@ struct ALSXT_API FAlsxtAnimationInstanceRotateInPlaceAssets
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Rotate_90_Left;
+	TObjectPtr<UAnimSequence> Rotate_90_Left {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Rotate_90_Right;
+	TObjectPtr<UAnimSequence> Rotate_90_Right {nullptr};
 
 	bool operator==(const FAlsxtAnimationInstanceRotateInPlaceAssets& other) const
 	{
@@ -288,10 +289,10 @@ struct ALSXT_API FAlsxtAnimationInstanceStopTransitionAssets
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Stop_Left;
+	TObjectPtr<UAnimSequence> Stop_Left {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
-	TObjectPtr<UAnimSequence> Stop_Right;
+	TObjectPtr<UAnimSequence> Stop_Right {nullptr};
 
 	bool operator==(const FAlsxtAnimationInstanceStopTransitionAssets& other) const
 	{
@@ -306,46 +307,46 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General")
-	TObjectPtr<UAnimSequence> IdlePose;
+	TObjectPtr<UAnimSequence> IdlePose {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandIdlePose;
+	bool bUseUniqueRightHandIdlePose {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandIdlePose", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> IdlePose_RightHand;
+	TObjectPtr<UAnimSequence> IdlePose_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General")
-	TObjectPtr<UAnimSequence> Sprint;
+	TObjectPtr<UAnimSequence> Sprint {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandSprint;
+	bool bUseUniqueRightHandSprint {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandSprint", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> Sprint_RightHand;
+	TObjectPtr<UAnimSequence> Sprint_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General")
-	TObjectPtr<UAnimSequence> SprintAcceleration;
+	TObjectPtr<UAnimSequence> SprintAcceleration {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandSprintAcceleration;
+	bool bUseUniqueRightHandSprintAcceleration {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandSprintAcceleration", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> SprintAcceleration_RightHand;
+	TObjectPtr<UAnimSequence> SprintAcceleration_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General")
 	FAlsxtAnimationInstanceBlendSpaceAssets BlendSpaceAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandBlendSpaceAssets;
+	bool bUseUniqueRightHandBlendSpaceAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandBlendSpaceAssets", EditConditionHides=true))
 	FAlsxtAnimationInstanceBlendSpaceAssets BlendSpaceAssets_RightHand;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General")
-	TObjectPtr<UBlendSpace> MovementLean;
+	TObjectPtr<UBlendSpace> MovementLean {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandMovementLean;
+	bool bUseUniqueRightHandMovementLean {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandMovementLean", EditConditionHides=true))
 	TObjectPtr<UBlendSpace> MovementLean_RightHand;
@@ -354,7 +355,7 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 	FAlsxtSidlingAssets SidlingAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandSidlingAssets;
+	bool bUseUniqueRightHandSidlingAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandSidlingAssets", EditConditionHides=true))
 	FAlsxtSidlingAssets SidlingAssets_RightHand;
@@ -363,7 +364,7 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 	FAlsxtAnimationInstanceAccelerationAssets AccelerationAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandAccelerationAssets;
+	bool bUseUniqueRightHandAccelerationAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandAccelerationAssets", EditConditionHides=true))
 	FAlsxtAnimationInstanceAccelerationAssets AccelerationAssets_RightHand;
@@ -372,7 +373,7 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 	FAlsxtAnimationInstanceMovementAssets PlantFootAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandPlantFootAssets;
+	bool bUseUniqueRightHandPlantFootAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandPlantFootAssets", EditConditionHides=true))
 	FAlsxtAnimationInstanceMovementAssets PlantFootAssets_RightHand;
@@ -381,7 +382,7 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 	FAlsxtTurnInPlaceStanceAssets TurnInPlaceAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandTurnInPlaceAssets;
+	bool bUseUniqueRightHandTurnInPlaceAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandTurnInPlaceAssets", EditConditionHides=true))
 	FAlsxtTurnInPlaceStanceAssets TurnInPlaceAssets_RightHand;
@@ -390,7 +391,7 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 	FAlsxtTurnInPlaceStanceAssets RotateInPlaceAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandRotateInPlaceAssets;
+	bool bUseUniqueRightHandRotateInPlaceAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandRotateInPlaceAssets", EditConditionHides=true))
 	FAlsxtTurnInPlaceStanceAssets RotateInPlaceAssets_RightHand;
@@ -399,7 +400,7 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 	FAlsxtAnimationInstanceStopTransitionAssets StopTransitions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandStopTransitions;
+	bool bUseUniqueRightHandStopTransitions {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandStopTransitions", EditConditionHides=true))
 	FAlsxtAnimationInstanceStopTransitionAssets StopTransitions_RightHand;
@@ -408,7 +409,7 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
     FAlsxtTransitionAssets TransitionAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandTransitionAssets;
+	bool bUseUniqueRightHandTransitionAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandTransitionAssets", EditConditionHides=true))
 	FAlsxtTransitionAssets TransitionAssets_RightHand;
@@ -417,25 +418,25 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
     FAlsxtTransitionAssets DynamicTransitionAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandDynamicTransitionAssets;
+	bool bUseUniqueRightHandDynamicTransitionAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "General", meta=(EditCondition="bUseUniqueRightHandDynamicTransitionAssets", EditConditionHides=true))
 	FAlsxtTransitionAssets DynamicTransitionAssets_RightHand;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Movement")
-	TObjectPtr<UAnimSequence> CustomMovementWalkPose;
+	TObjectPtr<UAnimSequence> CustomMovementWalkPose {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandCustomMovementWalkPose;
+	bool bUseUniqueRightHandCustomMovementWalkPose {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Movement", meta=(EditCondition="bUseUniqueRightHandCustomMovementWalkPose", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> CustomMovementWalkPose_RightHand;
+	TObjectPtr<UAnimSequence> CustomMovementWalkPose_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Movement")
 	FAlsxtAnimationInstanceMovementAssets CustomMovementAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandCustomMovementAssets;
+	bool bUseUniqueRightHandCustomMovementAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Movement", meta=(EditCondition="bUseUniqueRightHandCustomMovementAssets", EditConditionHides=true))
 	FAlsxtAnimationInstanceMovementAssets CustomMovementAssets_RightHand;
@@ -444,7 +445,7 @@ struct ALSXT_API FAlsxtLocomotionAnimationInstanceAssets
 	FAlsxtCustomMovementAnimationInstanceBlendSpaceAssets CustomMovementBlendSpaceAssets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUseUniqueRightHandCustomMovementBlendSpaceAssets;
+	bool bUseUniqueRightHandCustomMovementBlendSpaceAssets {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Movement", meta=(EditCondition="bUseUniqueRightHandCustomMovementBlendSpaceAssets", EditConditionHides=true))
 	FAlsxtCustomMovementAnimationInstanceBlendSpaceAssets CustomMovementBlendSpaceAssets_RightHand;
@@ -461,237 +462,242 @@ struct ALSXT_API FAlsxtOverlayAnimationInstanceAssets
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimSequence> OverlayPoses;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UAnimInstance> AnimationInstance {nullptr};
+
+	//
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bOverlayPosesContainRightHandPoses;
+	TObjectPtr<UAnimSequence> OverlayPoses {nullptr};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bOverlayPosesContainRightHandPoses {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="!bOverlayPosesContainRightHandPoses", EditConditionHides=true))
-	bool bUseUniqueRightHandOverlayPoses;
+	bool bUseUniqueRightHandOverlayPoses {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="bUseUniqueRightHandOverlayPoses", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> OverlayPoses_RightHand;
+	TObjectPtr<UAnimSequence> OverlayPoses_RightHand {nullptr};
 
 	// Arms
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arms")
-	TObjectPtr<UAnimSequence> RunArms;
+	TObjectPtr<UAnimSequence> RunArms {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arms")
-	bool bUseUniqueRightHandRunArms;
+	bool bUseUniqueRightHandRunArms {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arms", meta=(EditCondition="bUseUniqueRightHandRunArms", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> RunArms_RightHand;
+	TObjectPtr<UAnimSequence> RunArms_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arms")
-	TObjectPtr<UAnimSequence> SprintArms;
+	TObjectPtr<UAnimSequence> SprintArms {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arms")
-	bool bUseUniqueRightHandSprintArms;
+	bool bUseUniqueRightHandSprintArms {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arms", meta=(EditCondition="bUseUniqueRightHandSprintArms", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> SprintArms_RightHand;
+	TObjectPtr<UAnimSequence> SprintArms_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arms")
-	TObjectPtr<UAnimSequence> SprintImpulseArms;
+	TObjectPtr<UAnimSequence> SprintImpulseArms {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arms")
-	bool bUseUniqueRightHandSprintImpulseArms;
+	bool bUseUniqueRightHandSprintImpulseArms {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arms", meta=(EditCondition="bUseUniqueRightHandSprintImpulseArms", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> SprintImpulseArms_RightHand;
+	TObjectPtr<UAnimSequence> SprintImpulseArms_RightHand {nullptr};
 
 	// Aim
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim")
-	TObjectPtr<UAnimSequence> Aim;
+	TObjectPtr<UAnimSequence> Aim {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim")
-	bool bUseUniqueRightHandAim;
+	bool bUseUniqueRightHandAim {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim", meta=(EditCondition="bUseUniqueRightHandAim", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> Aim_RightHand;
+	TObjectPtr<UAnimSequence> Aim_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|")
-	TObjectPtr<UAnimSequence> AimWading;
+	TObjectPtr<UAnimSequence> AimWading {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim")
-	bool bUseUniqueRightHandAimWading;
+	bool bUseUniqueRightHandAimWading {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|", meta=(EditCondition="bUseUniqueRightHandAimWading", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimWading_RightHand;
+	TObjectPtr<UAnimSequence> AimWading_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim")
-	TObjectPtr<UAnimSequence> AimCrouch;
+	TObjectPtr<UAnimSequence> AimCrouch {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim")
-	bool bUseUniqueRightHandAimCrouch;
+	bool bUseUniqueRightHandAimCrouch {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim", meta=(EditCondition="bUseUniqueRightHandAimCrouch", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimCrouch_RightHand;
+	TObjectPtr<UAnimSequence> AimCrouch_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim")
-	TObjectPtr<UAnimSequence> AimProne;
+	TObjectPtr<UAnimSequence> AimProne {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim")
-	bool bUseUniqueRightHandAimProne;
+	bool bUseUniqueRightHandAimProne {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim", meta=(EditCondition="bUseUniqueRightHandAimProne", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimProne_RightHand;
+	TObjectPtr<UAnimSequence> AimProne_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Canted")
-	TObjectPtr<UAnimSequence> AimCantedLeft;
+	TObjectPtr<UAnimSequence> AimCantedLeft {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Canted")
-	bool bUseUniqueRightHandAimCantedLeft;
+	bool bUseUniqueRightHandAimCantedLeft {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Canted", meta=(EditCondition="bUseUniqueRightHandAimCantedLeft", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimCantedLeft_RightHand;
+	TObjectPtr<UAnimSequence> AimCantedLeft_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Canted")
-	TObjectPtr<UAnimSequence> AimCantedRight;
+	TObjectPtr<UAnimSequence> AimCantedRight {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Canted")
-	bool bUseUniqueRightHandAimCantedRight;
+	bool bUseUniqueRightHandAimCantedRight {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Canted", meta=(EditCondition="bUseUniqueRightHandAimCantedRight", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimCantedRight_RightHand;
+	TObjectPtr<UAnimSequence> AimCantedRight_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover")
-	TObjectPtr<UAnimSequence> AimAroundCoverLeft;
+	TObjectPtr<UAnimSequence> AimAroundCoverLeft {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover")
-	bool bUseUniqueRightHandAimAroundCoverLeft;
+	bool bUseUniqueRightHandAimAroundCoverLeft {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover", meta=(EditCondition="bUseUniqueRightHandAimAroundCoverLeft", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimAroundCoverLeft_RightHand;
+	TObjectPtr<UAnimSequence> AimAroundCoverLeft_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover")
-	TObjectPtr<UAnimSequence> AimAroundCoverRight;
+	TObjectPtr<UAnimSequence> AimAroundCoverRight {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover")
-	bool bUseUniqueRightHandAimAroundCoverRight;
+	bool bUseUniqueRightHandAimAroundCoverRight {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover", meta=(EditCondition="bUseUniqueRightHandAimAroundCoverRight", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimAroundCoverRight_RightHand;
+	TObjectPtr<UAnimSequence> AimAroundCoverRight_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover")
-	TObjectPtr<UAnimSequence> AimAroundCoverUpLeft;
+	TObjectPtr<UAnimSequence> AimAroundCoverUpLeft {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover")
-	bool bUseUniqueRightHandAimAroundCoverUpLeft;
+	bool bUseUniqueRightHandAimAroundCoverUpLeft {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover", meta=(EditCondition="bUseUniqueRightHandAimAroundCoverUpLeft", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimAroundCoverUpLeft_RightHand;
+	TObjectPtr<UAnimSequence> AimAroundCoverUpLeft_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover")
-	TObjectPtr<UAnimSequence> AimAroundCoverUpRight;
+	TObjectPtr<UAnimSequence> AimAroundCoverUpRight {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover")
-	bool bUseUniqueRightHandAimAroundCoverUpRight;
+	bool bUseUniqueRightHandAimAroundCoverUpRight {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Cover", meta=(EditCondition="bUseUniqueRightHandAimAroundCoverUpRight", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimAroundCoverUpRight_RightHand;
+	TObjectPtr<UAnimSequence> AimAroundCoverUpRight_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Special")
-	TObjectPtr<UAnimSequence> AimLadder;
+	TObjectPtr<UAnimSequence> AimLadder {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Special")
-	bool bUseUniqueRightHandAimLadder;
+	bool bUseUniqueRightHandAimLadder {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Special", meta=(EditCondition="bUseUniqueRightHandAimLadder", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimLadder_RightHand;
+	TObjectPtr<UAnimSequence> AimLadder_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Special")
-	TObjectPtr<UAnimSequence> AimSwimming;
+	TObjectPtr<UAnimSequence> AimSwimming {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Special")
-	bool bUseUniqueRightHandAimSwimming;
+	bool bUseUniqueRightHandAimSwimming {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim|Special", meta=(EditCondition="bUseUniqueRightHandAimSwimming", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> AimSwimming_RightHand;
+	TObjectPtr<UAnimSequence> AimSwimming_RightHand {nullptr};
 
 	// Lean
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean")
-	TObjectPtr<UAnimSequence> Lean;
+	TObjectPtr<UAnimSequence> Lean {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean")
-	bool bUseUniqueRightHandLean;
+	bool bUseUniqueRightHandLean {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean", meta=(EditCondition="bUseUniqueRightHandLean", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> Lean_RightHand;
+	TObjectPtr<UAnimSequence> Lean_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean")
-	TObjectPtr<UAnimSequence> LeanCrouch;
+	TObjectPtr<UAnimSequence> LeanCrouch {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean")
-	bool bUseUniqueRightHandLeanCrouch;
+	bool bUseUniqueRightHandLeanCrouch {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean", meta=(EditCondition="bUseUniqueRightHandLeanCrouch", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> LeanCrouch_RightHand;
+	TObjectPtr<UAnimSequence> LeanCrouch_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean")
-	TObjectPtr<UAnimSequence> LeanProne;
+	TObjectPtr<UAnimSequence> LeanProne {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean")
-	bool bUseUniqueRightHandLeanProne;
+	bool bUseUniqueRightHandLeanProne {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean", meta=(EditCondition="bUseUniqueRightHandLeanProne", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> LeanProne_RightHand;
+	TObjectPtr<UAnimSequence> LeanProne_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mantle")
-	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsHigh;
+	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsHigh {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mantle")
-	bool bUseUniqueRightHandMantleSettingsHigh;
+	bool bUseUniqueRightHandMantleSettingsHigh {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mantle", meta=(EditCondition="bUseUniqueRightHandMantleSettingsHigh", EditConditionHides=true))
-	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsHigh_RightHand;
+	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsHigh_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mantle")
-	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsLow;
+	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsLow {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mantle")
-	bool bUseUniqueRightHandMantleSettingsLow;
+	bool bUseUniqueRightHandMantleSettingsLow {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mantle", meta=(EditCondition="bUseUniqueRightHandMantleSettingsLow", EditConditionHides=true))
-	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsLow_RightHand;
+	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsLow_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mantle")
-	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsInAir;
+	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsInAir {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mantle")
-	bool bUseUniqueRightHandMantleSettingsInAir;
+	bool bUseUniqueRightHandMantleSettingsInAir {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mantle", meta=(EditCondition="bUseUniqueRightHandMantleSettingsInAir", EditConditionHides=true))
-	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsInAir_RightHand;
+	TSoftObjectPtr<UAlsMantlingSettings> MantleSettingsInAir_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Vaulting")
-	TSoftObjectPtr<UAlsMantlingSettings> VaultingSettings;
+	TSoftObjectPtr<UAlsMantlingSettings> VaultingSettings {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Vaulting")
-	bool bUseUniqueRightHandVaulting;
+	bool bUseUniqueRightHandVaulting {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Vaulting", meta=(EditCondition="bUseUniqueRightHandVaulting", EditConditionHides=true))
-	TSoftObjectPtr<UAlsMantlingSettings> VaultingSettings_RightHand;
+	TSoftObjectPtr<UAlsMantlingSettings> VaultingSettings_RightHand {nullptr};
 
 	// Slope Slide
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slope Slide")
-	TObjectPtr<UAnimSequence> SlopeSlide;
+	TObjectPtr<UAnimSequence> SlopeSlide {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slope Slide")
-	bool bUseUniqueRightHandSlopeSlide;
+	bool bUseUniqueRightHandSlopeSlide {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slope Slide", meta=(EditCondition="bUseUniqueRightHandSlopeSlide", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> SlopeSlide_RightHand;
+	TObjectPtr<UAnimSequence> SlopeSlide_RightHand {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slope Slide")
-	TObjectPtr<UAnimSequence> SlopeSlideCrouch;
+	TObjectPtr<UAnimSequence> SlopeSlideCrouch {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slope Slide")
-	bool bUseUniqueRightHandSlopeSlideCrouch;
+	bool bUseUniqueRightHandSlopeSlideCrouch {false};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Slope Slide", meta=(EditCondition="bUseUniqueRightHandSlopeSlideCrouch", EditConditionHides=true))
-	TObjectPtr<UAnimSequence> SlopeSlideCrouch_RightHand;
+	TObjectPtr<UAnimSequence> SlopeSlideCrouch_RightHand {nullptr};
 	
 
 	bool operator==(const FAlsxtOverlayAnimationInstanceAssets& other) const

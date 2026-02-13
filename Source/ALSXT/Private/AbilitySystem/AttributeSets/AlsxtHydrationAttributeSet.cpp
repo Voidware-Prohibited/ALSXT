@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/AttributeSets/AlsxtHydrationAttributeSet.h"
 #include "GameplayEffectExtension.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UAlsxtHydrationAttributeSet::UAlsxtHydrationAttributeSet()
@@ -124,13 +124,13 @@ void UAlsxtHydrationAttributeSet::PostAttributeChange(const FGameplayAttribute& 
 	
 	if (Attribute == GetCurrentHydrationAttribute())
 	{
-		CheckMaxReachedForAttribute(MaximumHydration, ALSXTGASGameplayTags::State::TAG_State_Max_Hydration.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaximumHydration, AlsxtGASGameplayTags::State::TAG_State_Max_Hydration.GetTag(), NewValue);
 		return;
 	}
 	
 	if (Attribute == GetBleedingAttribute())
 	{
-		CheckStatusTagForAttribute(ALSXTGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
+		CheckStatusTagForAttribute(AlsxtGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
 		return;
 	}
 

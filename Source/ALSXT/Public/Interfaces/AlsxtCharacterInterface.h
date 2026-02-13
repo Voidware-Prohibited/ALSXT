@@ -94,6 +94,12 @@ public:
   FGameplayTag GetCharacterGait() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  FGameplayTag GetCharacterReadiness() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface", meta=(Categories="Alsxt.Readiness"))
+  void SetCharacterReadiness(const FGameplayTag& NewReadiness);
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterRotationMode() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")

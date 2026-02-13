@@ -118,6 +118,35 @@ struct ALSXT_API FSound
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	TSoftObjectPtr<USoundBase> SoundAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FSubtitles Subtitles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	bool Mature{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	EIarcRating IarcRating{ EIarcRating::IarcRating_3 };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	float Weight {1.0f};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess))
+	FVector2D PitchRange {1.0f, 1.0f};
+
+	bool operator==(const FAlsxtSound& other) const
+	{
+		return (other.SoundAsset == SoundAsset) && (other.PitchRange == PitchRange) && (other.Weight == Weight) && (other.IarcRating == IarcRating);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FBoneLocationEntry
 {
 	GENERATED_BODY()

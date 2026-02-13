@@ -6,6 +6,7 @@
 #include "Settings/AlsxtCharacterSettings.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetRenderingLibrary.h"
+#include "Utility/AlsLog.h"
 
 UAlsxtPaintableSkeletalMeshComponent::UAlsxtPaintableSkeletalMeshComponent()
 {
@@ -30,6 +31,10 @@ void UAlsxtPaintableSkeletalMeshComponent::BeginPlay()
 				MaterialInstanceDynamic->SetTextureParameterValue("RT_Effects", RenderTargetAsset);
 			}
 		}
+	}
+	else
+	{
+		UE_LOG(LogAls, Error, TEXT("IsMeshPaintingConfigured is false"));
 	}
 }
 

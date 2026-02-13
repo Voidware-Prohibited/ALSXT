@@ -3,9 +3,11 @@
 
 
 #include "AlsxtCharacterPlayer.h"
+
+#include "AlsxtCharacterNpc.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "Utility/AlsVector.h"
@@ -30,8 +32,14 @@ void AAlsxtCharacterPlayer::BeginPlay()
 		{
 			PlayerState = CurrentPlayerController->PlayerState;
 		}
-	}
-	
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(CurrentPlayerController->GetLocalPlayer()))
+		{
+			if (InputMappingContext)
+			{
+				Subsystem->AddMappingContext(InputMappingContext, 0); // Add the context
+			}
+		}
+	}	
 }
 
 void AAlsxtCharacterPlayer::SetupPlayerInputComponent(UInputComponent* Input)
@@ -141,6 +149,11 @@ UAbilitySystemComponent* AAlsxtCharacterPlayer::GetAbilitySystemComponent() cons
 	}
 }
 
+bool AAlsxtCharacterPlayer::GetCharacterIsCameraRightShoulder_Implementation() const
+{
+	return IsCameraRightShoulder();
+}
+
 void AAlsxtCharacterPlayer::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
@@ -155,16 +168,41 @@ void AAlsxtCharacterPlayer::Input_OnLookMouse(const FInputActionValue& ActionVal
 {
 	const FVector2f Value{ActionValue.Get<FVector2D>()};
 
-	AddControllerPitchInput(Value.Y * LookUpMouseSensitivity);
-	AddControllerYawInput(Value.X * LookRightMouseSensitivity);
+	if (GetViewMode() == AlsViewModeTags::ThirdPerson && ALSXTSettings->ViewSettings.IsValid())
+	{
+		if (ALSXTSettings->ViewSettings.Get()->bClampControlRotation)
+		{
+			AddControllerPitchInput(FMath::Clamp(Value.Y, ALSXTSettings->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampY.MinValue, ALSXTSettings->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampY.MaxValue) * LookUpMouseSensitivity);
+			AddControllerYawInput(FMath::Clamp(Value.X, ALSXTSettings->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampX.MinValue, ALSXTSettings->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampX.MaxValue) * LookRightMouseSensitivity);
+		}
+	}
+	else
+	{
+		AddControllerPitchInput(Value.Y * LookUpMouseSensitivity);
+		AddControllerYawInput(Value.X * LookRightMouseSensitivity);
+	}
 }
 
 void AAlsxtCharacterPlayer::Input_OnLook(const FInputActionValue& ActionValue)
 {
 	const FVector2f Value{ActionValue.Get<FVector2D>()};
 
-	AddControllerPitchInput(Value.Y * LookUpRate);
-	AddControllerYawInput(Value.X * LookRightRate);
+	// AddControllerPitchInput(Value.Y * LookUpRate);
+	// AddControllerYawInput(Value.X * LookRightRate);
+
+	if (GetViewMode() == AlsViewModeTags::ThirdPerson && ALSXTSettings->ViewSettings.IsValid())
+	{
+		if (ALSXTSettings->ViewSettings.Get()->bClampControlRotation)
+		{
+			AddControllerPitchInput(FMath::Clamp(Value.Y, ALSXTSettings->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampY.MinValue, ALSXTSettings->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampY.MaxValue) * LookUpMouseSensitivity);
+			AddControllerYawInput(FMath::Clamp(Value.X, ALSXTSettings->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampX.MinValue, ALSXTSettings->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampX.MaxValue) * LookRightMouseSensitivity);
+		}
+	}
+	else
+	{
+		AddControllerPitchInput(Value.Y * LookUpRate);
+		AddControllerYawInput(Value.X * LookRightRate);
+	}
 }
 
 void AAlsxtCharacterPlayer::Input_OnMove(const FInputActionValue& ActionValue)
@@ -217,34 +255,151 @@ void AAlsxtCharacterPlayer::Input_OnSprint(const FInputActionValue& ActionValue)
 
 void AAlsxtCharacterPlayer::Input_OnWalk()
 {
-	if (GetDesiredGait() == AlsGaitTags::Walking)
+	if (GetDesiredStance() == AlsGaitTags::Walking)
 	{
-		SetDesiredGait(AlsGaitTags::Running);
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+		if (ASC)
+		{
+			FGameplayTag RunningTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Running"));
+			// ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RunningTag));
+            
+			if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RunningTag)))
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: Running Ability Activated")));
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: Running Ability Could NOT be Activated!")));
+			}
+		}
+		else
+		{
+			if (GEngine)
+			{
+				FString ClassName = this->GetClass()->GetName();
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: AbilitySystemComponent NOT found in %s"), *ClassName));
+			}
+		}
 	}
-	else if (GetDesiredGait() == AlsGaitTags::Running)
+	else
 	{
-		SetDesiredGait(AlsGaitTags::Walking);
+		if (GetDesiredGait() == AlsGaitTags::Running)
+		{
+			UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+			if (ASC)
+			{
+				FGameplayTag RunningTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Running"));
+				FGameplayTagContainer CancelTags;
+				CancelTags.AddTag(RunningTag);
+				ASC->CancelAbilities(&CancelTags);
+				// SetDesiredGait(AlsGaitTags::Walking);	
+			}
+			else
+			{
+				SetDesiredGait(AlsGaitTags::Walking);
+
+				if (GEngine)
+				{
+					FString ClassName = this->GetClass()->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: AbilitySystemComponent NOT found in %s"), *ClassName));
+				}
+			}
+		}
 	}
+	
+	// if (GetDesiredGait() == AlsGaitTags::Walking)
+	// {
+	// 	SetDesiredGait(AlsGaitTags::Running);
+	// }
+	// else if (GetDesiredGait() == AlsGaitTags::Running)
+	// {
+	// 	SetDesiredGait(AlsGaitTags::Walking);
+	// }
 }
 
 void AAlsxtCharacterPlayer::Input_OnCrouch()
 {
+	// if (GetDesiredStance() == AlsStanceTags::Standing)
+	// {
+	// 	if (CanSlide())
+	// 	{
+	// 		TryStartSliding(1.3f);
+	// 	}
+	// 	else {
+	// 		SetDesiredStance(AlsStanceTags::Crouching);
+	// 	}
+	// }
+	// else if (GetDesiredStance() == AlsStanceTags::Crouching)
+	// {
+	// 	SetDesiredStance(AlsStanceTags::Standing);
+	// 	if (GetDesiredStatus() != ALSXTStatusTags::Normal)
+	// 	{
+	// 		SetDesiredStatus(ALSXTStatusTags::Normal);
+	// 	}
+	// }
+	
 	if (GetDesiredStance() == AlsStanceTags::Standing)
 	{
-		if (CanSlide())
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+		if (ASC)
 		{
-			TryStartSliding(1.3f);
+			FGameplayTag CrouchingTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Crouching"));
+        
+			if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(CrouchingTag)))
+			{
+				UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+    
+				// Get MinForwardVelocity for Sliding
+				// float MinSlideVelocity = GetSettings()->Sliding.MinForwardVelocity; // Example
+				float MinSlideVelocity = 600.0f; // Replace with your variable from AlsSettings
+
+				// Calculate forward velocity
+				float ForwardVelocity = FVector::DotProduct(GetVelocity(), GetActorForwardVector());
+
+				if (CanSlide() && (ForwardVelocity >= MinSlideVelocity))
+				{
+					TryStartSliding(1.3f);
+				}
+				else {
+					SetDesiredStance(AlsStanceTags::Crouching);
+				}
+			}
+			else
+			{
+				if (GEngine)
+				{
+					FString ClassName = this->GetClass()->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Ability with Tag Gameplay.Ability.Crouching could NOT be Activated in %s"), *ClassName));
+				}
+			}
 		}
-		else {
-			SetDesiredStance(AlsStanceTags::Crouching);
+		else
+		{
+			if (GEngine)
+			{
+				FString ClassName = this->GetClass()->GetName();
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("AbilitySystemComponent NOT found in %s"), *ClassName));
+			}
 		}
 	}
-	else if (GetDesiredStance() == AlsStanceTags::Crouching)
+	else
 	{
-		SetDesiredStance(AlsStanceTags::Standing);
-		if (GetDesiredStatus() != ALSXTStatusTags::Normal)
+		if (GetDesiredStance() == AlsStanceTags::Crouching)
 		{
-			SetDesiredStatus(ALSXTStatusTags::Normal);
+			UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+			FGameplayTag CrouchingTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Crouching"));
+			FGameplayTagContainer CancelTags;
+			CancelTags.AddTag(CrouchingTag);
+			if (ASC)
+			{
+				ASC->CancelAbilities(&CancelTags);
+				SetDesiredStance(AlsStanceTags::Standing);	
+			}
+			if (GEngine)
+			{
+				FString ClassName = this->GetClass()->GetName();
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("AbilitySystemComponent NOT found in %s"), *ClassName));
+			}
 		}
 	}
 }
@@ -372,7 +527,16 @@ void AAlsxtCharacterPlayer::Input_OnRoll()
 {
 	static constexpr auto PlayRate{1.3f};
 
-	StartRolling(PlayRate);
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (ASC)
+	{
+		FGameplayTag RollingTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Roll"));
+        
+		if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RollingTag)))
+		{
+			StartRolling(PlayRate);
+		}
+	}
 }
 
 void AAlsxtCharacterPlayer::Input_OnRotationMode()
@@ -389,7 +553,8 @@ void AAlsxtCharacterPlayer::Input_OnViewMode()
 
 void AAlsxtCharacterPlayer::Input_OnSwitchShoulder()
 {
-	Camera->SetRightShoulder(!Camera->IsRightShoulder());
+	// Camera->SetRightShoulder(!Camera->IsRightShoulder());
+	SetCameraRightShoulder(!IsCameraRightShoulder());
 }
 
 void AAlsxtCharacterPlayer::Input_OnMantle(const FInputActionValue& ActionValue)
@@ -611,6 +776,10 @@ void AAlsxtCharacterPlayer::Input_OnLeanLeft(const FInputActionValue& ActionValu
 			NewPoseState.LeanDirection = ALSXTLeanDirectionTags::Left;
 			SetALSXTPoseState(NewPoseState);
 		}
+		if (IsCameraRightShoulder())
+		{
+			SetCameraRightShoulder(false);
+		}
 	}
 	else
 	{
@@ -631,6 +800,10 @@ void AAlsxtCharacterPlayer::Input_OnLeanRight(const FInputActionValue& ActionVal
 			FAlsxtPoseState NewPoseState = GetALSXTPoseState();
 			NewPoseState.LeanDirection = ALSXTLeanDirectionTags::Right;
 			SetALSXTPoseState(NewPoseState);
+		}
+		if (!IsCameraRightShoulder())
+		{
+			SetCameraRightShoulder(true);
 		}
 	}
 	else

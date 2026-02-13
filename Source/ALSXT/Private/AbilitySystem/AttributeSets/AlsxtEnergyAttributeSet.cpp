@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/AttributeSets/AlsxtEnergyAttributeSet.h"
 #include "GameplayEffectExtension.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UAlsxtEnergyAttributeSet::UAlsxtEnergyAttributeSet()
@@ -124,13 +124,13 @@ void UAlsxtEnergyAttributeSet::PostAttributeChange(const FGameplayAttribute& Att
 	
 	if (Attribute == GetCurrentEnergyAttribute())
 	{
-		CheckMaxReachedForAttribute(MaximumEnergy, ALSXTGASGameplayTags::State::TAG_State_Max_Energy.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaximumEnergy, AlsxtGASGameplayTags::State::TAG_State_Max_Energy.GetTag(), NewValue);
 		return;
 	}
 	
 	if (Attribute == GetBleedingAttribute())
 	{
-		CheckStatusTagForAttribute(ALSXTGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
+		CheckStatusTagForAttribute(AlsxtGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
 		return;
 	}
 

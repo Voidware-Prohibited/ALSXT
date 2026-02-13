@@ -14,9 +14,7 @@ UAlsxtGameplayAbilitySprint::UAlsxtGameplayAbilitySprint()
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	FGameplayTagContainer AssetTags = { };
 	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Sprint")));
-	// AbilityTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Sprint")));
 	SetAssetTags(AssetTags);
-	BaseStaminaCostPerSecond = 0.05f;
 	StaminaCostTag = FGameplayTag::RequestGameplayTag(FName("StaminaCost.Infinite.Sprint"));
 }
 
@@ -33,12 +31,12 @@ void UAlsxtGameplayAbilitySprint::ActivateAbility(const FGameplayAbilitySpecHand
 		return;
 	}
 
-	if (StaminaCostEffect)
+	if (CostGameplayEffectClass)
 	{
 		FGameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemComponent->MakeEffectContext();
 		EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
-		StaminaDrainEffectSpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(StaminaCostEffect, 1.0f, EffectContext);
-		StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseStaminaCostPerSecond);
+		StaminaDrainEffectSpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
+		// StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseStaminaCostPerSecond);
         
 		if (StaminaDrainEffectSpecHandle.IsValid())
 		{
@@ -53,8 +51,22 @@ void UAlsxtGameplayAbilitySprint::ActivateAbility(const FGameplayAbilitySpecHand
 	}
 }
 
+void UAlsxtGameplayAbilitySprint::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
+{
+	if (ScopeLockCount > 0)
+	{
+		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &UAlsxtGameplayAbilitySprint::CancelAbility, Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility));
+		return;
+	}
+	
+	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+
+	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
+}
+
 void UAlsxtGameplayAbilitySprint::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+                                             const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	if (!IsEndAbilityValid(Handle, ActorInfo))
 	{
@@ -70,15 +82,8 @@ void UAlsxtGameplayAbilitySprint::EndAbility(const FGameplayAbilitySpecHandle Ha
 	// Remove the stamina drain Gameplay Effect
 	if (HasAuthority(&ActivationInfo) && StaminaDrainEffectSpecHandle.IsValid())
 	{
-		ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(StaminaCostEffect, ActorInfo->AbilitySystemComponent.Get(), -1);
+		ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(CostGameplayEffectClass, ActorInfo->AbilitySystemComponent.Get(), -1);
 	}
-
-	
-	// if (HasAuthority(&ActivationInfo) && ActiveStaminaDrainEffectHandle.IsValid())
-	// {
-	// 	ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveStaminaDrainEffectHandle);
-	// }
-	
 
 	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
 	Character->SetDesiredGait(AlsGaitTags::Running);
@@ -116,6 +121,7 @@ bool UAlsxtGameplayAbilitySprint::CanActivateAbility(const FGameplayAbilitySpecH
 	
 	const ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
 	float CurrentStamina = StaminaAttributeSet->GetCurrentStamina();
+	//if (CostGameplayEffectClass)
 	if (CostGameplayEffectClass)
 	{
 		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
@@ -126,9 +132,9 @@ bool UAlsxtGameplayAbilitySprint::CanActivateAbility(const FGameplayAbilitySpecH
 			{
 				if (Modifier.Attribute == UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute() && Modifier.ModifierOp == EGameplayModOp::Additive)
 				{
-					float JumpCost = 0.0f;
-					JumpCost -= CostSpecHandle.Data->GetModifierMagnitude(0);
-					return CurrentStamina >= FMath::Abs(JumpCost); // Use FMath::Abs as cost is likely negative
+					float InitialCost = 0.0f;
+					InitialCost -= CostSpecHandle.Data->GetModifierMagnitude(0);
+					return CurrentStamina >= FMath::Abs(InitialCost); // Use FMath::Abs as cost is likely negative
 				}
 			}
 		}

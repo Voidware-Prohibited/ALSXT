@@ -63,9 +63,7 @@ private:
 	};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
-		FGameplayTag Injury {
-		ALSXTInjuryTags::None
-	};
+		FGameplayTag Injury {AlsxtStatusEffectLocomotionVariantTags::None};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 		FGameplayTag CombatStance {

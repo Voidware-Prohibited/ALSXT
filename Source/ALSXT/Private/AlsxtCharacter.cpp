@@ -15,6 +15,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Components/SceneComponent.h"
+#include "Components/Character/AlsxtProceduralRecoilAnimComponent.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "Settings/AlsxtCharacterSettings.h"
 #include "Settings/AlsxtLocomotionActionSettings.h"
@@ -79,9 +80,30 @@ void AAlsxtCharacter::OnRep_PlayerState()
 	}
 }
 
+FAlsxtAnimationParametersState AAlsxtCharacter::GetAnimationParametersState() const
+{
+	return AnimationParametersState;
+}
+
+void AAlsxtCharacter::SetAnimationParametersState_Implementation(FAlsxtAnimationParametersState NewAnimationParametersState)
+{
+	AnimationParametersState = NewAnimationParametersState;
+	
+	// Manually mark the property as dirty to force replication with Push Model
+	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, AnimationParametersState, this)
+	OnRep_AnimationParametersState();
+}
+
+void AAlsxtCharacter::OnRep_AnimationParametersState()
+{
+	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, AnimationParametersState, this)
+}
+
 AAlsxtCharacter::AAlsxtCharacter(const FObjectInitializer& ObjectInitializer) :
                                                                               Super(ObjectInitializer.SetDefaultSubobjectClass<UAlsxtPaintableSkeletalMeshComponent>(AAlsCharacter::MeshComponentName).SetDefaultSubobjectClass<UAlsxtCharacterMovementComponent>(AAlsCharacter::CharacterMovementComponentName))
 {
+	DesiredGait = AlsGaitTags::Walking;
+
 	// Setup Components
 	GetCapsuleComponent()->SetCapsuleRadius(25);
 	GetCapsuleComponent()->bReceivesDecals = false;
@@ -103,17 +125,6 @@ AAlsxtCharacter::AAlsxtCharacter(const FObjectInitializer& ObjectInitializer) :
 	//Setup Gameplay Camera Component
 	GameplayCamera = CreateDefaultSubobject<UGameplayCameraComponent>(TEXT("Gameplay Camera Component"));
 	AddOwnedComponent(GameplayCamera);
-
-	// TODO Remove
-	KillerCameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Killer Camera Spring Arm"));
-	KillerCameraSpringArm->SetupAttachment(GetMesh());
-	KillerCameraSpringArm->SetRelativeRotation_Direct({ 10.0f, 300.0f, 0.0f });
-	KillerCameraSpringArm->SetRelativeLocation_Direct({ 0.0f, 0.0f, 122.0f });
-	KillerCameraSpringArm->TargetArmLength = 250.0;
-	KillerCamera = CreateDefaultSubobject<UCineCameraComponent>(TEXT("Killer Camera"));
-	KillerCamera->SetupAttachment(KillerCameraSpringArm);
-	KillerCamera->SetRelativeRotation_Direct({ 0.0f, 0.0f, 0.0f });
-	KillerCamera->SetRelativeLocation_Direct({ -250.0f, 0.0f, 0.0f });
 
 	// Body Mesh Components
 
@@ -407,7 +418,7 @@ AAlsxtCharacter::AAlsxtCharacter(const FObjectInitializer& ObjectInitializer) :
 
 	// Overlay Objects
 
-	OverlaySkeletalMesh = CreateDefaultSubobject<UAlsxtPaintableSkeletalMeshComponent>(TEXT("Overlay Skeletal Mesh"));
+	OverlaySkeletalMesh = CreateDefaultSubobject<UAlsxtPaintableSkeletalMeshComponent>(TEXT("Overlay Skeletal Mesh Primary"));
 	OverlaySkeletalMesh->SetupAttachment(GetMesh());
 	OverlaySkeletalMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	OverlaySkeletalMesh->bEnableUpdateRateOptimizations = false;
@@ -420,7 +431,7 @@ AAlsxtCharacter::AAlsxtCharacter(const FObjectInitializer& ObjectInitializer) :
 	OverlaySkeletalMesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
 	OverlaySkeletalMesh->bReceivesDecals = false;
 
-	OverlayStaticMesh = CreateDefaultSubobject<UAlsxtPaintableStaticMeshComponent>(TEXT("Overlay Static Mesh"));
+	OverlayStaticMesh = CreateDefaultSubobject<UAlsxtPaintableStaticMeshComponent>(TEXT("Overlay Static Mesh Primary"));
 	OverlayStaticMesh->SetupAttachment(GetMesh());
 	OverlayStaticMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	OverlayStaticMesh->AlwaysLoadOnClient = true;
@@ -430,6 +441,30 @@ AAlsxtCharacter::AAlsxtCharacter(const FObjectInitializer& ObjectInitializer) :
 	OverlayStaticMesh->bAffectDynamicIndirectLighting = true;
 	OverlayStaticMesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
 	OverlayStaticMesh->bReceivesDecals = false;
+
+	OverlaySkeletalMeshSecondary = CreateDefaultSubobject<UAlsxtPaintableSkeletalMeshComponent>(TEXT("Overlay Skeletal Mesh Secondary"));
+	OverlaySkeletalMeshSecondary->SetupAttachment(GetMesh());
+	OverlaySkeletalMeshSecondary->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	OverlaySkeletalMeshSecondary->bEnableUpdateRateOptimizations = false;
+	OverlaySkeletalMeshSecondary->AlwaysLoadOnClient = true;
+	OverlaySkeletalMeshSecondary->AlwaysLoadOnServer = true;
+	OverlaySkeletalMeshSecondary->bOwnerNoSee = false;
+	OverlaySkeletalMeshSecondary->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
+	OverlaySkeletalMeshSecondary->bCastDynamicShadow = true;
+	OverlaySkeletalMeshSecondary->bAffectDynamicIndirectLighting = true;
+	OverlaySkeletalMeshSecondary->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	OverlaySkeletalMeshSecondary->bReceivesDecals = false;
+
+	OverlayStaticMeshSecondary = CreateDefaultSubobject<UAlsxtPaintableStaticMeshComponent>(TEXT("Overlay Static Mesh Secondary"));
+	OverlayStaticMeshSecondary->SetupAttachment(GetMesh());
+	OverlayStaticMeshSecondary->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	OverlayStaticMeshSecondary->AlwaysLoadOnClient = true;
+	OverlayStaticMeshSecondary->AlwaysLoadOnServer = true;
+	OverlayStaticMeshSecondary->bOwnerNoSee = false;
+	OverlayStaticMeshSecondary->bCastDynamicShadow = true;
+	OverlayStaticMeshSecondary->bAffectDynamicIndirectLighting = true;
+	OverlayStaticMeshSecondary->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	OverlayStaticMeshSecondary->bReceivesDecals = false;
 
 	PhysicsConstraints = CreateDefaultSubobject<USceneComponent>(TEXT("Physics Constraints"));
 	PhysicsConstraints->SetupAttachment(this->RootComponent);
@@ -457,6 +492,9 @@ AAlsxtCharacter::AAlsxtCharacter(const FObjectInitializer& ObjectInitializer) :
 
 	CharacterSound = CreateDefaultSubobject<UAlsxtCharacterSoundComponent>(TEXT("Character Sound"));
 	AddOwnedComponent(CharacterSound);
+
+	ProceduralRecoil = CreateDefaultSubobject<UAlsxtProceduralRecoilAnimComponent>(TEXT("Procedural Recoil"));
+	AddOwnedComponent(ProceduralRecoil);
 
 	PhysicalAnimation = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("Physical Animation"));
 	AddOwnedComponent(PhysicalAnimation);
@@ -709,6 +747,7 @@ void AAlsxtCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, AimState, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, bMovementEnabled, Parameters)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MovementInput, Parameters)
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, AnimationParametersState, Parameters)
 }
 
 void AAlsxtCharacter::PreInitializeComponents()
@@ -797,10 +836,6 @@ void AAlsxtCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(RotationModeAction, ETriggerEvent::Triggered, this, &ThisClass::InputRotationMode);
 		EnhancedInput->BindAction(ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::InputViewMode);
 		EnhancedInput->BindAction(SwitchShoulderAction, ETriggerEvent::Triggered, this, &ThisClass::InputSwitchShoulder);
-		EnhancedInput->BindAction(LeanLeftAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanLeft);
-		EnhancedInput->BindAction(ToggleLeanLeftAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanLeft);
-		EnhancedInput->BindAction(LeanRightAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanRight);
-		EnhancedInput->BindAction(ToggleLeanRightAction, ETriggerEvent::Triggered, this, &ThisClass::InputLeanRight);
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
 		EnhancedInput->BindAction(ToggleFreelookAction, ETriggerEvent::Triggered, this, &ThisClass::InputFreelook);
 		EnhancedInput->BindAction(ToggleGaitAction, ETriggerEvent::Triggered, this, &ThisClass::InputToggleGait);
@@ -857,9 +892,9 @@ FAlsxtCameraShakeSetting AAlsxtCharacter::SelectMovementCameraShakeAsset()
 // TODO: Implement requiring holding down Jump to Mantle and Vault
 bool AAlsxtCharacter::IsMantlingAllowedToStart_Implementation() const
 {
-	if (IsLocallyControlled())
+	if (IsLocallyControlled() && ALSXTSettings->LocomotionActionSettings.IsValid())
 	{
-		if (ALSXTSettings->LocomotionActionSettings.bHoldJumpToMantle)
+		if (ALSXTSettings->LocomotionActionSettings.Get()->bHoldJumpToMantle)
 		{
 			// return Super::IsMantlingAllowedToStart() && InputMantleValue.Get<bool>();
 			return InputMantleValue.Get<bool>();
@@ -892,6 +927,16 @@ void AAlsxtCharacter::OnEndProne(float HalfHeightAdjust, float ScaledHalfHeightA
 	
 }
 
+TSoftObjectPtr<UGameplayCameraComponent> AAlsxtCharacter::GetCharacterGameplayCameraComponent_Implementation() const
+{
+	return GameplayCamera;
+}
+
+bool AAlsxtCharacter::GetCharacterIsCameraRightShoulder_Implementation() const
+{
+	return true;
+}
+
 void AAlsxtCharacter::DisableInputMovement(const bool Disable)
 {
 	bMovementEnabled = !Disable;
@@ -915,19 +960,59 @@ void AAlsxtCharacter::InputLookMouse(const FInputActionValue& ActionValue)
 {
 	FVector2D Value{ActionValue.Get<FVector2D>()};
 
-	if (Freelooking == ALSXTFreelookingTags::True)
+	if (GetViewMode() == AlsViewModeTags::ThirdPerson && ALSXTSettings->IsValidLowLevelFast() && ALSXTSettings.Get()->ViewSettings->IsValidLowLevelFast())
 	{
-		Value = FreelookState.LockedLookInput;
+		// Get the input vector (X=Yaw, Y=Pitch)
+		FVector2D LookAxisVector = ActionValue.Get<FVector2D>();
+
+		// Apply sensitivity to the input values
+		float YawInput = LookAxisVector.X * LookRightMouseSensitivity;
+		float PitchInput = LookAxisVector.Y * LookUpMouseSensitivity;
+
+		// Apply the input using the standard controller functions. These functions manage accumulation
+		AddControllerYawInput(YawInput * LookRightMouseSensitivity);
+		AddControllerPitchInput(PitchInput * LookUpMouseSensitivity);
+
+		// Get the current control rotation
+		FRotator CurrentRotation = GetControlRotation();
+
+		// Clamp values using FMath::Clamp
+		CurrentRotation.Pitch = FMath::Clamp(CurrentRotation.Pitch, ALSXTSettings.Get()->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampY.MinValue, ALSXTSettings.Get()->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampY.MaxValue);
+		CurrentRotation.Yaw = FMath::Clamp(CurrentRotation.Yaw, ALSXTSettings.Get()->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampX.MinValue, ALSXTSettings.Get()->ViewSettings.Get()->ThirdPersonControlRotationClamp.ClampX.MaxValue);
+
+		// Set the corrected rotation back to the controller. This is necessary to enforce the clamp *after* the AddControllerInput operations have modified the rotation
+		Controller->SetControlRotation(CurrentRotation);
 	}
 	else
 	{
-		Value = ActionValue.Get<FVector2D>();
+		if (Freelooking == ALSXTFreelookingTags::True)
+		{
+			Value = FreelookState.LockedLookInput;
+		}
+		else
+		{
+			Value = ActionValue.Get<FVector2D>();
+		}
+
+		AddControllerPitchInput(Value.Y * LookUpMouseSensitivity);
+		PreviousLookInput.Y = Value.Y;
+		AddControllerYawInput(Value.X * LookRightMouseSensitivity);
+		PreviousLookInput.X = Value.X;
 	}
 
-	AddControllerPitchInput(Value.Y * LookUpMouseSensitivity);
-	PreviousLookInput.Y = Value.Y;
-	AddControllerYawInput(Value.X * LookRightMouseSensitivity);
-	PreviousLookInput.X = Value.X;
+	// if (Freelooking == ALSXTFreelookingTags::True)
+	// {
+	// 	Value = FreelookState.LockedLookInput;
+	// }
+	// else
+	// {
+	// 	Value = ActionValue.Get<FVector2D>();
+	// }
+// 
+	// AddControllerPitchInput(Value.Y * LookUpMouseSensitivity);
+	// PreviousLookInput.Y = Value.Y;
+	// AddControllerYawInput(Value.X * LookRightMouseSensitivity);
+	// PreviousLookInput.X = Value.X;
 }
 
 void AAlsxtCharacter::InputLook(const FInputActionValue& ActionValue)
@@ -1009,66 +1094,154 @@ void AAlsxtCharacter::InputWalk()
 
 void AAlsxtCharacter::InputCrouch()
 {
+	// if (GetDesiredStance() == AlsStanceTags::Standing)
+	// {
+	// 	if (CanSlide())
+	// 	{
+	// 		TryStartSliding(1.3f);
+	// 	}
+	// 	else {
+	// 		SetDesiredStance(AlsStanceTags::Crouching);
+	// 	}
+	// }
+	// else if (GetDesiredStance() == AlsStanceTags::Crouching)
+	// {
+	// 	SetDesiredStance(AlsStanceTags::Standing);
+	// 	if (GetDesiredStatus() != ALSXTStatusTags::Normal)
+	// 	{
+	// 		SetDesiredStatus(ALSXTStatusTags::Normal);
+	// 	}
+	// }
+
 	if (GetDesiredStance() == AlsStanceTags::Standing)
 	{
-		if (CanSlide())
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+		if (ASC)
 		{
-			TryStartSliding(1.3f);
-		}
-		else {
-			SetDesiredStance(AlsStanceTags::Crouching);
+			FGameplayTag CrouchingTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Crouching"));
+        
+			if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(CrouchingTag)))
+			{
+				UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+    
+				// Get MinForwardVelocity for Sliding
+				// float MinSlideVelocity = GetSettings()->Sliding.MinForwardVelocity; // Example
+				float MinSlideVelocity = 600.0f; // Replace with your variable from AlsSettings
+
+				// Calculate forward velocity
+				float ForwardVelocity = FVector::DotProduct(GetVelocity(), GetActorForwardVector());
+
+				if (CanSlide() && (ForwardVelocity >= MinSlideVelocity))
+				{
+					TryStartSliding(1.3f);
+				}
+				else {
+					SetDesiredStance(AlsStanceTags::Crouching);
+				}
+			}
 		}
 	}
-	else if (GetDesiredStance() == AlsStanceTags::Crouching)
+	else
 	{
-		SetDesiredStance(AlsStanceTags::Standing);
-		if (GetDesiredStatus() != ALSXTStatusTags::Normal)
+		if (GetDesiredStance() == AlsStanceTags::Crouching)
 		{
-			SetDesiredStatus(ALSXTStatusTags::Normal);
+			SetDesiredStance(AlsStanceTags::Standing);	
 		}
 	}
 }
 
 void AAlsxtCharacter::InputJump(const FInputActionValue& ActionValue)
 {
-	if (CanJump() && bMovementEnabled)
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (ASC)
 	{
-		if (ActionValue.Get<bool>())
+		FGameplayTag JumpTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Jump"));
+        
+		if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(JumpTag)))
 		{
-			if (StopRagdolling())
+			if (CanJump() && bMovementEnabled)
 			{
-				return;
-			}
-			if (GetDesiredStatus() != ALSXTStatusTags::Normal)
-			{
-				SetDesiredStatus(ALSXTStatusTags::Normal);
-				return;
-			}
-			if (TryStartVaultingGrounded())
-			{
-				return;
-			}
-			if (StartMantlingGrounded())
-			{
-				return;
-			}
-			if (GetStance() == AlsStanceTags::Crouching)
-			{
-				SetDesiredStance(AlsStanceTags::Standing);
-				return;
-			}
+				if (ActionValue.Get<bool>())
+				{
+					if (StopRagdolling())
+					{
+						return;
+					}
+					if (GetDesiredStatus() != ALSXTStatusTags::Normal)
+					{
+						SetDesiredStatus(ALSXTStatusTags::Normal);
+						return;
+					}
+					if (TryStartVaultingGrounded())
+					{
+						return;
+					}
+					if (StartMantlingGrounded())
+					{
+						return;
+					}
+					if (GetStance() == AlsStanceTags::Crouching)
+					{
+						SetDesiredStance(AlsStanceTags::Standing);
+						return;
+					}
 
-			Super::Jump();
-		}
-		else
-		{
-			StopJumping();
+					Super::Jump();
+				}
+				else
+				{
+					StopJumping();
+				}
+			}
+			else
+			{
+				StopJumping();
+			}
 		}
 	}
 	else
 	{
 		StopJumping();
 	}
+
+	// if (CanJump() && bMovementEnabled)
+	// {
+	// 	if (ActionValue.Get<bool>())
+	// 	{
+	// 		if (StopRagdolling())
+	// 		{
+	// 			return;
+	// 		}
+	// 		if (GetDesiredStatus() != ALSXTStatusTags::Normal)
+	// 		{
+	// 			SetDesiredStatus(ALSXTStatusTags::Normal);
+	// 			return;
+	// 		}
+	// 		if (TryStartVaultingGrounded())
+	// 		{
+	// 			return;
+	// 		}
+	// 		if (StartMantlingGrounded())
+	// 		{
+	// 			return;
+	// 		}
+	// 		if (GetStance() == AlsStanceTags::Crouching)
+	// 		{
+	// 			SetDesiredStance(AlsStanceTags::Standing);
+	// 			return;
+	// 		}
+// 
+	// 		Super::Jump();
+	// 	}
+	// 	else
+	// 	{
+	// 		StopJumping();
+	// 	}
+	// }
+	// else
+	// {
+	// 	StopJumping();
+	// }
 }
 
 void AAlsxtCharacter::InputMantle(const FInputActionValue& ActionValue)
@@ -1308,7 +1481,7 @@ void AAlsxtCharacter::ApplyDesiredStance()
 	}
 	else
 	{
-		if ((GetLocomotionAction() == AlsLocomotionActionTags::Rolling && ALSXTSettings->Rolling.bCrouchOnStart) || (GetLocomotionAction() == AlsLocomotionActionTags::Sliding && ALSXTSettings->Sliding.bCrouchOnStart))
+		if ((GetLocomotionAction() == AlsLocomotionActionTags::Rolling && Settings->Rolling.bCrouchOnStart) || (GetLocomotionAction() == AlsLocomotionActionTags::Sliding && ALSXTSettings->Sliding.bCrouchOnStart))
 		{
 			Crouch();
 		}
@@ -1950,49 +2123,6 @@ void AAlsxtCharacter::InputBlock(const FInputActionValue& ActionValue)
 		NewDefensiveModeState.ObstacleHeight = FGameplayTag::EmptyTag;
 		SetDefensiveModeState(NewDefensiveModeState);
 		SetDesiredDefensiveMode(FGameplayTag::EmptyTag);
-	}
-}
-
-
-void AAlsxtCharacter::InputLeanLeft(const FInputActionValue & ActionValue)
-{
-	if (ActionValue.Get<bool>())
-	{
-		if (CanLean())
-		{
-			SetDesiredLean(ALSXTLeanDirectionTags::Left);
-			FAlsxtPoseState NewPoseState = GetALSXTPoseState();
-			NewPoseState.LeanDirection = ALSXTLeanDirectionTags::Left;
-			SetALSXTPoseState(NewPoseState);
-		}
-	}
-	else
-	{
-		SetDesiredLean(FGameplayTag::EmptyTag);
-		FAlsxtPoseState NewPoseState = GetALSXTPoseState();
-		NewPoseState.LeanDirection = FGameplayTag::EmptyTag;
-		SetALSXTPoseState(NewPoseState);
-	}
-}
-
-void AAlsxtCharacter::InputLeanRight(const FInputActionValue& ActionValue)
-{
-	if (ActionValue.Get<bool>())
-	{
-		if (CanLean())
-		{
-			SetDesiredLean(ALSXTLeanDirectionTags::Right);
-			FAlsxtPoseState NewPoseState = GetALSXTPoseState();
-			NewPoseState.LeanDirection = ALSXTLeanDirectionTags::Right;
-			SetALSXTPoseState(NewPoseState);
-		}
-	}
-	else
-	{
-		SetDesiredLean(FGameplayTag::EmptyTag);
-		FAlsxtPoseState NewPoseState = GetALSXTPoseState();
-		NewPoseState.LeanDirection = FGameplayTag::EmptyTag;
-		SetALSXTPoseState(NewPoseState);
 	}
 }
 
@@ -3906,6 +4036,16 @@ FGameplayTag AAlsxtCharacter::GetCharacterGait_Implementation() const
 	return GetDesiredGait();
 }
 
+FGameplayTag AAlsxtCharacter::GetCharacterReadiness_Implementation() const
+{
+	return GetDesiredReadyStance();
+}
+
+void AAlsxtCharacter::SetCharacterReadiness_Implementation(const FGameplayTag& NewReadiness)
+{
+	SetDesiredReadyStance(NewReadiness);
+}
+
 FGameplayTag AAlsxtCharacter::GetCharacterRotationMode_Implementation() const
 {
 	return GetDesiredRotationMode();
@@ -3988,7 +4128,7 @@ bool AAlsxtCharacter::CanGesture_Implementation() const
 
 FAlsxtAnimationParametersState AAlsxtCharacter::GetCharacterAnimationParametersState_Implementation() const
 {
-	return AnimationParametersState;
+	return GetAnimationParametersState();
 }
 
 FGameplayTag AAlsxtCharacter::GetCharacterLocomotionAction_Implementation() const

@@ -30,7 +30,15 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	virtual bool GetCharacterIsCameraRightShoulder_Implementation() const override;
+
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Camera")
+	bool IsCameraRightShoulder() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Camera")
+	void SetCameraRightShoulder(const bool bNewCameraRightShoulder);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
 	TObjectPtr<UInputAction> ProneAction;
@@ -50,6 +58,9 @@ protected:
 
 	TObjectPtr<UEnhancedInputComponent> EnhancedInput;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+	bool bCameraRightShoulder {false};
+	
 	virtual void OnRep_PlayerState() override;
 	
 	virtual void Input_OnLookMouse(const FInputActionValue& ActionValue);
@@ -110,3 +121,13 @@ protected:
     
     virtual void Input_OnSwitchForegripPosition();
 };
+
+inline bool AAlsxtCharacterPlayer::IsCameraRightShoulder() const
+{
+	return bCameraRightShoulder;
+}
+
+inline void AAlsxtCharacterPlayer::SetCameraRightShoulder(const bool bNewCameraRightShoulder)
+{
+	bCameraRightShoulder = bNewCameraRightShoulder;
+}

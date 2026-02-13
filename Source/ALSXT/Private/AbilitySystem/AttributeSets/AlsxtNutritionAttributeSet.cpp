@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/AttributeSets/AlsxtNutritionAttributeSet.h"
 #include "GameplayEffectExtension.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UAlsxtNutritionAttributeSet::UAlsxtNutritionAttributeSet()
@@ -124,13 +124,13 @@ void UAlsxtNutritionAttributeSet::PostAttributeChange(const FGameplayAttribute& 
 	
 	if (Attribute == GetCurrentNutritionAttribute())
 	{
-		CheckMaxReachedForAttribute(MaximumNutrition, ALSXTGASGameplayTags::State::TAG_State_Max_Nutrition.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaximumNutrition, AlsxtGASGameplayTags::State::TAG_State_Max_Nutrition.GetTag(), NewValue);
 		return;
 	}
 	
 	if (Attribute == GetBleedingAttribute())
 	{
-		CheckStatusTagForAttribute(ALSXTGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
+		CheckStatusTagForAttribute(AlsxtGASGameplayTags::Statuses::TAG_Debuff_Bleeding, NewValue, OldValue);
 		return;
 	}
 

@@ -139,7 +139,7 @@ void UAlsxtAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 
 		if (StaticMeshComp)
 		{
-			if (FootstepEffectsSettings->EnableVertexPaintTrace)
+			if (FootstepEffectsSettings->EnableVertexPaintTrace && FootstepEffectsSettings->VertexColorPhysicalMaterialMap.IsValid())
 			{
 				int32 HitVertexID = UAlsxtVertexFunctionLibrary::GetClosestVertexIDFromStaticMesh(StaticMeshComp, Hit.ImpactPoint);
 				EProminentRGBAChannel ProminentRGBAChannel = UAlsxtVertexFunctionLibrary::GetProminentVertexColorChannel(StaticMeshComp, HitVertexID);
@@ -151,7 +151,7 @@ void UAlsxtAnimNotify_FootstepEffects::Notify(USkeletalMeshComponent* Mesh, UAni
 
 					// Find Matching Physical Material
 					UAlsxtVertexColorPhysicalMaterialMap* VertexColorPhysicalMaterialMap = FootstepEffectsSettings->VertexColorPhysicalMaterialMap.Get();
-					UPhysicalMaterial** VertexColorChannelPhysicalMaterial = VertexColorPhysicalMaterialMap->VertexColorPhysicalMaterialMap.VertexColorPhysicalMaterialMap.Find(VertexColorChannel);
+					UPhysicalMaterial** VertexColorChannelPhysicalMaterial = VertexColorPhysicalMaterialMap->VertexColorPhysicalMaterialMap.Find(VertexColorChannel);
 				}
 			}
 		}

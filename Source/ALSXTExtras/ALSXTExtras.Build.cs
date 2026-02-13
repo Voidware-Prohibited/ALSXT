@@ -15,7 +15,8 @@ public class ALSXTExtras : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"UMG",
-			"GameplayTags"
+			"GameplayTags",
+			"ModularGameplayActors"
 		]);			
 		
 		PrivateDependencyModuleNames.AddRange([

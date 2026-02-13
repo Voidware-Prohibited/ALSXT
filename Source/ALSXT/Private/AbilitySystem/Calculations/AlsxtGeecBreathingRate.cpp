@@ -50,8 +50,8 @@ UAlsxtGeecBreathingRate::UAlsxtGeecBreathingRate()
 	// Add the captured attributes to the RelevantAttributesToCapture array.
 	RelevantAttributesToCapture.Add(AlsxtBreathingRateStatics().CurrentStaminaDef);
 	RelevantAttributesToCapture.Add(AlsxtBreathingRateStatics().MaxStaminaDef);
-	// RelevantAttributesToCapture.Add(StaminaDef);
-	// RelevantAttributesToCapture.Add(MaxStaminaDef);
+	RelevantAttributesToCapture.Add(StaminaDef);
+	RelevantAttributesToCapture.Add(MaxStaminaDef);
 	// RelevantAttributesToCapture.Add(BreathingRateCaptureDefinition.HoldingBreathLengthDef);
 }
 
@@ -65,6 +65,10 @@ void UAlsxtGeecBreathingRate::Execute_Implementation(const FGameplayEffectCustom
 	UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
 	if (!TargetAbilitySystemComponent)
 	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("TargetAbilitySystemComponent not found!"));
+		}
 		return;
 	}
 
@@ -79,28 +83,26 @@ void UAlsxtGeecBreathingRate::Execute_Implementation(const FGameplayEffectCustom
 	float BreathingRate = 0.5f;
 	float BreathingMagnitude = 0.5f;
 	
-	if (MaxStamina > 0.0f)
+	if (Stamina > 0.0f)
 	{
 		float StaminaRatio = Stamina / MaxStamina;
 
 		// Inverse relationship: lower stamina means higher breathing rate.
-		BreathingRate = FMath::Lerp(2.0f, 0.2f, FMath::Clamp(StaminaRatio, 0.0f, 1.0f));
-		BreathingMagnitude = FMath::Lerp(2.0f, 0.2f, FMath::Clamp(StaminaRatio, 0.0f, 1.0f)); 
+		BreathingRate = FMath::Lerp(MaxBreathingRate, MinBreathingRate, FMath::Clamp(StaminaRatio, 0.0f, 2.0f));
+		BreathingMagnitude = FMath::Lerp(MaxBreathingMagnitude, MinBreathingMagnitude, FMath::Clamp(StaminaRatio, 0.0f, 2.0f)); 
 		
-		// For example, if Stamina is 100% (Ratio 1.0), BreathingRate = 1.0 (calm).
-		// If Stamina is 0% (Ratio 0.0), BreathingRate = 5.0 (heavy breathing).
 	}
 	else
 	{
 		// Default to a resting rate if max stamina is zero or invalid.
-		BreathingRate = 0.2f;
-		BreathingMagnitude = 0.2f;
+		BreathingRate = MaxBreathingRate;
+		BreathingMagnitude = MaxBreathingMagnitude;
 	}
 
 	
 
-	float BreathingRateValue = 0.5f;
-	float BreathingMagnitudeValue = 0.5f;
+	float BreathingRateValue = BreathingRate;
+	float BreathingMagnitudeValue = BreathingMagnitude;
 	FGameplayEffectAttributeCaptureDefinition BreathRateGameplayEffectAttributeCaptureDefinition = FGameplayEffectAttributeCaptureDefinition();
 	BreathRateGameplayEffectAttributeCaptureDefinition.AttributeToCapture = UAlsxtBreathAttributeSet::GetCurrentBreathRateAttribute();
 	BreathRateGameplayEffectAttributeCaptureDefinition.AttributeSource = EGameplayEffectAttributeCaptureSource::Source;
@@ -116,14 +118,60 @@ void UAlsxtGeecBreathingRate::Execute_Implementation(const FGameplayEffectCustom
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UAlsxtBreathAttributeSet::GetCurrentBreathMagnitudeAttribute(), EGameplayModOp::Override, BreathingMagnitudeValue));
 
 	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->GetOwnerActor() : nullptr;
+	if (GEngine)
+	{
+		// GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, TargetActor->GetClass()->GetName());
+	}
+	
+	AAlsxtCharacter* AlsxtCharacter = Cast<AAlsxtCharacter>(TargetAbilitySystemComponent->GetAvatarActor());
+
+	if (!AlsxtCharacter)
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AlsxtCharacter not found!"));
+		}
+		return;
+	}
+
+	// Update the struct in the Character	
+	FAlsxtAnimationParametersState NewAnimationParametersState = AlsxtCharacter->GetAnimationParametersState();
+	NewAnimationParametersState.BreathingRate = BreathingRateValue;
+	NewAnimationParametersState.BreathingAlpha = BreathingMagnitudeValue;
+	AlsxtCharacter->SetAnimationParametersState(NewAnimationParametersState);
+	ServerUpdateAnimationParametersState(NewAnimationParametersState, ExecutionParams);
+
+	if (TargetAbilitySystemComponent->GetOwnerActor()->HasAuthority()) // Only run on the server
+	{
+		AlsxtCharacter->SetAnimationParametersState(NewAnimationParametersState);
+		ServerUpdateAnimationParametersState(NewAnimationParametersState, ExecutionParams);
+	}
+}
+
+void UAlsxtGeecBreathingRate::ServerUpdateAnimationParametersState_Implementation(FAlsxtAnimationParametersState NewAnimationParametersState,
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams) const
+{
+	// Get the ability system component of the character receiving the effect.
+	UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
+	if (!TargetAbilitySystemComponent)
+	{
+		return;
+	}
+
+	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->GetAvatarActor() : nullptr;
 	AAlsxtCharacter* AlsxtCharacter = Cast<AAlsxtCharacter>(TargetActor);
 
 	if (!AlsxtCharacter)
 	{
 		return;
 	}
+	
+	// AlsxtCharacter->AnimationParametersState = NewAnimationParametersState;
+	AlsxtCharacter->SetAnimationParametersState(NewAnimationParametersState);
+}
 
-	// Update the struct in the Character
-	AlsxtCharacter->AnimationParametersState.BreathingRate = BreathingRateValue;
-	AlsxtCharacter->AnimationParametersState.BreathingAlpha = BreathingMagnitudeValue;
+bool UAlsxtGeecBreathingRate::ServerUpdateAnimationParametersState_Validate(FAlsxtAnimationParametersState NewAnimationParametersState,
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams)
+{
+	return true;
 }

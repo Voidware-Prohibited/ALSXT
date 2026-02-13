@@ -4,7 +4,7 @@
 #include "AlsxtPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "AbilitySystem/Interfaces/AlsxtAbilitySystemInterface.h"
 #include "Utility/AlsGameplayTags.h"
 #include "Utility/AlsVector.h"
@@ -63,13 +63,13 @@ void AAlsxtPlayerController::BeginPlay()
 	}
 
 	// Get the Enhanced Input Local Player Subsystem and add the mapping context
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-	{
-		if (InputMappingContext)
-		{
-			Subsystem->AddMappingContext(InputMappingContext, 0); // Priority 0
-		}
-	}
+	// if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	// {
+	// 	if (InputMappingContext)
+	// 	{
+	// 		Subsystem->AddMappingContext(InputMappingContext, 0); // Priority 0
+	// 	}
+	// }
 }
 
 void AAlsxtPlayerController::SetupInputComponent()

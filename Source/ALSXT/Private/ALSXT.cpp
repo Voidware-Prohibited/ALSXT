@@ -2,6 +2,8 @@
 
 #include "ALSXT.h"
 #include "Engine/CollisionProfile.h"
+#include "Developer/Settings/Public/ISettingsModule.h"
+#include "Settings/AlsxtAnimationModifierExtractCurvesSettings.h"
 
 #define LOCTEXT_NAMESPACE "FALSXTModule"
 
@@ -10,12 +12,21 @@ void FALSXTModule::StartupModule()
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 
 	AddPhysAnimCollisionProfile();
+	if(ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
+	{
+		SettingsModule->RegisterSettings("Project", "Plugins", "ALSXT",
+										 LOCTEXT("RuntimeSettingsName", "ALSXT Procedural Recoil Animation"),
+										 LOCTEXT("RuntimeSettingsDescription", "ALSXT Procedural Recoil Animation Settings"),
+										 GetMutableDefault<UAlsxtAnimationModifierExtractCurvesSettings>());
+	}
 }
 
 void FALSXTModule::ShutdownModule()
 {
-	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
-	// we call this function before unloading the module.
+	if(ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
+	{
+		SettingsModule->UnregisterSettings("Project", "Plugins", "ALSXT");
+	}
 }
 
 void FALSXTModule::AddPhysAnimCollisionProfile()

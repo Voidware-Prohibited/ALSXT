@@ -8,6 +8,41 @@
 #include "Sound/SoundBase.h"
 #include "AlsxtFirearmSettings.generated.h"
 
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtFirearmDischargeSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Firearm", Meta = (AllowPrivateAccess, Categories = "Alsxt.Firearm Fire Mode"))
+	FGameplayTagContainer FireModes;
+
+	/** Fire Rate in shots per minute */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Firearm", Meta = (AllowPrivateAccess))
+	float FireRate {0.0f};
+
+	/** Rounds fired in Burst Fire mode */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Firearm", Meta = (AllowPrivateAccess))
+	int BurstFireAmount {0};
+};
+
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UAlsxtFirearmDischargeSettingsDataAsset : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Firearm", Meta = (AllowPrivateAccess, Categories = "Alsxt.Firearm Fire Mode"))
+	FGameplayTagContainer FireModes;
+
+	/** Fire Rate in Rounds per Minute (RPM) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Firearm", Meta = (AllowPrivateAccess))
+	float FireRate {600.0f};
+
+	/** Rounds fired in Burst Fire mode */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Firearm", Meta = (AllowPrivateAccess))
+	int BurstFireAmount {3};
+};
+
 UENUM(BlueprintType)
 enum class EAlsxtCameraRecoilMode : uint8
 { 

@@ -1,12 +1,22 @@
 #include "Utility/AlsxtGameplayTags.h"
 #include "Utility/AlsGameplayTags.h"
 
+namespace AlsViewModeTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(KillerCam, TEXT("Als.ViewMode.KillerCam"))
+	UE_DEFINE_GAMEPLAY_TAG(IsometricTopDown, TEXT("Als.ViewMode.IsometricTopDown"))
+	UE_DEFINE_GAMEPLAY_TAG(Cinematic, TEXT("Als.ViewMode.Cinematic"))
+	UE_DEFINE_GAMEPLAY_TAG(FourthPerson, TEXT("Als.ViewMode.FourthPerson"))
+}
+
 namespace AlsLocomotionModeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(SlopeSliding, TEXT("Als.LocomotionMode.Slope Sliding"))
 	UE_DEFINE_GAMEPLAY_TAG(Stationary, TEXT("Als.LocomotionMode.Stationary"))
 	UE_DEFINE_GAMEPLAY_TAG(Ladder, TEXT("Als.LocomotionMode.Ladder"))
-	UE_DEFINE_GAMEPLAY_TAG(Swimming, TEXT("Als.LocomotionMode.Swimming"))
+	UE_DEFINE_GAMEPLAY_TAG(Climbing, TEXT("Als.LocomotionMode.Climbing"))
+	UE_DEFINE_GAMEPLAY_TAG(SwimmingTreading, TEXT("Als.LocomotionMode.Swimming Treading"))
+	UE_DEFINE_GAMEPLAY_TAG(SwimmingUnderwater, TEXT("Als.LocomotionMode.Swimming Underwater"))
 }
 
 namespace AlsStanceTags
@@ -24,113 +34,21 @@ namespace AlsOverlayModeTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Axe, TEXT("Als.OverlayMode.Axe"))
 	UE_DEFINE_GAMEPLAY_TAG(Knife, TEXT("Als.OverlayMode.Knife"))
-	UE_DEFINE_GAMEPLAY_TAG(HandsTiedBothHands, FName{TEXTVIEW("Als.OverlayMode.HandsTied.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(DefaultBothHands, FName{TEXTVIEW("Als.OverlayMode.Default.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(DefaultLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Default.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(DefaultLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Default.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(DefaultLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Default.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(DefaultRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Default.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(DefaultRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Default.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(DefaultRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Default.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(RifleBothHands, FName{TEXTVIEW("Als.OverlayMode.Rifle.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(RifleLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Rifle.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(RifleLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Rifle.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(RifleLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Rifle.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(RifleRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Rifle.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(RifleRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Rifle.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(RifleRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Rifle.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(PistolBothHands, FName{TEXTVIEW("Als.OverlayMode.Pistol.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(PistolLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Pistol.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(PistolLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Pistol.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(PistolLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Pistol.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(PistolRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Pistol.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(PistolRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Pistol.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(PistolRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Pistol.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(BowBothHands, FName{TEXTVIEW("Als.OverlayMode.Bow.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(TorchBothHands, FName{TEXTVIEW("Als.OverlayMode.Torch.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(TorchLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Torch.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(TorchLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Torch.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(TorchLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Torch.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(TorchRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Torch.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(TorchRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Torch.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(TorchRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Torch.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(BinocularsBothHands, FName{TEXTVIEW("Als.OverlayMode.Binoculars.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(BinocularsLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Binoculars.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(BinocularsLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Binoculars.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(BinocularsLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Binoculars.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(BinocularsRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Binoculars.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(BinocularsRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Binoculars.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(BinocularsRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Binoculars.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(BoxBothHands, FName{TEXTVIEW("Als.OverlayMode.Box.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(BarrelBothHands, FName{TEXTVIEW("Als.OverlayMode.Barrel.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(BarreLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Barrel.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(BarreLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Barrel.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(BarreLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Barrel.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(BarreRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Barrel.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(BarreRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Barrel.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(BarreRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Barrel.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(AxeBothHands, FName{TEXTVIEW("Als.OverlayMode.Axe.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(AxeLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Axe.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(AxeLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Axe.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(AxeLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Axe.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(AxeRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Axe.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(AxeRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Axe.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(AxeRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Axe.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(PickaxeBothHands, FName{TEXTVIEW("Als.OverlayMode.Pickaxe.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(PickaxeLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Pickaxe.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(PickaxeLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Pickaxe.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(PickaxeLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Pickaxe.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(PickaxeRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Pickaxe.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(PickaxeRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Pickaxe.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(PickaxeRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Pickaxe.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(KnifeLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Knife.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(KnifeLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Knife.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(KnifeLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Knife.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(KnifeRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Knife.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(KnifeRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Knife.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(KnifeRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Knife.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(HammerLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Hammer.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(HammerLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Hammer.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(HammerLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Hammer.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(HammerRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Hammer.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(HammerRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Hammer.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(HammerRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Hammer.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(GrenadeRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Grenade.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(GrenadeRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Grenade.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(GrenadeRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Grenade.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(GrenadeLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Grenade.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(GrenadeLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Grenade.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(GrenadeLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Grenade.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(BuildingPlanBothHands, FName{TEXTVIEW("Als.OverlayMode.BuildingPlan.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(BuildingPlanRightHandActive, FName{TEXTVIEW("Als.OverlayMode.BuildingPlan.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(BuildingPlanRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.BuildingPlan.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(BuildingPlanRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.BuildingPlan.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(BuildingPlanLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.BuildingPlan.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(BuildingPlanLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.BuildingPlan.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(BuildingPlanLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.BuildingPlan.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(FlashlightBothHands, FName{TEXTVIEW("Als.OverlayMode.Flashlight.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(FlashlightRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Flashlight.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(FlashlightRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Flashlight.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(FlashlightRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Flashlight.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(FlashlightLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Flashlight.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(FlashlightLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Flashlight.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(FlashlightLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Flashlight.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(KatanaBothHands, FName{TEXTVIEW("Als.OverlayMode.Katana.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(KatanaRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Katana.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(KatanaRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Katana.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(KatanaRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Katana.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(KatanaLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Katana.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(KatanaLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Katana.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(KatanaLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Katana.LeftHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(SwordBothHands, FName{TEXTVIEW("Als.OverlayMode.Sword.BothHands")})
-	UE_DEFINE_GAMEPLAY_TAG(SwordRightHandActive, FName{TEXTVIEW("Als.OverlayMode.Sword.RightHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(SwordRightHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Sword.RightHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(SwordRightHandPassive, FName{TEXTVIEW("Als.OverlayMode.Sword.RightHand.Passive")})
-	UE_DEFINE_GAMEPLAY_TAG(SwordLeftHandActive, FName{TEXTVIEW("Als.OverlayMode.Sword.LeftHand.Active")})
-	UE_DEFINE_GAMEPLAY_TAG(SwordLeftHandNeutral, FName{TEXTVIEW("Als.OverlayMode.Sword.LeftHand.Neutral")})
-	UE_DEFINE_GAMEPLAY_TAG(SwordLeftHandPassive, FName{TEXTVIEW("Als.OverlayMode.Sword.LeftHand.Passive")})
+	UE_DEFINE_GAMEPLAY_TAG(Pickaxe, FName{TEXTVIEW("Als.OverlayMode.Pickaxe")})
+	UE_DEFINE_GAMEPLAY_TAG(Hammer, FName{TEXTVIEW("Als.OverlayMode.Hammer")})
+	UE_DEFINE_GAMEPLAY_TAG(Grenade, FName{TEXTVIEW("Als.OverlayMode.Grenade")})
+	UE_DEFINE_GAMEPLAY_TAG(BuildingPlan, FName{TEXTVIEW("Als.OverlayMode.BuildingPlan")})
+	UE_DEFINE_GAMEPLAY_TAG(Flashlight, FName{TEXTVIEW("Als.OverlayMode.Flashlight")})
+	UE_DEFINE_GAMEPLAY_TAG(Katana, FName{TEXTVIEW("Als.OverlayMode.Katana")})
+	UE_DEFINE_GAMEPLAY_TAG(Sword, FName{TEXTVIEW("Als.OverlayMode.Sword")})
 }
 
+namespace AlsxtStatusEffectLocomotionVariantSeverityTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Light, TEXT("Als.Status Effect Locomotion Variant.Light"))
+	UE_DEFINE_GAMEPLAY_TAG(Moderate, TEXT("Als.Status Effect Locomotion Variant.Moderate"))
+	UE_DEFINE_GAMEPLAY_TAG(Severe, TEXT("Als.Status Effect Locomotion Variant.Severe"))
+}
 
 namespace AlsLocomotionActionTags
 {
@@ -518,20 +436,34 @@ namespace ALSXTLocomotionVariantTags
 	UE_DEFINE_GAMEPLAY_TAG(Style03, TEXT("Als.Locomotion Variant.Style03"))
 }
 
-namespace ALSXTInjuryTags
+namespace AlsxtStatusEffectLocomotionVariantTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Als.Injury.None"))
-	UE_DEFINE_GAMEPLAY_TAG(Head, TEXT("Als.Injury.Head"))
-	UE_DEFINE_GAMEPLAY_TAG(Abdomen, TEXT("Als.Injury.Abdomen"))
-	UE_DEFINE_GAMEPLAY_TAG(LeftArm, TEXT("Als.Injury.Left Arm"))
-	UE_DEFINE_GAMEPLAY_TAG(RightArm, TEXT("Als.Injury.Right Arm"))
-	UE_DEFINE_GAMEPLAY_TAG(LeftLeg, TEXT("Als.Injury.Left Leg"))
-	UE_DEFINE_GAMEPLAY_TAG(RightLeg, TEXT("Als.Injury.Right Leg"))
+	UE_DEFINE_GAMEPLAY_TAG(None, TEXT("Als.Status Effect Locomotion Variant.None"))
+	UE_DEFINE_GAMEPLAY_TAG(Cold, TEXT("Als.Status Effect Locomotion Variant.Cold"))
+	UE_DEFINE_GAMEPLAY_TAG(Hot, TEXT("Als.Status Effect Locomotion Variant.Hot"))
+	UE_DEFINE_GAMEPLAY_TAG(Exhaustion, TEXT("Als.Status Effect Locomotion Variant.Exhaustion"))
+	UE_DEFINE_GAMEPLAY_TAG(Illness, TEXT("Als.Status Effect Locomotion Variant.Illness"))
+	UE_DEFINE_GAMEPLAY_TAG(InjuryHead, TEXT("Als.Status Effect Locomotion Variant.Injury Head"))
+	UE_DEFINE_GAMEPLAY_TAG(InjuryAbdomen, TEXT("Als.Status Effect Locomotion Variant.Injury Abdomen"))
+	UE_DEFINE_GAMEPLAY_TAG(InjuryLeftArm, TEXT("Als.Status Effect Locomotion Variant.Injury Left Arm"))
+	UE_DEFINE_GAMEPLAY_TAG(InjuryRightArm, TEXT("Als.Status Effect Locomotion Variant.Injury Right Arm"))
+	UE_DEFINE_GAMEPLAY_TAG(InjuryLeftLeg, TEXT("Als.Status Effect Locomotion Variant.Injury Left Leg"))
+	UE_DEFINE_GAMEPLAY_TAG(InjuryRightLeg, TEXT("Als.Status Effect Locomotion Variant.Injury Right Leg"))
+}
+
+namespace AlsxtReadinessTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(Relaxed, TEXT("Alsxt.Readiness.Relaxed"))
+	UE_DEFINE_GAMEPLAY_TAG(Carry, TEXT("Alsxt.Readiness.Carry"))
+	UE_DEFINE_GAMEPLAY_TAG(Ready, TEXT("Alsxt.Readiness.Ready"))
+	UE_DEFINE_GAMEPLAY_TAG(Aiming, TEXT("Alsxt.Readiness.Aiming"))
 }
 
 namespace AlsxtReadyStanceTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Neutral, TEXT("Als.Ready Stance.Neutral"))
+	UE_DEFINE_GAMEPLAY_TAG(Relaxed, TEXT("Als.Ready Stance.Relaxed"))
+	UE_DEFINE_GAMEPLAY_TAG(Carry, TEXT("Als.Ready Stance.Carry"))
 	UE_DEFINE_GAMEPLAY_TAG(Ready, TEXT("Als.Ready Stance.Ready"))
 	UE_DEFINE_GAMEPLAY_TAG(Aiming, TEXT("Als.Ready Stance.Aiming"))
 }

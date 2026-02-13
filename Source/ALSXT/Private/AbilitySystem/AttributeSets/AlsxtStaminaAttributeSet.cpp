@@ -3,13 +3,14 @@
 
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
 #include "GameplayEffectExtension.h"
-#include "AbilitySystem/Data/AlsxtGasGameplayTags.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UAlsxtStaminaAttributeSet::UAlsxtStaminaAttributeSet()
 {
 	MaxStamina = 1.0f;
 	CurrentStamina = 1.0f;
+	LowStaminaThreshold = 0.2f;
 	CurrentStaminaRegenMagnitude = 1.0f;
 	MaxStaminaRegenMagnitude = 10.0f;
 	CurrentStaminaRegenDelay = 3.0f;
@@ -22,8 +23,8 @@ void UAlsxtStaminaAttributeSet::PostAttributeChange(const FGameplayAttribute& At
 	
 	if (Attribute == GetCurrentStaminaAttribute())
 	{
-		CheckMaxReachedForAttribute(MaxStamina, ALSXTGASGameplayTags::State::TAG_State_Max_Stamina.GetTag(), NewValue);
-		CheckMinReachedForAttribute(LowStaminaThreshold, ALSXTGASGameplayTags::State::TAG_State_Min_Stamina.GetTag(), NewValue);
+		CheckMaxReachedForAttribute(MaxStamina, AlsxtGASGameplayTags::State::TAG_State_Max_Stamina.GetTag(), NewValue);
+		CheckMinReachedForAttribute(LowStaminaThreshold, AlsxtGASGameplayTags::State::TAG_State_Min_Stamina.GetTag(), NewValue);
 		return;
 	}
 
@@ -69,6 +70,7 @@ void UAlsxtStaminaAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	// Replicated to all
 	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtStaminaAttributeSet, CurrentStamina, Params);
 	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtStaminaAttributeSet, MaxStamina, Params);
+	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtStaminaAttributeSet, LowStaminaThreshold, Params);
 
 	// Owner Only
 	Params.Condition = COND_OwnerOnly;
@@ -91,6 +93,11 @@ void UAlsxtStaminaAttributeSet::OnRep_CurrentStamina(const FGameplayAttributeDat
 void UAlsxtStaminaAttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UAlsxtStaminaAttributeSet, MaxStamina, OldValue);
+}
+
+void UAlsxtStaminaAttributeSet::OnRep_LowStaminaThreshold(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAlsxtStaminaAttributeSet, LowStaminaThreshold, OldValue);
 }
 
 void UAlsxtStaminaAttributeSet::OnRep_CurrentStaminaRegenMagnitude(const FGameplayAttributeData& OldValue)

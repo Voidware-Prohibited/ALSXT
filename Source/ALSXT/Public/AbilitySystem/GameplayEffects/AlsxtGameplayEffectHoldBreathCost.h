@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Uriel Ballinas, VOIDWARE Prohibited. All rights reserved.
+﻿// Copyright (C) 2026 Uriel Ballinas, VOIDWARE Prohibited. All rights reserved.
 // This software is licensed under the MIT License (LICENSE.md).
 
 #pragma once

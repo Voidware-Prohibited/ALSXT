@@ -6,6 +6,7 @@
 #include "Curves/CurveVector.h"
 #include "Settings/AlsxtFPEyeFocusSettings.h"
 #include "GameplayTagContainer.h"
+#include "Utility/AlsGameplayTags.h"
 #include "AlsxtCameraEffectsSettings.generated.h"
 
 USTRUCT(BlueprintType)
@@ -84,6 +85,34 @@ class ALSXT_API UAlsxtCameraShakeSettings : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Shake")
 	FAlsxtMovementCameraShakeSettings CameraShakeSettings;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtMovementRotationModeShakeSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
+	TMap<FGameplayTag, FAlsxtMovementCameraShakeSettings> Grounded
+	{
+		{AlsRotationModeTags::VelocityDirection, {}},
+		{AlsRotationModeTags::ViewDirection, {}},
+		{AlsRotationModeTags::Aiming, {}}
+	};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Als.Gait"))
+	TMap<UPARAM(meta = (Categories = "Als.Gait")) FGameplayTag, FAlsxtCameraShakeSetting> Ladder;
+	
+};
+
+UCLASS()
+class ALSXT_API UAlsxtMovementCameraShakeSettingsAsset : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Shake")
+	FAlsxtMovementRotationModeShakeSettings MovementCameraShakeSettings;
 };
 
 USTRUCT(BlueprintType)
