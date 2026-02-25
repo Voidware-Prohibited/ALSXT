@@ -52,6 +52,7 @@ void AAlsxtCharacterPlayer::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(LookMouseAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLookMouse);
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLook);
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnMove);
+		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::Input_OnMoveReleased);
 		EnhancedInput->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSprint);
 		EnhancedInput->BindAction(WalkAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnWalk);
 		EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnCrouch);
@@ -63,6 +64,7 @@ void AAlsxtCharacterPlayer::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(FocusAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnFocus);
 		EnhancedInput->BindAction(RagdollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRagdoll);
 		EnhancedInput->BindAction(RollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRoll);
+		EnhancedInput->BindAction(RollAction, ETriggerEvent::Completed, this, &ThisClass::Input_OnRollReleased);
 		EnhancedInput->BindAction(RotationModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRotationMode);
 		EnhancedInput->BindAction(ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnViewMode);
 		EnhancedInput->BindAction(SwitchShoulderAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSwitchShoulder);
@@ -208,21 +210,35 @@ void AAlsxtCharacterPlayer::Input_OnLook(const FInputActionValue& ActionValue)
 void AAlsxtCharacterPlayer::Input_OnMove(const FInputActionValue& ActionValue)
 {
 	const auto Value{UAlsVector::ClampMagnitude012D(ActionValue.Get<FVector2D>())};
-
 	auto ViewRotation{GetViewState().Rotation};
 
 	if (IsValid(GetController()))
 	{
 		// Use exact camera rotation instead of target rotation whenever possible.
-
 		FVector ViewLocation;
 		GetController()->GetPlayerViewPoint(ViewLocation, ViewRotation);
 	}
 
 	const auto ForwardDirection{UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(ViewRotation.Yaw))};
 	const auto RightDirection{UAlsVector::PerpendicularCounterClockwiseXY(ForwardDirection)};
+	
+	FGameplayTagContainer AbilityTags;
 
+	// TODO Create Data/DB/Settings for All Tags Associated to Gameplay Abilities
+	FGameplayTag MovementTag {AlsxtGASGameplayTags::State::TAG_State_MovementInput};
+	AbilityTags.AddTag(MovementTag);
+	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.Movement")));
+
+	GetAbilitySystemComponent()->TryActivateAbilitiesByTag(AbilityTags);
 	AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
+}
+
+void AAlsxtCharacterPlayer::Input_OnMoveReleased()
+{
+	FGameplayTagContainer AbilityTags;
+	FGameplayTag MovementTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Movement"));
+	AbilityTags.AddTagFast(MovementTag);
+	GetAbilitySystemComponent()->CancelAbilities(&AbilityTags, nullptr, nullptr);
 }
 
 void AAlsxtCharacterPlayer::Input_OnSprint(const FInputActionValue& ActionValue)
@@ -306,38 +322,10 @@ void AAlsxtCharacterPlayer::Input_OnWalk()
 			}
 		}
 	}
-	
-	// if (GetDesiredGait() == AlsGaitTags::Walking)
-	// {
-	// 	SetDesiredGait(AlsGaitTags::Running);
-	// }
-	// else if (GetDesiredGait() == AlsGaitTags::Running)
-	// {
-	// 	SetDesiredGait(AlsGaitTags::Walking);
-	// }
 }
 
 void AAlsxtCharacterPlayer::Input_OnCrouch()
 {
-	// if (GetDesiredStance() == AlsStanceTags::Standing)
-	// {
-	// 	if (CanSlide())
-	// 	{
-	// 		TryStartSliding(1.3f);
-	// 	}
-	// 	else {
-	// 		SetDesiredStance(AlsStanceTags::Crouching);
-	// 	}
-	// }
-	// else if (GetDesiredStance() == AlsStanceTags::Crouching)
-	// {
-	// 	SetDesiredStance(AlsStanceTags::Standing);
-	// 	if (GetDesiredStatus() != ALSXTStatusTags::Normal)
-	// 	{
-	// 		SetDesiredStatus(ALSXTStatusTags::Normal);
-	// 	}
-	// }
-	
 	if (GetDesiredStance() == AlsStanceTags::Standing)
 	{
 		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
@@ -358,7 +346,10 @@ void AAlsxtCharacterPlayer::Input_OnCrouch()
 
 				if (CanSlide() && (ForwardVelocity >= MinSlideVelocity))
 				{
-					TryStartSliding(1.3f);
+					FGameplayTag SlidingTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Slide"));
+					ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(SlidingTag));
+
+					// TryStartSliding(1.3f);
 				}
 				else {
 					SetDesiredStance(AlsStanceTags::Crouching);
@@ -527,16 +518,24 @@ void AAlsxtCharacterPlayer::Input_OnRoll()
 {
 	static constexpr auto PlayRate{1.3f};
 
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
-	if (ASC)
+	if (GetAbilitySystemComponent())
 	{
 		FGameplayTag RollingTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Roll"));
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer(RollingTag));
         
-		if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RollingTag)))
-		{
-			StartRolling(PlayRate);
-		}
+		// if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RollingTag)))
+		// {
+		// 	StartRolling(PlayRate);
+		// }
 	}
+}
+
+void AAlsxtCharacterPlayer::Input_OnRollReleased()
+{
+	FGameplayTag RollingTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Roll"));
+	FGameplayTagContainer RollingGameplayTags;
+	RollingGameplayTags.AddTagFast(RollingTag);
+	GetAbilitySystemComponent()->CancelAbilities(&RollingGameplayTags);
 }
 
 void AAlsxtCharacterPlayer::Input_OnRotationMode()
@@ -548,7 +547,61 @@ void AAlsxtCharacterPlayer::Input_OnRotationMode()
 
 void AAlsxtCharacterPlayer::Input_OnViewMode()
 {
-	SetViewMode(GetViewMode() == AlsViewModeTags::ThirdPerson ? AlsViewModeTags::FirstPerson : AlsViewModeTags::ThirdPerson);
+
+	if (GetViewMode() == AlsViewModeTags::FirstPerson)
+	{
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+		if (ASC)
+		{
+			FGameplayTag ThirdPersonTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.ThirdPerson"));
+            
+			if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(ThirdPersonTag)))
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnViewMode: Running Ability Activated")));
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnViewMode: Running Ability Could NOT be Activated!")));
+			}
+		}
+		else
+		{
+			if (GEngine)
+			{
+				FString ClassName = this->GetClass()->GetName();
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnViewMode: AbilitySystemComponent NOT found in %s"), *ClassName));
+			}
+		}
+	}
+	else
+	{
+		if (GetViewMode() == AlsViewModeTags::ThirdPerson)
+		{
+			UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+			if (ASC)
+			{
+				FGameplayTag ThirdPersonTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.ThirdPerson"));
+				FGameplayTagContainer CancelTags;
+				CancelTags.AddTag(ThirdPersonTag);
+				ASC->CancelAbilities(&CancelTags);
+				if (GEngine)
+				{
+					FString ClassName = this->GetClass()->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: Cancel Third Person Ability in %s"), *ClassName));
+				}
+			}
+			else
+			{
+				SetViewMode(AlsViewModeTags::FirstPerson);
+
+				if (GEngine)
+				{
+					FString ClassName = this->GetClass()->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: AbilitySystemComponent NOT found in %s"), *ClassName));
+				}
+			}
+		}
+	}
 }
 
 void AAlsxtCharacterPlayer::Input_OnSwitchShoulder()
@@ -591,13 +644,18 @@ void AAlsxtCharacterPlayer::Input_OnFocus(const FInputActionValue& ActionValue)
 {
 	if (CanFocus())
 	{
+		FGameplayTagContainer FocusTagContainer;
+		FocusTagContainer.AddTagFast(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Focus")));
+		// ActionValue.Get<bool>() ? GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FocusTagContainer) : GetAbilitySystemComponent()->CancelAbilities(&FocusTagContainer);
 		if (ActionValue.Get<bool>())
 		{
-			SetDesiredFocus(ALSXTFocusedTags::True);
+			// SetDesiredFocus(ALSXTFocusedTags::True);
+			GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FocusTagContainer);
 		}
 		else
 		{
-			SetDesiredFocus(ALSXTFocusedTags::False);
+			// SetDesiredFocus(ALSXTFocusedTags::False);
+			GetAbilitySystemComponent()->CancelAbilities(&FocusTagContainer);
 		}
 	}
 }

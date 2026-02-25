@@ -132,12 +132,8 @@ bool UAlsxtGameplayAbilityRun::CanActivateAbility(const FGameplayAbilitySpecHand
 	
 	if (!IsValid(StaminaAttributeSet))
 	{
-		// Optionally, provide a reason why activation failed for debugging.
-		// You can use a tag, for example: FGameplayTag::RequestGameplayTag(TEXT("Ability.Cost.MissingAttributeSet"));
 		return false;
 	}
-
-	
 	
 	// Calculate the jump cost from the Gameplay Effect
 	

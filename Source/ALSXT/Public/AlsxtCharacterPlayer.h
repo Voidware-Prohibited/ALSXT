@@ -68,6 +68,8 @@ protected:
     virtual void Input_OnLook(const FInputActionValue& ActionValue);
     
     virtual void Input_OnMove(const FInputActionValue& ActionValue);
+
+	virtual void Input_OnMoveReleased();
     
     virtual void Input_OnSprint(const FInputActionValue& ActionValue);
     
@@ -84,6 +86,8 @@ protected:
     virtual void Input_OnRagdoll();
     
     virtual void Input_OnRoll();
+
+	virtual void Input_OnRollReleased();
     
     virtual void Input_OnRotationMode();
     

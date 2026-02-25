@@ -10,6 +10,7 @@ namespace AlsxtAbilityGameplayTags
 {
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crouching);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Prone);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Movement);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Running);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Sprint);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Breathing);
@@ -30,6 +31,8 @@ namespace AlsxtAbilityGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(PrimaryFire);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Block);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Flip);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(WallJump);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(WallRun);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(HandGesture);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Emote);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SwitchCombatStance);
@@ -57,6 +60,7 @@ namespace AlsxtGASGameplayTags
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StaminaCost_Instant_HoldingBreath);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StaminaCost_Instant_Crouching);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StaminaCost_Instant_Jump);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StaminaCost_Instant_Flip);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StaminaCost_Instant_WallJump);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StaminaCost_Instant_Roll);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StaminaCost_Instant_Slide);
@@ -73,6 +77,11 @@ namespace AlsxtGASGameplayTags
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StaminaCost_Instant_Damage_Heavy);
 	}
 
+	namespace BreathCost
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_BreathCost_Infinite_HoldingBreath);
+	}
+
 	namespace BasicAttack
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_DamageType_DirectDamage);
@@ -82,6 +91,7 @@ namespace AlsxtGASGameplayTags
 	
 	namespace State
 	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_MovementInput);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Consuming_Stamina);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Regen_Stamina);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_KnockedDown);

@@ -16,13 +16,14 @@ public class ALSXTExtras : ModuleRules
 			"Engine",
 			"UMG",
 			"GameplayTags",
+			"GameplayAbilities",
 			"ModularGameplayActors"
 		]);			
 		
 		PrivateDependencyModuleNames.AddRange([
 			"PhysicsCore",
 			"Slate",
-			"SlateCore",
+			"SlateCore"
 		]);
 
 		if (Target.Type == TargetRules.TargetType.Editor)

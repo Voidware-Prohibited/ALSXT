@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Abilities/Tasks/AbilityTask_WaitAttributeChange.h"
 #include "AbilitySystem/GameplayAbilities/AlsxtGameplayAbilityBase.h"
 #include "AlsxtGameplayAbilityStaminaRegen.generated.h"
 
@@ -28,10 +29,7 @@ public:
 		const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr,
 		FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
 
-	UFUNCTION()
-	void OnDelayFinished();
-
-protected:
+protected:	
 	UPROPERTY(EditDefaultsOnly, Category = "Stamina Regen")
 	TSubclassOf<UGameplayEffect> StaminaRegenEffect;
 
@@ -39,14 +37,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "StaminaRegen")
 	FGameplayTag StaminaRegenTag;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameplayEffect")
-	float DelayDuration = 1.0f;
-
 	UPROPERTY()
 	FGameplayEffectSpecHandle StaminaRegenEffectSpecHandle;
-
-	FTimerHandle DelayTimerHandle;
-	
-	FTimerDelegate DelayTimerDelegate;
 };
 	

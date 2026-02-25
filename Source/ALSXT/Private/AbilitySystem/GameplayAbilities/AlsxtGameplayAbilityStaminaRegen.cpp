@@ -8,6 +8,7 @@
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
 #include "GameplayEffect.h"
 // #include "TimerManager.h"
+#include "Abilities/Tasks/AbilityTask_WaitAttributeChange.h"
 #include "Abilities/Tasks/AbilityTask_WaitDelay.h"
 
 UAlsxtGameplayAbilityStaminaRegen::UAlsxtGameplayAbilityStaminaRegen()
@@ -16,15 +17,19 @@ UAlsxtGameplayAbilityStaminaRegen::UAlsxtGameplayAbilityStaminaRegen()
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	FGameplayTagContainer AssetTags = { };
 	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.StaminaRegen")));
-	// AbilityTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.StaminaRegen")));
 	SetAssetTags(AssetTags);
 	BaseStaminaRegenPerSecond = 0.05f;
 	StaminaRegenTag = FGameplayTag::RequestGameplayTag(FName("StaminaCost.Infinite.Sprint"));
 
-	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag(FName("State.Cooldown.StaminaRegen")));
-
-	// Add a requirement: does NOT have the StaminaConsumptionActive tag
 	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag(FName("State.Consuming.Stamina")));
+	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag(FName("State.Cooldown.StaminaRegen")));
+	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag(FName("State.Max.Stamina")));
+
+	FGameplayTagContainer BlockTags;
+	BlockTags.AddTag(FGameplayTag::RequestGameplayTag(FName("State.Consuming.Stamina")));
+	BlockTags.AddTag(FGameplayTag::RequestGameplayTag(FName("State.Cooldown.StaminaRegen")));
+	BlockTags.AddTag(FGameplayTag::RequestGameplayTag(FName("State.Max.Stamina")));
+	ActivationBlockedTags = BlockTags;
 }
 
 void UAlsxtGameplayAbilityStaminaRegen::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -40,22 +45,43 @@ void UAlsxtGameplayAbilityStaminaRegen::ActivateAbility(const FGameplayAbilitySp
 		return;
 	}
 
-	if (StaminaRegenEffect)
+	FGameplayEffectContextHandle EffectContext = GetActorInfo().AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddInstigator(GetActorInfo().AvatarActor.Get(), GetActorInfo().AvatarActor.Get());
+	StaminaRegenEffectSpecHandle = GetActorInfo().AbilitySystemComponent->MakeOutgoingSpec(StaminaRegenEffect, 1.0f, EffectContext);
+	StaminaRegenEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaRegenTag, -BaseStaminaRegenPerSecond);
+        
+	if (StaminaRegenEffectSpecHandle.IsValid())
 	{
-		// FTimerManager& TimerManager = ActorInfo->OwnerActor->GetWorldTimerManager();
-		// TimerManager.SetTimer(DelayTimerHandle, this, &UAlsxtGameplayAbilityStaminaRegen::OnDelayFinished, DelayDuration, false);
-
-		UAbilityTask_WaitDelay* WaitTask = UAbilityTask_WaitDelay::WaitDelay(this, DelayDuration);
-		WaitTask->OnFinish.AddDynamic(this, &UAlsxtGameplayAbilityStaminaRegen::OnDelayFinished);
-		WaitTask->Activate();
-
+		GetActorInfo().AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaRegenEffectSpecHandle.Data.Get());
 	}
 
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	if (Character->CanSprint())
-	{
-		Character->SetDesiredGait(AlsGaitTags::Sprinting);
-	}
+	// if (StaminaRegenEffect)
+	// {
+	// 	UAbilityTask_WaitDelay* WaitTask = UAbilityTask_WaitDelay::WaitDelay(this, DelayDuration);
+	// 	WaitTask->OnFinish.AddDynamic(this, &UAlsxtGameplayAbilityStaminaRegen::OnDelayFinished);
+	// 	WaitTask->Activate();
+// 
+	// }
+
+	// ActorInfo->AbilitySystemComponent->GetNumericAttribute(UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute());
+	
+	// Setup Task to listen for MaxStamina
+	// UAbilityTask_WaitAttributeChange* MaxStaminaTask = UAbilityTask_WaitAttributeChange::WaitForAttributeChangeWithComparison(
+	// 	this,
+	// 	FGameplayAttribute(UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute()),
+	// 	FGameplayTag(), // No specific tag needed
+	// 	FGameplayTag(), // No specific tag to exclude
+	// 	EWaitAttributeChangeComparison::GreaterThanOrEqualTo,
+	// 	ActorInfo->AbilitySystemComponent->GetNumericAttribute(UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute()),
+	// 	true, // Trigger once
+	// 	nullptr // Optional External Owner
+	// );
+
+	// if (MaxStaminaTask)
+	// {
+	// 	MaxStaminaTask->OnChange.AddDynamic(this, &UAlsxtGameplayAbilityStaminaRegen::OnStaminaReachedMax);
+	// 	MaxStaminaTask->ReadyForActivation();
+	// }
 }
 
 void UAlsxtGameplayAbilityStaminaRegen::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -89,10 +115,6 @@ void UAlsxtGameplayAbilityStaminaRegen::EndAbility(const FGameplayAbilitySpecHan
 	// 	GetWorld()->GetTimerManager().ClearTimer(DelayTimerHandle);
 	// }
 	
-
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	Character->SetDesiredGait(AlsGaitTags::Running);
-	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -114,18 +136,6 @@ bool UAlsxtGameplayAbilityStaminaRegen::CanActivateAbility(const FGameplayAbilit
 		return false;
 	}
 	
-	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
-}
-
-void UAlsxtGameplayAbilityStaminaRegen::OnDelayFinished()
-{
-	FGameplayEffectContextHandle EffectContext = GetActorInfo().AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddInstigator(GetActorInfo().AvatarActor.Get(), GetActorInfo().AvatarActor.Get());
-	StaminaRegenEffectSpecHandle = GetActorInfo().AbilitySystemComponent->MakeOutgoingSpec(StaminaRegenEffect, 1.0f, EffectContext);
-	StaminaRegenEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaRegenTag, -BaseStaminaRegenPerSecond);
-        
-	if (StaminaRegenEffectSpecHandle.IsValid())
-	{
-		GetActorInfo().AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaRegenEffectSpecHandle.Data.Get());
-	}
+	return true;
+	// return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }

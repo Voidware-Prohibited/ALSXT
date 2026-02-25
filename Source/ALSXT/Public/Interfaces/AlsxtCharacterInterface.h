@@ -82,6 +82,15 @@ public:
   FVector GetCharacterFirstPersonCameraLocation() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  bool CanCharacterFocus() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  bool GetCharacterFocus() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterFocus(const bool NewFocus);
+ 
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   bool GetCharacterFirstPersonFocus() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")

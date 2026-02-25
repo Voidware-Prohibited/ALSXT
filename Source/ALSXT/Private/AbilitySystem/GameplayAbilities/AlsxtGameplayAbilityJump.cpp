@@ -8,7 +8,6 @@
 
 UAlsxtGameplayAbilityJump::UAlsxtGameplayAbilityJump()
 {
-	// InstancingPolicy = EGameplayAbilityInstancingPolicy::NonInstanced;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	FGameplayTagContainer AssetTags = { };
@@ -77,6 +76,11 @@ void UAlsxtGameplayAbilityJump::ActivateAbility(const FGameplayAbilitySpecHandle
 				}
 				// Perform the jump action
 				Character->Jump();
+
+				// Cancel Stamina Regen Ability
+				FGameplayTagContainer CancelStaminaRegenGameplayContainer;
+				CancelStaminaRegenGameplayContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
+				ActorInfo->AbilitySystemComponent->CancelAbilities(&CancelStaminaRegenGameplayContainer);
 
 				EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 			}
@@ -156,15 +160,19 @@ void UAlsxtGameplayAbilityJump::CancelAbility(const FGameplayAbilitySpecHandle H
 void UAlsxtGameplayAbilityJump::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	// Character->SetDesiredGait(AlsGaitTags::Running);
-
-	// Try to Activate Stamina Regen Ability
-	FGameplayTagContainer StaminaRegenGameplayTags;
-	StaminaRegenGameplayTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
-	if (ActorInfo->AbilitySystemComponent->TryActivateAbilitiesByTag(StaminaRegenGameplayTags, true))
+	// Apply Cooldown (which handles re-activating later)
+	if (ActorInfo && ActorInfo->AbilitySystemComponent.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UAlsxtGameplayAbilityJump::EndAbility: Gameplay.Ability.StaminaRegen activated!"));
+		if (GetCooldownGameplayEffect())
+		{
+			FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(GetCooldownGameplayEffect()->GetClass(), 1.0f);
+        
+			if (SpecHandle.IsValid())
+			{
+				// Apply Cooldown Spec to Self
+				GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			}
+		}
 	}
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);

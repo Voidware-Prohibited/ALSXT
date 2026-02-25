@@ -31,6 +31,11 @@ void UAlsxtGameplayAbilitySprint::ActivateAbility(const FGameplayAbilitySpecHand
 		return;
 	}
 
+	// Cancel Stamina Regen Ability
+	FGameplayTagContainer CancelStaminaRegenGameplayContainer;
+	CancelStaminaRegenGameplayContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
+	ActorInfo->AbilitySystemComponent->CancelAbilities(&CancelStaminaRegenGameplayContainer);
+
 	if (CostGameplayEffectClass)
 	{
 		FGameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemComponent->MakeEffectContext();
@@ -45,6 +50,8 @@ void UAlsxtGameplayAbilitySprint::ActivateAbility(const FGameplayAbilitySpecHand
 	}
 
 	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
+	PreviousGait = Character->GetDesiredGait();
+	
 	if (Character->CanSprint())
 	{
 		Character->SetDesiredGait(AlsGaitTags::Sprinting);
@@ -86,14 +93,21 @@ void UAlsxtGameplayAbilitySprint::EndAbility(const FGameplayAbilitySpecHandle Ha
 	}
 
 	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	Character->SetDesiredGait(AlsGaitTags::Running);
+	Character->SetDesiredGait(PreviousGait);
 
-	// Try to Activate Stamina Regen Ability
-	FGameplayTagContainer StaminaRegenGameplayTags;
-	StaminaRegenGameplayTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
-	if (ActorInfo->AbilitySystemComponent->TryActivateAbilitiesByTag(StaminaRegenGameplayTags, true))
+	// Apply Cooldown (which handles re-activating later)
+	if (ActorInfo && ActorInfo->AbilitySystemComponent.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UAlsxtGameplayAbilitySprint::EndAbility: Gameplay.Ability.StaminaRegen activated!"));
+		if (GetCooldownGameplayEffect())
+		{
+			FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(GetCooldownGameplayEffect()->GetClass(), 1.0f);
+        
+			if (SpecHandle.IsValid())
+			{
+				// Apply Cooldown Spec to Self
+				GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			}
+		}
 	}
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);

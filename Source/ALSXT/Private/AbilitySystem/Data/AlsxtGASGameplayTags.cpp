@@ -7,6 +7,7 @@ namespace AlsxtAbilityGameplayTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Crouching, TEXT("Gameplay.Ability.Crouching"))
 	UE_DEFINE_GAMEPLAY_TAG(Prone, TEXT("Gameplay.Ability.Prone"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Movement, TEXT("Gameplay.Ability.Movement"))
 	UE_DEFINE_GAMEPLAY_TAG(Running, TEXT("Gameplay.Ability.Running"))
 	UE_DEFINE_GAMEPLAY_TAG(Sprint, TEXT("Gameplay.Ability.Sprint"))
 	UE_DEFINE_GAMEPLAY_TAG(Breathing, TEXT("Gameplay.Ability.Breathing"))
@@ -27,6 +28,8 @@ namespace AlsxtAbilityGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(PrimaryFire, TEXT("Gameplay.Ability.PrimaryFire"))
 	UE_DEFINE_GAMEPLAY_TAG(Block, TEXT("Gameplay.Ability.Block"))
 	UE_DEFINE_GAMEPLAY_TAG(Flip, TEXT("Gameplay.Ability.Flip"))
+	UE_DEFINE_GAMEPLAY_TAG(WallJump, TEXT("Gameplay.Ability.Wall Jump"))
+	UE_DEFINE_GAMEPLAY_TAG(WallRun, TEXT("Gameplay.Ability.Wall Run"))
 	UE_DEFINE_GAMEPLAY_TAG(HandGesture, TEXT("Gameplay.Ability.HandGesture"))
 	UE_DEFINE_GAMEPLAY_TAG(Emote, TEXT("Gameplay.Ability.Emote"))
 	UE_DEFINE_GAMEPLAY_TAG(SwitchCombatStance, TEXT("Gameplay.Ability.SwitchCombatStance"))
@@ -53,6 +56,7 @@ namespace AlsxtGASGameplayTags
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_HoldingBreath, "StaminaCost.Instant.HoldingBreath", "A Gameplay Tag applied to Holding Breath Stamina Cost")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_Crouching, "StaminaCost.Instant.Crouching", "A Gameplay Tag applied to Crouching Stamina Cost")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_Jump, "StaminaCost.Instant.Jump", "A Gameplay Tag applied to Jumping Stamina Cost")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_Flip, "StaminaCost.Instant.Flip", "A Gameplay Tag applied to Flipping Stamina Cost")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_WallJump, "StaminaCost.Instant.WallJump", "A Gameplay Tag applied to Wall Jumping Stamina Cost")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_Roll, "StaminaCost.Instant.Roll", "A Gameplay Tag applied to Rolling Stamina Cost")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_Slide, "StaminaCost.Instant.Slide", "A Gameplay Tag applied to Sliding Stamina Cost")
@@ -69,6 +73,12 @@ namespace AlsxtGASGameplayTags
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StaminaCost_Instant_Damage_Heavy, "StaminaCost.Instant.Damage.Heavy", "A Gameplay Tag applied to Heavy Damage Stamina Cost")
 		
 	}
+
+	namespace BreathCost
+	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_BreathCost_Infinite_HoldingBreath, "BreathCost.Infinite.HoldingBreath", "A Gameplay Tag applied to Holding Breath Cost")
+		
+	}
 	
 	namespace BasicAttack
 	{
@@ -79,6 +89,7 @@ namespace AlsxtGASGameplayTags
 
 	namespace State
 	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_State_MovementInput, "State.MovementInput", "MovementInput")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_State_Consuming_Stamina, "State.Consuming.Stamina", "Consuming Stamina")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_State_Regen_Stamina, "State.Regen.Stamina", "Regenerating Stamina")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_State_KnockedDown, "State.KnockedDown", "KnockedDown")

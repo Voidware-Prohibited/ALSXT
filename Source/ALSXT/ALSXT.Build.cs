@@ -18,6 +18,7 @@ public class ALSXT : ModuleRules
 			"AudioExtensions",
 			"UMG",
 			"GameplayTags",
+			"GameplayAbilities",
 			"GameplayCameras",
 			"CinematicCamera",
 			"AIModule",
@@ -52,7 +53,6 @@ public class ALSXT : ModuleRules
 			"PhysicsCore",
 			"Slate",
 			"SlateCore",
-			"GameplayAbilities",
 			"TargetingSystem"
 		]);
 

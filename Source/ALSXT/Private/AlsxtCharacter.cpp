@@ -1,4 +1,6 @@
 #include "AlsxtCharacter.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AlsxtAnimationInstance.h"
 
 #include "AlsCharacter.h"
@@ -41,6 +43,7 @@
 #include "AlsxtCharacterNpc.h"
 #include "AbilitySystem/AttributeSets/AlsxtBreathAttributeSet.h"
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
+#include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Utility/AlsxtOverlayGameplayTags.h"
 
 void AAlsxtCharacter::ServerSetDesiredStance_Implementation(const FGameplayTag& NewDesiredStance)
@@ -102,7 +105,9 @@ void AAlsxtCharacter::OnRep_AnimationParametersState()
 AAlsxtCharacter::AAlsxtCharacter(const FObjectInitializer& ObjectInitializer) :
                                                                               Super(ObjectInitializer.SetDefaultSubobjectClass<UAlsxtPaintableSkeletalMeshComponent>(AAlsCharacter::MeshComponentName).SetDefaultSubobjectClass<UAlsxtCharacterMovementComponent>(AAlsCharacter::CharacterMovementComponentName))
 {
+	// Set GAS Defaults for this Sub-Class.
 	DesiredGait = AlsGaitTags::Walking;
+	ViewMode = AlsViewModeTags::FirstPerson;
 
 	// Setup Components
 	GetCapsuleComponent()->SetCapsuleRadius(25);
@@ -642,6 +647,94 @@ bool AAlsxtCharacter::TrySetOverlaySlot(const FGameplayTag& TargetSlot, const FG
 	return ReturnValue;
 }
 
+void AAlsxtCharacter::SetMovingTag(bool bIsMoving)
+{
+	GetLocalRole() < ROLE_Authority ? Server_SetMovingTag(bIsMoving) : SetMovingTagLocal(bIsMoving);
+}
+
+void AAlsxtCharacter::SetMovingTagLocal(bool bIsMoving)
+{
+	if (!GetAbilitySystemComponent()) return;
+	const FGameplayTag MovingTag {AlsxtGASGameplayTags::State::TAG_State_MovementInput};
+	// bIsMoving ? GetAbilitySystemComponent()->AddLooseGameplayTag(MovingTag) : GetAbilitySystemComponent()->RemoveLooseGameplayTag(MovingTag);
+
+	if (bIsMoving)
+	{
+		if (!GetAbilitySystemComponent()->HasMatchingGameplayTag(MovingTag))
+		{
+			// GetAbilitySystemComponent()->AddLooseGameplayTag(MovingTag);
+			GetAbilitySystemComponent()->SetLooseGameplayTagCount(MovingTag, 1); 
+		}
+	}
+	else
+	{
+		// GetAbilitySystemComponent()->RemoveLooseGameplayTag(MovingTag, 1, EGameplayTagReplicationState::TagAndCountToAll);
+		GetAbilitySystemComponent()->SetLooseGameplayTagCount(MovingTag, 0); 
+		if (GetAbilitySystemComponent()->HasMatchingGameplayTag(MovingTag))
+		{
+			// GetAbilitySystemComponent()->RemoveLooseGameplayTag(MovingTag);
+			// GetAbilitySystemComponent()->RemoveLooseGameplayTag(MovingTag, 1, EGameplayTagReplicationState::TagAndCountToAll);
+			GetAbilitySystemComponent()->SetLooseGameplayTagCount(MovingTag, 0);
+		}
+	}
+}
+
+void AAlsxtCharacter::Server_SetMovingTag_Implementation(bool bIsMoving)
+{
+	if (!GetAbilitySystemComponent()) return;
+	const FGameplayTag MovingTag {AlsxtGASGameplayTags::State::TAG_State_MovementInput};
+	// bIsMoving ? GetAbilitySystemComponent()->AddLooseGameplayTag(MovingTag) : GetAbilitySystemComponent()->RemoveLooseGameplayTag(MovingTag);
+
+	if (bIsMoving)
+	{
+		if (!GetAbilitySystemComponent()->HasMatchingGameplayTag(MovingTag))
+		{
+			// GetAbilitySystemComponent()->AddLooseGameplayTag(MovingTag);
+			GetAbilitySystemComponent()->SetLooseGameplayTagCount(MovingTag, 1); 
+		}
+	}
+	else
+	{
+		// GetAbilitySystemComponent()->RemoveLooseGameplayTag(MovingTag, 1, EGameplayTagReplicationState::TagAndCountToAll);
+		GetAbilitySystemComponent()->SetLooseGameplayTagCount(MovingTag, 0); 
+		if (GetAbilitySystemComponent()->HasMatchingGameplayTag(MovingTag))
+		{
+			// GetAbilitySystemComponent()->RemoveLooseGameplayTag(MovingTag);
+			// GetAbilitySystemComponent()->RemoveLooseGameplayTag(MovingTag, 1, EGameplayTagReplicationState::TagAndCountToAll);
+			GetAbilitySystemComponent()->SetLooseGameplayTagCount(MovingTag, 0);
+		}
+	}
+
+	// GetAbilitySystemComponent()->AddLooseGameplayTag(MovingTag);  
+
+// if (!GetAbilitySystemComponent()->HasMatchingGameplayTag(MovingTag))
+// {
+// 	// The proper way in UE 5.4 to add a replicated loose tag is to call
+// 	// the library function with bShouldReplicate = true, which handles
+// 	// adding it to both the server's local list and the replicated list
+// 	// for clients to pick up.
+// 	UAbilitySystemBlueprintLibrary::AddLooseGameplayTags(this, FGameplayTagContainer(MovingTag), true);
+
+// 	UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(this, FGameplayTagContainer(MovingTag), true);
+
+// 	// Alternatively, for a more direct approach:
+// 	// ASC->AddReplicatedLooseGameplayTag(MyUniqueTag); // Replicates to clients, but not added to server's local tags
+// 	// ASC->AddLooseGameplayTag(MyUniqueTag);         // Adds locally on the server
+
+// 	// The library function combines these actions effectively.
+// 	UE_LOG(LogTemp, Warning, TEXT("Server added unique tag: %s"), *MovingTag.ToString());
+// }
+// else
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("Tag %s already exists on ASC. Not adding duplicate."), *MovingTag.ToString());
+// }
+}
+
+bool AAlsxtCharacter::Server_SetMovingTag_Validate(bool bIsMoving)
+{
+	return true;
+}
+
 void AAlsxtCharacter::OnReplicated_OverlayModes(const FGameplayTagContainer& PreviousOverlayModes)
 {
 	OnOverlayModesChanged(PreviousOverlayModes);
@@ -935,6 +1028,21 @@ TSoftObjectPtr<UGameplayCameraComponent> AAlsxtCharacter::GetCharacterGameplayCa
 bool AAlsxtCharacter::GetCharacterIsCameraRightShoulder_Implementation() const
 {
 	return true;
+}
+
+bool AAlsxtCharacter::CanCharacterFocus_Implementation() const
+{
+	return Focus == ALSXTFocusedTags::False;
+}
+
+bool AAlsxtCharacter::GetCharacterFocus_Implementation() const
+{
+	return Focus == ALSXTFocusedTags::True;
+}
+
+void AAlsxtCharacter::SetCharacterFocus_Implementation(const bool NewFocus)
+{
+	NewFocus ? SetDesiredFocus(ALSXTFocusedTags::True) : SetDesiredFocus(ALSXTFocusedTags::False);
 }
 
 void AAlsxtCharacter::DisableInputMovement(const bool Disable)

@@ -157,6 +157,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "State|Als Character")
 	bool TrySetOverlaySlot(const FGameplayTag& TargetSlot, const FGameplayTag& NewOverlayMode, const FGameplayTag& NewCombatStance, const bool bForce);
 
+	UFUNCTION()
+	void SetMovingTag(bool bIsMoving);
+
+	UFUNCTION()
+	void SetMovingTagLocal(bool bIsMoving);
+	
+	// Server RPC to update the moving tag
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetMovingTag(bool bIsMoving);
+
 // Settings
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character")
@@ -441,6 +451,10 @@ public:
 	virtual bool GetCharacterIsCameraRightShoulder_Implementation() const override;
 
 	//Character Interface
+	virtual bool CanCharacterFocus_Implementation() const override;
+	virtual bool GetCharacterFocus_Implementation() const override;
+	virtual void SetCharacterFocus_Implementation(const bool NewFocus) override;
+
 	virtual FRotator GetCharacterControlRotation_Implementation() const override;
 	virtual FVector GetCharacterFirstPersonCameraLocation_Implementation() const override;
 	virtual UAlsxtCameraAnimationInstance* GetCharacterCameraAnimationInstance_Implementation() const override;

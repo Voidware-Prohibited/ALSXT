@@ -35,6 +35,10 @@ class ALSXT_API UAlsxtGameplayAbilityBase : public UGameplayAbility
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Input")
 	ETriggerEvent InputReleasedTriggerType = ETriggerEvent::Completed;
 
+	// Gameplay Tag that will apply Magnitude to the Cooldown Effect Duration
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Cooldown Gameplay Effect")
+	FGameplayTag CooldownGameplayEffectMagnitudeTag {FGameplayTag::EmptyTag};
+
 	// Returns the "Avatar Character" associated with this Gameplay Ability.
 	// Will return null if the Avatar Actor does not derive from Character.
 	UFUNCTION(BlueprintCallable, BlueprintPure)

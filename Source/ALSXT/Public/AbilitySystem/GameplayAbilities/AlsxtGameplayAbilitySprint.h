@@ -33,5 +33,8 @@ protected:
 
 	UPROPERTY()
 	FGameplayEffectSpecHandle StaminaDrainEffectSpecHandle;
+
+	UPROPERTY()
+	FGameplayTag PreviousGait;
 };
 	
