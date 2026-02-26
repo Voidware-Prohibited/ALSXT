@@ -56,6 +56,8 @@ void UAlsxtGameplayAbilitySprint::ActivateAbility(const FGameplayAbilitySpecHand
 	{
 		Character->SetDesiredGait(AlsGaitTags::Sprinting);
 	}
+
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void UAlsxtGameplayAbilitySprint::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

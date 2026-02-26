@@ -75,7 +75,7 @@ void AAlsxtCharacterPlayer::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(FreelookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnFreelook);
 		EnhancedInput->BindAction(ToggleFreelookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnFreelook);
 		EnhancedInput->BindAction(ToggleGaitAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnToggleGait);
-		EnhancedInput->BindAction(SwitchReadyStanceAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSwitchCombatStance);
+		EnhancedInput->BindAction(SwitchCombatStanceAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSwitchCombatStance);
 		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnToggleCombatReady);
 		EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnPrimaryInteraction);
 		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSecondaryInteraction);
@@ -154,6 +154,11 @@ UAbilitySystemComponent* AAlsxtCharacterPlayer::GetAbilitySystemComponent() cons
 bool AAlsxtCharacterPlayer::GetCharacterIsCameraRightShoulder_Implementation() const
 {
 	return IsCameraRightShoulder();
+}
+
+void AAlsxtCharacterPlayer::SetCharacterCameraRightShoulder_Implementation(const bool NewCameraRightShoulder)
+{
+	SetCameraRightShoulder(NewCameraRightShoulder);
 }
 
 void AAlsxtCharacterPlayer::OnRep_PlayerState()
@@ -760,15 +765,23 @@ void AAlsxtCharacterPlayer::Input_OnToggleCombatReady()
 
 void AAlsxtCharacterPlayer::Input_OnSwitchCombatStance()
 {
+	if (GetAbilitySystemComponent())
+	{
+		FGameplayTagContainer CombatStanceTags;
+		CombatStanceTags.AddTag(AlsxtAbilityGameplayTags::TAG_Ability_SwitchCombatStance);
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(CombatStanceTags);
+	}
 	if (CanSwitchCombatStance())
 	{
 		if (GetDesiredCombatStance() == ALSXTCombatStanceTags::Orthodox)
 		{
 			SetDesiredCombatStance(ALSXTCombatStanceTags::Southpaw);
+			SetCameraRightShoulder(!IsCameraRightShoulder());
 		}
 		else
 		{
 			SetDesiredCombatStance(ALSXTCombatStanceTags::Orthodox);
+			SetCameraRightShoulder(!IsCameraRightShoulder());
 		}
 	}
 }

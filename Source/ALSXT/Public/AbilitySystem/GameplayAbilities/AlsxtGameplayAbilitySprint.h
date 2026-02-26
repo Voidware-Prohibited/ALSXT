@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/GameplayAbilities/AlsxtGameplayAbilityBase.h"
+#include "AlsxtGameplayAbilityExternalCooldowns.h"
 #include "AlsxtGameplayAbilitySprint.generated.h"
 
 struct FEventData;
@@ -11,7 +11,7 @@ struct FEventData;
  * 
  */
 UCLASS()
-class ALSXT_API UAlsxtGameplayAbilitySprint : public UAlsxtGameplayAbilityBase
+class ALSXT_API UAlsxtGameplayAbilitySprint : public UAlsxtGameplayAbilityExternalCooldowns
 {
 	GENERATED_BODY()
 	

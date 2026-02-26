@@ -62,6 +62,7 @@ void UAlsxtGameplayAbilityRoll::ActivateAbility(const FGameplayAbilitySpecHandle
 			}
 		}
 	}
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void UAlsxtGameplayAbilityRoll::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

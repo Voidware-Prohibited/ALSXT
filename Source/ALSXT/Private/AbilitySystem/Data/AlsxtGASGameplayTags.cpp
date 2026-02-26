@@ -32,7 +32,7 @@ namespace AlsxtAbilityGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(WallRun, TEXT("Gameplay.Ability.Wall Run"))
 	UE_DEFINE_GAMEPLAY_TAG(HandGesture, TEXT("Gameplay.Ability.HandGesture"))
 	UE_DEFINE_GAMEPLAY_TAG(Emote, TEXT("Gameplay.Ability.Emote"))
-	UE_DEFINE_GAMEPLAY_TAG(SwitchCombatStance, TEXT("Gameplay.Ability.SwitchCombatStance"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_SwitchCombatStance, TEXT("Gameplay.Ability.SwitchCombatStance"))
 	UE_DEFINE_GAMEPLAY_TAG(Ready, TEXT("Gameplay.Ability.Ready"))
 }
 
@@ -40,11 +40,96 @@ namespace AlsxtGASGameplayTags
 {
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Effect_NoLevel, "Effect.NoLevel", "This GE won't be leveled up or down. Base level will always be the same (upon granting it).")
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Effect_Type_Cooldown, "Effect.Type.Cooldown", "This is a cooldown GE")
+
+	namespace Character
+	{
+		namespace Controller
+		{
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Controller_PC, "Character.Controller.PlayerCharacter", "A Gameplay Tag applied to Characters that are controlled by a local player.")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Controller_NPC, "Character.Controller.NonPlayerCharacter", "A Gameplay Tag applied to Characters that are AI controlled.")
+		}
+		namespace Role
+		{
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Rank_ServerOwner, "Character.Rank.ServerOwner", "A Gameplay Tag applied to Characters that are controlled by a local player.")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Rank_Admin, "Character.Rank.Admin", "A Gameplay Tag applied to Characters that are AI controlled.")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Rank_Moderator, "Character.Rank.Moderator", "A Gameplay Tag applied to Characters that are AI controlled.")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Rank_Player, "Character.Rank.Player", "A Gameplay Tag applied to Characters that are AI controlled.")
+		}
+	}
 	
 	namespace CharacterTags
 	{
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_PC, "Character.Type.PlayerCharacter", "A Gameplay Tag applied to Characters that are controlled by a local player.")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_NPC, "Character.Type.NonPlayerCharacter", "A Gameplay Tag applied to Characters that are AI controlled.")
+	}
+
+	namespace Cost
+	{
+		namespace Stamina
+		{
+			namespace Infinite
+			{
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Infinite_Combat, "StaminaCost.Infinite.Combat", "A Gameplay Tag applied to Combat Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Infinite_Running, "StaminaCost.Infinite.Running", "A Gameplay Tag applied to Running Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Infinite_Sprint, "StaminaCost.Infinite.Sprint", "A Gameplay Tag applied to Sprinting Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Infinite_WallRun, "StaminaCost.Infinite.WallRun", "A Gameplay Tag applied to Wall Running Stamina Cost")
+			}
+			namespace Instant
+			{
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_HoldingBreath, "StaminaCost.Instant.HoldingBreath", "A Gameplay Tag applied to Holding Breath Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Crouching, "StaminaCost.Instant.Crouching", "A Gameplay Tag applied to Crouching Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Jump, "StaminaCost.Instant.Jump", "A Gameplay Tag applied to Jumping Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Flip, "StaminaCost.Instant.Flip", "A Gameplay Tag applied to Flipping Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_WallJump, "StaminaCost.Instant.WallJump", "A Gameplay Tag applied to Wall Jumping Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Roll, "StaminaCost.Instant.Roll", "A Gameplay Tag applied to Rolling Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Slide, "StaminaCost.Instant.Slide", "A Gameplay Tag applied to Sliding Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Mantle, "StaminaCost.Instant.Mantle", "A Gameplay Tag applied to Mantle Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Vault, "StaminaCost.Instant.Vault", "A Gameplay Tag applied to Vaulting Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Attack_Light, "StaminaCost.Instant.Attack.Light", "A Gameplay Tag applied to ight Attack Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Attack_Medium, "StaminaCost.Instant.Attack.Medium", "A Gameplay Tag applied to Medium Attack Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Attack_Heavy, "StaminaCost.Instant.Attack.Heavy", "A Gameplay Tag applied to Heavy Attack Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Fall_Light, "StaminaCost.Instant.Fall.Light", "A Gameplay Tag applied to Light Fall Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Fall_Medium, "StaminaCost.Instant.Fall.Medium", "A Gameplay Tag applied to Medium Fall Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Fall_Heavy, "StaminaCost.Instant.Fall.Heavy", "A Gameplay Tag applied to Heavy Fall Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Damage_Light, "StaminaCost.Instant.Damage.Light", "A Gameplay Tag applied to Light Damage Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Damage_Medium, "StaminaCost.Instant.Damage.Medium", "A Gameplay Tag applied to Medium Damage Stamina Cost")
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cost_Stamina_Instant_Damage_Heavy, "StaminaCost.Instant.Damage.Heavy", "A Gameplay Tag applied to Heavy Damage Stamina Cost")
+			}
+		}
+
+		namespace Breath
+		{
+			namespace Infinite
+			{
+				UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_BreathCost_Infinite_HoldingBreath, "Cost.Breath.Infinite.Breath.HoldingBreath", "A Gameplay Tag applied to Holding Breath Cost")
+			}
+		}
+	}
+
+	namespace Cooldown
+	{
+		namespace Stamina
+		{
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Sprint, "Cooldown.Stamina.Sprint", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Jump, "Cooldown.Stamina.Jump", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Roll, "Cooldown.Stamina.Roll", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Slide, "Cooldown.Stamina.Slide", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Mantle, "Cooldown.Stamina.Mantle", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Vault, "Cooldown.Stamina.Vault", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Flip, "Cooldown.Stamina.Flip", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_WallJump, "Cooldown.Stamina.WallJump", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_WallRun, "Cooldown.Stamina.WallRun", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_HoldingBreath, "Cooldown.Stamina.HoldingBreath", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Fall_Light, "Cooldown.Stamina.Fall.Light", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Fall_Medium, "Cooldown.Stamina.Fall.Medium", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Fall_Heavy, "Cooldown.Stamina.Fall.Heavy", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Damage_Light, "Cooldown.Damage.Light", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Damage_Medium, "Cooldown.Damage.Medium", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Damage_Heavy, "Cooldown.Damage.Heavy", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Attack_Light, "Cooldown.Attack.Light", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Attack_Medium, "Cooldown.Attack.Medium", "A Gameplay Tag applied to Combat Stamina Cost")
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Cooldown_Stamina_Attack_Heavy, "Cooldown.Attack.Heavy", "A Gameplay Tag applied to Combat Stamina Cost")
+		}
 	}
 
 	namespace StaminaCost

@@ -21,7 +21,7 @@ public:
 
 	// Default value for the stamina cost
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jump|Cost")
-	float MinBreathingRate = 0.20f;
+	float MinBreathingRate = 0.50f;
 
 	// Default value for the stamina cost
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jump|Cost")
@@ -29,7 +29,7 @@ public:
 	
 	// Default value for the stamina cost
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jump|Cost")
-	float MinBreathingMagnitude = 0.20f;
+	float MinBreathingMagnitude = 0.50f;
 
 	// Default value for the stamina cost
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jump|Cost")

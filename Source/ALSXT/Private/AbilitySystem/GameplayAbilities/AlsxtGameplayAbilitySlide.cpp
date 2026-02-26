@@ -17,6 +17,7 @@ void UAlsxtGameplayAbilitySlide::ActivateAbility(const FGameplayAbilitySpecHandl
 	{
 		Character->TryStartSliding(1.3f);
 	}
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void UAlsxtGameplayAbilitySlide::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

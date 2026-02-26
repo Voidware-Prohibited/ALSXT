@@ -7,9 +7,6 @@
 #include "AlsxtCharacterMovementComponent.h"
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
 #include "GameplayEffect.h"
-// #include "TimerManager.h"
-#include "Abilities/Tasks/AbilityTask_WaitAttributeChange.h"
-#include "Abilities/Tasks/AbilityTask_WaitDelay.h"
 
 UAlsxtGameplayAbilityStaminaRegen::UAlsxtGameplayAbilityStaminaRegen()
 {
@@ -54,34 +51,6 @@ void UAlsxtGameplayAbilityStaminaRegen::ActivateAbility(const FGameplayAbilitySp
 	{
 		GetActorInfo().AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaRegenEffectSpecHandle.Data.Get());
 	}
-
-	// if (StaminaRegenEffect)
-	// {
-	// 	UAbilityTask_WaitDelay* WaitTask = UAbilityTask_WaitDelay::WaitDelay(this, DelayDuration);
-	// 	WaitTask->OnFinish.AddDynamic(this, &UAlsxtGameplayAbilityStaminaRegen::OnDelayFinished);
-	// 	WaitTask->Activate();
-// 
-	// }
-
-	// ActorInfo->AbilitySystemComponent->GetNumericAttribute(UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute());
-	
-	// Setup Task to listen for MaxStamina
-	// UAbilityTask_WaitAttributeChange* MaxStaminaTask = UAbilityTask_WaitAttributeChange::WaitForAttributeChangeWithComparison(
-	// 	this,
-	// 	FGameplayAttribute(UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute()),
-	// 	FGameplayTag(), // No specific tag needed
-	// 	FGameplayTag(), // No specific tag to exclude
-	// 	EWaitAttributeChangeComparison::GreaterThanOrEqualTo,
-	// 	ActorInfo->AbilitySystemComponent->GetNumericAttribute(UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute()),
-	// 	true, // Trigger once
-	// 	nullptr // Optional External Owner
-	// );
-
-	// if (MaxStaminaTask)
-	// {
-	// 	MaxStaminaTask->OnChange.AddDynamic(this, &UAlsxtGameplayAbilityStaminaRegen::OnStaminaReachedMax);
-	// 	MaxStaminaTask->ReadyForActivation();
-	// }
 }
 
 void UAlsxtGameplayAbilityStaminaRegen::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -99,20 +68,9 @@ void UAlsxtGameplayAbilityStaminaRegen::EndAbility(const FGameplayAbilitySpecHan
 	}
 
 	// Remove the stamina drain Gameplay Effect
-	if (HasAuthority(&ActivationInfo) && StaminaRegenEffectSpecHandle.IsValid())
-	{
-		ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(StaminaRegenEffect, ActorInfo->AbilitySystemComponent.Get(), -1);
-	}
-
-	
-	// if (HasAuthority(&ActivationInfo) && ActiveStaminaDrainEffectHandle.IsValid())
+	// if (HasAuthority(&ActivationInfo) && StaminaRegenEffectSpecHandle.IsValid())
 	// {
-	// 	ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveStaminaDrainEffectHandle);
-	// }
-
-	// if (GetWorld()->GetTimerManager().IsTimerActive(DelayTimerHandle))
-	// {
-	// 	GetWorld()->GetTimerManager().ClearTimer(DelayTimerHandle);
+	// 	ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(StaminaRegenEffect, ActorInfo->AbilitySystemComponent.Get(), -1);
 	// }
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -131,11 +89,8 @@ bool UAlsxtGameplayAbilityStaminaRegen::CanActivateAbility(const FGameplayAbilit
 	
 	if (!IsValid(StaminaAttributeSet))
 	{
-		// Optionally, provide a reason why activation failed for debugging.
-		// You can use a tag, for example: FGameplayTag::RequestGameplayTag(TEXT("Ability.Cost.MissingAttributeSet"));
 		return false;
 	}
 	
 	return true;
-	// return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }

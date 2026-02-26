@@ -283,6 +283,9 @@ public:
   FGameplayTag GetCharacterCombatStance() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  bool CanCharacterSwitchCombatStance() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   void SetCharacterCombatStance(UPARAM(meta = (Categories = "Als.Combat Stance"))const FGameplayTag& NewCombatStance);
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")

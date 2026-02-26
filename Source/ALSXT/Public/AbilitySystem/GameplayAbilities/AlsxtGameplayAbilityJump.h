@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/GameplayAbilities/AlsxtGameplayAbilityBase.h"
+#include "AlsxtGameplayAbilityExternalCooldowns.h"
 #include "AlsxtGameplayAbilityJump.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ALSXT_API UAlsxtGameplayAbilityJump : public UAlsxtGameplayAbilityBase
+class ALSXT_API UAlsxtGameplayAbilityJump : public UAlsxtGameplayAbilityExternalCooldowns
 {
 	GENERATED_BODY()
 

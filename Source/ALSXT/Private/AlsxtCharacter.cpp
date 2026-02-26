@@ -46,8 +46,10 @@
 #include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
 #include "Utility/AlsxtOverlayGameplayTags.h"
 
-void AAlsxtCharacter::ServerSetDesiredStance_Implementation(const FGameplayTag& NewDesiredStance)
+void AAlsxtCharacter::ServerSetDesiredStance_Implementation(FGameplayTag NewDesiredStance)
 {
+	Super::ServerSetDesiredStance_Implementation(NewDesiredStance);
+
 	Super::ServerSetDesiredStance_Implementation(NewDesiredStance);
 	FGameplayTagContainer StanceTags {AlsStanceTags::Standing};
 	StanceTags.AddTag(AlsStanceTags::Crouching);
@@ -946,8 +948,10 @@ void AAlsxtCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 	}
 }
 
-void AAlsxtCharacter::OnStanceChanged_Implementation(const FGameplayTag& PreviousStance)
+void AAlsxtCharacter::OnStanceChanged_Implementation(FGameplayTag PreviousStance)
 {
+	Super::OnStanceChanged_Implementation(PreviousStance);
+
 	ImpactReaction->RefreshObstacleNavigationPoses();
 }
 
@@ -1057,9 +1061,10 @@ void AAlsxtCharacter::DisableLookAt(const bool Disable)
 
 }
 
-void AAlsxtCharacter::NotifyLocomotionModeChanged(const FGameplayTag& PreviousLocomotionMode)
+void AAlsxtCharacter::NotifyLocomotionModeChanged(FGameplayTag PreviousLocomotionMode)
 {
 	Super::NotifyLocomotionModeChanged(PreviousLocomotionMode);
+
 	AnimationParametersState.LocomotionTags.RemoveTag(PreviousLocomotionMode);
 	AnimationParametersState.LocomotionTags.AddTag(LocomotionMode);
 }
@@ -1694,9 +1699,10 @@ void AAlsxtCharacter::EndBlendOutPhysicalAnimation()
 	SetPhysicalAnimationMode(AlsxtPhysicalAnimationModeTags::None, EmptyNames);
 }
 
-void AAlsxtCharacter::OnOverlayModeChanged_Implementation(const FGameplayTag& PreviousOverlayMode)
+void AAlsxtCharacter::OnOverlayModeChanged_Implementation(FGameplayTag PreviousOverlayMode)
 {
-	// Super::OnOverlayModeChanged(PreviousOverlayMode);
+	Super::OnOverlayModeChanged_Implementation(PreviousOverlayMode);
+
 	ImpactReaction->RefreshBlockingPoses();
 	ImpactReaction->RefreshCrowdNavigationPoses();
 	RefreshOverlayLinkedAnimationLayer();
@@ -2690,6 +2696,16 @@ void AAlsxtCharacter::SetReadyStance(const FGameplayTag& NewReadyStanceTag)
 
 		OnReadyStanceChanged(PreviousReadyStance);
 	}
+}
+
+bool AAlsxtCharacter::CanCharacterSwitchCombatStance_Implementation() const
+{
+	return true;
+}
+
+void AAlsxtCharacter::SetCharacterCameraRightShoulder_Implementation(const bool NewCameraRightShoulder)
+{
+	Camera->SetRightShoulder(!Camera->IsRightShoulder());
 }
 
 void AAlsxtCharacter::SetCombatStance(const FGameplayTag& NewCombatStanceTag)

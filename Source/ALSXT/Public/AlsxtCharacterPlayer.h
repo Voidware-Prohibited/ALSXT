@@ -32,6 +32,8 @@ public:
 
 	virtual bool GetCharacterIsCameraRightShoulder_Implementation() const override;
 
+	virtual void SetCharacterCameraRightShoulder_Implementation(const bool NewCameraRightShoulder) override;
+
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Camera")
@@ -44,7 +46,7 @@ public:
 	TObjectPtr<UInputAction> ProneAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Als Character Example", Meta = (DisplayThumbnail = false))
-	TObjectPtr<UInputAction> SwitchReadyStanceAction;
+	TObjectPtr<UInputAction> SwitchCombatStanceAction;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Als|Input Actions")
 	void Input_OnPrimaryInteraction();

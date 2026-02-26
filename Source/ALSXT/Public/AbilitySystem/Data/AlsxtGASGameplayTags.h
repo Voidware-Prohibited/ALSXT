@@ -35,7 +35,7 @@ namespace AlsxtAbilityGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(WallRun);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(HandGesture);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Emote);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SwitchCombatStance);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_SwitchCombatStance);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ready);
 }
 
@@ -43,12 +43,97 @@ namespace AlsxtGASGameplayTags
 {
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Effect_NoLevel);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Effect_Type_Cooldown);
+
+	namespace Character
+	{
+		namespace Controller
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Controller_PC);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Controller_NPC);
+		}
+		namespace Role
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Rank_ServerOwner);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Rank_Admin);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Rank_Moderator);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Rank_Player);
+		}
+	}
 	
 	namespace CharacterTags
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Type_PC);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Type_NPC);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_State_BlockHealthRegen);
+	}
+
+	namespace Cost
+	{
+		namespace Stamina
+		{
+			namespace Infinite
+			{
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Infinite_Combat);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Infinite_Running);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Infinite_Sprint);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Infinite_WallRun);
+			}
+			namespace Instant
+			{
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_HoldingBreath);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Crouching);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Jump);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Flip);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_WallJump);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Roll);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Slide);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Mantle);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Vault);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Attack_Light);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Attack_Medium);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Attack_Heavy);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Fall_Light);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Fall_Medium);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Fall_Heavy);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Damage_Light);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Damage_Medium);
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cost_Stamina_Instant_Damage_Heavy);
+			}
+		}
+
+		namespace Breath
+		{
+			namespace Infinite
+			{
+				UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_BreathCost_Infinite_HoldingBreath);
+			}
+		}
+	}
+
+	namespace Cooldown
+	{
+		namespace Stamina
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Sprint);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Jump);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Roll);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Slide);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Mantle);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Vault);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Flip);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_WallJump);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_WallRun);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_HoldingBreath);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Fall_Light);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Fall_Medium);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Fall_Heavy);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Damage_Light);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Damage_Medium);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Damage_Heavy);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Attack_Light);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Attack_Medium);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Cooldown_Stamina_Attack_Heavy);
+		}
 	}
 	
 	namespace StaminaCost

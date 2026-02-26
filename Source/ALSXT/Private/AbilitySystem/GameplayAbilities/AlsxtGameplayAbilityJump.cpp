@@ -86,6 +86,7 @@ void UAlsxtGameplayAbilityJump::ActivateAbility(const FGameplayAbilitySpecHandle
 			}
 		}
 	}
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool UAlsxtGameplayAbilityJump::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo * ActorInfo, const FGameplayTagContainer * SourceTags, const FGameplayTagContainer * TargetTags, OUT FGameplayTagContainer * OptionalRelevantTags) const

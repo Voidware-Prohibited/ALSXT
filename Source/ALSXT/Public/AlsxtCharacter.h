@@ -203,11 +203,13 @@ public:
 	// Implement the IAbilitySystemInterface.
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-private:
-	virtual void ServerSetDesiredStance_Implementation(const FGameplayTag& NewDesiredStance) override;
+	// virtual void SetDesiredStance(const FGameplayTag& NewDesiredStance) override;
 
-// State
-public:
+	virtual void ServerSetDesiredStance_Implementation(FGameplayTag NewDesiredStance) override;
+
+	
+
+	// State
 	virtual void OnRep_PlayerState() override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS|State|Parameters", ReplicatedUsing=OnRep_AnimationParametersState, BlueprintGetter=GetAnimationParametersState, Meta =(AllowPrivateAccess))
@@ -400,9 +402,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
 	class UPhysicalAnimationComponent* PhysicalAnimation;
 	
-protected:
-	virtual void OnStanceChanged_Implementation(const FGameplayTag& PreviousStance) override;
+	virtual void OnStanceChanged_Implementation(FGameplayTag PreviousStance) override;
 
+protected:
 	// Breath State
 	void UpdateBreathState();
 	bool ShouldUpdateBreathState() const;
@@ -411,7 +413,10 @@ protected:
 	void SetTargetBreathState(const FAlsxtTargetBreathState& NewTargetBreathState);
 	void TransitionBreathState();
 
-	virtual void OnOverlayModeChanged_Implementation(const FGameplayTag& PreviousOverlayMode) override;
+public:
+	virtual void OnOverlayModeChanged_Implementation(FGameplayTag PreviousOverlayMode) override;
+
+protected:
 	virtual void OnJumped_Implementation() override;
 	virtual void OnMantlingStarted_Implementation(const FAlsMantlingParameters& Parameters) override;
 	virtual void OnMantlingEnded_Implementation() override;
@@ -431,7 +436,7 @@ public:
 	void DisableLookAt(const bool Disable);
 
 protected:
-	virtual void NotifyLocomotionModeChanged(const FGameplayTag& PreviousLocomotionMode) override;
+	virtual void NotifyLocomotionModeChanged(FGameplayTag PreviousLocomotionMode) override;
 
 public:
 	virtual bool IsMantlingAllowedToStart_Implementation() const override;
@@ -1777,6 +1782,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanSwitchReadyStance() const;
+
+	virtual bool CanCharacterSwitchCombatStance_Implementation() const override;
+
+	virtual void SetCharacterCameraRightShoulder_Implementation(const bool NewCameraRightShoulder) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "ALS|Movement System")
 	bool CanSwitchCombatStance() const;
