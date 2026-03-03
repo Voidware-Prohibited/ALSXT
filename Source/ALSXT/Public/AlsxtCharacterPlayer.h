@@ -84,6 +84,8 @@ protected:
     virtual void Input_OnJump(const FInputActionValue& ActionValue);
     
     virtual void Input_OnAim(const FInputActionValue& ActionValue);
+
+	virtual void Input_OnAimReleased();
     
     virtual void Input_OnRagdoll();
     

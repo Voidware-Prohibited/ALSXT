@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectExecutionCalculation.h"
-#include "AlsxtStaminaCooldownExecutionCalculation.generated.h"
+#include "AlsxtGeecStaminaDrainRate.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ALSXT_API UAlsxtStaminaCooldownExecutionCalculation : public UGameplayEffectExecutionCalculation
+class ALSXT_API UAlsxtGeecStaminaDrainRate : public UGameplayEffectExecutionCalculation
 {
 	GENERATED_BODY()
 
 public:
-	UAlsxtStaminaCooldownExecutionCalculation();
+	UAlsxtGeecStaminaDrainRate();
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 };

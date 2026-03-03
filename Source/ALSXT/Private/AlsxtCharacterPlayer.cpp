@@ -60,6 +60,7 @@ void AAlsxtCharacterPlayer::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnJump);
 		EnhancedInput->BindAction(MantleAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnMantle);
 		EnhancedInput->BindAction(AimAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnAim);
+		EnhancedInput->BindAction(AimAction, ETriggerEvent::Completed, this, &ThisClass::Input_OnAimReleased);
 		EnhancedInput->BindAction(AimToggleAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnToggleAim);
 		EnhancedInput->BindAction(FocusAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnFocus);
 		EnhancedInput->BindAction(RagdollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRagdoll);
@@ -508,7 +509,38 @@ void AAlsxtCharacterPlayer::Input_OnJump(const FInputActionValue& ActionValue)
 
 void AAlsxtCharacterPlayer::Input_OnAim(const FInputActionValue& ActionValue)
 {
-	SetDesiredAiming(ActionValue.Get<bool>());
+	// if (GetAbilitySystemComponent())
+	// {
+	// 	FGameplayTag AimTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Aim"));
+	// 	GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer(AimTag));
+	// }
+
+	if (CanAim())
+	{
+		FGameplayTagContainer AimTagContainer;
+		AimTagContainer.AddTagFast(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Aim")));
+		// ActionValue.Get<bool>() ? GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FocusTagContainer) : GetAbilitySystemComponent()->CancelAbilities(&FocusTagContainer);
+		if (ActionValue.Get<bool>())
+		{
+			// SetDesiredFocus(ALSXTFocusedTags::True);
+			GetAbilitySystemComponent()->TryActivateAbilitiesByTag(AimTagContainer);
+		}
+		else
+		{
+			// SetDesiredFocus(ALSXTFocusedTags::False);
+			GetAbilitySystemComponent()->CancelAbilities(&AimTagContainer);
+		}
+	}
+
+	// SetDesiredAiming(ActionValue.Get<bool>());
+}
+
+void AAlsxtCharacterPlayer::Input_OnAimReleased()
+{
+	FGameplayTag AimTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Aim"));
+	FGameplayTagContainer AimGameplayTags;
+	AimGameplayTags.AddTagFast(AimTag);
+	GetAbilitySystemComponent()->CancelAbilities(&AimGameplayTags);
 }
 
 void AAlsxtCharacterPlayer::Input_OnRagdoll()

@@ -1,13 +1,13 @@
 ﻿// MIT
 
 
-#include "AbilitySystem/Calculations/AlsxtStaminaCooldownExecutionCalculation.h"
+#include "AbilitySystem/Calculations/AlsxtGeecStaminaRegenCooldown.h"
 
-UAlsxtStaminaCooldownExecutionCalculation::UAlsxtStaminaCooldownExecutionCalculation()
+UAlsxtGeecStaminaRegenCooldown::UAlsxtGeecStaminaRegenCooldown()
 {
 }
 
-void UAlsxtStaminaCooldownExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+void UAlsxtGeecStaminaRegenCooldown::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
