@@ -37,6 +37,7 @@ namespace AlsxtAbilityGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Emote);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_SwitchCombatStance);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ready);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_WeaponReadyPosition);
 }
 
 namespace AlsxtGASGameplayTags

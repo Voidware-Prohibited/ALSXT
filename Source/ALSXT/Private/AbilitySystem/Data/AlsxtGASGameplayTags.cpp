@@ -34,6 +34,7 @@ namespace AlsxtAbilityGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Emote, TEXT("Gameplay.Ability.Emote"))
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_SwitchCombatStance, TEXT("Gameplay.Ability.SwitchCombatStance"))
 	UE_DEFINE_GAMEPLAY_TAG(Ready, TEXT("Gameplay.Ability.Ready"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_WeaponReadyPosition, TEXT("Gameplay.Ability.WeaponReadyPosition"))
 }
 
 namespace AlsxtGASGameplayTags

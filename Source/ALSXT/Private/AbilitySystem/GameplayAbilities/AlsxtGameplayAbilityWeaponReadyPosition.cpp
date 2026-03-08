@@ -1,7 +1,7 @@
 // MIT
 
 
-#include "AbilitySystem/GameplayAbilities/AlsxtGameplayAbilityReadiness.h"
+#include "AbilitySystem/GameplayAbilities/AlsxtGameplayAbilityWeaponReadyPosition.h"
 #include "AbilitySystem/AbilityTasks/AlsxtAbilityTaskWaitEnhancedInputEvent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
@@ -11,19 +11,19 @@
 
 class UAlsxtAbilityTaskWaitEnhancedInputEvent;
 
-UAlsxtGameplayAbilityReadiness::UAlsxtGameplayAbilityReadiness()
+UAlsxtGameplayAbilityWeaponReadyPosition::UAlsxtGameplayAbilityWeaponReadyPosition()
 {
 	// Initialize tags in constructor
 	ReadyTag = FGameplayTag::RequestGameplayTag(FName("Als.Combat Stance.Ready"));
 	AimingTag = FGameplayTag::RequestGameplayTag(FName("Als.Combat Stance.Aiming"));
 	NeutralTag = FGameplayTag::RequestGameplayTag(FName("Als.Combat Stance.Neutral"));
-
+	
 	FGameplayTagContainer AssetTags = { };
-	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Readiness")));
+	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.WeaponReadyPosition")));
 	SetAssetTags(AssetTags);
 }
 
-bool UAlsxtGameplayAbilityReadiness::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
+bool UAlsxtGameplayAbilityWeaponReadyPosition::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {
 	if (!Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
 	{
@@ -35,7 +35,7 @@ bool UAlsxtGameplayAbilityReadiness::CanActivateAbility(const FGameplayAbilitySp
 	return true;
 }
 
-void UAlsxtGameplayAbilityReadiness::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+void UAlsxtGameplayAbilityWeaponReadyPosition::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	if (!HasAuthority(&ActivationInfo)) return;
@@ -65,7 +65,7 @@ void UAlsxtGameplayAbilityReadiness::ActivateAbility(const FGameplayAbilitySpecH
 		{
 			ApplyTagGameplayEffect(AimingGameplayEffect);
 			// Bind a function to the OnRelease delegate
-			WaitInputReleaseTask->OnRelease.AddDynamic(this, &UAlsxtGameplayAbilityReadiness::OnInputReleased);
+			WaitInputReleaseTask->OnRelease.AddDynamic(this, &UAlsxtGameplayAbilityWeaponReadyPosition::OnInputReleased);
 			// Activate the task
 			WaitInputReleaseTask->ReadyForActivation();
 		}
@@ -77,31 +77,31 @@ void UAlsxtGameplayAbilityReadiness::ActivateAbility(const FGameplayAbilitySpecH
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UAlsxtGameplayAbilityReadiness::OnInputReleased(float TimeHeld)
+void UAlsxtGameplayAbilityWeaponReadyPosition::OnInputReleased(float TimeHeld)
 {
 	// Logic to execute when input is released
 	UE_LOG(LogTemp, Warning, TEXT("Input Released! Time held: %f"), TimeHeld);
 
 	if (AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(GetAvatarActorFromActorInfo()))
 	{
-		if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Relaxed || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Carry)
+		if (Character->GetCharacterReadiness() == AlsxtReadinessTags::Relaxed || Character->GetCharacterReadiness() == AlsxtReadinessTags::Carry)
 		{
-			IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Ready);
+			Character->SetCharacterReadiness(AlsxtReadinessTags::Ready);
 		}
-		if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Ready || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Aiming)
+		if (Character->GetCharacterReadiness() == AlsxtReadinessTags::Ready || Character->GetCharacterReadiness() == AlsxtReadinessTags::Aiming)
 		{
-			IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Carry);
+			Character->SetCharacterReadiness(AlsxtReadinessTags::Carry);
 		}
 	}
 	
 	// ApplyTagGameplayEffect(ReadyGameplayEffect);
 }
 
-void UAlsxtGameplayAbilityReadiness::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void UAlsxtGameplayAbilityWeaponReadyPosition::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	if (ScopeLockCount > 0)
 	{
-		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &UAlsxtGameplayAbilityReadiness::EndAbility, Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled));
+		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &UAlsxtGameplayAbilityWeaponReadyPosition::EndAbility, Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled));
 		return;
 	}
 
@@ -117,7 +117,7 @@ void UAlsxtGameplayAbilityReadiness::EndAbility(const FGameplayAbilitySpecHandle
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UAlsxtGameplayAbilityReadiness::ApplyTagGameplayEffect(TSubclassOf<UGameplayEffect> EffectClass)
+void UAlsxtGameplayAbilityWeaponReadyPosition::ApplyTagGameplayEffect(TSubclassOf<UGameplayEffect> EffectClass)
 {
     UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
     if (ASC && EffectClass)

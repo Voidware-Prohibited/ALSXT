@@ -102,17 +102,33 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterGait() const;
 
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface", meta=(Categories="Als.Gait"))
+  void SetCharacterGait(const FGameplayTag& NewGait);
+
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterReadiness() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface", meta=(Categories="Alsxt.Readiness"))
   void SetCharacterReadiness(const FGameplayTag& NewReadiness);
 
+	// Rotation Mode
+	
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterRotationMode() const;
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterRotationMode(const FGameplayTag& NewRotationMode);
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterViewMode() const;
+	
+  // Roll
+  
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  bool GetCharacterCanRoll() const;
+  
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void StartCharacterRoll(float PlayRate);
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterLean() const;
@@ -204,6 +220,12 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterWeaponReadyPosition() const;
 
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALSXTCharacter Interface")
+  FGameplayTagContainer GetCharacterAvailableWeaponReadyPositions() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterWeaponReadyPosition(FGameplayTag NewWeaponReadyPosition);
+
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterStationaryMode() const;
 
@@ -243,8 +265,21 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FGameplayTag GetCharacterVaultType() const;
 
+  // Aim
+
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FAlsxtAimState GetCharacterAimState() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  bool GetCanCharacterAim() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  bool GetCharacterAim() const;
+
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
+  void SetCharacterAim(const bool NewStance);
+
+  // Free Look
 
   UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ALSXTCharacter Interface")
   FAlsxtFreelookState GetCharacterFreelookState() const;

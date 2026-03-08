@@ -32,32 +32,33 @@ void UAlsxtGameplayAbilityRun::ActivateAbility(const FGameplayAbilitySpecHandle 
 	}
 
 	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
+	Character->SetDesiredGait(AlsGaitTags::Running);
 
-	if (Character->GetDesiredGait() == AlsGaitTags::Walking)
-	{
-		Character->SetDesiredGait(AlsGaitTags::Running);
-
-		if (CostGameplayEffectClass)
-		{
-			FGameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemComponent->MakeEffectContext();
-			EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
-			StaminaDrainEffectSpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
-			// StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseStaminaCostPerSecond);
-        
-			if (StaminaDrainEffectSpecHandle.IsValid())
-			{
-				ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaDrainEffectSpecHandle.Data.Get());
-			}
-		}
-	}
-	else
-	{
-		if (Character->GetDesiredGait() == AlsGaitTags::Running)
-		{
-			// Character->SetDesiredGait(AlsGaitTags::Walking);
-			EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
-		}
-	}
+	// if (Character->GetDesiredGait() == AlsGaitTags::Walking)
+	// {
+	// 	Character->SetDesiredGait(AlsGaitTags::Running);
+// 
+	// 	// if (CostGameplayEffectClass)
+	// 	// {
+	// 	// 	FGameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemComponent->MakeEffectContext();
+	// 	// 	EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
+	// 	// 	StaminaDrainEffectSpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
+	// 	// 	// StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseStaminaCostPerSecond);
+    //     // 
+	// 	// 	if (StaminaDrainEffectSpecHandle.IsValid())
+	// 	// 	{
+	// 	// 		ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaDrainEffectSpecHandle.Data.Get());
+	// 	// 	}
+	// 	// }
+	// }
+	// else
+	// {
+	// 	if (Character->GetDesiredGait() == AlsGaitTags::Running)
+	// 	{
+	// 		// Character->SetDesiredGait(AlsGaitTags::Walking);
+	// 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+	// 	}
+	// }
 }
 
 void UAlsxtGameplayAbilityRun::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -109,12 +110,12 @@ void UAlsxtGameplayAbilityRun::EndAbility(const FGameplayAbilitySpecHandle Handl
 	// }
 
 	// Try to Activate Stamina Regen Ability
-	FGameplayTagContainer StaminaRegenGameplayTags;
-	StaminaRegenGameplayTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
-	if (ActorInfo->AbilitySystemComponent->TryActivateAbilitiesByTag(StaminaRegenGameplayTags, true))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UAlsxtGameplayAbilityRun::EndAbility: Gameplay.Ability.StaminaRegen activated!"));
-	}
+	// FGameplayTagContainer StaminaRegenGameplayTags;
+	// StaminaRegenGameplayTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
+	// if (ActorInfo->AbilitySystemComponent->TryActivateAbilitiesByTag(StaminaRegenGameplayTags, true))
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("UAlsxtGameplayAbilityRun::EndAbility: Gameplay.Ability.StaminaRegen activated!"));
+	// }
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

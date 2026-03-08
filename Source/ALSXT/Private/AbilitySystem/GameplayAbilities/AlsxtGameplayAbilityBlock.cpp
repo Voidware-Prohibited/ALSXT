@@ -8,6 +8,9 @@
 
 UAlsxtGameplayAbilityBlock::UAlsxtGameplayAbilityBlock()
 {
+	FGameplayTagContainer AssetTags = { };
+	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Block")));
+	SetAssetTags(AssetTags);
 }
 
 void UAlsxtGameplayAbilityBlock::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

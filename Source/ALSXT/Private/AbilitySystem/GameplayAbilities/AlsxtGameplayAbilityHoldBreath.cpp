@@ -6,6 +6,12 @@
 UAlsxtGameplayAbilityHoldBreath::UAlsxtGameplayAbilityHoldBreath()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerExecution;
+
+	FGameplayTagContainer AssetTags = { };
+	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.HoldBreath")));
+	SetAssetTags(AssetTags);
+
+	HoldBreathCostTag = FGameplayTag::RequestGameplayTag(FName("Cost.Breath.Infinite.Breath.HoldingBreath"));
 }
 
 void UAlsxtGameplayAbilityHoldBreath::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

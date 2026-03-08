@@ -2,6 +2,8 @@
 
 #include "NativeGameplayTags.h"
 #include "Settings/AlsxtCameraEffectsSettings.h"
+#include "Settings/AlsxtGameplayCameraComponentSettings.h"
+#include "Settings/AlsxtMovementSettings.h"
 #include "Templates/SubclassOf.h"
 #include "AlsxtOverlayStructs.generated.h"
 
@@ -66,6 +68,79 @@ struct ALSXT_API FAlsxtOverlayAnimationInfo
 	bool operator==(const FAlsxtOverlayAnimationInfo& other) const
 	{
 		return (other.ActiveStance == ActiveStance) && (other.NeutralStance == NeutralStance) && (other.PassiveStance == PassiveStance) && (other.BothHandsAnimationInstance == BothHandsAnimationInstance) && (other.Settings == Settings);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtRotationLerpGaitSettings
+{
+	GENERATED_BODY()
+
+public:
+	// Gait amount to acceleration, deceleration, and ground friction curve.
+	// Gait amount ranges from 0 to 3, where 0 is stopped, 1 is walking, 2 is running, and 3 is sprinting.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TObjectPtr<UCurveVector> AccelerationAndDecelerationAndGroundFrictionCurve;
+
+	// Gait amount to rotation interpolation speed curve.
+	// Gait amount ranges from 0 to 3, where 0 is stopped, 1 is walking, 2 is running, and 3 is sprinting.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
+	TObjectPtr<UCurveFloat> RotationInterpolationSpeedCurve;
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtRotationLerpStanceSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS", Meta = (ForceInlineRow))
+	TMap<FGameplayTag, FAlsxtRotationLerpGaitSettings> Stances
+	{
+			{AlsStanceTags::Standing, {}},
+			{AlsStanceTags::Crouching, {}}
+	};
+};
+
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UAlsxtRotationLerpSettings : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
+	TMap<FGameplayTag, FAlsxtRotationLerpStanceSettings> RotationModes
+	{
+				{AlsRotationModeTags::VelocityDirection, {}},
+				{AlsRotationModeTags::ViewDirection, {}},
+				{AlsRotationModeTags::Aiming, {}}
+	};
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtOverlayInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+	FAlsxtOverlayAnimationInfo AnimationInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	TSoftObjectPtr<UAlsxtCameraShakeSettings> CameraShakeSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	TSoftObjectPtr<UAlsxtOverlayCameraOffsetSettings> CameraOffsetSettings;
+
+	// Rotation Lag
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	TSoftObjectPtr<UAlsxtRotationLerpSettings> RotationLerpSettings;
+
+	// Movement Speeds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
+	TSoftObjectPtr<UAlsxtMovementSettings> MovementSettings;
+
+	bool operator==(const FAlsxtOverlayInfo& other) const
+	{
+		return (other.AnimationInfo == AnimationInfo) && (other.CameraShakeSettings == CameraShakeSettings) && (other.CameraOffsetSettings == CameraOffsetSettings);
 	}
 };
 

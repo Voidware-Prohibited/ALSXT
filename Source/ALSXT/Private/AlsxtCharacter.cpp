@@ -4110,6 +4110,16 @@ FGameplayTag AAlsxtCharacter::GetCharacterWeaponReadyPosition_Implementation() c
 	return GetDesiredWeaponReadyPosition();
 }
 
+FGameplayTagContainer AAlsxtCharacter::GetCharacterAvailableWeaponReadyPositions_Implementation() const
+{
+	return IAlsxtCharacterInterface::Execute_GetCharacterAvailableWeaponReadyPositions(this);
+}
+
+void AAlsxtCharacter::SetCharacterWeaponReadyPosition_Implementation(FGameplayTag NewWeaponReadyPosition)
+{
+	SetDesiredWeaponReadyPosition(NewWeaponReadyPosition);
+}
+
 FGameplayTag AAlsxtCharacter::GetCharacterWeaponFirearmStance_Implementation() const
 {
 	return GetDesiredWeaponFirearmStance();
@@ -4160,6 +4170,11 @@ FGameplayTag AAlsxtCharacter::GetCharacterGait_Implementation() const
 	return GetDesiredGait();
 }
 
+void AAlsxtCharacter::SetCharacterGait_Implementation(const FGameplayTag& NewGait)
+{
+	SetDesiredGait(NewGait);
+}
+
 FGameplayTag AAlsxtCharacter::GetCharacterReadiness_Implementation() const
 {
 	return GetDesiredReadyStance();
@@ -4173,6 +4188,11 @@ void AAlsxtCharacter::SetCharacterReadiness_Implementation(const FGameplayTag& N
 FGameplayTag AAlsxtCharacter::GetCharacterRotationMode_Implementation() const
 {
 	return GetDesiredRotationMode();
+}
+
+void AAlsxtCharacter::SetCharacterRotationMode_Implementation(const FGameplayTag& NewRotationMode)
+{
+	SetDesiredRotationMode(NewRotationMode);
 }
 
 FGameplayTag AAlsxtCharacter::GetCharacterViewMode_Implementation() const
@@ -4228,6 +4248,31 @@ bool AAlsxtCharacter::IsBlocking_Implementation() const
 bool AAlsxtCharacter::IsCharacterPlayerControlled_Implementation() const
 {
 	return IsPlayerControlled();
+}
+
+bool AAlsxtCharacter::GetCharacterCanRoll_Implementation() const
+{
+	return CanRoll();
+}
+
+void AAlsxtCharacter::StartCharacterRoll_Implementation(float PlayRate)
+{
+	StartRolling(PlayRate);
+}
+
+bool AAlsxtCharacter::GetCanCharacterAim_Implementation() const
+{
+	return CanAim();
+}
+
+bool AAlsxtCharacter::GetCharacterAim_Implementation() const
+{
+	return IsDesiredAiming();
+}
+
+void AAlsxtCharacter::SetCharacterAim_Implementation(const bool NewStance)
+{
+	SetDesiredAiming(NewStance);
 }
 
 bool AAlsxtCharacter::GetCharacterFirstPersonFocus_Implementation() const

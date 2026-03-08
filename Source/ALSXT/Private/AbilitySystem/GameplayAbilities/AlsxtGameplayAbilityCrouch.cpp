@@ -14,7 +14,6 @@ UAlsxtGameplayAbilityCrouch::UAlsxtGameplayAbilityCrouch()
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	FGameplayTagContainer AssetTags = { };
 	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Crouching")));
-	// AbilityTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Sprint")));
 	SetAssetTags(AssetTags);
 	StaminaCostTag = FGameplayTag::RequestGameplayTag(FName("StaminaCost.Instant.Crouching"));
 }
@@ -45,8 +44,13 @@ void UAlsxtGameplayAbilityCrouch::ActivateAbility(const FGameplayAbilitySpecHand
 	// 	}
 	// }
 
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	Character->SetDesiredStance(AlsStanceTags::Crouching);
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
+	{
+		IAlsxtCharacterInterface::Execute_SetCharacterStance(GetAvatarActorFromActorInfo(), AlsStanceTags::Crouching);
+	}
+
+	// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
+	// Character->SetDesiredStance(AlsStanceTags::Crouching);
 }
 
 void UAlsxtGameplayAbilityCrouch::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -76,8 +80,13 @@ void UAlsxtGameplayAbilityCrouch::EndAbility(const FGameplayAbilitySpecHandle Ha
 	// }
 	
 
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	Character->SetDesiredStance(AlsStanceTags::Standing);
+	// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
+	// Character->SetDesiredStance(AlsStanceTags::Standing);
+
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
+	{
+		IAlsxtCharacterInterface::Execute_SetCharacterStance(GetAvatarActorFromActorInfo(), AlsStanceTags::Standing);
+	}
 
 	// Try to Activate Stamina Regen Ability
 	if (CostGameplayEffectClass)

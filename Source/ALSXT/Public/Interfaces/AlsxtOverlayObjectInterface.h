@@ -16,7 +16,7 @@ public:
   FAlsxtFirearmDischargeEffectsSettings GetOverlayObjectEffectsSettings() const;
 
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Overlay Object Interface|Settings")
-  FAlsxtFirearmRecoilSettings GetOverlayObjectRecoilSettings() const;	
+  FAlsxtFirearmRecoilSettings GetOverlayObjectRecoilSettings() const;
 
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Overlay Object Interface|State")
   FAlsxtFirearmSightsState GetOverlayObjectState() const;

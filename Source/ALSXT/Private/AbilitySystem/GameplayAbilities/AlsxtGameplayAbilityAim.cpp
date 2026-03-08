@@ -8,17 +8,28 @@
 
 UAlsxtGameplayAbilityAim::UAlsxtGameplayAbilityAim()
 {
+	FGameplayTagContainer AssetTags = { };
+	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Aim")));
+	SetAssetTags(AssetTags);
 }
 
 void UAlsxtGameplayAbilityAim::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	if (Character->CanAim())
+	// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
+
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 	{
-		Character->SetDesiredRotationMode(AlsRotationModeTags::Aiming);
-		Character->SetDesiredAiming(true);
+		if (IAlsxtCharacterInterface::Execute_GetCanCharacterAim(GetAvatarActorFromActorInfo()))
+		{
+			IAlsxtCharacterInterface::Execute_SetCharacterRotationMode(GetAvatarActorFromActorInfo(), AlsRotationModeTags::Aiming);
+			// Character->SetDesiredRotationMode(AlsRotationModeTags::Aiming);
+			// Character->SetDesiredAiming(true);
+			IAlsxtCharacterInterface::Execute_SetCharacterAim(GetAvatarActorFromActorInfo(), true);
+			IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Aiming);
+		}
 	}
+	
 }
 
 void UAlsxtGameplayAbilityAim::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -49,14 +60,15 @@ void UAlsxtGameplayAbilityAim::EndAbility(const FGameplayAbilitySpecHandle Handl
 		return;
 	}
 
-	// if (ActorInfo->AvatarActor.Get()->Implements<UAlsxtCharacterInterface>())
-	// {
-	// 	IAlsxtCharacterInterface::Execute_SetCharacterFocus(ActorInfo->AvatarActor.Get(), false);
-	// }
-
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	Character->SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
-	Character->SetDesiredAiming(false);
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
+	{
+		// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
+		// Character->SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
+		IAlsxtCharacterInterface::Execute_SetCharacterRotationMode(GetAvatarActorFromActorInfo(), AlsRotationModeTags::ViewDirection);
+		// Character->SetDesiredAiming(false);
+		IAlsxtCharacterInterface::Execute_SetCharacterAim(GetAvatarActorFromActorInfo(), false);
+		IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Ready);
+	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);	
 }
@@ -70,9 +82,9 @@ void UAlsxtGameplayAbilityAim::InputReleased(const FGameplayAbilitySpecHandle Ha
 bool UAlsxtGameplayAbilityAim::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
                                                   const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {
-	if (AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get()))
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 	{
-		return Character->CanAim();
+		return IAlsxtCharacterInterface::Execute_GetCanCharacterAim(GetAvatarActorFromActorInfo());
 	}
 	return false;
 }

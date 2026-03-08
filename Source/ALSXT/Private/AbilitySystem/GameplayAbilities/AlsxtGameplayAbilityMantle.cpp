@@ -6,6 +6,12 @@
 
 UAlsxtGameplayAbilityMantle::UAlsxtGameplayAbilityMantle()
 {
+	FGameplayTagContainer AssetTags = { };
+	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Mantle")));
+	SetAssetTags(AssetTags);
+
+	// Default tag for setting the stamina cost magnitude
+	StaminaCostTag = FGameplayTag::RequestGameplayTag(FName("StaminaCost.Instant.Mantle"));
 }
 
 void UAlsxtGameplayAbilityMantle::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

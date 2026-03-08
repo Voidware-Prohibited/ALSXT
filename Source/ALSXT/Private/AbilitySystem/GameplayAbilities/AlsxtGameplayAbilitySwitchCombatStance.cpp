@@ -9,6 +9,9 @@
 
 UAlsxtGameplayAbilitySwitchCombatStance::UAlsxtGameplayAbilitySwitchCombatStance()
 {
+	FGameplayTagContainer AssetTags = { };
+	AssetTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.SwitchCombatStance")));
+	SetAssetTags(AssetTags);
 }
 
 void UAlsxtGameplayAbilitySwitchCombatStance::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

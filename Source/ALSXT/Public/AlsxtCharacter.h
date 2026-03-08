@@ -470,12 +470,16 @@ public:
 	virtual FGameplayTag GetCharacterInjury_Implementation() const override;
 	virtual FGameplayTag GetCharacterCombatStance_Implementation() const override;
 	virtual void SetCharacterCombatStance_Implementation(UPARAM(meta = (Categories = "Als.Combat Stance"))const FGameplayTag& NewCombatStance) override;
-	virtual FGameplayTag GetCharacterWeaponReadyPosition_Implementation() const override;
+	
 	virtual FGameplayTag GetCharacterWeaponFirearmStance_Implementation() const override;
 	virtual void SetCharacterRagdoll_Implementation(const bool NewRagdoll) override;
 
 	virtual FGameplayTag GetCharacterReadiness_Implementation() const override;
 	virtual void SetCharacterReadiness_Implementation(const FGameplayTag& NewReadiness) override;
+
+	virtual FGameplayTag GetCharacterWeaponReadyPosition_Implementation() const override;
+	virtual FGameplayTagContainer GetCharacterAvailableWeaponReadyPositions_Implementation() const override;
+	virtual void SetCharacterWeaponReadyPosition_Implementation(FGameplayTag NewWeaponReadyPosition) override;
 
 	// Mesh Painting Interface
 	virtual FAlsxtGlobalGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings_Implementation() const override;
@@ -2187,6 +2191,16 @@ protected:
 	virtual UAlsxtCharacterSettings* GetCharacterSettings_Implementation() const override;
 	virtual UInputComponent* GetCharacterInputComponent_Implementation() const override;
 	virtual bool IsCharacterPlayerControlled_Implementation() const override;
+
+public:
+	virtual bool GetCharacterCanRoll_Implementation() const override;
+	virtual void StartCharacterRoll_Implementation(float PlayRate) override;
+
+	virtual bool GetCanCharacterAim_Implementation() const override;
+	virtual bool GetCharacterAim_Implementation() const override;
+	virtual void SetCharacterAim_Implementation(const bool NewStance) override;
+
+protected:
 	virtual bool GetCharacterFirstPersonFocus_Implementation() const override;
 	virtual bool GetCharacterAimingDownSights_Implementation() const override;
 	virtual bool CanEmote_Implementation() const override;
@@ -2232,7 +2246,16 @@ protected:
 	virtual void SetCharacterStance_Implementation(const FGameplayTag& NewStance) override;
 	virtual FGameplayTag GetCharacterGait_Implementation() const override;
 
+public:
+	virtual void SetCharacterGait_Implementation(const FGameplayTag& NewGait) override;
+
+protected:
 	virtual FGameplayTag GetCharacterRotationMode_Implementation() const override;
+
+public:
+	virtual void SetCharacterRotationMode_Implementation(const FGameplayTag& NewRotationMode) override;
+
+protected:
 	virtual FGameplayTag GetCharacterViewMode_Implementation() const override;
 
 	virtual FGameplayTag GetCharacterLean_Implementation() const override;

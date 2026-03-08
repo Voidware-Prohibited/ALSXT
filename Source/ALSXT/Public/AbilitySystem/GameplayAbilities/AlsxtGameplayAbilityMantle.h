@@ -24,6 +24,9 @@ public:
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr,
 		FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
-	
-	
+
+protected:
+	// Tag to set the magnitude of the stamina cost effect
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jump|Cost")
+	FGameplayTag StaminaCostTag;
 };
