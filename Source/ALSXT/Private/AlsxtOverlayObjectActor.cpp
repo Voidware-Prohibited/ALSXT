@@ -1,13 +1,24 @@
-﻿// MIT
+﻿// Copyright (C) 2026 Uriel Ballinas, VOIDWARE Prohibited. All rights reserved.
+// This software is licensed under the MIT License (LICENSE.md).
 
 
 #include "AlsxtOverlayObjectActor.h"
 #include "Actors/AlsxtOverlayObjectAttachmentBase.h"
 
 
-// Sets default values
+/**
+* @file AlsxtOverlayObjectAcotr.cpp
+* @brief Base Actor class for in-world Overlay Object pickups
+*/
+
+/**
+* @brief Constructor for AlsxtOverlayObjectActor adding Meshes, and Ability System Component
+*/
 AAlsxtOverlayObjectActor::AAlsxtOverlayObjectActor()
 {
+	// If the NetUpdateFrequency is too low, there will be a delay on Ability activation / Effect application on the client.
+	SetNetUpdateFrequency(100.0f);
+	
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -24,6 +35,13 @@ AAlsxtOverlayObjectActor::AAlsxtOverlayObjectActor()
 	SkeletalMeshComponent->SetupAttachment(Pivot);
 
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Scene Capture"));
+
+	// Create the Ability System Component sub-object.
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+ 
+	// Set Replication Mode to Mixed for NPCs.
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 }
 
 #if WITH_EDITOR
@@ -63,6 +81,30 @@ void AAlsxtOverlayObjectActor::BeginPlay()
 	
 }
 
+void AAlsxtOverlayObjectActor::InitializeAbilitySystem()
+{
+	if (!AbilitySystemComponent)
+	{
+		// Shouldn't happen, but if it is, return an error.
+		return;
+	}
+	
+	// Call the function on "Custom Ability System Component" to set up references and Init data. (Client)
+	// AbilitySystemComponent->InitializeAbilitySystemData(AbilitySystemInitializationData, this, this);
+
+	// AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UAlsxtMovementAttributeSet::GetMovementSpeedMultiplierAttribute()).AddUObject(this, &ThisClass::MovementSpeedMultiplierChanged);
+	
+	PostInitializeAbilitySystem();
+}
+
+void AAlsxtOverlayObjectActor::PostInitializeAbilitySystem_Implementation()
+{
+	if (!AbilitySystemComponent)
+	{
+		return;
+	}
+}
+
 // Called every frame
 void AAlsxtOverlayObjectActor::Tick(float DeltaTime)
 {
@@ -96,6 +138,11 @@ void AAlsxtOverlayObjectActor::SetupAttachments()
 			Attachments[i].Group.Add(Attachment);
 		}
 	}
+}
+
+UAbilitySystemComponent* AAlsxtOverlayObjectActor::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 
 USceneCaptureComponent2D* AAlsxtOverlayObjectActor::GetSceneCaptureComponent_Implementation() const

@@ -36,7 +36,32 @@ void UAlsxtGameplayAbilityRoll::ActivateAbility(const FGameplayAbilitySpecHandle
 		
 		if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo())
 		{
-			if (AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get()))
+			// if (AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get()))
+			// {
+			// 	if (CostGameplayEffectClass)
+			// 	{
+			// 		FGameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemComponent->MakeEffectContext();
+			// 		EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
+			// 		StaminaDrainEffectSpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
+			// 		// StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseStaminaCostPerSecond);
+        // 
+			// 		if (StaminaDrainEffectSpecHandle.IsValid())
+			// 		{
+			// 			ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaDrainEffectSpecHandle.Data.Get());
+			// 		}
+			// 	}
+			// 	
+			// 	Character->StartRolling(1.3f);
+// 
+			// 	// Cancel Stamina Regen Ability
+			// 	FGameplayTagContainer CancelStaminaRegenGameplayContainer;
+			// 	CancelStaminaRegenGameplayContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
+			// 	ActorInfo->AbilitySystemComponent->CancelAbilities(&CancelStaminaRegenGameplayContainer);
+// 
+			// 	// EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+			// }
+
+			if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 			{
 				if (CostGameplayEffectClass)
 				{
@@ -50,15 +75,13 @@ void UAlsxtGameplayAbilityRoll::ActivateAbility(const FGameplayAbilitySpecHandle
 						ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaDrainEffectSpecHandle.Data.Get());
 					}
 				}
-				
-				Character->StartRolling(1.3f);
+
+				IAlsxtCharacterInterface::Execute_StartCharacterRoll(GetAvatarActorFromActorInfo(), 1.3f);
 
 				// Cancel Stamina Regen Ability
 				FGameplayTagContainer CancelStaminaRegenGameplayContainer;
 				CancelStaminaRegenGameplayContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
 				ActorInfo->AbilitySystemComponent->CancelAbilities(&CancelStaminaRegenGameplayContainer);
-
-				// EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 			}
 		}
 	}
@@ -77,9 +100,6 @@ void UAlsxtGameplayAbilityRoll::CancelAbility(const FGameplayAbilitySpecHandle H
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
-
-	// ACharacter * Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
-	// Character->StopJumping();
 }
 
 void UAlsxtGameplayAbilityRoll::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -126,27 +146,35 @@ bool UAlsxtGameplayAbilityRoll::CanActivateAbility(const FGameplayAbilitySpecHan
 
 	// Calculate the jump cost from the Gameplay Effect
 	
-	const AAlsxtCharacter* Character = CastChecked<AAlsxtCharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
+	// const AAlsxtCharacter* Character = CastChecked<AAlsxtCharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
 	float CurrentStamina = StaminaSet->GetCurrentStamina();
-	if (CostGameplayEffectClass)
+
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 	{
-		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
-		FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
-		if (CostSpecHandle.IsValid())
+		if (CostGameplayEffectClass)
 		{
-			for (const FGameplayModifierInfo& Modifier : CostSpecHandle.Data->Def->Modifiers)
+			FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+			FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
+			if (CostSpecHandle.IsValid())
 			{
-				if (Modifier.Attribute == UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute() && Modifier.ModifierOp == EGameplayModOp::Additive)
+				for (const FGameplayModifierInfo& Modifier : CostSpecHandle.Data->Def->Modifiers)
 				{
-					float RollCost = 0.01f;
-					RollCost -= CostSpecHandle.Data->GetModifierMagnitude(0);
-					return CurrentStamina >= FMath::Abs(RollCost) && Character->CanRoll(); // Use FMath::Abs as cost is likely negative
+					if (Modifier.Attribute == UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute() && Modifier.ModifierOp == EGameplayModOp::Additive)
+					{
+						float RollCost = 0.01f;
+						RollCost -= CostSpecHandle.Data->GetModifierMagnitude(0);
+						return CurrentStamina >= FMath::Abs(RollCost) && IAlsxtCharacterInterface::Execute_GetCharacterCanRoll(GetAvatarActorFromActorInfo()); // Use FMath::Abs as cost is likely negative
+					}
 				}
 			}
+			return IAlsxtCharacterInterface::Execute_GetCharacterCanRoll(GetAvatarActorFromActorInfo());
+			// return Character->CanRoll();
 		}
-		return Character->CanRoll();
+		return IAlsxtCharacterInterface::Execute_GetCharacterCanRoll(GetAvatarActorFromActorInfo());
 	}
-	return Character->CanRoll();
+	return false;
+	
+	/// return Character->CanRoll();
 }
 
 void UAlsxtGameplayAbilityRoll::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

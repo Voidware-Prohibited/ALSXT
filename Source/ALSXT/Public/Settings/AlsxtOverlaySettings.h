@@ -12,6 +12,9 @@
 #include "Settings/AlsxtAnimationSequenceSettings.h"
 #include "AlsxtOverlaySettings.generated.h"
 
+class UAlsxtAimableOverlayObjectLookupTableDataAsset;
+class UAlsxtOverlayObjectLookupTableDataAsset;
+class UAlsxtOverlayLookupTableDataAsset;
 struct FAlsxtMovementCameraShakeSettings;
 
 USTRUCT(BlueprintType)
@@ -21,6 +24,15 @@ struct ALSXT_API FAlsxtOverlaySettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Overlay Modes")
 	TSoftObjectPtr<UChooserTable> OverlayChooserTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UAlsxtOverlayLookupTableDataAsset> OverlayLookupTable {nullptr};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UAlsxtOverlayObjectLookupTableDataAsset> OverlayObjectLookupTable {nullptr};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UAlsxtAimableOverlayObjectLookupTableDataAsset> AimableOverlayObjectLookupTable {nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	TSoftObjectPtr<UAlsxtPoseMapSettingsAsset> OverlayPoseMap;
@@ -77,4 +89,14 @@ public:
 	// General Settings for Gameplay Camera System
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
 	TSoftObjectPtr<UAlsxtGeneralViewSettingsDataAsset> ViewCameraSettings;
+};
+
+UCLASS(Blueprintable, BlueprintType)
+class ALSXT_API UAlsxtOverlayDataAsset: public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
+	FAlsxtOverlayInfo OverlaySettings;
 };

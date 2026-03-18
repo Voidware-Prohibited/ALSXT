@@ -49,12 +49,22 @@ void UAlsxtGameplayAbilitySprint::ActivateAbility(const FGameplayAbilitySpecHand
 		}
 	}
 
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	PreviousGait = Character->GetDesiredGait();
-	
-	if (Character->CanSprint())
+	// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
+	// PreviousGait = Character->GetDesiredGait();
+	// 
+	// if (Character->CanSprint())
+	// {
+	// 	Character->SetDesiredGait(AlsGaitTags::Sprinting);
+	// }
+
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 	{
-		Character->SetDesiredGait(AlsGaitTags::Sprinting);
+		PreviousGait = IAlsxtCharacterInterface::Execute_GetCharacterGait(GetAvatarActorFromActorInfo());
+		if (IAlsxtCharacterInterface::Execute_CanCharacterSprint(GetAvatarActorFromActorInfo()))
+		{
+			IAlsxtCharacterInterface::Execute_SetCharacterGait(GetAvatarActorFromActorInfo(), AlsGaitTags::Sprinting);
+		}
+		
 	}
 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
@@ -94,8 +104,13 @@ void UAlsxtGameplayAbilitySprint::EndAbility(const FGameplayAbilitySpecHandle Ha
 		ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(CostGameplayEffectClass, ActorInfo->AbilitySystemComponent.Get(), -1);
 	}
 
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	Character->SetDesiredGait(PreviousGait);
+	// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
+	// Character->SetDesiredGait(PreviousGait);
+
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
+	{
+		IAlsxtCharacterInterface::Execute_SetCharacterGait(GetAvatarActorFromActorInfo(), PreviousGait);
+	}
 
 	// Apply Cooldown (which handles re-activating later)
 	if (ActorInfo && ActorInfo->AbilitySystemComponent.IsValid())

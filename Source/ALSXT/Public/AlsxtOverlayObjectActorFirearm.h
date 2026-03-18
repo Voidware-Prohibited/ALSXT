@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AlsxtOverlayObjectActor.h"
+#include "AlsxtAimableOverlayObjectActor.h"
 #include "AlsxtOverlayObjectActorFirearm.generated.h"
 
 UCLASS()
-class ALSXT_API AAlsxtOverlayObjectActorFirearm : public AAlsxtOverlayObjectActor, public IAlsxtFirearmInterface
+class ALSXT_API AAlsxtOverlayObjectActorFirearm : public AAlsxtAimableOverlayObjectActor, public IAlsxtFirearmInterface
 {
 	GENERATED_BODY()
 

@@ -31,26 +31,11 @@ void UAlsxtGameplayAbilityCrouch::ActivateAbility(const FGameplayAbilitySpecHand
 		return;
 	}
 
-	// if (CostGameplayEffectClass)
-	// {
-	// 	FGameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemComponent->MakeEffectContext();
-	// 	EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
-	// 	StaminaDrainEffectSpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
-	// 	StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseStaminaCostPerSecond);
-    //     
-	// 	if (StaminaDrainEffectSpecHandle.IsValid())
-	// 	{
-	// 		ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaDrainEffectSpecHandle.Data.Get());
-	// 	}
-	// }
-
 	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 	{
 		IAlsxtCharacterInterface::Execute_SetCharacterStance(GetAvatarActorFromActorInfo(), AlsStanceTags::Crouching);
 	}
-
-	// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	// Character->SetDesiredStance(AlsStanceTags::Crouching);
+	
 }
 
 void UAlsxtGameplayAbilityCrouch::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -67,36 +52,9 @@ void UAlsxtGameplayAbilityCrouch::EndAbility(const FGameplayAbilitySpecHandle Ha
 		return;
 	}
 
-	// Remove the stamina drain Gameplay Effect
-	if (HasAuthority(&ActivationInfo) && StaminaDrainEffectSpecHandle.IsValid())
-	{
-		ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(CostGameplayEffectClass, ActorInfo->AbilitySystemComponent.Get(), -1);
-	}
-
-	
-	// if (HasAuthority(&ActivationInfo) && ActiveStaminaDrainEffectHandle.IsValid())
-	// {
-	// 	ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveStaminaDrainEffectHandle);
-	// }
-	
-
-	// AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	// Character->SetDesiredStance(AlsStanceTags::Standing);
-
 	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 	{
 		IAlsxtCharacterInterface::Execute_SetCharacterStance(GetAvatarActorFromActorInfo(), AlsStanceTags::Standing);
-	}
-
-	// Try to Activate Stamina Regen Ability
-	if (CostGameplayEffectClass)
-	{
-		FGameplayTagContainer StaminaRegenGameplayTags;
-		StaminaRegenGameplayTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
-		if (ActorInfo->AbilitySystemComponent->TryActivateAbilitiesByTag(StaminaRegenGameplayTags, true))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UAlsxtGameplayAbilityCrouch::EndAbility: Gameplay.Ability.StaminaRegen activated!"));
-		}
 	}
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -121,28 +79,4 @@ bool UAlsxtGameplayAbilityCrouch::CanActivateAbility(const FGameplayAbilitySpecH
 	}
 
 	return true;
-	
-	// Calculate the jump cost from the Gameplay Effect
-	
-	const ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
-	float CurrentStamina = StaminaAttributeSet->GetCurrentStamina();
-	if (CostGameplayEffectClass)
-	{
-		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
-		FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
-		if (CostSpecHandle.IsValid())
-		{
-			for (const FGameplayModifierInfo& Modifier : CostSpecHandle.Data->Def->Modifiers)
-			{
-				if (Modifier.Attribute == UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute() && Modifier.ModifierOp == EGameplayModOp::Additive)
-				{
-					float JumpCost = 0.0f;
-					JumpCost -= CostSpecHandle.Data->GetModifierMagnitude(0);
-					return CurrentStamina >= FMath::Abs(JumpCost); // Use FMath::Abs as cost is likely negative
-				}
-			}
-		}
-		return false;
-	}
-	return false;
 }

@@ -14,7 +14,12 @@ class ALSXT_API UAlsxtGameplayAbilityTargeting : public UAlsxtGameplayAbilityBas
 {
 	GENERATED_BODY()
 	
-	
+public:
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+protected:
+	UFUNCTION()
+	void OnTargetDataReadyCallback(const FGameplayAbilityTargetDataHandle& DataHandle);
 	
 	
 };

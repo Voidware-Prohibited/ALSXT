@@ -82,7 +82,7 @@ void UAlsxtGameplayAbilityReadiness::OnInputReleased(float TimeHeld)
 	// Logic to execute when input is released
 	UE_LOG(LogTemp, Warning, TEXT("Input Released! Time held: %f"), TimeHeld);
 
-	if (AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(GetAvatarActorFromActorInfo()))
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 	{
 		if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Relaxed || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Carry)
 		{

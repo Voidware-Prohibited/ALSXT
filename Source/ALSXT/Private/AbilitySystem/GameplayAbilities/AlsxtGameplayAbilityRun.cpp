@@ -31,48 +31,18 @@ void UAlsxtGameplayAbilityRun::ActivateAbility(const FGameplayAbilitySpecHandle 
 		return;
 	}
 
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	Character->SetDesiredGait(AlsGaitTags::Running);
-
-	// if (Character->GetDesiredGait() == AlsGaitTags::Walking)
-	// {
-	// 	Character->SetDesiredGait(AlsGaitTags::Running);
-// 
-	// 	// if (CostGameplayEffectClass)
-	// 	// {
-	// 	// 	FGameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemComponent->MakeEffectContext();
-	// 	// 	EffectContext.AddInstigator(ActorInfo->AvatarActor.Get(), ActorInfo->AvatarActor.Get());
-	// 	// 	StaminaDrainEffectSpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
-	// 	// 	// StaminaDrainEffectSpecHandle.Data->SetSetByCallerMagnitude(StaminaCostTag, -BaseStaminaCostPerSecond);
-    //     // 
-	// 	// 	if (StaminaDrainEffectSpecHandle.IsValid())
-	// 	// 	{
-	// 	// 		ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StaminaDrainEffectSpecHandle.Data.Get());
-	// 	// 	}
-	// 	// }
-	// }
-	// else
-	// {
-	// 	if (Character->GetDesiredGait() == AlsGaitTags::Running)
-	// 	{
-	// 		// Character->SetDesiredGait(AlsGaitTags::Walking);
-	// 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
-	// 	}
-	// }
-}
-
-void UAlsxtGameplayAbilityRun::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
-{
-	if (ScopeLockCount > 0)
+	// If Current Overlay allows for Combat Gait, use that instead
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 	{
-		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &UAlsxtGameplayAbilityRun::CancelAbility, Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility));
-		return;
+		if (IAlsxtCharacterInterface::Execute_GetCharacterAvailableGaits(GetAvatarActorFromActorInfo()).HasTag(AlsGaitTags::Combat))
+		{
+			IAlsxtCharacterInterface::Execute_SetCharacterGait(GetAvatarActorFromActorInfo(), AlsGaitTags::Combat);
+		}
+		else
+		{
+			IAlsxtCharacterInterface::Execute_SetCharacterGait(GetAvatarActorFromActorInfo(), AlsGaitTags::Running);
+		}
 	}
-	
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-
-	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
 void UAlsxtGameplayAbilityRun::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -95,27 +65,10 @@ void UAlsxtGameplayAbilityRun::EndAbility(const FGameplayAbilitySpecHandle Handl
 		ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(CostGameplayEffectClass, ActorInfo->AbilitySystemComponent.Get(), -1);
 	}
 
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-	Character->SetDesiredGait(AlsGaitTags::Walking);
-
-	// Try to Activate Stamina Regen Ability
-	// if (CostGameplayEffectClass)
-	// {
-	// 	FGameplayTagContainer StaminaRegenGameplayTags;
-	// 	StaminaRegenGameplayTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
-	// 	if (ActorInfo->AbilitySystemComponent->TryActivateAbilitiesByTag(StaminaRegenGameplayTags, true))
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("UAlsxtGameplayAbilityRun::EndAbility: Gameplay.Ability.StaminaRegen activated!"));
-	// 	}
-	// }
-
-	// Try to Activate Stamina Regen Ability
-	// FGameplayTagContainer StaminaRegenGameplayTags;
-	// StaminaRegenGameplayTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.StaminaRegen")));
-	// if (ActorInfo->AbilitySystemComponent->TryActivateAbilitiesByTag(StaminaRegenGameplayTags, true))
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("UAlsxtGameplayAbilityRun::EndAbility: Gameplay.Ability.StaminaRegen activated!"));
-	// }
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
+	{
+		IAlsxtCharacterInterface::Execute_SetCharacterGait(GetAvatarActorFromActorInfo(), AlsGaitTags::Walking);
+	}
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -136,32 +89,11 @@ bool UAlsxtGameplayAbilityRun::CanActivateAbility(const FGameplayAbilitySpecHand
 		return false;
 	}
 	
-	// Calculate the jump cost from the Gameplay Effect
-	
-	AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(ActorInfo->AvatarActor.Get());
-
-	return (Character->GetDesiredGait() == AlsGaitTags::Walking) || (Character->GetDesiredGait() == AlsGaitTags::Sprinting);
+	// if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
+	// {
+	// 	return !(IAlsxtCharacterInterface::Execute_GetCharacterGait(GetAvatarActorFromActorInfo()) == AlsGaitTags::Running) || !(IAlsxtCharacterInterface::Execute_GetCharacterGait(GetAvatarActorFromActorInfo()) == AlsGaitTags::Combat);
+	// }
+	// return false;
 
 	return true;
-	
-	float CurrentStamina = StaminaAttributeSet->GetCurrentStamina();
-	if (CostGameplayEffectClass)
-	{
-		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
-		FGameplayEffectSpecHandle CostSpecHandle = ASC->MakeOutgoingSpec(CostGameplayEffectClass, 1.0f, EffectContext);
-		if (CostSpecHandle.IsValid())
-		{
-			for (const FGameplayModifierInfo& Modifier : CostSpecHandle.Data->Def->Modifiers)
-			{
-				if (Modifier.Attribute == UAlsxtStaminaAttributeSet::GetCurrentStaminaAttribute() && Modifier.ModifierOp == EGameplayModOp::Additive)
-				{
-					float JumpCost = 0.0f;
-					JumpCost -= CostSpecHandle.Data->GetModifierMagnitude(0);
-					return CurrentStamina >= FMath::Abs(JumpCost); // Use FMath::Abs as cost is likely negative
-				}
-			}
-		}
-		return false;
-	}
-	return false;
 }

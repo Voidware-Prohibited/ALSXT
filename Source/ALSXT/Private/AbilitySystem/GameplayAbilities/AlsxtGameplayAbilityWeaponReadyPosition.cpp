@@ -82,17 +82,31 @@ void UAlsxtGameplayAbilityWeaponReadyPosition::OnInputReleased(float TimeHeld)
 	// Logic to execute when input is released
 	UE_LOG(LogTemp, Warning, TEXT("Input Released! Time held: %f"), TimeHeld);
 
-	if (AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(GetAvatarActorFromActorInfo()))
+	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 	{
-		if (Character->GetCharacterReadiness() == AlsxtReadinessTags::Relaxed || Character->GetCharacterReadiness() == AlsxtReadinessTags::Carry)
+		IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Ready);
+
+		if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Relaxed || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Carry)
 		{
-			Character->SetCharacterReadiness(AlsxtReadinessTags::Ready);
+			IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Ready);
 		}
-		if (Character->GetCharacterReadiness() == AlsxtReadinessTags::Ready || Character->GetCharacterReadiness() == AlsxtReadinessTags::Aiming)
+		if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Ready || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Aiming)
 		{
-			Character->SetCharacterReadiness(AlsxtReadinessTags::Carry);
+			IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Carry);
 		}
 	}
+
+	// if (AAlsxtCharacter* Character = Cast<AAlsxtCharacter>(GetAvatarActorFromActorInfo()))
+	// {
+	// 	if (Character->GetCharacterReadiness() == AlsxtReadinessTags::Relaxed || Character->GetCharacterReadiness() == AlsxtReadinessTags::Carry)
+	// 	{
+	// 		Character->SetCharacterReadiness(AlsxtReadinessTags::Ready);
+	// 	}
+	// 	if (Character->GetCharacterReadiness() == AlsxtReadinessTags::Ready || Character->GetCharacterReadiness() == AlsxtReadinessTags::Aiming)
+	// 	{
+	// 		Character->SetCharacterReadiness(AlsxtReadinessTags::Carry);
+	// 	}
+	// }
 	
 	// ApplyTagGameplayEffect(ReadyGameplayEffect);
 }

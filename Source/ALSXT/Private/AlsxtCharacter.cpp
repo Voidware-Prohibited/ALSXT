@@ -18,6 +18,7 @@
 #include "Net/Core/PushModel/PushModel.h"
 #include "Components/SceneComponent.h"
 #include "Components/Character/AlsxtProceduralRecoilAnimComponent.h"
+#include "Components/Character/AlsxtTargetingComponent.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "Settings/AlsxtCharacterSettings.h"
 #include "Settings/AlsxtLocomotionActionSettings.h"
@@ -44,6 +45,7 @@
 #include "AbilitySystem/AttributeSets/AlsxtBreathAttributeSet.h"
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
 #include "AbilitySystem/Data/AlsxtGASGameplayTags.h"
+#include "Settings/AlsxtOverlayLookupTableDataAsset.h"
 #include "Utility/AlsxtOverlayGameplayTags.h"
 
 void AAlsxtCharacter::ServerSetDesiredStance_Implementation(FGameplayTag NewDesiredStance)
@@ -4095,6 +4097,40 @@ FGameplayTag AAlsxtCharacter::GetCharacterOverlayMode_Implementation() const
 	return GetOverlayMode();
 }
 
+FGameplayTag AAlsxtCharacter::GetCharacterDominantOverlayLayer_Implementation(FGameplayTag& OverlaySlot) const
+{
+	return IAlsxtCharacterInterface::GetCharacterDominantOverlayLayer_Implementation(OverlaySlot);
+}
+
+TSoftObjectPtr<UAlsxtOverlayLookupTableDataAsset> AAlsxtCharacter::GetCharacterOverlayLookupTable_Implementation() const
+{
+	return nullptr;
+}
+
+FAlsxtOverlayInfo AAlsxtCharacter::GetCharacterOverlayInfo_Implementation(const FGameplayTag& OverlayModeTag) const
+{
+	if (!OverlayLookupTable.IsNull())
+	{
+		if (TSoftObjectPtr<UAlsxtOverlayDataAsset>* OverlayDataAsset = OverlayLookupTable.Get()->OverlayDataMap.Find(OverlayModeTag))
+		{
+			return OverlayDataAsset->Get()->OverlaySettings;
+		}
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("AAlsxtCharacter::GetCharacterOverlayInfo: OverlayMode not found in OverlayLookupTable.OverlayDataMap")));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("AAlsxtCharacter::GetCharacterOverlayInfo: OverlayLookupTable Not Valid")));
+	}
+	FAlsxtOverlayInfo EmptyOverlayInfo {};
+	return EmptyOverlayInfo;
+}
+
+FAlsxtOverlayLayers AAlsxtCharacter::GetCharacterOverlayLayers_Implementation() const
+{
+	FAlsxtOverlayLayers EmptyOverlayLayers {};
+	return EmptyOverlayLayers;
+}
+
 FGameplayTag AAlsxtCharacter::GetCharacterCombatStance_Implementation() const
 {
 	return GetDesiredCombatStance();
@@ -4258,6 +4294,11 @@ bool AAlsxtCharacter::GetCharacterCanRoll_Implementation() const
 void AAlsxtCharacter::StartCharacterRoll_Implementation(float PlayRate)
 {
 	StartRolling(PlayRate);
+}
+
+bool AAlsxtCharacter::CanCharacterSprint_Implementation() const
+{
+	return CanSprint();
 }
 
 bool AAlsxtCharacter::GetCanCharacterAim_Implementation() const

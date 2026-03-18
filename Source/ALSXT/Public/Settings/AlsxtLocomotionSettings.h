@@ -6,6 +6,9 @@
 
 #include "AlsxtLocomotionSettings.generated.h"
 
+class UAlsxtAimableOverlayObjectLookupTableDataAsset;
+class UAlsxtOverlayObjectLookupTableDataAsset;
+class UAlsxtOverlayLookupTableDataAsset;
 struct FGameplayTag;
 
 UCLASS()
@@ -53,5 +56,14 @@ class ALSXT_API UAlsxtLocomotionSettingsDataAsset: public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ForceInlineRow))
 	FAlsxtLocomotionSettings LocomotionSettings;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UAlsxtOverlayLookupTableDataAsset> OverlayLookupTable {nullptr};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UAlsxtOverlayObjectLookupTableDataAsset> OverlayObjectLookupTable {nullptr};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UAlsxtAimableOverlayObjectLookupTableDataAsset> AimableOverlayObjectLookupTable {nullptr};
 };
 

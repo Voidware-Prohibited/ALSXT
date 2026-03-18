@@ -9,6 +9,8 @@
 #include "Utility/AlsxtOverlayStructs.h"
 #include "Settings/AlsxtCameraEffectsSettings.h"
 #include "Chooser.h"
+#include "Components/Mesh/AlsxtPaintableSkeletalMeshComponent.h"
+#include "Components/Mesh/AlsxtPaintableStaticMeshComponent.h"
 #include "AlsxtOverlayObjectSettings.generated.h"
 
 class UChooserTable;
@@ -30,6 +32,9 @@ class ALSXT_API UAlsxtGeneralAimableOverlayObjectSettingsDataAsset: public UData
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
+	FGameplayTagContainer AvailableAimTargetingModes;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
 	FGameplayTag DefaultCarryPosition;
 
@@ -57,17 +62,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
 	FGameplayTag DefaultReadyPosition;
-};
 
-UCLASS()
-class ALSXT_API UAlsxtOverlayObjectSettingsDataAsset: public UDataAsset
-{
-	GENERATED_BODY()
-
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
-	TMap<FGameplayTag, FAlsxtOverlayAnimationInfo> Overlays;
+	FGameplayTagContainer AvailableTargetingModes;
 };
+
 
 USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtOverlayObjectSettings
@@ -152,3 +151,15 @@ struct ALSXT_API FAlsxtOverlayObjectSettings
 };
 
 
+UCLASS()
+class ALSXT_API UAlsxtOverlayObjectSettingsDataAsset: public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode"))
+	TMap<FGameplayTag, FAlsxtOverlayAnimationInfo> Overlays;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAlsxtOverlayObjectSettings OverlayObjectSettings;
+};

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "Actors/AlsxtOverlayObjectAttachmentBase.h"
 #include "Components/Character/AlsxtProceduralRecoilAnimComponent.h"
 #include "Components/Mesh/AlsxtPaintableSkeletalMeshComponent.h"
@@ -11,6 +12,7 @@
 #include "Interfaces/AlsxtFirearmInterface.h"
 #include "Interfaces/AlsxtMeshPaintingInterface.h"
 #include "Interfaces/AlsxtOverlayObjectInterface.h"
+#include "Settings/AlsxtOverlayObjectSettings.h"
 #include "AlsxtOverlayObjectActor.generated.h"
 
 USTRUCT(BlueprintType)
@@ -64,7 +66,7 @@ struct FAlsxtOverlayObjectAttachmentGroup
 };
 
 UCLASS()
-class ALSXT_API AAlsxtOverlayObjectActor : public AActor, public IAlsxtMeshPaintingInterface, public IAlsxtOverlayObjectInterface
+class ALSXT_API AAlsxtOverlayObjectActor : public AActor, public IAlsxtMeshPaintingInterface, public IAlsxtOverlayObjectInterface, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -89,6 +91,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Data used to initialize the Ability System Component. (Can be found in "AbilitySystemData.h")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System", Meta = (ShowOnlyInnerProperties))
+	TSoftObjectPtr<UAlsxtAbilitySystemInitializationDataAsset> AbilitySystemInitializationData;
+
+	UAbilitySystemComponent* AbilitySystemComponent;
+
+	void InitializeAbilitySystem();
+
+	// This event is fired after Ability System Component initialization is finished.
+	UFUNCTION(BlueprintNativeEvent)
+	void PostInitializeAbilitySystem();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -107,6 +121,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowedClasses = "/Script/Engine.SkeletalMesh, /Script/Engine.StaticMesh"))
 	TSoftObjectPtr<UObject> MeshAsset;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	TSoftObjectPtr<UAlsxtOverlayObjectSettingsDataAsset> OverlayObjectSettings;
+
+	// This Gameplay Tag is used to retrieve Settings from the Overlay Object Lookup Table 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	FGameplayTag OverlayObjectTag;
+
 	virtual USceneCaptureComponent2D* GetSceneCaptureComponent_Implementation() const override;
 
 	UFUNCTION(BlueprintCallable)
@@ -121,11 +142,14 @@ public:
 	void SetAttachmentsVisibility(bool bVisibility);
 	
 	void SetupAttachments();
+
+	// Implement the IAbilitySystemInterface.
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimSequence* SkeletalMeshBasePose;
 
-	// Gun offset in mesh space
+	// Gun offset in mesh space 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	FVector PositionOffset = FVector::ZeroVector;
 	

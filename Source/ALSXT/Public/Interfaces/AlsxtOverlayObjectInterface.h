@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Settings/AlsxtFirearmSettings.h"
+#include "Utility/AlsxtOverlayStructs.h"
 #include "AlsxtOverlayObjectInterface.generated.h"
 
 UINTERFACE(Blueprintable)
@@ -12,6 +13,9 @@ class ALSXT_API IAlsxtOverlayObjectInterface {
 	GENERATED_BODY()
 
 public:
+  UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Overlay Object Interface|Settings")
+  FAlsxtOverlayInfo GetObjectOverlayInfo() const;
+	
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Overlay Object Interface|Settings")
   FAlsxtFirearmDischargeEffectsSettings GetOverlayObjectEffectsSettings() const;
 

@@ -51,13 +51,16 @@ struct ALSXT_API FAlsxtOverlayAnimationInfo
 	FGameplayTagContainer AvailableSlots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Gait", AllowPrivateAccess))
-	FGameplayTagContainer AvailableGaits;
+	FGameplayTagContainer AvailableGaits {AlsGaitTags::Walking};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Stance", AllowPrivateAccess))
-	FGameplayTagContainer AvailableStances;
+	FGameplayTagContainer AvailableStances {AlsStanceTags::Standing};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Alsxt.CombatStance", AllowPrivateAccess))
+	FGameplayTagContainer AvailableCombatStances {ALSXTCombatStanceTags::Orthodox};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.Ready Stance", AllowPrivateAccess))
-	FGameplayTagContainer AvailableReadyStances;
+	FGameplayTagContainer AvailableReadyStances {AlsxtReadyStanceTags::Relaxed};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlaySettings", AllowPrivateAccess))
 	FGameplayTagContainer Settings;
@@ -120,6 +123,9 @@ USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtOverlayInfo
 {
 	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+    int Weight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
 	FAlsxtOverlayAnimationInfo AnimationInfo;
@@ -141,6 +147,31 @@ struct ALSXT_API FAlsxtOverlayInfo
 	bool operator==(const FAlsxtOverlayInfo& other) const
 	{
 		return (other.AnimationInfo == AnimationInfo) && (other.CameraShakeSettings == CameraShakeSettings) && (other.CameraOffsetSettings == CameraOffsetSettings);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtOverlayLayers
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode,Als.OverlaySlotStance,Als.OverlayLeftHandMirrorPolicy,Als.OverlaySettings", AllowPrivateAccess))
+	FGameplayTagContainer ActiveLayers;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode,Als.OverlaySlotStance,Als.OverlayLeftHandMirrorPolicy,Als.OverlaySettings", AllowPrivateAccess))
+	FGameplayTag OverlayLayerRightHand;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode,Als.OverlaySlotStance,Als.OverlayLeftHandMirrorPolicy,Als.OverlaySettings", AllowPrivateAccess))
+	FGameplayTag OverlayLayerLeftHand;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode,Als.Als.OverlaySettings", AllowPrivateAccess))
+	FGameplayTag OverlayLayerBothHands;
+
+	FAlsxtOverlayInfo GetDominantOverlayInfo();
+
+	bool operator==(const FAlsxtOverlayLayers& other) const
+	{
+		return (other.ActiveLayers == ActiveLayers) && (other.OverlayLayerRightHand == OverlayLayerRightHand) && (other.OverlayLayerLeftHand == OverlayLayerLeftHand) && (other.OverlayLayerBothHands == OverlayLayerBothHands);
 	}
 };
 

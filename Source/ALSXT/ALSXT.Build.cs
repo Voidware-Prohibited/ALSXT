@@ -41,6 +41,7 @@ public class ALSXT : ModuleRules
 			"ContextualAnimation",
 			"PhysicsControl",
 			"DataRegistry",
+			"TargetingSystem"
 #if UE_5_5_OR_LATER
 			// pass
 #else
@@ -53,7 +54,6 @@ public class ALSXT : ModuleRules
 			"PhysicsCore",
 			"Slate",
 			"SlateCore",
-			"TargetingSystem"
 		]);
 
 		if (Target.Type == TargetRules.TargetType.Editor)

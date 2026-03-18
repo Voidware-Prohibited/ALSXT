@@ -11,10 +11,12 @@
 #include "AlsxtGameplayCameraComponentSettings.generated.h"
 
 USTRUCT(BlueprintType)
-struct ALSXT_API FAlsxtGaitCameraOffsetSettings
+struct ALSXT_API FAlsxtCombatStanceCameraOffsetSettings
 {
 	GENERATED_BODY()
 
+	// View Mode
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector RelaxedOffset {FVector::ZeroVector};
 
@@ -22,14 +24,31 @@ struct ALSXT_API FAlsxtGaitCameraOffsetSettings
 	FVector ReadyOffset {FVector::ZeroVector};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector AimingOffset {FVector::ZeroVector};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector FocusOffset {FVector::ZeroVector};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector ThirdPersonAimOffset {FVector::ZeroVector};
+	FVector VelocityDirectionOffset {FVector::ZeroVector};
+
+	bool operator==(const FAlsxtCombatStanceCameraOffsetSettings& other) const
+	{
+		return (other.RelaxedOffset == RelaxedOffset) && (other.ReadyOffset == ReadyOffset) && (other.FocusOffset == FocusOffset) && (other.AimingOffset == AimingOffset);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtGaitCameraOffsetSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Alsxt.CombatStance"))
+	TMap<UPARAM(meta = (Categories = "Alsxt.CombatStance")) FGameplayTag, FAlsxtCombatStanceCameraOffsetSettings> CombatStances;
 
 	bool operator==(const FAlsxtGaitCameraOffsetSettings& other) const
 	{
-		return (other.RelaxedOffset == RelaxedOffset) && (other.ReadyOffset == ReadyOffset) && (other.FocusOffset == FocusOffset) && (other.ThirdPersonAimOffset == ThirdPersonAimOffset);
+		return (other.CombatStances.OrderIndependentCompareEqual(CombatStances));
 	}
 };
 
@@ -67,7 +86,7 @@ struct ALSXT_API FAlsxtLocomotionModeGameplayCameraOffsetSettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Als.LocomotionMode"))
-	TMap<UPARAM(meta = (Categories = "Als.LocomotionMode")) FGameplayTag, FAlsxtOverlayGameplayCameraOffsetSettings> LocomotionModes;
+	TMap<UPARAM(meta = (Categories = "Als.LocomotionMode")) FGameplayTag, FAlsxtStanceGameplayCameraOffsetSettings> LocomotionModes;
 
 	bool operator==(const FAlsxtLocomotionModeGameplayCameraOffsetSettings& other) const
 	{
@@ -81,12 +100,7 @@ struct ALSXT_API FAlsxtViewModeGameplayCameraOffsetSettings
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Als.ViewMode"))
-	TMap<UPARAM(meta = (Categories = "Als.ViewMode")) FGameplayTag, FAlsxtLocomotionModeGameplayCameraOffsetSettings> ViewModes
-	{
-		{AlsRotationModeTags::VelocityDirection, {}},
-		{AlsRotationModeTags::ViewDirection, {}},
-		{AlsRotationModeTags::Aiming, {}}
-	};;
+	TMap<UPARAM(meta = (Categories = "Als.ViewMode")) FGameplayTag, FAlsxtLocomotionModeGameplayCameraOffsetSettings> ViewModes;
 
 	bool operator==(const FAlsxtViewModeGameplayCameraOffsetSettings& other) const
 	{

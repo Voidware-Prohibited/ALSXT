@@ -277,21 +277,24 @@ void AAlsxtCharacterPlayer::Input_OnSprint(const FInputActionValue& ActionValue)
 
 void AAlsxtCharacterPlayer::Input_OnWalk()
 {
-	if (GetDesiredStance() == AlsGaitTags::Walking)
+	if (GetDesiredGait() == AlsGaitTags::Walking)
 	{
 		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 		if (ASC)
 		{
 			FGameplayTag RunningTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Running"));
-			// ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RunningTag));
-            
+        
 			if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RunningTag)))
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: Running Ability Activated")));
+				SetDesiredGait(AlsGaitTags::Running);			
 			}
 			else
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: Running Ability Could NOT be Activated!")));
+				if (GEngine)
+				{
+					FString ClassName = this->GetClass()->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Ability with Tag Gameplay.Ability.Running could NOT be Activated in %s"), *ClassName));
+				}
 			}
 		}
 		else
@@ -299,35 +302,82 @@ void AAlsxtCharacterPlayer::Input_OnWalk()
 			if (GEngine)
 			{
 				FString ClassName = this->GetClass()->GetName();
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: AbilitySystemComponent NOT found in %s"), *ClassName));
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("AbilitySystemComponent NOT found in %s"), *ClassName));
 			}
 		}
 	}
 	else
 	{
-		if (GetDesiredGait() == AlsGaitTags::Running)
+		if ((GetDesiredGait() == AlsGaitTags::Running) || (GetDesiredGait() == AlsGaitTags::Combat))
 		{
 			UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+			FGameplayTag RunningTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Running"));
+			FGameplayTagContainer CancelTags;
+			CancelTags.AddTag(RunningTag);
 			if (ASC)
 			{
-				FGameplayTag RunningTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Running"));
-				FGameplayTagContainer CancelTags;
-				CancelTags.AddTag(RunningTag);
 				ASC->CancelAbilities(&CancelTags);
-				// SetDesiredGait(AlsGaitTags::Walking);	
-			}
-			else
-			{
 				SetDesiredGait(AlsGaitTags::Walking);
-
-				if (GEngine)
-				{
-					FString ClassName = this->GetClass()->GetName();
-					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: AbilitySystemComponent NOT found in %s"), *ClassName));
-				}
+			}
+			if (GEngine)
+			{
+				FString ClassName = this->GetClass()->GetName();
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("AbilitySystemComponent NOT found in %s"), *ClassName));
 			}
 		}
 	}
+
+	// if (GetDesiredStance() == AlsGaitTags::Walking)
+	// {
+	// 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	// 	if (ASC)
+	// 	{
+	// 		FGameplayTag RunningTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Running"));
+	// 		// ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RunningTag));
+    //         
+	// 		if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RunningTag)))
+	// 		{
+	// 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: Running Ability Activated")));
+	// 		}
+	// 		else
+	// 		{
+	// 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: Running Ability Could NOT be Activated!")));
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		if (GEngine)
+	// 		{
+	// 			FString ClassName = this->GetClass()->GetName();
+	// 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: AbilitySystemComponent NOT found in %s"), *ClassName));
+	// 		}
+	// 	}
+	// }
+	// else
+	// {
+	// 	if (GetDesiredGait() == AlsGaitTags::Running)
+	// 	{
+	// 		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	// 		if (ASC)
+	// 		{
+	// 			FGameplayTag RunningTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Running"));
+	// 			FGameplayTagContainer CancelTags;
+	// 			CancelTags.AddTag(RunningTag);
+	// 			ASC->CancelAbilities(&CancelTags);
+	// 			// SetDesiredGait(AlsGaitTags::Walking);	
+	// 		}
+	// 		else
+	// 		{
+	// 			SetDesiredGait(AlsGaitTags::Walking);
+// 
+	// 			if (GEngine)
+	// 			{
+	// 				FString ClassName = this->GetClass()->GetName();
+	// 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: AbilitySystemComponent NOT found in %s"), *ClassName));
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 void AAlsxtCharacterPlayer::Input_OnCrouch()

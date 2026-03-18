@@ -68,6 +68,9 @@
 
 #include "AlsxtCharacter.generated.h"
 
+class UAlsxtOverlayLookupTableDataAsset;
+class UAlsxtOverlayObjectLookupTableDataAsset;
+class UAlsxtAimableOverlayObjectLookupTableDataAsset;
 class UAlsxtMovementSettings;
 class UAlsxtCameraAnimationInstance;
 class UAlsxtMantlingSettings;
@@ -404,6 +407,15 @@ public:
 	
 	virtual void OnStanceChanged_Implementation(FGameplayTag PreviousStance) override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UAlsxtOverlayLookupTableDataAsset> OverlayLookupTable {nullptr};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UAlsxtOverlayObjectLookupTableDataAsset> OverlayObjectLookupTable {nullptr};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess))
+	TSoftObjectPtr<UAlsxtAimableOverlayObjectLookupTableDataAsset> AimableOverlayObjectLookupTable {nullptr};
+	
 protected:
 	// Breath State
 	void UpdateBreathState();
@@ -441,8 +453,6 @@ protected:
 public:
 	virtual bool IsMantlingAllowedToStart_Implementation() const override;
 
-	// Stance
-
 	UFUNCTION(BlueprintCallable, Category=Character)
 	virtual bool CanProne() const;
 
@@ -451,35 +461,52 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category=Character)
 	virtual void OnEndProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust);
+	
+	// Character Interface
 
+	// Controller
+	virtual FRotator GetCharacterControlRotation_Implementation() const override;
+	
+	// Ragdoll
+	virtual void SetCharacterRagdoll_Implementation(const bool NewRagdoll) override;
+
+	// Sex
+	virtual FGameplayTag GetCharacterSex_Implementation() const override;
+
+	// Stance
+	virtual FGameplayTag GetCharacterStance_Implementation() const override;
+
+	// Camera
 	virtual TSoftObjectPtr<UGameplayCameraComponent> GetCharacterGameplayCameraComponent_Implementation() const override;
 	virtual bool GetCharacterIsCameraRightShoulder_Implementation() const override;
+	virtual FVector GetCharacterFirstPersonCameraLocation_Implementation() const override;
 
-	//Character Interface
+	// Focus
 	virtual bool CanCharacterFocus_Implementation() const override;
 	virtual bool GetCharacterFocus_Implementation() const override;
 	virtual void SetCharacterFocus_Implementation(const bool NewFocus) override;
 
-	virtual FRotator GetCharacterControlRotation_Implementation() const override;
-	virtual FVector GetCharacterFirstPersonCameraLocation_Implementation() const override;
-	virtual UAlsxtCameraAnimationInstance* GetCharacterCameraAnimationInstance_Implementation() const override;
-	virtual UAlsCameraComponent* GetCharacterCamera_Implementation() const override;
-	virtual FGameplayTag GetCharacterSex_Implementation() const override;
-	virtual FGameplayTag GetCharacterStance_Implementation() const override;
+	// Overlay Mode
 	virtual FGameplayTag GetCharacterOverlayMode_Implementation() const override;
+	virtual FGameplayTag GetCharacterDominantOverlayLayer_Implementation(FGameplayTag& OverlaySlot) const override;
+	virtual TSoftObjectPtr<UAlsxtOverlayLookupTableDataAsset> GetCharacterOverlayLookupTable_Implementation() const override;
+	virtual FAlsxtOverlayLayers GetCharacterOverlayLayers_Implementation() const override;
+	virtual FAlsxtOverlayInfo GetCharacterOverlayInfo_Implementation(const FGameplayTag& OverlayModeTag) const override;
 	virtual FGameplayTag GetCharacterInjury_Implementation() const override;
 	virtual FGameplayTag GetCharacterCombatStance_Implementation() const override;
 	virtual void SetCharacterCombatStance_Implementation(UPARAM(meta = (Categories = "Als.Combat Stance"))const FGameplayTag& NewCombatStance) override;
-	
-	virtual FGameplayTag GetCharacterWeaponFirearmStance_Implementation() const override;
-	virtual void SetCharacterRagdoll_Implementation(const bool NewRagdoll) override;
 
+	// Readiness
 	virtual FGameplayTag GetCharacterReadiness_Implementation() const override;
 	virtual void SetCharacterReadiness_Implementation(const FGameplayTag& NewReadiness) override;
 
+	// Weapon Ready Positions
 	virtual FGameplayTag GetCharacterWeaponReadyPosition_Implementation() const override;
 	virtual FGameplayTagContainer GetCharacterAvailableWeaponReadyPositions_Implementation() const override;
 	virtual void SetCharacterWeaponReadyPosition_Implementation(FGameplayTag NewWeaponReadyPosition) override;
+
+	// Weapon Firearm Stance
+	virtual FGameplayTag GetCharacterWeaponFirearmStance_Implementation() const override;
 
 	// Mesh Painting Interface
 	virtual FAlsxtGlobalGeneralMeshPaintingSettings GetGlobalGeneralMeshPaintingSettings_Implementation() const override;
@@ -491,6 +518,10 @@ public:
 	virtual void ResetPaintOnComponent_Implementation(UPrimitiveComponent* Component) override;
 	virtual void ResetPaintTypeOnAllComponents_Implementation(UPARAM(meta = (Categories = "Als.Mesh Paint Type"))const FGameplayTag PaintType) override;
 	virtual void ResetPaintOnAllComponents_Implementation() override;
+
+	// Camera Old
+	virtual UAlsxtCameraAnimationInstance* GetCharacterCameraAnimationInstance_Implementation() const override;
+	virtual UAlsCameraComponent* GetCharacterCamera_Implementation() const override;
 
 protected:
 
@@ -2195,6 +2226,8 @@ protected:
 public:
 	virtual bool GetCharacterCanRoll_Implementation() const override;
 	virtual void StartCharacterRoll_Implementation(float PlayRate) override;
+
+	virtual bool CanCharacterSprint_Implementation() const override;
 
 	virtual bool GetCanCharacterAim_Implementation() const override;
 	virtual bool GetCharacterAim_Implementation() const override;
