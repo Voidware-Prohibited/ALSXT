@@ -425,8 +425,23 @@ protected:
 	void SetTargetBreathState(const FAlsxtTargetBreathState& NewTargetBreathState);
 	void TransitionBreathState();
 
+	void UpdateAnimationBlendState() const;
+	bool ShouldUpdateAnimationBlendState() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Als Character")
+	FAlsxtTargetBreathState CalculateAnimationBlendState();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Als Character")
+	FAlsxtAnimationBlendState GetAnimationBlendState() const;
+	
+	void SetAnimationBlendState(FAlsxtAnimationBlendState NewAnimationBlendState);
+
 public:
 	virtual void OnOverlayModeChanged_Implementation(FGameplayTag PreviousOverlayMode) override;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALSXT|State")
+	void OnAnimationBlendStateChanged(FAlsxtAnimationBlendState PreviousBlendState);
+	
 
 protected:
 	virtual void OnJumped_Implementation() override;
@@ -492,6 +507,8 @@ public:
 	virtual TSoftObjectPtr<UAlsxtOverlayLookupTableDataAsset> GetCharacterOverlayLookupTable_Implementation() const override;
 	virtual FAlsxtOverlayLayers GetCharacterOverlayLayers_Implementation() const override;
 	virtual FAlsxtOverlayInfo GetCharacterOverlayInfo_Implementation(const FGameplayTag& OverlayModeTag) const override;
+	virtual FAlsxtOverlayInfo GetCharacterOverlayObjectInfo_Implementation(const FGameplayTag& OverlayModeTag) const override;
+	virtual FAlsxtOverlayInfo GetCharacterAimableOverlayObjectInfo_Implementation(const FGameplayTag& OverlayModeTag) const override;
 	virtual FGameplayTag GetCharacterInjury_Implementation() const override;
 	virtual FGameplayTag GetCharacterCombatStance_Implementation() const override;
 	virtual void SetCharacterCombatStance_Implementation(UPARAM(meta = (Categories = "Als.Combat Stance"))const FGameplayTag& NewCombatStance) override;
@@ -886,6 +903,9 @@ private:
 	FGameplayTag Freelooking{ALSXTFreelookingTags::False};
 
 public:
+	virtual void CharacterActivateFreelooking_Implementation() override;
+	virtual void CharacterDeactivateFreelooking_Implementation() override;
+
 	UFUNCTION(BlueprintCallable, Category = "ALS|Movement System")
 	const FAlsxtFreelookState& GetFreelookState() const;
 
@@ -985,16 +1005,16 @@ protected:
 	// CombatStance
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredReadyStance{AlsxtReadyStanceTags::Neutral};
+	FGameplayTag DesiredReadyStance{AlsxtReadinessTags::Relaxed};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag ReadyStance{AlsxtReadyStanceTags::Neutral};
+	FGameplayTag ReadyStance{AlsxtReadinessTags::Relaxed};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State", Replicated, Meta = (AllowPrivateAccess))
-	FGameplayTag DesiredCombatStance{ALSXTCombatStanceTags::Neutral};
+	FGameplayTag DesiredCombatStance{ALSXTCombatStanceTags::Orthodox};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State|Als Character", Transient, Meta = (AllowPrivateAccess))
-	FGameplayTag CombatStance{ALSXTCombatStanceTags::Neutral};
+	FGameplayTag CombatStance{ALSXTCombatStanceTags::Orthodox};
 
 	// WeaponFirearmStance
 

@@ -1,4 +1,5 @@
-// MIT
+// Copyright (C) 2025 Uriel Ballinas, VOIDWARE Prohibited. All rights reserved.
+// This software is licensed under the MIT License (LICENSE.md).
 
 #include "AbilitySystem/GameplayAbilities/AlsxtGameplayAbilityRun.h"
 #include "AbilitySystem/AbilitySystemComponent/AlsxtAbilitySystemComponent.h"
@@ -7,6 +8,11 @@
 #include "AbilitySystem/AttributeSets/AlsxtStaminaAttributeSet.h"
 #include "GameplayEffect.h"
 #include "TimerManager.h"
+
+/**
+* @file AlsxtGameplayAbilityRun.cpp
+* @brief Gameplay Ability for toggling between Walking and Running/Combat Gaits
+*/
 
 UAlsxtGameplayAbilityRun::UAlsxtGameplayAbilityRun()
 {

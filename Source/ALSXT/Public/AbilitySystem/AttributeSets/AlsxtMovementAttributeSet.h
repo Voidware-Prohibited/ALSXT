@@ -28,6 +28,11 @@ public:
 	// Set Attributes to replicate.
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	// The current movement speed (base + modifiers)
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MovementSpeed)
+	FGameplayAttributeData MovementSpeed;
+	ATTRIBUTE_ACCESSORS(UAlsxtMovementAttributeSet, MovementSpeed)
+
 	UPROPERTY(BlueprintReadOnly, Category = "Movement Attribute Set", ReplicatedUsing = OnRep_MovementSpeedMultiplier)
 	FGameplayAttributeData MovementSpeedMultiplier;
 	ATTRIBUTE_ACCESSORS_BASIC(UAlsxtMovementAttributeSet, MovementSpeedMultiplier)
@@ -35,7 +40,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Movement Attribute Set", ReplicatedUsing = OnRep_MovementAccelerationMultiplier)
 	FGameplayAttributeData MovementAccelerationMultiplier;
 	ATTRIBUTE_ACCESSORS_BASIC(UAlsxtMovementAttributeSet, MovementAccelerationMultiplier)
+	
 protected:
+	UFUNCTION()
+	virtual void OnRep_MovementSpeed(const FGameplayAttributeData& OldValue);
 	
 	UFUNCTION()
 	virtual void OnRep_MovementSpeedMultiplier(const FGameplayAttributeData& OldValue);

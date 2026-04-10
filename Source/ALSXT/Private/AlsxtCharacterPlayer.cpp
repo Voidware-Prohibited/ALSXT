@@ -77,7 +77,7 @@ void AAlsxtCharacterPlayer::SetupPlayerInputComponent(UInputComponent* Input)
 		EnhancedInput->BindAction(ToggleFreelookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnFreelook);
 		EnhancedInput->BindAction(ToggleGaitAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnToggleGait);
 		EnhancedInput->BindAction(SwitchCombatStanceAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSwitchCombatStance);
-		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnToggleCombatReady);
+		EnhancedInput->BindAction(ToggleCombatReadyAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnToggleReadiness);
 		EnhancedInput->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnPrimaryInteraction);
 		EnhancedInput->BindAction(SecondaryInteractionAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSecondaryInteraction);
 		EnhancedInput->BindAction(BlockAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnBlock);
@@ -225,15 +225,25 @@ void AAlsxtCharacterPlayer::Input_OnMove(const FInputActionValue& ActionValue)
 		GetController()->GetPlayerViewPoint(ViewLocation, ViewRotation);
 	}
 
-	const auto ForwardDirection{UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(ViewRotation.Yaw))};
-	const auto RightDirection{UAlsVector::PerpendicularCounterClockwiseXY(ForwardDirection)};
+	// const auto ForwardDirection{UAlsVector::AngleToDirectionXY(UE_REAL_TO_FLOAT(ViewRotation.Yaw))};
+	// const auto RightDirection{UAlsVector::PerpendicularCounterClockwiseXY(ForwardDirection)};
 	
 	FGameplayTagContainer AbilityTags;
 
-	// TODO Create Data/DB/Settings for All Tags Associated to Gameplay Abilities
+	/**
+	 * @todo Create Data/DB/Settings for All Tags Associated to Gameplay Abilities
+	 **/
+	
 	FGameplayTag MovementTag {AlsxtGASGameplayTags::State::TAG_State_MovementInput};
 	AbilityTags.AddTag(MovementTag);
 	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Ability.Movement")));
+	
+	const FRotator MovementRotation = GetFreelookState().bFreelooking ? 
+			GetFreelookState().LockedControlRotation : 
+			FRotator(0, GetControlRotation().Yaw, 0);
+
+	const FVector ForwardDirection = FRotationMatrix(MovementRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(MovementRotation).GetUnitAxis(EAxis::Y);
 
 	GetAbilitySystemComponent()->TryActivateAbilitiesByTag(AbilityTags);
 	AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
@@ -326,58 +336,6 @@ void AAlsxtCharacterPlayer::Input_OnWalk()
 			}
 		}
 	}
-
-	// if (GetDesiredStance() == AlsGaitTags::Walking)
-	// {
-	// 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
-	// 	if (ASC)
-	// 	{
-	// 		FGameplayTag RunningTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Running"));
-	// 		// ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RunningTag));
-    //         
-	// 		if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(RunningTag)))
-	// 		{
-	// 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: Running Ability Activated")));
-	// 		}
-	// 		else
-	// 		{
-	// 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: Running Ability Could NOT be Activated!")));
-	// 		}
-	// 	}
-	// 	else
-	// 	{
-	// 		if (GEngine)
-	// 		{
-	// 			FString ClassName = this->GetClass()->GetName();
-	// 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: AbilitySystemComponent NOT found in %s"), *ClassName));
-	// 		}
-	// 	}
-	// }
-	// else
-	// {
-	// 	if (GetDesiredGait() == AlsGaitTags::Running)
-	// 	{
-	// 		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
-	// 		if (ASC)
-	// 		{
-	// 			FGameplayTag RunningTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Running"));
-	// 			FGameplayTagContainer CancelTags;
-	// 			CancelTags.AddTag(RunningTag);
-	// 			ASC->CancelAbilities(&CancelTags);
-	// 			// SetDesiredGait(AlsGaitTags::Walking);	
-	// 		}
-	// 		else
-	// 		{
-	// 			SetDesiredGait(AlsGaitTags::Walking);
-// 
-	// 			if (GEngine)
-	// 			{
-	// 				FString ClassName = this->GetClass()->GetName();
-	// 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Input_OnWalk: AbilitySystemComponent NOT found in %s"), *ClassName));
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 
 void AAlsxtCharacterPlayer::Input_OnCrouch()
@@ -716,12 +674,12 @@ void AAlsxtCharacterPlayer::Input_OnToggleAim()
 		if (GetDesiredRotationMode() == AlsRotationModeTags::Aiming)
 		{
 			SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
-			SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
+			SetDesiredReadyStance(AlsxtReadinessTags::Ready);
 		}
 		if (CanAim())
 		{
 			SetViewMode(AlsViewModeTags::FirstPerson);
-			SetDesiredCombatStance(ALSXTCombatStanceTags::Aiming);
+			SetDesiredReadyStance(AlsxtReadinessTags::Aiming);
 			SetDesiredRotationMode(AlsRotationModeTags::Aiming);
 		}
 	}
@@ -751,13 +709,18 @@ void AAlsxtCharacterPlayer::Input_OnFreelook(const FInputActionValue& ActionValu
 {
 	if (CanFreelook())
 	{
+		FGameplayTagContainer FreelookTagContainer;
+		FreelookTagContainer.AddTagFast(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Freelook")));
+		FAlsxtFreelookState NewFreelookState = GetFreelookState();
 		if (ActionValue.Get<bool>())
 		{
-			// ActivateFreelooking();
+			GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FreelookTagContainer);
+			// SetDesiredFreelooking(ALSXTFreelookingTags::True);
 		}
 		else
 		{
-			// DeactivateFreelooking();
+			GetAbilitySystemComponent()->CancelAbilities(&FreelookTagContainer);
+			// SetDesiredFreelooking(ALSXTFreelookingTags::False);
 		}
 	}
 }
@@ -777,15 +740,22 @@ void AAlsxtCharacterPlayer::Input_OnToggleGait()
 	}
 }
 
-void AAlsxtCharacterPlayer::Input_OnToggleReadyStance()
+// Input Action to Switch between Relaxed and Ready Stances
+void AAlsxtCharacterPlayer::Input_OnToggleReadiness()
 {
 	if (CanToggleCombatReady())
 	{
-		if ((GetDesiredCombatStance() == FGameplayTag::EmptyTag) || (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral))
+		if ((GetDesiredReadyStance() == FGameplayTag::EmptyTag) || (GetDesiredReadyStance() == AlsxtReadinessTags::Relaxed))
 		{
-			if (CanBecomeCombatReady())
+			if (GetAbilitySystemComponent() && CanBecomeCombatReady())
 			{
-				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
+				if (GetAbilitySystemComponent())
+				{
+					FGameplayTagContainer ReadinessTags;
+					ReadinessTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Readiness")));
+					GetAbilitySystemComponent()->TryActivateAbilitiesByTag(ReadinessTags);
+				}
+				SetDesiredReadyStance(AlsxtReadinessTags::Ready);
 				if (IAlsxtHeldItemInterface::Execute_IsHoldingAimableItem(this))
 				{
 					if (GetRotationMode() != AlsRotationModeTags::Aiming)
@@ -805,46 +775,31 @@ void AAlsxtCharacterPlayer::Input_OnToggleReadyStance()
 		}
 		else
 		{
-			SetDesiredCombatStance(ALSXTCombatStanceTags::Neutral);
-			SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::PatrolReady);
-		}
-	}
-}
-
-void AAlsxtCharacterPlayer::Input_OnToggleCombatReady()
-{
-	if (CanToggleCombatReady())
-	{
-		if ((GetDesiredCombatStance() == FGameplayTag::EmptyTag) || (GetDesiredCombatStance() == ALSXTCombatStanceTags::Neutral))
-		{
-			if (CanBecomeCombatReady())
+			if (GetDesiredReadyStance() != AlsxtReadinessTags::Relaxed)
 			{
-				SetDesiredCombatStance(ALSXTCombatStanceTags::Ready);
-				if (IAlsxtHeldItemInterface::Execute_IsHoldingAimableItem(this))
+				UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+				FGameplayTag ReadinessTag = FGameplayTag::RequestGameplayTag(FName("Gameplay.Ability.Readiness"));
+				FGameplayTagContainer CancelTags;
+				CancelTags.AddTag(ReadinessTag);
+				if (ASC)
 				{
-					if (GetRotationMode() != AlsRotationModeTags::Aiming)
-					{
-						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
-					}
-					else
-					{
-						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
-					}
+					ASC->CancelAbilities(&CancelTags);
+					SetDesiredReadyStance(AlsxtReadinessTags::Relaxed);
 				}
-				else
+				if (GEngine)
 				{
-					SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
+					FString ClassName = this->GetClass()->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("AbilitySystemComponent NOT found in %s"), *ClassName));
 				}
 			}
-		}
-		else
-		{
-			SetDesiredCombatStance(ALSXTCombatStanceTags::Neutral);
-			SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::PatrolReady);
+
+			// SetDesiredReadyStance(AlsxtReadinessTags::Relaxed);
+			// SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::PatrolReady);
 		}
 	}
 }
 
+// Input Action to Switch between Orthodox and Southpaw stances
 void AAlsxtCharacterPlayer::Input_OnSwitchCombatStance()
 {
 	if (GetAbilitySystemComponent())

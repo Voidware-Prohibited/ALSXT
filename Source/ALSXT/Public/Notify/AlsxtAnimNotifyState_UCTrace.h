@@ -6,7 +6,20 @@
 #include "GameplayTagContainer.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "../Settings/AlsxtCombatSettings.h"
+#include "AbilitySystem/Data/AlsxtMeleeTraceEventData.h"
 #include "AlsxtAnimNotifyState_UCTrace.generated.h"
+
+UCLASS(BlueprintType)
+class UAlsxtMeleeTraceEventDataObject : public UObject
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	FAlsxtMeleeTraceEventData MeleeTraceEventData;
+
+	// Helper to get the struct
+	const FAlsxtMeleeTraceEventData& GetInstancedStruct() const { return MeleeTraceEventData; }
+};
 
 /**
  * 
@@ -18,6 +31,12 @@ class ALSXT_API UAlsxtAnimNotifyState_UCTrace : public UAnimNotifyState
 
 protected:
 	FAlsxtCombatAttackTraceSettings TraceSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Trace Data")
+	FGameplayTag MeleeCollisionTraceBeginEventTag {FGameplayTag::RequestGameplayTag(FName("Event.Trace.Melee.Begin"))};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Trace Data")
+	FGameplayTag MeleeCollisionTraceEndEventTag {FGameplayTag::RequestGameplayTag(FName("Event.Trace.Melee.End"))};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FGameplayTag UnarmedAttackType;

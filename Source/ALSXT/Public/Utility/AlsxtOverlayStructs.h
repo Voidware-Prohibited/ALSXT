@@ -151,6 +151,68 @@ struct ALSXT_API FAlsxtOverlayInfo
 };
 
 USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtOverlayObjectInfo
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+	int Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+	FAlsxtOverlayAnimationInfo AnimationInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	TSoftObjectPtr<UAlsxtCameraShakeSettings> CameraShakeSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	TSoftObjectPtr<UAlsxtOverlayCameraOffsetSettings> CameraOffsetSettings;
+
+	// Rotation Lag
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	TSoftObjectPtr<UAlsxtRotationLerpSettings> RotationLerpSettings;
+
+	// Movement Speeds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
+	TSoftObjectPtr<UAlsxtMovementSettings> MovementSettings;
+
+	bool operator==(const FAlsxtOverlayInfo& other) const
+	{
+		return (other.AnimationInfo == AnimationInfo) && (other.CameraShakeSettings == CameraShakeSettings) && (other.CameraOffsetSettings == CameraOffsetSettings);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct ALSXT_API FAlsxtAimableOverlayObjectInfo
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+	int Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+	FAlsxtOverlayAnimationInfo AnimationInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	TSoftObjectPtr<UAlsxtCameraShakeSettings> CameraShakeSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	TSoftObjectPtr<UAlsxtOverlayCameraOffsetSettings> CameraOffsetSettings;
+
+	// Rotation Lag
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	TSoftObjectPtr<UAlsxtRotationLerpSettings> RotationLerpSettings;
+
+	// Movement Speeds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
+	TSoftObjectPtr<UAlsxtMovementSettings> MovementSettings;
+
+	bool operator==(const FAlsxtOverlayInfo& other) const
+	{
+		return (other.AnimationInfo == AnimationInfo) && (other.CameraShakeSettings == CameraShakeSettings) && (other.CameraOffsetSettings == CameraOffsetSettings);
+	}
+};
+
+USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtOverlayLayers
 {
 	GENERATED_BODY()
@@ -166,8 +228,6 @@ struct ALSXT_API FAlsxtOverlayLayers
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (Categories = "Als.OverlayMode,Als.Als.OverlaySettings", AllowPrivateAccess))
 	FGameplayTag OverlayLayerBothHands;
-
-	FAlsxtOverlayInfo GetDominantOverlayInfo();
 
 	bool operator==(const FAlsxtOverlayLayers& other) const
 	{

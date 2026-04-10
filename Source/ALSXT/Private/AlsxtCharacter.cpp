@@ -1701,6 +1701,11 @@ void AAlsxtCharacter::EndBlendOutPhysicalAnimation()
 	SetPhysicalAnimationMode(AlsxtPhysicalAnimationModeTags::None, EmptyNames);
 }
 
+void AAlsxtCharacter::SetAnimationBlendState(FAlsxtAnimationBlendState NewAnimationBlendState)
+{
+	OnAnimationBlendStateChanged(GetAnimationBlendState());
+}
+
 void AAlsxtCharacter::OnOverlayModeChanged_Implementation(FGameplayTag PreviousOverlayMode)
 {
 	Super::OnOverlayModeChanged_Implementation(PreviousOverlayMode);
@@ -1709,6 +1714,11 @@ void AAlsxtCharacter::OnOverlayModeChanged_Implementation(FGameplayTag PreviousO
 	ImpactReaction->RefreshCrowdNavigationPoses();
 	RefreshOverlayLinkedAnimationLayer();
 	RefreshOverlayObject();
+}
+
+void AAlsxtCharacter::OnAnimationBlendStateChanged_Implementation(FAlsxtAnimationBlendState PreviousBlendState)
+{
+	
 }
 
 void AAlsxtCharacter::OnJumped_Implementation()
@@ -2410,28 +2420,37 @@ void AAlsxtCharacter::IsFreelooking(bool& bIsFreelooking, bool& bIsFreelookingIn
 
 void AAlsxtCharacter::ActivateFreelooking()
 {
+	FAlsxtFreelookState NewFreelookState = GetFreelookState();
+
+	NewFreelookState.bFreelooking = true;
+	NewFreelookState.Freelooking = ALSXTFreelookingTags::True;
+	
+	// Lock the current movement reference to the current actor yaw
+	NewFreelookState.LockedControlRotation = FRotator(0, GetActorRotation().Yaw, 0);
+
 	//PreviousYaw = GetViewState().Rotation.Yaw;
-	PreviousYaw = FMath::GetMappedRangeValueClamped(FVector2D(0, 359.998993), FVector2D(0.0, 1.0), GetControlRotation().Yaw);
+	// PreviousYaw = FMath::GetMappedRangeValueClamped(FVector2D(0, 359.998993), FVector2D(0.0, 1.0), GetControlRotation().Yaw);
 	//FMath::GetMappedRangeValueClamped(FVector2D(-90,90), FVector2D(0,1), GetViewState().Rotation.Pitch)
-	PreviousPitch = FMath::GetMappedRangeValueClamped(FVector2D(89.900002, -89.899994), FVector2D(0.0, 1.0), GetViewState().Rotation.Pitch);
+	// PreviousPitch = FMath::GetMappedRangeValueClamped(FVector2D(89.900002, -89.899994), FVector2D(0.0, 1.0), GetViewState().Rotation.Pitch);
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("%f"), GetControlRotation().Yaw));
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%f"), PreviousYaw));
 	// LockRotation(GetActorRotation().Yaw);
 	SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 	SetDesiredFreelooking(ALSXTFreelookingTags::True);
-	FAlsxtFreelookState NewFreelookState = GetFreelookState();
-	NewFreelookState.Freelooking = ALSXTFreelookingTags::True;
-	NewFreelookState.LockedControlRotation = GetControlRotation();
-	NewFreelookState.LockedViewState = GetViewState();
+	// NewFreelookState.Freelooking = ALSXTFreelookingTags::True;
+	// NewFreelookState.LockedControlRotation = GetControlRotation();
+	// NewFreelookState.LockedViewState = GetViewState();
 	SetFreelookState(NewFreelookState);
 }
 
 void AAlsxtCharacter::DeactivateFreelooking()
 {
+	FAlsxtFreelookState NewFreelookState = GetFreelookState();
+
+	NewFreelookState.bFreelooking = false;
+	NewFreelookState.Freelooking = ALSXTFreelookingTags::False;
 	// UnLockRotation();
 	SetDesiredFreelooking(ALSXTFreelookingTags::False);
-	FAlsxtFreelookState NewFreelookState = GetFreelookState();
-	NewFreelookState.Freelooking = ALSXTFreelookingTags::False;
 	SetFreelookState(NewFreelookState);
 	// HeadLookAtState.LockedViewState.PreviousYawAngle = 0.0f;
 	// HeadLookAtState.LockedViewState.Rotation = FRotator(0.0f, 0.0f, 0.0f);
@@ -2653,22 +2672,6 @@ void AAlsxtCharacter::SetDesiredCombatStance(const FGameplayTag& NewCombatStance
 			if (GetLocalRole() == ROLE_AutonomousProxy)
 			{
 				ServerSetDesiredCombatStance(NewCombatStanceTag);
-				if (NewCombatStanceTag != ALSXTCombatStanceTags::Neutral)
-				{
-					if (IAlsxtHeldItemInterface::Execute_IsHoldingAimableItem(this))
-					{
-						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::LowReady);
-					}
-					else
-					{
-						SetDesiredWeaponReadyPosition(ALSXTWeaponReadyPositionTags::Ready);
-					}
-					SetDesiredRotationMode(AlsRotationModeTags::Aiming);
-				}
-				else
-				{
-					SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
-				}
 			}
 			else if (GetLocalRole() == ROLE_Authority)
 			{
@@ -2723,9 +2726,29 @@ void AAlsxtCharacter::SetCombatStance(const FGameplayTag& NewCombatStanceTag)
 	}
 }
 
-void AAlsxtCharacter::OnReadyStanceChanged_Implementation(const FGameplayTag& PreviousCombatReadyTag) {}
+void AAlsxtCharacter::OnReadyStanceChanged_Implementation(const FGameplayTag& PreviousCombatReadyTag)
+{
+	// auto NewAnimationParametersState = AAlsxtCharacter::Execute_GetCharacterAnimationParametersState(this);
+	FGameplayTag NewReadinessReadyTag = AAlsxtCharacter::Execute_GetCharacterReadiness(this);
+	// NewAnimationParametersState.StanceTags.AddTag(NewReadinessReadyTag);
+	// SetAnimationParametersState(NewAnimationParametersState);
+	
+	FGameplayTagContainer TagsToRemove = UGameplayTagsManager::Get().RequestGameplayTagChildren(FGameplayTag::RequestGameplayTag(FName("Alsxt.Readiness")));
+	AnimationParametersState.StanceTags.RemoveTags(TagsToRemove);
+	AnimationParametersState.StanceTags.AddTag(NewReadinessReadyTag);
+}
 
-void AAlsxtCharacter::OnCombatStanceChanged_Implementation(const FGameplayTag& PreviousCombatStanceTag) {}
+void AAlsxtCharacter::OnCombatStanceChanged_Implementation(const FGameplayTag& PreviousCombatStanceTag)
+{
+	// auto NewAnimationParametersState = AAlsxtCharacter::Execute_GetCharacterAnimationParametersState(this);
+	FGameplayTag NewCombatStanceTag = AAlsxtCharacter::Execute_GetCharacterCombatStance(this);
+	// NewAnimationParametersState.StanceTags.AddTag(NewCombatStanceTag);
+	// SetAnimationParametersState(NewAnimationParametersState);
+
+	FGameplayTagContainer TagsToRemove = UGameplayTagsManager::Get().RequestGameplayTagChildren(FGameplayTag::RequestGameplayTag(FName("Als.Combat Stance")));
+	AnimationParametersState.StanceTags.RemoveTags(TagsToRemove);
+	AnimationParametersState.StanceTags.AddTag(NewCombatStanceTag);
+}
 
 // WeaponFirearmStance
 
@@ -2901,6 +2924,29 @@ void AAlsxtCharacter::OnAimStateChanged_Implementation(const FAlsxtAimState& Pre
 
 //Freelooking
 
+
+void AAlsxtCharacter::CharacterActivateFreelooking_Implementation()
+{
+	IAlsxtCharacterInterface::CharacterActivateFreelooking_Implementation();
+
+	FAlsxtFreelookState NewFreelookState = GetFreelookState();
+	NewFreelookState.bFreelooking = true;
+	NewFreelookState.Freelooking = ALSXTFreelookingTags::True;
+	
+	// Lock the input direction to the character's current facing or velocity direction
+	NewFreelookState.LockedControlRotation = GetActorRotation(); 
+	SetFreelookState(NewFreelookState);
+}
+
+void AAlsxtCharacter::CharacterDeactivateFreelooking_Implementation()
+{
+	IAlsxtCharacterInterface::CharacterDeactivateFreelooking_Implementation();
+
+	FAlsxtFreelookState NewFreelookState = GetFreelookState();
+	NewFreelookState.bFreelooking = false;
+	NewFreelookState.Freelooking = ALSXTFreelookingTags::False;
+	SetFreelookState(NewFreelookState);
+}
 
 void AAlsxtCharacter::SetFreelookState(const FAlsxtFreelookState& NewFreelookState)
 {
@@ -4026,6 +4072,26 @@ void AAlsxtCharacter::TransitionBreathState()
 	}
 }
 
+void AAlsxtCharacter::UpdateAnimationBlendState() const
+{
+	
+}
+
+bool AAlsxtCharacter::ShouldUpdateAnimationBlendState() const
+{
+	return true;
+}
+
+FAlsxtAnimationBlendState AAlsxtCharacter::GetAnimationBlendState_Implementation() const
+{
+	return IAlsxtCharacterInterface::GetAnimationBlendState_Implementation();
+}
+
+FAlsxtTargetBreathState AAlsxtCharacter::CalculateAnimationBlendState_Implementation()
+{
+	return FAlsxtTargetBreathState();
+}
+
 void AAlsxtCharacter::OnAIJumpObstacle_Implementation()
 {
 	// if (TryVault())
@@ -4111,7 +4177,7 @@ FAlsxtOverlayInfo AAlsxtCharacter::GetCharacterOverlayInfo_Implementation(const 
 {
 	if (!OverlayLookupTable.IsNull())
 	{
-		if (TSoftObjectPtr<UAlsxtOverlayDataAsset>* OverlayDataAsset = OverlayLookupTable.Get()->OverlayDataMap.Find(OverlayModeTag))
+		if (TSoftObjectPtr<UAlsxtOverlayDataAsset>* OverlayDataAsset = ALSXTSettings->OverlaySettings.OverlayLookupTable.Get()->OverlayDataMap.Find(OverlayModeTag))
 		{
 			return OverlayDataAsset->Get()->OverlaySettings;
 		}
@@ -4123,6 +4189,16 @@ FAlsxtOverlayInfo AAlsxtCharacter::GetCharacterOverlayInfo_Implementation(const 
 	}
 	FAlsxtOverlayInfo EmptyOverlayInfo {};
 	return EmptyOverlayInfo;
+}
+
+FAlsxtOverlayInfo AAlsxtCharacter::GetCharacterOverlayObjectInfo_Implementation(const FGameplayTag& OverlayModeTag) const
+{
+	return IAlsxtCharacterInterface::GetCharacterOverlayObjectInfo_Implementation(OverlayModeTag);
+}
+
+FAlsxtOverlayInfo AAlsxtCharacter::GetCharacterAimableOverlayObjectInfo_Implementation(const FGameplayTag& OverlayModeTag) const
+{
+	return IAlsxtCharacterInterface::GetCharacterAimableOverlayObjectInfo_Implementation(OverlayModeTag);
 }
 
 FAlsxtOverlayLayers AAlsxtCharacter::GetCharacterOverlayLayers_Implementation() const

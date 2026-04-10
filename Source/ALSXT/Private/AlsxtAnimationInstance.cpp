@@ -87,6 +87,7 @@ void UAlsxtAnimationInstance::NativeUpdateAnimation(const float DeltaTime)
 		Lean = IAlsxtCharacterInterface::Execute_GetCharacterLean(GetOwningActor());
 		LocomotionVariant = IAlsxtCharacterInterface::Execute_GetCharacterLocomotionVariant(GetOwningActor());
 		Injury = IAlsxtCharacterInterface::Execute_GetCharacterInjury(GetOwningActor());
+		Readiness = IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetOwningActor());
 		CombatStance = IAlsxtCharacterInterface::Execute_GetCharacterCombatStance(GetOwningActor());
 		WeaponFirearmStance = IAlsxtCharacterInterface::Execute_GetCharacterWeaponFirearmStance(GetOwningActor());
 		WeaponReadyPosition = IAlsxtCharacterInterface::Execute_GetCharacterWeaponReadyPosition(GetOwningActor());

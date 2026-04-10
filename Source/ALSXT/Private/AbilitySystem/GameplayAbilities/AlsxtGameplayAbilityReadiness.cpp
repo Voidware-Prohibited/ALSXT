@@ -59,16 +59,28 @@ void UAlsxtGameplayAbilityReadiness::ActivateAbility(const FGameplayAbilitySpecH
 		// Add the Ready tag initially
 		ApplyTagGameplayEffect(ReadyGameplayEffect);
 
-		// Wait for Input Press
-		UAbilityTask_WaitInputRelease* WaitInputReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this);
-		if (WaitInputReleaseTask)
+		if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
 		{
-			ApplyTagGameplayEffect(AimingGameplayEffect);
-			// Bind a function to the OnRelease delegate
-			WaitInputReleaseTask->OnRelease.AddDynamic(this, &UAlsxtGameplayAbilityReadiness::OnInputReleased);
-			// Activate the task
-			WaitInputReleaseTask->ReadyForActivation();
+			if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Relaxed || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Carry)
+			{
+				IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Ready);
+			}
+			if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Ready || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Aiming)
+			{
+				IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Carry);
+			}
 		}
+
+		// Wait for Input Press
+		// UAbilityTask_WaitInputRelease* WaitInputReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this);
+		// if (WaitInputReleaseTask)
+		// {
+		// 	ApplyTagGameplayEffect(AimingGameplayEffect);
+		// 	// Bind a function to the OnRelease delegate
+		// 	WaitInputReleaseTask->OnRelease.AddDynamic(this, &UAlsxtGameplayAbilityReadiness::OnInputReleased);
+		// 	// Activate the task
+		// 	WaitInputReleaseTask->ReadyForActivation();
+		// }
 
 		
 
@@ -82,17 +94,17 @@ void UAlsxtGameplayAbilityReadiness::OnInputReleased(float TimeHeld)
 	// Logic to execute when input is released
 	UE_LOG(LogTemp, Warning, TEXT("Input Released! Time held: %f"), TimeHeld);
 
-	if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
-	{
-		if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Relaxed || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Carry)
-		{
-			IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Ready);
-		}
-		if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Ready || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Aiming)
-		{
-			IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Carry);
-		}
-	}
+	// if (GetAvatarActorFromActorInfo()->Implements<UAlsxtCharacterInterface>())
+	// {
+	// 	if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Relaxed || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Carry)
+	// 	{
+	// 		IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Ready);
+	// 	}
+	// 	if (IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Ready || IAlsxtCharacterInterface::Execute_GetCharacterReadiness(GetAvatarActorFromActorInfo()) == AlsxtReadinessTags::Aiming)
+	// 	{
+	// 		IAlsxtCharacterInterface::Execute_SetCharacterReadiness(GetAvatarActorFromActorInfo(), AlsxtReadinessTags::Carry);
+	// 	}
+	// }
 	
 	// ApplyTagGameplayEffect(ReadyGameplayEffect);
 }

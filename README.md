@@ -18,128 +18,192 @@
      <a href="https://liberapay.com/colorindarkness"><img alt="Support me on Liberapay" src="https://img.shields.io/badge/support_me_on-liberapay-yellow?link=https%3A%2F%2Fliberapay.com%2Fcolorindarkness%2F"></a>
 </p>
 
-An Unreal Engine 5 plugin that extends ALS-Refactored with a set of popular replicated gameplay features, to demonstrate the extendability of ALS-Refactored in a Modular, Data-Driven, UE5 Way. The feature-set is informed by First and Third Person Tactical Shooters, Action Shooters and the parent project [Target Vector](https://github.com/Voidware-Prohibited/TargetVector).
+> [!NOTE]  Following the acquisition of GitHub by Micro$lop, we have taken principled action and have begun primarily hosting code and content on [Codeberg](https://codeberg.org/Voidware-Prohibited/). Mirrors will still be maintained on [GitHub](https://github.com/Voidware-Prohibited/ALSXT/) and [GitLab](https://gitlab.com/Voidware-Prohibited/ALSXT/).
 
-_A Major Rewrite is underway to utilze GAS, Modular features and new technologies_.
-_ALSXT is under heavy development, many features may not be finished or production-ready_.
+An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based, Data-oriented, Character System with the Latest UE5 Features. The feature-set is informed the parent project [Target Vector](https://github.com/Voidware-Prohibited/TargetVector/).
 
-[ALSXT Notion](https://alsxt.notion.site/2be59e501e7a4bf583437d1636bc7f2f?v=ac361eb5a6a14081892ff9a68e3e7a44)
-
-_[Contibutors](#Contributions) and PRs are welcome_.
-
-[ALSXT-Assets](https://github.com/Voidware-Prohibited/ALSXT-Assets): Source Assets of the Meshes, Textures, Sounds and Cascaduer files.
+[Wiki](../../wiki/) - [Documentation](https://alsxt.notion.site/2be59e501e7a4bf583437d1636bc7f2f?v=ac361eb5a6a14081892ff9a68e3e7a44/) - [ALSXT Notion](https://alsxt.notion.site/2be59e501e7a4bf583437d1636bc7f2f?v=ac361eb5a6a14081892ff9a68e3e7a44/) - [Submit Pull Request](https://codeberg.org/Voidware-Prohibited/ALSXT/pulls/) - [Twitter](https://x.com/ALSXT/) - [Discord](discord://colorindarkness/)
 
 # Introduction
+- Generate truly unlimited, unique and immersive Characters with extensive States, deep Character Customization, Southpaw and support for blending multiple Locomotion and Overlay Layers.
+- Create smooth third Person and True First Person Gameplay featuring Input Actions converted to Gameplay Abilities, governed by Attribute Sets and Gameplay Effects.
+- Developer anbd Artist friendly, Data-oriented Locomotion framework with Real-world tested tech such as ALS-Refactored, GAS, Chooser Tables, Smart Objects and Modular Gamplay Features.
 
-Two example Character classes are provided `ALSXTCharacter` and `ALSXTCharacterAdvanced`, each with their respective feature-sets. Create a child C++ class or blueprint of either class or simply use `ALSXTCharacterAdvanced` as an example for building your own custom class from the base `ALSXTCharacter` class.
+## Available Modular Game Features
+- [Alsxt Dash Ability](https://codeberg.org/Voidware-Prohibited/AlsxtDashAbility/)
 
-**Features**
+## Implementation Goals
+- Empower Individuals and small independent Studios with AAA Feature Parity or better.
+- Promote and Advance the Free and Open Source Software Movement.
+- Utilize the latest Technologies and Methodologies.
+- Maintain a Modular, Configurable and Data-oriented Design.
+- Encourage and Facilitate the use of Versioning Systems and CI/CD.
+- Performance and Optimization by Design.
+- Do Cool Procedural Stuff.
 
-ALSXT
+# Features
 
-- Expanded Character States (Combat Stance, Sex, Variant, Weapon Ready Position)
-- Sliding Locomotion Action (with Sound, Decal and Particle Support)
-- Expanded Footprints System (Independent foot states, Saturation, Material Transfer, Vertex Paint Support(Static Mesh only, In Progress))
-- Customization Component _In Progress_
-- Paintable Skeletal Mesh Component _In Progress_
-- Combat Component _In Progress_
-- Impact Reactions (Blending reaction animations with Physical Animation) _In Progress_
-- Character Sound Component_In Progress_
-- Idle Animation Component _In Progress_
-- Vaulting _In Progress_
-- Physical Animation _In Progress_
-- Sound Component _In Progress_
-- Idle Animation Component _In Progress_
-- Gesture _In Progress_
-- Emotes _In Progress_
-- Basic Stats Component (Stamina and Health to demonstate the functionality of various components)
+> [!WARNING] _ALSXT is under heavy development, including a rewrite to utilze GAS, Modular features and new technologies. Many features may not be finished or production-ready. Use at your own risk._
 
-ALSXT Advanced
+## Improvements
+- Alsxt Character Movement Component - Expanded Movement Featurees and GAS Integration.
+- Expanded Character States - Combat Stance, Sex, Variant, Weapon Ready Position, etc.
+- Expanded Footprints System - Independent foot states, Saturation, Material Transfer, Vertex Paint Support(Static Mesh only, In Progress).
 
-- Combat
+## New Features
+- Locomotion Layer Blending
+- Overlay Layer  Blending
+- Gameplay Camera System - Replaces ALS-Camera Component.
+	- Gameplay Camera System Director.
+	- Third and First Person Camera Rigs.
+- GAS Gameplay Abilities - With Cost Gameplay Effects
+	- Nearly all exiting Input Actions.
+	- Movement Ability that can modify Regen Magnitudes
+	- Extended State Input Actions.
+	- New Locomotion Actions: Slide, Flip, Hold Breath, Focus.
+	- Plus More.
+- GAS Gameplay Effects.
+	- Staus Effects, such as Injuries, that modify Movement Speed Magnitudes.
+	- Stamina Regen with Magnitude.
+	- Hold Breath Regen with Magnitude.
+- GAS Gameplay Attribute Sets.
+	- Stamina.
+	- Breath.
+	- Plus More.
+- Advanced Customizable and Paintable Master Materials for Characters and Objects.
+
+### Firearm Features
 - ADS
-- Procedural Recoil _In Progress_
-- Reloading _In Progress_
-- Camera FX Component _In Progress_
-- Acrobatic Actions (Flipping, Wallrunning etc) _In Progress_
+- Procedural Recoil
+- Firearm Actions
+- Trigger Finger Layer
 
-**Planned Features**
-- New Skeletal Mesh and Clothing set with Morph Targets/Shape Keys
-- Stationary Modes (Sitting, Vehilcles etc)
+## Features In Development
+- Smart Object based Generic Interaction System.
+- Contextual Animation
+- Combat System
+- Impact Reactions (Blending reaction animations with Physical Animation)
+- Physical Animation
+- Character Customization
+- Paintable Mesh Components
+- Character Sound Component
+- Vaulting
+- Idle Animation Component
+
+## Bonus Features
+- Advanced Landscape Auto-Material.
+- Procedural Radial/Pie Menu.
+- Workflow YAML files for Codeberg/Forgejo and Micro$lop Github.
+
+## Planned Features
+- Skeletal Mesh and Clothing set with Morph Targets/Shape Keys
+- Stationary Modes (Sitting, Vehicles etc)
+- Wallrunning and Walljumping
 - Prone Stance
 - Swimming Custom Movement Mode
 - Ladder Climbing Custom Movement Mode
+- Gestures
+- Emotes
 
-**Dependencies**
 
-- [Advanced Locomotion System Refactored](https://github.com/Sixze/ALS-Refactored/)
+# Prerequisites
+A working UE5 C++ Integrated Developement Environment(IDE) such as:
+
+**Windows**
+
+- Jetbrains Rider (Developers personal preference)
+- Micro$lop Visual Studio
+- Micro$lop VS Code
+
+**Linux**
+
+- Currently undergoing testing
+
+**MacOS**
+
+- XCode - Currently undergoing testing
+
+## Third-Party Plugins
+The following plugins require cloning or downloading into your projects `Plugins` folder.
+- [Advanced Locomotion System Refactored](https://github.com/Sixze/ALS-Refactored/) ![GitHub Tag](https://img.shields.io/github/v/tag/Voidware-Prohibited/ALS-Refactored)
+
+## Engine Plugins
+The following are built-in Engine plugins that are enabled in the Plugins window. Warning: some plugins may be Experimental or Beta software.
 - [Gameplay Abilities](https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Plugins/GameplayAbilities/)
-
-**Integrations**
-While any integration is possible, ALSXT was designed to facilitate the integration of the following:
-
-- [Target Vector](https://github.com/Voidware-Prohibited/TargetVector)
-- [Flora](https://github.com/Voidware-Prohibited/Flora)
-- [Ballistics FX](https://www.fab.com/listings/5a08c83d-deb0-4989-baaa-79b68e340e24)
-- [Procedural Recoil Animation System](https://www.fab.com/listings/c664053f-900b-4f33-aa26-4bdb46959e4c)
-- [FPS First Person Shooter Framework (SKG Shooter Framework V2)](https://www.fab.com/listings/dbed40cd-4529-455a-aab0-b1b353fb0180)
-- [Survival Game Kit V2](https://www.fab.com/listings/3db63098-0a00-432d-b359-becc6e32096f)
-
-**Important Note**
-
-ALSXT is not automatically synced with the main ALS-Refactored repository, but is instead maintained through [this fork](https://github.com/Voidware-Prohibited/ALS-Refactored). If you find changes in ALS-Refactored have broken ALSXT you may use this fork to maintain more stability in your projects.
+- GameplayCameras
+- GameplayTasks
+- SmartObjectsModule
+- GameplayBehaviorsModule
+- GameplayBehaviorSmartObjectsModule
+- AbilitySystemGameFeatureActions
+- AIModule
+- GameFeatures
+- ModularGameplay
+- ModularGameplayActors
+- Chooser
+- ContextualAnimation
+- PhysicsControl
+- DataRegistry
+- TargetingSystem
 
 # Installation
+[Complete Installation Instructions](../..//wiki/Installation/)
 
-## From Scratch
+1. Install and setup (if required) all dependencies.
+2. Clone/download ALSXT into your projects Plugin folder.
+3. Integrate Config\DefaultEngine.ini into your projects DefaultEngine.ini.
+	1. Note: Various `SurfaceTypes` and a new `CollisionChannel` named `Transferrable` are required for the Footprints and Impact Effects to work. SurfaceTypes can be renamed and/or re-assigned in the respective effects Settings.
+4. (Re)Build Project with the `BuildPlugin.bat` Script or your IDE.
+5. Once compilation is successful you can now begin using ALSXT in your project
 
-- Begin with an empty C++ Project
-- Install and setup Enhanced Input Plugin
-- Install and setup MetaSound Plugin
-- Install the latest version of ALS-Refactored via https://github.com/Sixze/ALS-Refactored#quick-start
-- Clone/download ALSXT into your projects Plugin folder (You should have both ALS-Refactored and ALSXT side by side)
-- Integrate Config\DefaultEngine.ini into your projects DefaultEngine.ini
-     - Note: Various `SurfaceTypes` and a new `CollisionChannel` named `Transferrable` are required for the Footprints and Impact Effects to work. SurfaceTypes can be renamed and/or re-assigned in the respective effects Settings.
-- Build your Solution in Visual Studio or Rider again
-- Once compilation is successful you can now begin using ALSXT in your project
+## Available Scripts
+- `./BuildPlugin.bat` - Build Plugin Batch Script
+- `./BuildPlugin.sh` - Build Plugin Shell Script
 
-## For Existing C++ Project
+# Getting Started
+[Getting Started](../..//wiki/GettingStarted/)
+Five(5) C++ Character classes and four(4) example Blueprint classes are provided, each with their respective feature-sets, defined by `AlsxtCharacterSettings`, `GameplaySystemInitalizationDataAsset` and any additional Actor Components Settings.
 
-- Install Enhanced Input, MetaSound and ALS-Refactored plugins.
-- Clone/download ALSXT into your projects Plugin folder (You should have both ALS-Refactored and ALSXT side by side)
-- Integrate Config\DefaultEngine.ini into your projects DefaultEngine.ini
-     - Note: Various `SurfaceTypes` and a new `CollisionChannel` named `Transferrable` are required for the Footprints and Impact Effects to work. SurfaceTypes can be renamed and/or re-assigned in the respective effects Settings.
-- Build your Solution in Visual Studio or Rider again
-- Once compilation is successful you can now begin using ALSXT in your project
+```
+AlsxtCharacter						  # Abstract Base Character Class. No Input Actions. Not Blueprintable.
+├──AlsxtCharacterPlayer/				# Uses Player State. Ability System Component (ASC) is located on the Player State.
+    ├── AlsxtCharacterPlayerAdvanced/   # Uses Player State. Ability System Component (ASC) is located on the Player State.
+ ├──AlsxtCharacterNPC/				  # No Input Actions. Ability System Component (ASC) is located on the Character Class.
+    ├── AlsxtCharacterNPCAdvanced/	  # No Input Actions. Ability System Component (ASC) is located on the Character Class.
+```
 
-
+Create a child C++ class or blueprint of any `AlsxtCharacter` subclass to create your own custom Character, or simply Copy and existing Blueprint class derived from any of these classes.
 
 # Settings
+ALSXT is designed to be extremely configurable by with Data Assets. Most [Settings](../..//wiki/Settings/) are centralized in the [ALSXTCharacter Settings](../..//wiki/ALSXTCharacterSettings/) Data Asset.
 
-Most Settings are set in the ALSXT Character Settings Data Assets in the Character Blueprint. This is where you would customize animations, sounds, parameters and toggle features. Components are configured similarly. Components may have some general settings that are editable when clicking on the Component inside the Character Blueprint.
+## Gameplay Ability System
+Default [Character Abilities](/wiki/Settings/GameplayAbilities/) are defined by [Gameplay System Initialization Data](../..//wiki/Settings/GameplayAbilities/).
+
+# Asset Source Files
+
+- [ALSXT-Assets-Cascaduer](https://github.com/Voidware-Prohibited/ALSXT-Assets-Cascaduer/): Source Assets Cascaduer files.
+- [ALSXT-Assets-Blender](https://github.com/Voidware-Prohibited/ALSXT-Assets-Blender/): Source Assets Blender files.
+- [ALSXT-Assets-Photoshop](https://github.com/Voidware-Prohibited/ALSXT-Assets-Photoshop/): Source Assets Photoshop files.
+- [ALSXT-Assets-Textures](https://github.com/Voidware-Prohibited/ALSXT-Assets-Textures/): Source Assets Texture files.
+- [ALSXT-Assets-Audio](https://github.com/Voidware-Prohibited/ALSXT-Assets-Audio/): Source Assets Audio files.
 
 # Contributions
 
-I'm looking for help with implementing Root Motion for Vaulting, Wallrunning, Walljumping!
-Any advice regarding making actions more GAS-friendly would be welcome!
-
-If you wish to contribute, please ensure you are in sync with ALSXT, message me and I'll set up permissions for you. While I try to stay in sync with ALS-Refactored, at times it may be temporarily out of sync and features may break or need refactoring.
-Please submit an issue for any Compile error fixes. Most are usually the result of ALSXT not being synced to ALS-R.
+Contibutors and PRs are welcome! If you wish to contribute, please ensure you are synced with the latest ALSXT commit, message me and I'll set up permissions for you.
 
 # License
 
-Original content and code in this repository is under the MIT license. Any git submodules are covered by their respective licenses. Content listed in the Attributions are covered by their respective licenses.
+ALSXT is dual-licensed. It is available for absoultely free under the [MIT License](LICENSE.md) for most Individuals. If your organization, industry or application is listed in the [Commercial License](LICENSE-Commercial.md), please [Contact Us](https://voidwarex.com/contact/).
+
+Any git submodules are covered by their respective licenses. Content listed in the Attributions are covered by their respective licenses.
+
 
 # Special Thanks
 
-[Sixze](https://github.com/Sixze)
-
-[Freesound](https://freesound.org/)
-
-[SketchFab](https://sketchfab.com/)
-
-[Mixamo](https://www.mixamo.com)
-
-[Joseph Thigpen, Narxim](https://github.com/Narxim) for [Narxim-GAS-Example](https://github.com/Narxim/Narxim-GAS-Example)
-
-[tranek](https://github.com/tranek) for [GASDocumentation](https://github.com/tranek/GASDocumentation)
+- [Sixze](https://github.com/Sixze/)
+- [Freesound](https://freesound.org/)
+- [SketchFab](https://sketchfab.com/)
+- [Mixamo](https://www.mixamo.com/)
+- [Joseph Thigpen, Narxim](https://github.com/Narxim/) for [Narxim-GAS-Example](https://github.com/Narxim/Narxim-GAS-Example/)
+- [tranek](https://github.com/tranek/) for [GASDocumentation](https://github.com/tranek/GASDocumentation/)

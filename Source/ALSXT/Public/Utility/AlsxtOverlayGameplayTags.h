@@ -2,6 +2,40 @@
 
 #include "NativeGameplayTags.h"
 
+namespace AlsxtTags
+{
+	namespace Animation
+	{
+		namespace Blending
+		{
+			namespace Layer
+			{
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Both)
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Right)
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Left)
+			}
+			namespace LayerPosture
+			{
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(FullBody)
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Active)
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Passive)
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Neutral)
+			}
+			namespace LayerSettings
+			{
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(UniqueCombatStanceAssets)
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Aimable)
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(UseGunBoneForOverlayObjects)
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(UseUniqueAssetsForLeaning)
+				ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(SecondaryHandIK)
+			}
+		}
+	
+	}
+}
+
+
+
 namespace AlsxtOverlayLeftHandMirrorPolicyTags
 {
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Mirror)
@@ -30,3 +64,4 @@ namespace AlsxtOverlaySlotStanceTags
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Passive)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Neutral)
 }
+

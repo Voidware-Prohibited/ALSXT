@@ -27,7 +27,13 @@ namespace AlsxtAbilityGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Focus);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Aim);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Targeting);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(MeleeAttack);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_MeleeAttack);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_MeleeAttack_Light);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_MeleeAttack_Medium);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_MeleeAttack_Heavy);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_MeleeAttack_Grapple);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_MeleeAttack_Throw);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_MeleeAttack_Takedown);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(PrimaryFire);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Block);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Flip);
@@ -36,7 +42,9 @@ namespace AlsxtAbilityGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(HandGesture);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Emote);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_SwitchCombatStance);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ready);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_BreathRegen);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_CameraZoom);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Readiness);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_WeaponReadyPosition);
 }
 
@@ -59,6 +67,13 @@ namespace AlsxtGASGameplayTags
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Rank_Moderator);
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Rank_Player);
 		}
+	}
+
+	namespace Event
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Trace_Melee);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Trace_Melee_Begin);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Trace_Melee_End);
 	}
 	
 	namespace CharacterTags

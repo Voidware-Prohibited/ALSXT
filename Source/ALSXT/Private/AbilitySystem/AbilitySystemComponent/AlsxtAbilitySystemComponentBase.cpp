@@ -95,7 +95,7 @@ void UAlsxtAbilitySystemComponentBase::ChangeLevel_Implementation(const float De
 
 	// Do not change the level of any GE with the NoLevel tag.
 	FGameplayEffectQuery Query{};
-	Query.EffectTagQuery.MakeQuery_MatchNoTags(AlsxtGASGameplayTags::TAG_Effect_NoLevel.GetTag().GetSingleTagContainer());
+	Query.EffectTagQuery.MakeQuery_MatchNoTags(FGameplayTag::RequestGameplayTag("Effect.NoLevel").GetSingleTagContainer());
 	
 	// Note: Floats could be used, but need to create a new method.
 	// Note 2: This method performance could be improved (Loop of Loops)

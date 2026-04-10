@@ -1,7 +1,8 @@
 #pragma once
 #include "Utility/AlsGameplayTags.h"
 #include "Utility/AlsxtGameplayTags.h"
-
+#include "Utility/AlsxtMaterialStructs.h"
+#include "Core/CameraVariableCollection.h"
 #include "AlsxtViewSettings.generated.h"
 
 USTRUCT(BlueprintType)
@@ -15,10 +16,10 @@ struct ALSXT_API FAlsxtFloatRangeClamp
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (EditCondition = "bClampMax"))
 	float MaxValue{ 0.0f };
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SKGProcedural")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Clamp")
 	bool bClampMin {false};
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SKGProcedural")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Clamp")
 	bool bClampMax{false};
 };
 
@@ -27,10 +28,10 @@ struct ALSXT_API FAlsxtFloatRange2dClamp
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SKGProcedural")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Clamp")
 	FAlsxtFloatRangeClamp ClampX;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SKGProcedural")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Clamp")
 	FAlsxtFloatRangeClamp ClampY;
 };
 
@@ -80,6 +81,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TSoftObjectPtr<UCameraShakeBase> WalkCameraShake {nullptr};
 
+	// Target Values for Parameters specified in 
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess))
+	TArray<FAlsxtMaterialParametersSet> WalkingForwardMaterialEffectParameters;
+
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess, EditCondition = "bAllowDirectionDependentBoomOffset"))
+	TArray<FAlsxtMaterialParametersSet> WalkingBackwardMaterialEffectParameters;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FVector AimingForwardBoomOffset{ForceInit};
 
@@ -89,6 +97,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TSoftObjectPtr<UCameraShakeBase> AimingCameraShake {nullptr};
+
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess))
+	TArray<FAlsxtMaterialParametersSet> AimingForwardMaterialEffectParameters;
+
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess, EditCondition = "bAllowDirectionDependentBoomOffset"))
+	TArray<FAlsxtMaterialParametersSet> AimingBackwardMaterialEffectParameters;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FVector CombatForwardBoomOffset{ForceInit};
@@ -100,6 +114,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TSoftObjectPtr<UCameraShakeBase> CombatCameraShake {nullptr};
 
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess))
+	TArray<FAlsxtMaterialParametersSet> CombatForwardMaterialEffectParameters;
+
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess, EditCondition = "bAllowDirectionDependentBoomOffset"))
+	TArray<FAlsxtMaterialParametersSet> CombatBackwardMaterialEffectParameters;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FVector RunForwardBoomOffset{ForceInit};
 
@@ -110,12 +130,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TSoftObjectPtr<UCameraShakeBase> RunCameraShake {nullptr};
 
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess))
+	TArray<FAlsxtMaterialParametersSet> RunForwardMaterialEffectParameters;
+
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess, EditCondition = "bAllowDirectionDependentBoomOffset"))
+	TArray<FAlsxtMaterialParametersSet> RunBackwardMaterialEffectParameters;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	FVector SprintBoomOffset{ForceInit};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALS")
 	TSoftObjectPtr<UCameraShakeBase> SprintCameraShake {nullptr};
 
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess))
+	TArray<FAlsxtMaterialParametersSet> SprintForwardMaterialEffectParameters;
+
+	UPROPERTY(EditAnywhere, Category="Post-Process Material", Meta = (AllowPrivateAccess, EditCondition = "bAllowDirectionDependentBoomOffset"))
+	TArray<FAlsxtMaterialParametersSet> SprintBackwardMaterialEffectParameters;
 public:
 	FVector GetWalkBoomOffset() const;
 	FVector GetAimingBoomOffset() const;
@@ -145,13 +176,17 @@ class ALSXT_API UAlsxtViewCameraSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Third Person", Meta = (ForceInlineRow))
 	TMap<FGameplayTag, FAlsxtViewCameraStanceSettings> RotationModes
 	{
 		{AlsRotationModeTags::VelocityDirection, {}},
 		{AlsRotationModeTags::ViewDirection, {}},
 		{AlsRotationModeTags::Aiming, {}}
-	};	
+	};
+
+	// Automatically interpolate Parameters for Post Process Materials by including them in this Parameter collection and define the Target values in Camera settings above
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera|Effects")
+	TSoftObjectPtr<UMaterialParameterCollection> CameraEffectsMaterialParameterCollection {nullptr};
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -163,14 +198,26 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "View Mode", meta = (AllowPrivateAccess))
 	FGameplayTag DefaultViewMode {AlsViewModeTags::FirstPerson};
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Features")
+	bool bEnableSwitchCameraShoulder {true};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Features")
+	bool bEnableFreelook {true};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Features")
+	bool bEnableFocus {true};
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Control Rotation")
 	bool bClampControlRotation {false};
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Control Rotation", meta = (EditCondition = "bClampControlRotation"))
 	FAlsxtFloatRange2dClamp ThirdPersonControlRotationClamp;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera Shoulder")
-	bool bEnableSwitchCameraShoulder {true};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Freelook", meta = (EditCondition = "bEnableFreelook"))
+	FAlsxtFloatRange2dClamp ThirdPersonFreelookRotationClamp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Freelook", meta = (EditCondition = "bEnableFreelook"))
+	FAlsxtFloatRange2dClamp FirstPersonFreelookRotationClamp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera Shoulder", meta = (EditCondition = "bEnableSwitchCameraShoulder"))
 	float CameraShoulderLeftOffset{-35.0f};
@@ -178,20 +225,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera Shoulder", meta = (EditCondition = "bEnableSwitchCameraShoulder"))
 	float CameraShoulderRightOffset{35.0f};
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Focus")
-	bool bEnableFocus {true};
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Focus", meta = (EditCondition = "bEnableFocus"))
 	float FocusZoomFactor{2.0f};
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Freelook")
-	bool bEnableFreelook {true};
+	// Control various Camera Parameters from nearly anywhere, similar to Material Parameter Collections
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
+	TSoftObjectPtr<UCameraVariableCollection> CameraVariablesCollection {nullptr};
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Freelook", meta = (EditCondition = "bEnableFreelook"))
-	FAlsxtFloatRange2dClamp ThirdPersonFreelookRotationClamp;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Freelook", meta = (EditCondition = "bEnableFreelook"))
-	FAlsxtFloatRange2dClamp FirstPersonFreelookRotationClamp;
+	// Automatically interpolate Parameters for Post Process Materials by including them in this Parameter collection and define the Target values in Camera settings above
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
+	TSoftObjectPtr<UMaterialParameterCollection> CameraEffectsMaterialParameterCollection {nullptr};
 
 	// General Settings for Gameplay Camera System
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))

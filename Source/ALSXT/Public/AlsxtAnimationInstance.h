@@ -98,6 +98,9 @@ protected:
 	FGameplayTag Injury{AlsxtStatusEffectLocomotionVariantTags::None};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
+	FGameplayTag Readiness{AlsxtReadinessTags::Relaxed};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))
 	FGameplayTag CombatStance{ALSXTCombatStanceTags::Neutral};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", Transient, Meta = (AllowPrivateAccess))

@@ -3,6 +3,7 @@
 #include "AlsxtCharacterMovementComponent.h"
 
 #include "AlsxtCharacter.h"
+#include "AbilitySystem/AttributeSets/AlsxtMovementAttributeSet.h"
 #include "Utility/AlsxtGameplayTags.h"
 #include "Interfaces/AlsxtCharacterInterface.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -28,6 +29,44 @@ FVector UAlsxtCharacterMovementComponent::ConsumeInputVector()
 
 float UAlsxtCharacterMovementComponent::GetMaxSpeed() const
 {
+	// if (!SpeedDataAsset) return Super::GetMaxSpeed();
+// 
+	// // 1. Get Tags from Character Owner
+	// AMyCharacter* CharOwner = Cast<AMyCharacter>(GetOwner());
+	// if (!CharOwner) return Super::GetMaxSpeed();
+    // 
+	// FGameplayTag CurrentStance = CharOwner->GetStanceTag();
+	// FGameplayTag CurrentGait = CharOwner->GetGaitTag();
+// 
+	// // 2. Lookup Base Speed
+	// float BaseSpeed = MovementDataAsset->GetSpeedForTags(CurrentStance, CurrentGait);
+// 
+	// // 3. Apply GAS Modifiers (Additive/Multiplicative)
+	// if (CharOwner->GetAbilitySystemComponent()) {
+	// 	// AttributeSet::GetMoveSpeed() returns the final value calculated by GE
+	// 	return CharOwner->GetAttributeSet()->GetMoveSpeed(); 
+	// }
+    // 
+	// return BaseSpeed;
+	// 
+	// 
+	// // 1. Determine Base Speed from Tags (Stance/Gait set on Actor)
+	// float BaseSpeed = SpeedDataAsset->DefaultConfig.WalkSpeed;
+    // 
+	// // Example: Check Actor Tags for current Gait (requires implementing tag setting)
+	// if (GetOwner()->Tags.Contains(FName("Gait.Sprint"))) BaseSpeed = SpeedDataAsset->DefaultConfig.SprintSpeed;
+	// else if (IsCrouching()) BaseSpeed = SpeedDataAsset->DefaultConfig.CrouchWalkSpeed;
+// 
+	// // 2. Apply GAS Movement Speed Modifier Attribute
+	// if (const auto* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner()))
+	// {
+	// 	// AttributeSet::GetMoveSpeedAttribute() returns the FGameplayAttribute
+	// 	float SpeedModifier = ASC->GetNumericAttribute(UAlsxtMovementAttributeSet::GetMovementSpeedAttribute());
+	// 	return BaseSpeed * SpeedModifier; // e.g., 0.5 for 50% speed
+	// }
+// 
+	// return BaseSpeed;
+	
 	return Super::GetMaxSpeed() * MovementSpeedMultiplier;
 }
 

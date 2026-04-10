@@ -35,8 +35,14 @@ void UAlsxtMovementAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	Params.Condition = COND_OwnerOnly;
 
 	// Replicated to all
+	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtMovementAttributeSet, MovementSpeed, Params);
 	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtMovementAttributeSet, MovementSpeedMultiplier, Params);
 	DOREPLIFETIME_WITH_PARAMS_FAST(UAlsxtMovementAttributeSet, MovementAccelerationMultiplier, Params);
+}
+
+void UAlsxtMovementAttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAlsxtMovementAttributeSet, MovementSpeed, OldValue);
 }
 
 void UAlsxtMovementAttributeSet::OnRep_MovementSpeedMultiplier(const FGameplayAttributeData& OldValue)

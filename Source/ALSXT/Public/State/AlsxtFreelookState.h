@@ -8,7 +8,16 @@ USTRUCT(BlueprintType)
 struct ALSXT_API FAlsxtFreelookState
 {
 	GENERATED_BODY()
-		
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bFreelooking;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FRotator LockedControlRotation { EForceInit::ForceInit };
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FRotator FreeLookHeadRotation { EForceInit::ForceInit };
+	
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FGameplayTag Freelooking;
 
@@ -17,12 +26,6 @@ struct ALSXT_API FAlsxtFreelookState
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FAlsViewState LockedViewState;
-
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
-		FRotator LockedControlRotation { EForceInit::ForceInit };
-
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FRotator FreeLookHeadRotation { EForceInit::ForceInit };
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ClampMin = -180, ClampMax = 180, ForceUnits = "deg"))
 		float LockedYawAngle { 0.0f };

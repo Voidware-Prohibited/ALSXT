@@ -24,7 +24,14 @@ namespace AlsxtAbilityGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Focus, TEXT("Gameplay.Ability.Focus"))
 	UE_DEFINE_GAMEPLAY_TAG(Aim, TEXT("Gameplay.Ability.Aim"))
 	UE_DEFINE_GAMEPLAY_TAG(Targeting, TEXT("Gameplay.Ability.Targeting"))
-	UE_DEFINE_GAMEPLAY_TAG(MeleeAttack, TEXT("Gameplay.Ability.MeleeAttack"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_MeleeAttack, TEXT("Gameplay.Ability.MeleeAttack"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_MeleeAttack_Light, TEXT("Gameplay.Ability.MeleeAttack.Light"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_MeleeAttack_Medium, TEXT("Gameplay.Ability.MeleeAttack.Medium"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_MeleeAttack_Heavy, TEXT("Gameplay.Ability.MeleeAttack.Heavy"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_MeleeAttack_Grapple, TEXT("Gameplay.Ability.MeleeAttack.Grapple"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_MeleeAttack_Throw, TEXT("Gameplay.Ability.MeleeAttack.Throw"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_MeleeAttack_Finisher, TEXT("Gameplay.Ability.MeleeAttack.Finisher"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_MeleeAttack_Takedown, TEXT("Gameplay.Ability.MeleeAttack.Takedown"))
 	UE_DEFINE_GAMEPLAY_TAG(PrimaryFire, TEXT("Gameplay.Ability.PrimaryFire"))
 	UE_DEFINE_GAMEPLAY_TAG(Block, TEXT("Gameplay.Ability.Block"))
 	UE_DEFINE_GAMEPLAY_TAG(Flip, TEXT("Gameplay.Ability.Flip"))
@@ -33,14 +40,19 @@ namespace AlsxtAbilityGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(HandGesture, TEXT("Gameplay.Ability.HandGesture"))
 	UE_DEFINE_GAMEPLAY_TAG(Emote, TEXT("Gameplay.Ability.Emote"))
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_SwitchCombatStance, TEXT("Gameplay.Ability.SwitchCombatStance"))
-	UE_DEFINE_GAMEPLAY_TAG(Ready, TEXT("Gameplay.Ability.Ready"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_BreathRegen, TEXT("Gameplay.Ability.Breath Regen"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_CameraZoom, TEXT("Gameplay.Ability.Camera Zoom"))
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Readiness, TEXT("Gameplay.Ability.Readiness"))
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_WeaponReadyPosition, TEXT("Gameplay.Ability.WeaponReadyPosition"))
 }
 
 namespace AlsxtGASGameplayTags
 {
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Effect_NoLevel, "Effect.NoLevel", "This GE won't be leveled up or down. Base level will always be the same (upon granting it).")
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Effect_Type_Cooldown, "Effect.Type.Cooldown", "This is a cooldown GE")
+	namespace Effect
+	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Effect_NoLevel, "Effect.NoLevel", "This GE won't be leveled up or down. Base level will always be the same (upon granting it).")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Effect_Type_Cooldown, "Effect.Type.Cooldown", "This is a cooldown GE")
+	}
 
 	namespace Character
 	{
@@ -56,6 +68,13 @@ namespace AlsxtGASGameplayTags
 			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Rank_Moderator, "Character.Rank.Moderator", "A Gameplay Tag applied to Characters that are AI controlled.")
 			UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Rank_Player, "Character.Rank.Player", "A Gameplay Tag applied to Characters that are AI controlled.")
 		}
+	}
+
+	namespace Event
+	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Event_Trace_Melee, "Event.Trace.Melee", "General Melee Trace Event Tag")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Event_Trace_Melee_Begin, "Event.Trace.Melee.Begin", "Begin Melee Trace Event Tag")
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Event_Trace_Melee_End, "Event.Trace.Melee.End", "End Melee Trace Event Tag")
 	}
 	
 	namespace CharacterTags

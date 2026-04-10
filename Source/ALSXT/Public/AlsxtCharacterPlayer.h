@@ -108,10 +108,8 @@ protected:
     virtual void Input_OnFreelook(const FInputActionValue& ActionValue);
    
     virtual void Input_OnToggleGait();
-
-	virtual void Input_OnToggleReadyStance();
    
-    virtual void Input_OnToggleCombatReady();
+    virtual void Input_OnToggleReadiness();
 
 	virtual void Input_OnSwitchCombatStance();
 

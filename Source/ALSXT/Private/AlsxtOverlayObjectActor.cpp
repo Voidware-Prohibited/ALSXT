@@ -42,6 +42,8 @@ AAlsxtOverlayObjectActor::AAlsxtOverlayObjectActor()
  
 	// Set Replication Mode to Mixed for NPCs.
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+
+	SmartObjectComponent = CreateDefaultSubobject<USmartObjectComponent>(TEXT("Smart Object Component"));
 }
 
 #if WITH_EDITOR

@@ -25,7 +25,6 @@ namespace AlsLocomotionModeTags
 
 namespace AlsGaitTags
 {
-	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(ADS)
 	ALSXT_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat)
 }
 

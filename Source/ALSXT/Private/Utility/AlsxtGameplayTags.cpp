@@ -26,8 +26,7 @@ namespace AlsStanceTags
 
 namespace AlsGaitTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(ADS, FName{TEXTVIEW("Als.Gait.ADS")})
-	UE_DEFINE_GAMEPLAY_TAG(Combat, FName{TEXTVIEW("Als.Gait.Combat")})
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Combat, FName{TEXTVIEW("Als.Gait.Combat")}, "Combat Gait is specialized, slower, ready-to-fire stance that acts as a middle ground between Walking and Running.")
 }
 
 namespace AlsOverlayModeTags

@@ -13,6 +13,7 @@
 #include "Interfaces/AlsxtMeshPaintingInterface.h"
 #include "Interfaces/AlsxtOverlayObjectInterface.h"
 #include "Settings/AlsxtOverlayObjectSettings.h"
+#include "SmartObjectComponent.h"
 #include "AlsxtOverlayObjectActor.generated.h"
 
 USTRUCT(BlueprintType)
@@ -82,6 +83,9 @@ public:
 	UPROPERTY()
 	USceneComponent* Pivot;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USmartObjectComponent* SmartObjectComponent;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* FireMontage;
 
@@ -95,6 +99,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System", Meta = (ShowOnlyInnerProperties))
 	TSoftObjectPtr<UAlsxtAbilitySystemInitializationDataAsset> AbilitySystemInitializationData;
 
+	UPROPERTY(EditAnywhere, Category = "Ability System")
+	
 	UAbilitySystemComponent* AbilitySystemComponent;
 
 	void InitializeAbilitySystem();

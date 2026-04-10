@@ -19,6 +19,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FGameplayTag OverlayMode;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Trace Data")
+	FGameplayTag MeleeEventTag;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	FGameplayTag ImpactType;
 

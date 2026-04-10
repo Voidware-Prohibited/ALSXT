@@ -31,8 +31,20 @@ class ALSXT_API UAlsxtCharacterSettings : public UDataAsset
 
 public:
 	// Movement Speed for Gaits and Stances
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", Meta = (ForceInlineRow))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", Meta = (ForceInlineRow))
 	TSoftObjectPtr<UAlsxtMovementSettings> MovementSettings {nullptr};
+
+	// Movement Speed for Gaits and Stances
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtMovementSettings> ControlSettings {nullptr};
+
+	// Movement Speed for Gaits and Stances
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtMovementSettings> CameraSettings {nullptr};
+
+	// Movement Speed for Gaits and Stances
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", Meta = (ForceInlineRow))
+	TSoftObjectPtr<UAlsxtMovementSettings> SoundSettings {nullptr};
 	
 	// Settings for Base Locomotion, Locomotion Modifiers, Locomotion Status Effects
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", Meta = (ForceInlineRow))
