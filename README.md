@@ -6,7 +6,7 @@
 
 <p align="center">
      <a href="https://github.com/Voidware-Prohibited/ALSXT/commits/master"><img src="https://img.shields.io/github/last-commit/Voidware-Prohibited/ALSXT.svg?logo=github&logoColor=white" alt="GitHub last commit"></a>&nbsp;
-     <a href="https://github.com/Voidware-Prohibited/TargetVector/commits/master"><img src="https://img.shields.io/github/checks-status/Voidware-Prohibited/ALSXT/main?logo=github&logoColor=white" alt="Checks Status"></a>&nbsp;
+     <a href="https://github.com/Voidware-Prohibited/ALSXT/commits/master"><img src="https://img.shields.io/github/checks-status/Voidware-Prohibited/ALSXT/main?logo=github&logoColor=white" alt="Checks Status"></a>&nbsp;
      <a href="https://github.com/Voidware-Prohibited/ALSXT/issues"><img src="https://img.shields.io/github/issues-raw/Voidware-Prohibited/ALSXT.svg?logo=github&logoColor=white" alt="GitHub issues"></a>&nbsp;
      <a href="https://github.com/Voidware-Prohibited/ALSXT/pulls"><img src="https://img.shields.io/github/issues-pr-raw/Voidware-Prohibited/ALSXT.svg?logo=github&logoColor=white" alt="GitHub pull requests"></a>&nbsp;
      <a href="https://github.com/Voidware-Prohibited/ALSXT/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-silver.svg?logo=github&logoColor=white" alt="MIT License"></a>
@@ -18,7 +18,8 @@
      <a href="https://liberapay.com/colorindarkness"><img alt="Support me on Liberapay" src="https://img.shields.io/badge/support_me_on-liberapay-yellow?link=https%3A%2F%2Fliberapay.com%2Fcolorindarkness%2F"></a>
 </p>
 
-> [!NOTE]  Following the acquisition of GitHub by Micro$lop, we have taken principled action and have begun primarily hosting code and content on [Codeberg](https://codeberg.org/Voidware-Prohibited/). Mirrors will still be maintained on [GitHub](https://github.com/Voidware-Prohibited/ALSXT/) and [GitLab](https://gitlab.com/Voidware-Prohibited/ALSXT/).
+> [!NOTE]
+> Following the acquisition of GitHub by Micro$lop, we have taken principled action and have begun primarily hosting code and content on [Codeberg](https://codeberg.org/Voidware-Prohibited/). Mirrors will still be maintained on [GitHub](https://github.com/Voidware-Prohibited/ALSXT/) and [GitLab](https://gitlab.com/Voidware-Prohibited/ALSXT/).
 
 An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based, Data-oriented, Character System with the Latest UE5 Features. The feature-set is informed the parent project [Target Vector](https://github.com/Voidware-Prohibited/TargetVector/).
 
@@ -43,43 +44,47 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 
 # Features
 
-> [!WARNING] _ALSXT is under heavy development, including a rewrite to utilze GAS, Modular features and new technologies. Many features may not be finished or production-ready. Use at your own risk._
+> [!WARNING]
+> _ALSXT is under heavy development, including a rewrite to utilze GAS, Modular features and new technologies. Many features may not be finished or production-ready. Use at your own risk._
 
 ## Improvements
-- Alsxt Character Movement Component - Expanded Movement Featurees and GAS Integration.
-- Expanded Character States - Combat Stance, Sex, Variant, Weapon Ready Position, etc.
-- Expanded Footprints System - Independent foot states, Saturation, Material Transfer, Vertex Paint Support(Static Mesh only, In Progress).
+- Alsxt Character Movement Component - Expanded Movement Featurees and GAS Integration
+- Expanded Character States - Combat Stance, Sex, Variant, Weapon Ready Position, etc
+- Expanded Footprints System - Independent foot states, Saturation, Material Transfer, Vertex Paint Support(Static Mesh only, In Progress)
 
 ## New Features
 - Locomotion Layer Blending
 - Overlay Layer  Blending
-- Gameplay Camera System - Replaces ALS-Camera Component.
-	- Gameplay Camera System Director.
-	- Third and First Person Camera Rigs.
+- Gameplay Camera System - Replaces ALS-Camera Component
+	- Gameplay Camera System Director
+	- Third and First Person Camera Rigs
 - GAS Gameplay Abilities - With Cost Gameplay Effects
-	- Nearly all exiting Input Actions.
+	- Nearly all exiting Input Actions
 	- Movement Ability that can modify Regen Magnitudes
-	- Extended State Input Actions.
-	- New Locomotion Actions: Slide, Flip, Hold Breath, Focus.
-	- Plus More.
-- GAS Gameplay Effects.
-	- Staus Effects, such as Injuries, that modify Movement Speed Magnitudes.
-	- Stamina Regen with Magnitude.
-	- Hold Breath Regen with Magnitude.
-- GAS Gameplay Attribute Sets.
-	- Stamina.
-	- Breath.
-	- Plus More.
-- Advanced Customizable and Paintable Master Materials for Characters and Objects.
+	- Extended State Input Actions
+	- New Locomotion Actions: Slide, Flip, Hold Breath, Focus
+	- Plus More
+- GAS Gameplay Effects
+	- Staus Effects, such as Injuries, that modify Movement Speed Magnitudes
+	- Stamina Regen with Magnitude
+	- Hold Breath Regen with Magnitude
+- GAS Gameplay Attribute Sets
+	- Stamina
+	- Breath
+	- Plus More
+- Advanced Customizable and Paintable Master Materials for Characters and Objects
 
 ### Firearm Features
-- ADS
+- ADS (Aim Down Sight)
+- Attachments
+- Optic Effects
+- Procedural Aim
 - Procedural Recoil
 - Firearm Actions
 - Trigger Finger Layer
 
 ## Features In Development
-- Smart Object based Generic Interaction System.
+- Smart Object based Generic Interaction System
 - Contextual Animation
 - Combat System
 - Impact Reactions (Blending reaction animations with Physical Animation)
@@ -91,9 +96,9 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 - Idle Animation Component
 
 ## Bonus Features
-- Advanced Landscape Auto-Material.
-- Procedural Radial/Pie Menu.
-- Workflow YAML files for Codeberg/Forgejo and Micro$lop Github.
+- Advanced Landscape Auto-Material
+- Procedural Radial/Pie Menu
+- Workflow YAML files for Codeberg/Forgejo and Micro$lop Github
 
 ## Planned Features
 - Skeletal Mesh and Clothing set with Morph Targets/Shape Keys
@@ -117,11 +122,11 @@ A working UE5 C++ Integrated Developement Environment(IDE) such as:
 
 **Linux**
 
-- Currently undergoing testing
+- Currently undergoing testing.
 
 **MacOS**
 
-- XCode - Currently undergoing testing
+- XCode - Currently undergoing testing.
 
 ## Third-Party Plugins
 The following plugins require cloning or downloading into your projects `Plugins` folder.
@@ -148,6 +153,8 @@ The following are built-in Engine plugins that are enabled in the Plugins window
 
 # Installation
 [Complete Installation Instructions](../..//wiki/Installation/)
+
+**Quick Install**
 
 1. Install and setup (if required) all dependencies.
 2. Clone/download ALSXT into your projects Plugin folder.
@@ -182,11 +189,11 @@ Default [Character Abilities](/wiki/Settings/GameplayAbilities/) are defined by 
 
 # Asset Source Files
 
-- [ALSXT-Assets-Cascaduer](https://github.com/Voidware-Prohibited/ALSXT-Assets-Cascaduer/): Source Assets Cascaduer files.
-- [ALSXT-Assets-Blender](https://github.com/Voidware-Prohibited/ALSXT-Assets-Blender/): Source Assets Blender files.
-- [ALSXT-Assets-Photoshop](https://github.com/Voidware-Prohibited/ALSXT-Assets-Photoshop/): Source Assets Photoshop files.
-- [ALSXT-Assets-Textures](https://github.com/Voidware-Prohibited/ALSXT-Assets-Textures/): Source Assets Texture files.
-- [ALSXT-Assets-Audio](https://github.com/Voidware-Prohibited/ALSXT-Assets-Audio/): Source Assets Audio files.
+- [ALSXT-Assets-Cascaduer](https://github.com/Voidware-Prohibited/ALSXT-Assets-Cascaduer/): Source Assets Cascaduer files
+- [ALSXT-Assets-Blender](https://github.com/Voidware-Prohibited/ALSXT-Assets-Blender/): Source Assets Blender files
+- [ALSXT-Assets-Photoshop](https://github.com/Voidware-Prohibited/ALSXT-Assets-Photoshop/): Source Assets Photoshop files
+- [ALSXT-Assets-Textures](https://github.com/Voidware-Prohibited/ALSXT-Assets-Textures/): Source Assets Texture files
+- [ALSXT-Assets-Audio](https://github.com/Voidware-Prohibited/ALSXT-Assets-Audio/): Source Assets Audio files
 
 # Contributions
 
