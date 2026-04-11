@@ -1,0 +1,19 @@
+name: Greetings
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  greeting:
+    runs-on: docker
+    steps:
+      - name: Welcome New Contributor
+        # You can use the GitHub action by prefixing it with the GitHub URL
+        uses: https://github.com
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: "👋 Welcome! Thank you for opening your first issue here."
+          pr-message: "🎉 Thank you for your first pull request! We'll review it soon."

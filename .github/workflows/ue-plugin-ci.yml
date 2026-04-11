@@ -1,3 +1,82 @@
+name: Unreal Plugin Cross-Platform CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    name: UE Build & Test (${{ matrix.os }})
+    # Requires self-hosted runners labeled with 'windows', 'linux', or 'macos'
+    runs-on: [self-hosted, "${{ matrix.os }}"]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows, linux, macos]
+    
+    env:
+      # Set this on your runner machine's environment variables or here
+      UE_PATH: ${{ matrix.os == 'windows' && 'C:/Program Files/Epic Games/UE_5.3' || '/Users/Shared/EpicGames/UE_5.3' }}
+      PROJECT_NAME: "YourProjectName"
+      PLUGIN_NAME: "YourPluginName"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build Plugin
+        run: |
+          # Use Unreal Automation Tool (UAT) to build the plugin
+          ${{ env.UE_PATH }}/Engine/Build/BatchFiles/RunUAT.${{ matrix.os == 'windows' && 'bat' || 'sh' }} \
+          BuildPlugin -Plugin="${{ github.workspace }}/${{ env.PLUGIN_NAME }}.uplugin" \
+          -Package="${{ github.workspace }}/BuiltPlugin" -Rocket
+
+      - name: Run Tests & Coverage (Windows)
+        if: matrix.os == 'windows'
+        shell: cmd
+        run: |
+          :: Use OpenCppCoverage to wrap the Unreal Editor test execution
+          OpenCppCoverage.exe --sources "${{ env.PLUGIN_NAME }}" --export_type cobertura:coverage.xml -- ^
+          "${{ env.UE_PATH }}\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" ^
+          "${{ github.workspace }}\${{ env.PROJECT_NAME }}.uproject" ^
+          -ExecCmds="Automation RunTests ${{ env.PLUGIN_NAME }}; quit" ^
+          -unattended -nopause -testexit="Automation Test Queue Empty" -log=TestLog.txt
+
+      - name: Run Tests & Coverage (Unix)
+        if: matrix.os != 'windows'
+        run: |
+          # Use LLVM instrumentation for coverage on Linux/macOS
+          export LLVM_PROFILE_FILE="code-%p.profraw"
+          ${{ env.UE_PATH }}/Engine/Binaries/${{ matrix.os == 'linux' && 'Linux' || 'Mac' }}/UnrealEditor-Cmd \
+          "${{ github.workspace }}/${{ env.PROJECT_NAME }}.uproject" \
+          -ExecCmds="Automation RunTests ${{ env.PLUGIN_NAME }}; quit" \
+          -unattended -nopause -testexit="Automation Test Queue Empty" -log=TestLog.txt
+
+      - name: Upload Build Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.os }}
+          path: |
+            Saved/Logs/*.log
+            TestLog.txt
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          flags: ${{ matrix.os }}
+          name: ue-plugin-coverage
+          fail_ci_if_error: true
+
+
+==
+
 name: Unreal Plugin Cross-Platform Build
 
 on:

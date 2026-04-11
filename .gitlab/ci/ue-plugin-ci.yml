@@ -1,0 +1,68 @@
+name: Unreal Plugin Cross-Platform CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PLUGIN_NAME: ALSXT # Change to .uplugin name
+  # Paths must match your self-hosted runner environment
+  UE_PATH_WIN: "C:\\EpicGames\\UE_5.3"
+  UE_PATH_LINUX: "/home/runner/UE_5.3"
+  UE_PATH_MAC: "/Users/runner/UE_5.3"
+  OUTPUT_FILENAME_PREFIX: "UE5Editor-" # Change to .uplugin name
+
+jobs:
+  build-and-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: self-hosted-windows
+            ue_path: "C:\\EpicGames\\UE_5.3"
+            run_cmd: RunUAT.bat
+          - os: self-hosted-linux
+            ue_path: "/home/runner/UE_5.3"
+            run_cmd: ./RunUAT.sh
+          - os: self-hosted-mac
+            ue_path: "/Users/runner/UE_5.3"
+            run_cmd: ./RunUAT.sh
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Plugin
+        run: |
+          ${{ matrix.ue_path }}/Engine/Build/BatchFiles/${{ matrix.run_cmd }} BuildPlugin -Plugin="${{ github.workspace }}/${{ env.PLUGIN_NAME }}.uplugin" -Package="${{ github.workspace }}/Build" -TargetPlatforms=Win64+Linux+Mac
+
+      - name: Run Automation Tests
+        run: |
+          ${{ matrix.ue_path }}/Engine/Build/BatchFiles/${{ matrix.run_cmd }} RunAutomationTests -Plugin="${{ env.PLUGIN_NAME }}" -ReportExportPath="${{ github.workspace }}/TestReports"
+
+      - name: Generate Coverage Report (Windows Only)
+        if: runner.os == 'Windows'
+        run: |
+          # Use OpenCppCoverage or similar installed on self-hosted runner
+          # Change to .dll name
+          & "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe" --export_type=cobertura:coverage.xml -- "Build\Win64\${{ env.PLUGIN_NAME }}\Binaries\Win64\${{ env.OUTPUT_FILENAME_PREFIX }}${{ env.PLUGIN_NAME }}.dll" 
+
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.os }}
+          path: |
+            TestLog.txt
+            Saved/Logs/
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          flags: ${{ runner.os }},unreal

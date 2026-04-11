@@ -1,0 +1,69 @@
+name: Unreal Plugin Cross-Platform CI
+
+on:
+  push:
+    branches: [ main ] # Add all branches to be tested here
+  pull_request:
+    branches: [ main ]
+
+env:
+  PLUGIN_NAME: "ALSXT" # Change to .uplugin name
+  # Paths must match your self-hosted runner environment
+  UE_PATH_WIN: "C:/Program Files/Epic Games/UE_5.4"
+  UE_PATH_LINUX: "/opt/unreal-engine"
+  UE_PATH_MAC: "/Users/Shared/Epic Games/UE_5.4"
+
+jobs:
+  build-and-test:
+    name: Build & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows
+            runuat: 'Engine/Build/BatchFiles/RunUAT.bat'
+            ue_path: "C:/Program Files/Epic Games/UE_5.4"
+          - os: linux
+            runuat: 'Engine/Build/BatchFiles/RunUAT.sh'
+            ue_path: "/opt/unreal-engine"
+          - os: macos
+            runuat: 'Engine/Build/BatchFiles/RunUAT.sh'
+            ue_path: "/Users/Shared/Epic Games/UE_5.4"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Plugin
+        run: |
+          "${{ matrix.ue_path }}/${{ matrix.runuat }}" BuildPlugin \
+          -Plugin="${{ github.workspace }}/${{ env.PLUGIN_NAME }}.uplugin" \
+          -Package="${{ github.workspace }}/Build" -Rocket
+
+      - name: Run Automation Tests
+        # Runs the editor in "null" mode to execute tests without a UI
+        run: |
+          "${{ matrix.ue_path }}/Engine/Binaries/${{ matrix.os == 'windows' && 'Win64' || 'Linux' }}/UnrealEditor-Cmd" \
+          "${{ github.workspace }}/TestProject/TestProject.uproject" \
+          -ExecCmds="Automation RunTests ${{ env.PLUGIN_NAME }}" \
+          -unattended -nopause -testexit="All tests passed" -log -log=TestLog.txt
+
+      - name: Generate Coverage Report (Windows Only)
+        if: matrix.os == 'windows'
+        run: |
+          # Requires OpenCppCoverage installed on the runner
+          & "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe" \
+          --sources "${{ github.workspace }}\Source" \
+          -- "${{ matrix.ue_path }}\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" `
+          "${{ github.workspace }}\TestProject\TestProject.uproject" `
+          -ExecCmds="Automation RunTests ${{ env.PLUGIN_NAME }}" -unattended -nopause
+
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.os }}
+          path: |
+            TestLog.txt
+            Saved/Logs/

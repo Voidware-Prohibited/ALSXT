@@ -1,0 +1,36 @@
+name: Generate Changelog
+
+on:
+  push:
+    branches:
+      - main  # Adjust to your default branch
+    tags:
+      - 'v*'
+
+jobs:
+  changelog:
+    runs-on: docker
+    permissions:
+      contents: write  # Required to push the updated CHANGELOG.md
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to fetch all tags and history
+
+      - name: Generate Changelog
+        uses: orhun/git-cliff-action@v4
+        id: git-cliff
+        with:
+          config: cliff.toml
+          args: --verbose
+        env:
+          OUTPUT: CHANGELOG.md
+
+      - name: Commit and Push
+        run: |
+          git config user.name "forgejo-actions[bot]"
+          git config user.email "forgejo-actions[bot]@noreply.localhost"
+          git add CHANGELOG.md
+          git commit -m "chore: update CHANGELOG.md [skip ci]" || echo "No changes to commit"
+          git push origin main

@@ -28,7 +28,7 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 # Introduction
 - Generate truly unlimited, unique and immersive Characters with extensive States, deep Character Customization, Southpaw and support for blending multiple Locomotion and Overlay Layers.
 - Create smooth third Person and True First Person Gameplay featuring Input Actions converted to Gameplay Abilities, governed by Attribute Sets and Gameplay Effects.
-- Developer anbd Artist friendly, Data-oriented Locomotion framework with Real-world tested tech such as ALS-Refactored, GAS, Chooser Tables, Smart Objects and Modular Gamplay Features.
+- Developer and Artist friendly, Data-oriented Locomotion framework with Real-world tested tech such as ALS-Refactored, GAS, Chooser Tables, Smart Objects and Modular Gamplay Features.
 
 ## Available Modular Game Features
 - [Alsxt Dash Ability](https://codeberg.org/Voidware-Prohibited/AlsxtDashAbility/)
@@ -38,6 +38,7 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 - Promote and Advance the Free and Open Source Software Movement.
 - Utilize the latest Technologies and Methodologies.
 - Maintain a Modular, Configurable and Data-oriented Design.
+- Adhere to, promote and facilitate adherance to Coding Standards and Style Guides.
 - Encourage and Facilitate the use of Versioning Systems and CI/CD.
 - Performance and Optimization by Design.
 - Do Cool Procedural Stuff.
@@ -204,6 +205,9 @@ Contibutors and PRs are welcome! If you wish to contribute, please ensure you ar
 ALSXT is dual-licensed. It is available for absoultely free under the [MIT License](LICENSE.md) for most Individuals. If your organization, industry or application is listed in the [Commercial License](LICENSE-Commercial.md), please [Contact Us](https://voidwarex.com/contact/).
 
 Any git submodules are covered by their respective licenses. Content listed in the Attributions are covered by their respective licenses.
+
+# Attributions
+[ATTRIBUTIONS](ATTRIBUTIONS.md)
 
 
 # Special Thanks

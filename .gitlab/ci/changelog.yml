@@ -1,0 +1,13 @@
+changelog:
+  stage: build
+  image:
+    name: orhunp/git-cliff:latest
+    entrypoint: [""]
+  variables:
+    GIT_STRATEGY: clone # Required to access full git history
+    GIT_DEPTH: 0        # Avoid shallow clones for accurate history parsing
+  script:
+    - git-cliff --config cliff.toml --output CHANGELOG.md
+  artifacts:
+    paths:
+      - CHANGELOG.md
