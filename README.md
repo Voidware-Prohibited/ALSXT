@@ -5,11 +5,15 @@
 </p>
 
 <p align="center">
-     <a href="https://github.com/Voidware-Prohibited/ALSXT/commits/master"><img src="https://img.shields.io/github/last-commit/Voidware-Prohibited/ALSXT.svg?logo=github&logoColor=white" alt="GitHub last commit"></a>&nbsp;
-     <a href="https://github.com/Voidware-Prohibited/ALSXT/commits/master"><img src="https://img.shields.io/github/checks-status/Voidware-Prohibited/ALSXT/main?logo=github&logoColor=white" alt="Checks Status"></a>&nbsp;
-     <a href="https://github.com/Voidware-Prohibited/ALSXT/issues"><img src="https://img.shields.io/github/issues-raw/Voidware-Prohibited/ALSXT.svg?logo=github&logoColor=white" alt="GitHub issues"></a>&nbsp;
-     <a href="https://github.com/Voidware-Prohibited/ALSXT/pulls"><img src="https://img.shields.io/github/issues-pr-raw/Voidware-Prohibited/ALSXT.svg?logo=github&logoColor=white" alt="GitHub pull requests"></a>&nbsp;
-     <a href="https://github.com/Voidware-Prohibited/ALSXT/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-silver.svg?logo=github&logoColor=white" alt="MIT License"></a>
+     <a href="https://github.com/Voidware-Prohibited/ALSXT/commits/master"><img src="https://img.shields.io/github/last-commit/Voidware-Prohibited/ALSXT.svg?logo=forgejo&logoColor=white" alt="Last commit"></a>&nbsp;
+     <a href="https://github.com/Voidware-Prohibited/ALSXT/commits/master"><img src="https://img.shields.io/github/check-runs/Voidware-Prohibited/ALSXT/stable?logo=forgejo&logoColor=white&label=CI" alt="CI"></a>&nbsp;
+     <a href="https://github.com/Voidware-Prohibited/ALSXT/commits/master"><img src="https://img.shields.io/github/checks-status/Voidware-Prohibited/ALSXT/stable?logo=forgejo&logoColor=white" alt="Checks Status"></a>&nbsp;
+     <a href="https://github.com/Voidware-Prohibited/ALSXT/commits/master"><img src="https://img.shields.io/codecov/c/github/Voidware-Prohibited/ALSXT/stable?logo=codecov&logoColor=white" alt="Coverage"></a>&nbsp;
+</p>
+<p align="center">
+     <a href="https://github.com/Voidware-Prohibited/ALSXT/issues"><img src="https://img.shields.io/github/issues-raw/Voidware-Prohibited/ALSXT.svg?logo=forgejo&logoColor=white" alt="Issues"></a>&nbsp;
+     <a href="https://github.com/Voidware-Prohibited/ALSXT/pulls"><img src="https://img.shields.io/github/issues-pr-raw/Voidware-Prohibited/ALSXT.svg?logo=forgejo&logoColor=white" alt="Pull requests"></a>&nbsp;
+     <a href="https://github.com/Voidware-Prohibited/ALSXT/blob/master/LICENSE"><img src="https://img.shields.io/badge/VOIDWARE%20Dual%20License-silver?style=flat&logo=unlicense&logoColor=white&label=License&color=white" alt="VOIDWARE Dual License"></a>
 </p>
 <p align="center">
      <a href="https://github.com/sponsors/colorindarkness"><img src="https://img.shields.io/github/sponsors/colorindarkness.svg?logo=github&logoColor=white" alt="Become a Sponsor"></a>&nbsp;
@@ -54,8 +58,9 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 - Expanded Footprints System - Independent foot states, Saturation, Material Transfer, Vertex Paint Support(Static Mesh only, In Progress)
 
 ## New Features
-- Locomotion Layer Blending
-- Overlay Layer  Blending
+- Locomotion Variants - Default, Feminine, Masculine
+- Locomotion Layer Blending - Injuries, Overlay-defined Locomotion
+- Overlay Layer  Blending - Right, Left and Both Hands Layers
 - Gameplay Camera System - Replaces ALS-Camera Component
 	- Gameplay Camera System Director
 	- Third and First Person Camera Rigs
@@ -64,7 +69,7 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 	- Movement Ability that can modify Regen Magnitudes
 	- Extended State Input Actions
 	- New Locomotion Actions: Slide, Flip, Hold Breath, Focus
-	- Plus More
+	- + More
 - GAS Gameplay Effects
 	- Staus Effects, such as Injuries, that modify Movement Speed Magnitudes
 	- Stamina Regen with Magnitude
@@ -72,7 +77,7 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 - GAS Gameplay Attribute Sets
 	- Stamina
 	- Breath
-	- Plus More
+	- + More
 - Advanced Customizable and Paintable Master Materials for Characters and Objects
 
 ### Firearm Features
@@ -215,7 +220,7 @@ Contibutors and PRs are welcome! If you wish to contribute, please ensure you ar
 
 # License
 
-This project is dual-licensed. It is available for absoultely free under the [MIT License](LICENSE.md) for most Individuals. If your organization, industry or application is listed in the [Commercial License](LICENSE-Commercial.md), please [Contact Us](https://voidwarex.com/contact/).
+This project is dual-licensed. It is available for absoultely free under the [MIT License](LICENSE.md) for most Individuals and Organizations. If your organization, industry or application is listed in the [Commercial License](LICENSE-Commercial.md), please [Contact Us](https://voidwarex.com/contact/).
 
 Any git submodules are covered by their respective licenses. Content listed in the Attributions are covered by their respective licenses.
 

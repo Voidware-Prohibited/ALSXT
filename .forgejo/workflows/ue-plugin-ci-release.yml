@@ -3,8 +3,15 @@ name: Cross-platform Unreal Plugin CI for Releases
 on:
   push:
     branches: [ main ] # Add all branches to be tested here
+    tags:
+      - 'v*'
+      - '!v*-alpha' # Excludes alpha tags
   pull_request:
     branches: [ main ]
+    tags:
+      - 'v*'
+      - '!v*-alpha' # Excludes alpha tags
+
 
 env:
   # --- Configuration Variables ---
