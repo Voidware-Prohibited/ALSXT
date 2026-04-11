@@ -23,6 +23,7 @@ jobs:
     name: UE Package (${{ matrix.os }})
     runs-on: [self-hosted, ${{ matrix.runner_label }}]
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: windows

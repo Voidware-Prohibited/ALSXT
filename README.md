@@ -113,7 +113,7 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 
 
 # Requirements
-- Unreal Engine 5.6.1 or later built from github Source Code
+- Unreal Engine 5.7 or later built from github Source Code
 - A working UE5 C++ Integrated Developement Environment(IDE)
      - Tested: Jetbrains Rider, VS Code, Visual Studio (Windows)
      - Untested: XCode (MacOS), Jetbrains Rider, VS Code, Visual Studio (Linux)
@@ -199,7 +199,7 @@ Provided Tests
 TODO
 
 ## Code Coverage
-OpenCodeCoverage will perform Code Coverage analysis and publish and XML file as a Commit Artifact, and can optionally be uploaded to a configured Codecov account.
+OpenCodeCoverage will perform Code Coverage analysis and publish and XML file as a Commit Artifact, and can optionally be uploaded to a configured Codecov account. You will need to generate an Access Token from your Codecov account and add it the the workflow YAML files.
 
 # Asset Source Files
 
