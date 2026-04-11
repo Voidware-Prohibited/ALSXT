@@ -1,4 +1,4 @@
-name: Unreal Plugin Cross-Platform CI
+name: Cross-platform Unreal Plugin CI
 
 on:
   push:
@@ -7,11 +7,15 @@ on:
     branches: [ main ]
 
 env:
+  # --- Configuration Variables ---
   PLUGIN_NAME: "ALSXT" # Change to .uplugin name
+  UE_VERSION: "5.7"
   # Paths must match your self-hosted runner environment
   UE_PATH_WIN: "C:/Program Files/Epic Games/UE_5.4"
   UE_PATH_LINUX: "/opt/unreal-engine"
   UE_PATH_MAC: "/Users/Shared/Epic Games/UE_5.4"
+  # Codecov Token (Add to Forgejo Secrets)
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
   build-and-test:

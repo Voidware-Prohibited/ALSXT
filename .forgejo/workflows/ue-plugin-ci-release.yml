@@ -1,0 +1,93 @@
+name: Cross-platform Unreal Plugin CI for Releases
+
+on:
+  push:
+    branches: [ main ] # Add all branches to be tested here
+  pull_request:
+    branches: [ main ]
+
+env:
+  # --- Configuration Variables ---
+  PLUGIN_NAME: "ALSXT"
+  UE_VERSION: "5.7"
+  # Path to UE Engine installation (Adjust for each runner OS)
+  UE_PATH_WIN: "C:/EpicGames/UE_5.7"
+  UE_PATH_LINUX: "/home/runner/ue/UE_5.7"
+  UE_PATH_MAC: "/Users/Shared/EpicGames/UE_5.7"
+  # Codecov Token (Add to Forgejo Secrets)
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  # ------------------------------
+
+jobs:
+  build-test-package:
+    name: UE Package (${{ matrix.os }})
+    runs-on: [self-hosted, ${{ matrix.runner_label }}]
+    strategy:
+      matrix:
+        include:
+          - os: windows
+            runner_label: ue-win
+            ue_path: "C:/EpicGames/UE_5.7"
+            run_cmd: "RunUAT.bat"
+          - os: linux
+            runner_label: ue-linux
+            ue_path: "/home/runner/ue/UE_5.7"
+            run_cmd: "./RunUAT.sh"
+          - os: macos
+            runner_label: ue-mac
+            ue_path: "/Users/Shared/EpicGames/UE_5.7"
+            run_cmd: "./RunUAT.sh"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build and Test
+        shell: bash
+        run: |
+          ${{ matrix.ue_path }}/Engine/Build/BatchFiles/${{ matrix.run_cmd }} BuildPlugin -Plugin=$GITHUB_WORKSPACE/${{ env.PLUGIN_NAME }}.uplugin -Package=$GITHUB_WORKSPACE/Build -TargetPlatforms=Win64+Linux+Mac
+
+      - name: Perform Coverage
+        if: matrix.os == 'linux' # Run coverage once to save resources
+        run: |
+          # Example using llvm-cov or specialized UE coverage tool
+          ${{ matrix.ue_path }}/Engine/Build/BatchFiles/${{ matrix.run_cmd }} RunTests -Plugin=$GITHUB_WORKSPACE/${{ env.PLUGIN_NAME }}.uplugin -Coverage
+
+      - name: Upload Coverage to Codecov
+        if: matrix.os == 'linux'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ env.CODECOV_TOKEN }}
+          files: ./coverage.xml
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: UE-Plugin-${{ matrix.os }}
+          path: ${{ github.workspace }}/Build
+
+  release:
+    needs: build-test-package
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Changelog
+        uses: orhun/git-cliff-action@v3
+        id: git-cliff
+        with:
+          config: cliff.toml
+          args: --latest --strip header
+        env:
+          OUTPUT: CHANGELOG.md
+
+      - name: Update Status/Changelog
+        run: |
+          git commit -m "chore: update changelog" CHANGELOG.md || echo "No changes"
+          git push

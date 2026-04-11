@@ -99,7 +99,7 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 ## Bonus Features
 - Advanced Landscape Auto-Material
 - Procedural Radial/Pie Menu
-- Workflow YAML files for Codeberg/Forgejo and Micro$lop Github
+- Workflow YAML files for Codeberg/Forgejo, GitHub, and GitLab
 
 ## Planned Features
 - Skeletal Mesh and Clothing set with Morph Targets/Shape Keys
@@ -112,26 +112,20 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 - Emotes
 
 
-# Prerequisites
-A working UE5 C++ Integrated Developement Environment(IDE) such as:
+# Requirements
+- Unreal Engine 5.6.1 or later built from github Source Code
+- A working UE5 C++ Integrated Developement Environment(IDE)
+     - Tested: Jetbrains Rider, VS Code, Visual Studio (Windows)
+     - Untested: XCode (MacOS), Jetbrains Rider, VS Code, Visual Studio (Linux)
+- clang -20 13.0.1
 
-**Windows**
-
-- Jetbrains Rider (Developers personal preference)
-- Micro$lop Visual Studio
-- Micro$lop VS Code
-
-**Linux**
-
-- Currently undergoing testing.
-
-**MacOS**
-
-- XCode - Currently undergoing testing.
-
-## Third-Party Plugins
-The following plugins require cloning or downloading into your projects `Plugins` folder.
-- [Advanced Locomotion System Refactored](https://github.com/Sixze/ALS-Refactored/) ![GitHub Tag](https://img.shields.io/github/v/tag/Voidware-Prohibited/ALS-Refactored)
+## CI System Requirements
+Systems performing Continous Intergration Workflows will have additional requirements depending on the CI solution used.
+- Git
+- OpenCppCoverage
+- Domain Name or ngrok (For Self Hosted CI)
+- Workflow Actions services and Runners configured for Forgejo/Codeberg, GitHub or GitLab.
+- Jenkins and Java 11 (For Jenkins)
 
 ## Engine Plugins
 The following are built-in Engine plugins that are enabled in the Plugins window. Warning: some plugins may be Experimental or Beta software.
@@ -151,6 +145,10 @@ The following are built-in Engine plugins that are enabled in the Plugins window
 - PhysicsControl
 - DataRegistry
 - TargetingSystem
+
+## Third-Party Plugins
+The following plugins require cloning or downloading into your projects `Plugins` folder.
+- [Advanced Locomotion System Refactored](https://github.com/Sixze/ALS-Refactored/) ![GitHub Tag](https://img.shields.io/github/v/tag/Voidware-Prohibited/ALS-Refactored)
 
 # Installation
 [Complete Installation Instructions](../..//wiki/Installation/)
@@ -188,6 +186,21 @@ ALSXT is designed to be extremely configurable by with Data Assets. Most [Settin
 ## Gameplay Ability System
 Default [Character Abilities](/wiki/Settings/GameplayAbilities/) are defined by [Gameplay System Initialization Data](../..//wiki/Settings/GameplayAbilities/).
 
+# CI
+CI workflow YAML files are included for Forgejo/Codeberg, GitHub and GitLab. 
+
+`ue-plugin-ci` Build, Test, Code Coverage, Upload to Codecov, Update Changelog, Update Status. Activated with any push.
+`ue-plugin-ci-release` Build, Cook, Package, Test, Code Coverage, Upload to Codecov, Update Changelog, Update Status. Activated the a `v*` tag in the commit.
+
+
+## Automated Testing
+Provided Tests
+
+TODO
+
+## Code Coverage
+OpenCodeCoverage will perform Code Coverage analysis and publish and XML file as a Commit Artifact, and can optionally be uploaded to a configured Codecov account.
+
 # Asset Source Files
 
 - [ALSXT-Assets-Cascaduer](https://github.com/Voidware-Prohibited/ALSXT-Assets-Cascaduer/): Source Assets Cascaduer files
@@ -202,7 +215,7 @@ Contibutors and PRs are welcome! If you wish to contribute, please ensure you ar
 
 # License
 
-ALSXT is dual-licensed. It is available for absoultely free under the [MIT License](LICENSE.md) for most Individuals. If your organization, industry or application is listed in the [Commercial License](LICENSE-Commercial.md), please [Contact Us](https://voidwarex.com/contact/).
+This project is dual-licensed. It is available for absoultely free under the [MIT License](LICENSE.md) for most Individuals. If your organization, industry or application is listed in the [Commercial License](LICENSE-Commercial.md), please [Contact Us](https://voidwarex.com/contact/).
 
 Any git submodules are covered by their respective licenses. Content listed in the Attributions are covered by their respective licenses.
 
