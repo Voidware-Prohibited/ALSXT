@@ -70,11 +70,11 @@ ALSXT is a modular, GAS-based Unreal Engine 5 plugin that extends ALS-Refactored
 - GAS Gameplay Abilities - With Cost Gameplay Effects
 	- Nearly all existing Input Actions
 	- Movement Ability that can modify Regen Magnitudes
-	- Extended State Input Actions
-	- New Locomotion Actions: Slide, Flip, Hold Breath, Focus
+	- Extended State Input Actions: Combat Stance, Readiness, Weapon Ready Position, Canting, Leaning, Hold Breath, Focus, Freelook
+	- New Locomotion Actions: Slide, Flip
 	- Plus more
 - GAS Gameplay Effects
-	- Staus Effects, such as Injuries, that modify Movement Speed Magnitudes
+	- Staus Effects, such as Injuries, that modify Movement Speed Magnitudes and Locomotion animations
 	- Stamina Regen with Magnitude
 	- Hold Breath Regen with Magnitude
 - GAS Gameplay Attribute Sets
@@ -154,17 +154,16 @@ The following plugins require cloning or downloading into your projects `Plugins
 To enable vertex detection in packaged builds (required for line tracing, procedural mesh, or runtime vertex inspection), you must enable Allow CPU Access on each mesh. This setting ensures vertex data is not stripped during cooking, allowing CPU-based functions to read vertex buffers at runtime.
 
 For each Static Mesh:
-- Open the Static Mes in the Content Browser.
-- In the Details panel, check "Allow CPU Access".
-- Bulk Edit Meshes: For multiple meshes, select them in the Content Browser, right-click, and use Asset Actions > Bulk Edit via Property Matrix to enable this setting in bulk.
-- Rebuild/Repackage: Save the meshes and repackage the project for the changes to take effect in the build. 
+- Open the Static Mesh in the Content Browser.
+- In the Details panel, check "Allow CPU Access". This can also be performed in bulk with the Bulk Edit via Property Matrix command.
+- Rebuild/Repackage: Save the meshes and repackage the project for the changes to take effect in the build.
 
 ## CI System Requirements
 Systems performing Continous Intergration Workflows will have additional requirements depending on the CI solution used.
 - Git
 - OpenCppCoverage
 - Domain Name or ngrok (For Self Hosted CI)
-- Workflow Actions services and Runners configured for Forgejo/Codeberg, GitHub or GitLab.
+- Workflow Actions services and Runners configured for Forgejo/Codeberg, GitHub or GitLab
 - Jenkins and Java 11 (For Jenkins)
 
 # Installation
@@ -172,11 +171,11 @@ Systems performing Continous Intergration Workflows will have additional require
 
 **Quick Install**
 
-1. Install and setup (if required) all dependencies.
-2. Clone/download ALSXT into your projects Plugin folder.
-3. Integrate Config\DefaultEngine.ini into your projects DefaultEngine.ini.
-	1. Note: Various `SurfaceTypes` and a new `CollisionChannel` named `Transferrable` are required for the Footprints and Impact Effects to work. SurfaceTypes can be renamed and/or re-assigned in the respective effects Settings.
-4. (Re)Build Project with the `BuildPlugin.bat` Script or your IDE.
+1. Install and setup (if required) all dependencies
+2. Clone/download ALSXT into your projects Plugin folder
+3. Integrate Config\DefaultEngine.ini into your projects DefaultEngine.ini
+	1. Note: Various `SurfaceTypes` and a new `CollisionChannel` named `Transferrable` are required for the Footprints and Impact Effects to work. SurfaceTypes can be renamed and/or re-assigned in the respective effects Settings
+4. (Re)Build Project with the `BuildPlugin.bat` Script or your IDE
 5. Once compilation is successful you can now begin using ALSXT in your project
 
 ## Available Scripts
@@ -188,11 +187,11 @@ Systems performing Continous Intergration Workflows will have additional require
 Five(5) C++ Character classes and four(4) example Blueprint classes are provided, each with their respective feature-sets, defined by `AlsxtCharacterSettings`, `GameplaySystemInitalizationDataAsset` and any additional Actor Components Settings.
 
 ```
-AlsxtCharacter						  # Abstract Base Character Class. No Input Actions. Not Blueprintable.
-├──AlsxtCharacterPlayer/				# Uses Player State. Ability System Component (ASC) is located on the Player State.
-    ├── AlsxtCharacterPlayerAdvanced/   # Uses Player State. Ability System Component (ASC) is located on the Player State.
- ├──AlsxtCharacterNPC/				  # No Input Actions. Ability System Component (ASC) is located on the Character Class.
-    ├── AlsxtCharacterNPCAdvanced/	  # No Input Actions. Ability System Component (ASC) is located on the Character Class.
+AlsxtCharacter						  # Abstract Base Character Class. No Input Actions. Not Blueprintable
+├──AlsxtCharacterPlayer/				# Uses Player State. Ability System Component (ASC) is located on the Player State
+    ├── AlsxtCharacterPlayerAdvanced/   # Uses Player State. Ability System Component (ASC) is located on the Player State
+ ├──AlsxtCharacterNPC/				  # No Input Actions. Ability System Component (ASC) is located on the Character Class
+    ├── AlsxtCharacterNPCAdvanced/	  # No Input Actions. Ability System Component (ASC) is located on the Character Class
 ```
 
 Create a child C++ class or blueprint of any `AlsxtCharacter` subclass to create your own custom Character, or simply Copy and existing Blueprint class derived from any of these classes.
