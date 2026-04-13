@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "AlsxtGameplayAbilityBase.h"
+#include "Abilities/GameplayAbility.h"
+#include "Chooser.h"
 #include "AlsxtGameplayAbilityBreathing.generated.h"
 
 class UGameplayEffect;
@@ -24,5 +26,44 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Effects")
 	TSubclassOf<UGameplayEffect> BreathingEffect;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Effects")
+	FName VoiceSocketName = "HeadSocket";
+
 	FActiveGameplayEffectHandle ActiveEffectHandle;
+
+	// Chooser Table asset to define BreathState based on Stamina
+	UPROPERTY(EditDefaultsOnly, Category = "Breathing")
+	UChooserTable* BreathingChooser; 
+
+	// MetaSound asset
+	UPROPERTY(EditDefaultsOnly, Category = "Breathing")
+	USoundBase* BreathingMetaSound;
+
+	// Tags to deactivate breath
+	UPROPERTY(EditDefaultsOnly, Category = "Breathing")
+	FGameplayTagContainer HoldingBreathTags;
+
+	// Tags to deactivate breath
+	UPROPERTY(EditDefaultsOnly, Category = "Breathing")
+	FGameplayTagContainer HoldingBreathUnderwaterTags;
+
+	// Tags to deactivate breath
+	UPROPERTY(EditDefaultsOnly, Category = "Breathing")
+	FGameplayTagContainer DeactivationTags;
+
+private:
+	void OnStaminaChanged(const FOnAttributeChangeData& Data);
+	void OnDeactivationTagChanged(const FOnAttributeChangeData& Data);
+	void RefreshBreathingSounds(float CurrentStamina);
+    
+	// Ability Task handle for the persistent sound
+	UPROPERTY()
+	class UAudioComponent* ActiveBreathComponent;
+    
+	FDelegateHandle StaminaChangedDelegateHandle;
 };
+
+inline void UAlsxtGameplayAbilityBreathing::OnDeactivationTagChanged(const FOnAttributeChangeData& Data)
+{
+	
+}

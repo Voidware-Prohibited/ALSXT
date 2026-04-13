@@ -1,4 +1,7 @@
 <h1 align="center">ALSXT</h1>
+<p align="center">
+	<b>Seize the Means of Animation</b>
+</p>
 
 <p align="center">
 <img src="ALSXT.png" alt="ALSXT">
@@ -25,9 +28,9 @@
 > [!NOTE]
 > Following the acquisition of GitHub by Micro$lop, we have taken principled action and have begun primarily hosting code and content on [Codeberg](https://codeberg.org/Voidware-Prohibited/). Mirrors will still be maintained on [GitHub](https://github.com/Voidware-Prohibited/ALSXT/) and [GitLab](https://gitlab.com/Voidware-Prohibited/ALSXT/).
 
-An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based, Data-oriented, Character System with the Latest UE5 Features. The feature-set is informed the parent project [Target Vector](https://github.com/Voidware-Prohibited/TargetVector/).
+ALSXT is a modular, GAS-based Unreal Engine 5 plugin that extends ALS-Refactored into a cutting-edge Character System. ALSXT empowers developers with AAA animation and features like Character Customization, runtime Mesh Painting, Gameplay Camera System, Combat, Impact Reactions, and advanced Firearms mechanics with Procedural Aim and Recoil, all streamlined into a rapid, data-driven workflow, ensuring stability without sacrificing flexibility. A part of the [Target Vector](https://github.com/Voidware-Prohibited/TargetVector/) framework.
 
-[Wiki](../../wiki/) - [Documentation](https://alsxt.notion.site/2be59e501e7a4bf583437d1636bc7f2f?v=ac361eb5a6a14081892ff9a68e3e7a44/) - [ALSXT Notion](https://alsxt.notion.site/2be59e501e7a4bf583437d1636bc7f2f?v=ac361eb5a6a14081892ff9a68e3e7a44/) - [Submit Pull Request](https://codeberg.org/Voidware-Prohibited/ALSXT/pulls/) - [Twitter](https://x.com/ALSXT/) - [Discord](discord://colorindarkness/)
+[📚Wiki](../../wiki/) • [📘Documentation](https://alsxt.notion.site/2be59e501e7a4bf583437d1636bc7f2f?v=ac361eb5a6a14081892ff9a68e3e7a44/) • [📑ALSXT Notion](https://alsxt.notion.site/2be59e501e7a4bf583437d1636bc7f2f?v=ac361eb5a6a14081892ff9a68e3e7a44/) • [🐤Twitter](https://x.com/ALSXT/) • [🗨️Discord](discord://colorindarkness/)
 
 # Introduction
 - Generate truly unlimited, unique and immersive Characters with extensive States, deep Character Customization, Southpaw and support for blending multiple Locomotion and Overlay Layers.
@@ -54,7 +57,7 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 
 ## Improvements
 - Alsxt Character Movement Component - Expanded Movement Featurees and GAS Integration
-- Expanded Character States - Combat Stance, Sex, Variant, Weapon Ready Position, etc
+- Expanded Character States - Orthodox/Southpaw Stances, Locmotion Variants, Readiness, Weapon Ready Position, etc
 - Expanded Footprints System - Independent foot states, Saturation, Material Transfer, Vertex Paint Support(Static Mesh only, In Progress)
 
 ## New Features
@@ -65,11 +68,11 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 	- Gameplay Camera System Director
 	- Third and First Person Camera Rigs
 - GAS Gameplay Abilities - With Cost Gameplay Effects
-	- Nearly all exiting Input Actions
+	- Nearly all existing Input Actions
 	- Movement Ability that can modify Regen Magnitudes
 	- Extended State Input Actions
 	- New Locomotion Actions: Slide, Flip, Hold Breath, Focus
-	- + More
+	- Plus more
 - GAS Gameplay Effects
 	- Staus Effects, such as Injuries, that modify Movement Speed Magnitudes
 	- Stamina Regen with Magnitude
@@ -77,7 +80,7 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 - GAS Gameplay Attribute Sets
 	- Stamina
 	- Breath
-	- + More
+	- Plus more
 - Advanced Customizable and Paintable Master Materials for Characters and Objects
 
 ### Firearm Features
@@ -92,12 +95,12 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
 ## Features In Development
 - Smart Object based Generic Interaction System
 - Contextual Animation
-- Combat System
-- Impact Reactions (Blending reaction animations with Physical Animation)
+- Combat System with Targeting
+- Impact Reactions System
 - Physical Animation
 - Character Customization
 - Paintable Mesh Components
-- Character Sound Component
+- Character Sounds
 - Vaulting
 - Idle Animation Component
 
@@ -124,14 +127,6 @@ An Unreal Engine 5 plugin that extends ALS-Refactored into a Modular, GAS-based,
      - Untested: XCode (MacOS), Jetbrains Rider, VS Code, Visual Studio (Linux)
 - clang -20 13.0.1
 
-## CI System Requirements
-Systems performing Continous Intergration Workflows will have additional requirements depending on the CI solution used.
-- Git
-- OpenCppCoverage
-- Domain Name or ngrok (For Self Hosted CI)
-- Workflow Actions services and Runners configured for Forgejo/Codeberg, GitHub or GitLab.
-- Jenkins and Java 11 (For Jenkins)
-
 ## Engine Plugins
 The following are built-in Engine plugins that are enabled in the Plugins window. Warning: some plugins may be Experimental or Beta software.
 - [Gameplay Abilities](https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Plugins/GameplayAbilities/)
@@ -154,6 +149,23 @@ The following are built-in Engine plugins that are enabled in the Plugins window
 ## Third-Party Plugins
 The following plugins require cloning or downloading into your projects `Plugins` folder.
 - [Advanced Locomotion System Refactored](https://github.com/Sixze/ALS-Refactored/) ![GitHub Tag](https://img.shields.io/github/v/tag/Voidware-Prohibited/ALS-Refactored)
+
+## Vertex Detection
+To enable vertex detection in packaged builds (required for line tracing, procedural mesh, or runtime vertex inspection), you must enable Allow CPU Access on each mesh. This setting ensures vertex data is not stripped during cooking, allowing CPU-based functions to read vertex buffers at runtime.
+
+For each Static Mesh:
+- Open the Static Mes in the Content Browser.
+- In the Details panel, check "Allow CPU Access".
+- Bulk Edit Meshes: For multiple meshes, select them in the Content Browser, right-click, and use Asset Actions > Bulk Edit via Property Matrix to enable this setting in bulk.
+- Rebuild/Repackage: Save the meshes and repackage the project for the changes to take effect in the build. 
+
+## CI System Requirements
+Systems performing Continous Intergration Workflows will have additional requirements depending on the CI solution used.
+- Git
+- OpenCppCoverage
+- Domain Name or ngrok (For Self Hosted CI)
+- Workflow Actions services and Runners configured for Forgejo/Codeberg, GitHub or GitLab.
+- Jenkins and Java 11 (For Jenkins)
 
 # Installation
 [Complete Installation Instructions](../..//wiki/Installation/)
@@ -226,7 +238,6 @@ Any git submodules are covered by their respective licenses. Content listed in t
 
 # Attributions
 [ATTRIBUTIONS](ATTRIBUTIONS.md)
-
 
 # Special Thanks
 
