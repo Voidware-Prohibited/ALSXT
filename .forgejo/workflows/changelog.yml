@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0 # Required to fetch all tags and history
 
       - name: Generate Changelog
-        uses: https://github.com/orhun/git-cliff-action
+        uses: https://github.com
         with:
           config: cliff.toml
           args: --verbose
