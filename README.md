@@ -207,6 +207,7 @@ CI workflow YAML files are included for Forgejo/Codeberg, GitHub and GitLab.
 
 `ue-plugin-ci` Build, Test, Code Coverage, Upload to Codecov, Update Changelog, Update Status. Activated with any push.
 `ue-plugin-ci-release` Build, Cook, Package, Test, Code Coverage, Upload to Codecov, Update Changelog, Update Status. Activated the a `v*` tag in the commit.
+`changelog` Generates and commits CHANGELOG.md. Activated the a `v*` tag in the commit.
 
 
 ## Automated Testing
