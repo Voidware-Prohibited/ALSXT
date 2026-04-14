@@ -9,7 +9,7 @@ on:
 
 jobs:
   changelog:
-    runs-on: [docker, codeberg-tiny]
+    runs-on: [codeberg-tiny]
     permissions:
       contents: write  # Required to push the updated CHANGELOG.md
     steps:
