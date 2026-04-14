@@ -210,7 +210,7 @@ CI workflow YAML files are included for Forgejo/Codeberg, GitHub and GitLab.
 
 
 ## Automated Testing
-The provided tests can be run in an Action Workflow or run manually with RunUAT. Learn more about Unreal Engine Automated Testing in the [Run Automated Tests](dev.epicgames.com/documentation/unreal-engine/run-automation-tests-in-unreal-engine?lang=en-US) documentation.
+The provided tests can be run in an Action Workflow or run manually with RunUAT. Learn more about Unreal Engine Automated Testing in the [Run Automated Tests](https://dev.epicgames.com/documentation/unreal-engine/run-automation-tests-in-unreal-engine?lang=en-US) documentation.
 
 - `AlsxtTest_BasicMovement`
 
