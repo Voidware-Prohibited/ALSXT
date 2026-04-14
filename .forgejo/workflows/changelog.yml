@@ -19,8 +19,7 @@ jobs:
           fetch-depth: 0 # Required to fetch all tags and history
 
       - name: Generate Changelog
-        uses: orhun/git-cliff-action@v4
-        id: git-cliff
+        uses: https://github.com/orhun/git-cliff-action
         with:
           config: cliff.toml
           args: --verbose
@@ -32,5 +31,5 @@ jobs:
           git config user.name "forgejo-actions[bot]"
           git config user.email "forgejo-actions[bot]@noreply.localhost"
           git add CHANGELOG.md
-          git commit -m "chore: update CHANGELOG.md [skip ci]" || echo "No changes to commit"
+          git commit -m "Action: Update CHANGELOG.md [skip CI]" || echo "No changes to commit"
           git push origin main
