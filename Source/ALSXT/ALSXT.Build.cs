@@ -79,7 +79,7 @@ public class ALSXT : ModuleRules
 			"EngineSettings",
 			"PhysicsCore",
 			"Slate",
-			"SlateCore",
+			"SlateCore"
 		]);
 
 		if (Target.Type == TargetRules.TargetType.Editor)

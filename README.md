@@ -210,12 +210,12 @@ CI workflow YAML files are included for Forgejo/Codeberg, GitHub and GitLab.
 
 
 ## Automated Testing
-Provided Tests
+The provided tests can be run in an Action Workflow or run manually with RunUAT. Learn more about Unreal Engine Automated Testing in the [Run Automated Tests](dev.epicgames.com/documentation/unreal-engine/run-automation-tests-in-unreal-engine?lang=en-US) documentation.
 
-TODO
+- `AlsxtTest_BasicMovement`
 
 ## Code Coverage
-OpenCodeCoverage will perform Code Coverage analysis and publish and XML file as a Commit Artifact, and can optionally be uploaded to a configured Codecov account. You will need to generate an Access Token from your Codecov account and add it the the workflow YAML files.
+OpenCodeCoverage will perform Code Coverage analysis and publish and XML file as a Commit Artifact, and can optionally be uploaded to a configured Codecov account. You will need to first generate an Access Token from your Codecov account and add it your Forgejo/Codeberg, GitHub or GitLab Secrets as `CODECOV_TOKEN`.
 
 # Asset Source Files
 
