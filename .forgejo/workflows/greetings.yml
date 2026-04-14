@@ -8,11 +8,11 @@ on:
 
 jobs:
   greeting:
-    runs-on: docker
+    runs-on: codeberg-tiny
     steps:
       - name: Welcome New Contributor
         # You can use the GitHub action by prefixing it with the GitHub URL
-        uses: https://github.com
+        uses: actions/first-interaction@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           issue-message: "👋 Welcome! Thank you for opening your first issue here."
