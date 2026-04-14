@@ -24,7 +24,7 @@ bool FAlsxtSimulateMoveForward::Update()
 bool FAlsxtTest_BasicMovement::RunTest(const FString& Parameters)
 {
 	// 1. Load a basic test level or use current
-	AutomationOpenMap(TEXT("/Game/Maps/TestMap")); // Replace with your actual test map path
+	AutomationOpenMap(TEXT("/ALSXT/ALSExtras/Levels/L_TestMap")); // Replace with your actual test map path
 
 	UWorld* World = GEngine->GetWorldContexts()[0].World();
 	if (!World) return false;
