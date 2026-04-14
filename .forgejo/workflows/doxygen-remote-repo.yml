@@ -3,10 +3,10 @@ name: Deploy Doxygen to External Repo
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the main branch
+      - stable  # Trigger on pushes to the main branch
 
 jobs:
-  build-and-deploy:
+  generate-doxygen-remote:
     runs-on: codeberg-tiny
     steps:
       # 1. Checkout the source code
