@@ -31,5 +31,5 @@ jobs:
           git config user.name "forgejo-actions[bot]"
           git config user.email "forgejo-actions[bot]@noreply.localhost"
           git add CHANGELOG.md
-          git commit -m "Action: Update CHANGELOG.md [skip CI]" || echo "No changes to commit"
+          git commit -m "Action: Update CHANGELOG.md [skip CI]" || echo "Action Skipped: No changes to commit"
           git push origin main
