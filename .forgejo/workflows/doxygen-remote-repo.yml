@@ -26,7 +26,7 @@ jobs:
 
       # 4. Deploy to External Repository
       - name: Deploy to Target Repo
-        uses: https://github.com
+        uses: orhun/git-cliff-action@latest
         with:
           # Use a Personal Access Token (PAT) stored in Forgejo Secrets
           token: ${{ secrets.DOXYGEN_REPO_PAT }}
